@@ -39,6 +39,7 @@
             <MenuItem x:Name="uxMenuDatabase" IsEnabled="False" Header="Database">
                 <MenuItem x:Name="uxGetDbTables" Header="Get DB Tables" Click="GetDbTables_Click" />
                 <MenuItem x:Name="uxRefreshFromDB" Header="Refresh Canvases From DB" Click="RefreshFromDB_Click" />
+                <MenuItem x:Name="uxCompareToDB" Header="Compare to DB" Click="CompareToDB_Click" />
                 <Separator />
                 <MenuItem x:Name="uxForwardEngineer" Header="Forward Engineer" Click="ForwardEngineer_Click" />
                 <MenuItem x:Name="uxScriptChanges" Header="Script Changes" Click="ScriptDbChanges_Click" />

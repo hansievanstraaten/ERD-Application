@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="DatabaseModel.cs" />
     <Compile Include="AltDatabaseModel.cs" />
-    <Compile Include="BuildModels\EntityFrameworkModels\EntityFrameworkSetup.cs" />
     <Compile Include="ColumnObjectModel.cs" />
     <Compile Include="ColumnRelationMapModel.cs" />
     <Compile Include="DatabaseRelation.cs" />
@@ -73,5 +72,6 @@
       <Name>ERD.Base</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -44,6 +44,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compare\CompareResultModel.cs" />
+    <Compile Include="Compare\DatabaseCompare.cs" />
+    <Compile Include="Compare\ObjectActionEnum.cs" />
+    <Compile Include="Compare\ObjectTypeEnum.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataConverters.cs" />
     <Compile Include="Engineering\ForwardEngineer.cs" />

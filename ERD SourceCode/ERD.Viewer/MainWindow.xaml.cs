@@ -3,10 +3,11 @@ using ERD.Build;
 using ERD.Build.Models;
 using ERD.Common;
 using ERD.DatabaseScripts;
+using ERD.DatabaseScripts.Compare;
 using ERD.DatabaseScripts.Engineering;
 using ERD.Models;
-using ERD.Models.BuildModels.EntityFrameworkModels;
 using ERD.Viewer.Build;
+using ERD.Viewer.Comparer;
 using ERD.Viewer.Database;
 using ERD.Viewer.Tools;
 using GeneralExtensions;
@@ -220,7 +221,9 @@ namespace ERD.Viewer
     {
       try
       {
-        this.ReverseEngineer(sender);
+        MenuItem item = (MenuItem)e.Source;
+
+        this.ReverseEngineer(item);
       }
       catch (Exception err)
       {
@@ -232,7 +235,27 @@ namespace ERD.Viewer
     {
       try
       {
-        this.RefreshFromDB((MenuItem) sender);
+        MenuItem item = (MenuItem)e.Source;
+
+        this.RefreshFromDB(item);
+      }
+      catch (Exception err)
+      {
+        MessageBox.Show(err.GetFullExceptionMessage());
+      }
+      finally
+      {
+        Connections.SetDefaultConnection();
+      }
+    }
+
+    private void CompareToDB_Click(object sender, RoutedEventArgs e)
+    {
+      try
+      {
+        MenuItem item = (MenuItem)e.Source;
+        
+        this.ComapreToDatabase(item);
       }
       catch (Exception err)
       {
@@ -248,7 +271,9 @@ namespace ERD.Viewer
     {
       try
       {
-        Connections.SetConnection((MenuItem)sender);
+        MenuItem item = (MenuItem)e.Source;
+
+        Connections.SetConnection(item);
 
         ForwardEngineer forward = new ForwardEngineer();
 
@@ -647,6 +672,61 @@ namespace ERD.Viewer
       }
     }
 
+    private async void ComapreToDatabase(MenuItem sender)
+    {
+      try
+      {
+        MessageBox.Show($"NOTE: THIS FUNCTION IS STILL UNDER WIP,{Environment.NewLine}and lacks scripting functionality.");
+
+        Connections.SetConnection(sender);
+
+        DatabaseCompare comparer = new DatabaseCompare(this.Dispatcher);
+
+        List<TableModel> tablesList = new List<TableModel>();
+
+        List<CompareResultModel> result = null;
+        
+        foreach (ErdCanvasModel canvas in this.canvasDictionary.Values)
+        {
+          tablesList.AddRange(canvas.SegmentTables);
+        }
+
+        foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => !((TableMenuItem)t).TableModelObject.IsDeleted))
+        {
+          if (!tablesList.Any(ta => ta.TableName == menuItem.TableName))
+          {
+            tablesList.Add(menuItem.TableModelObject);
+          }
+        }
+
+        await Task.Factory.StartNew(() =>
+        {
+          result = comparer.RunComparison(tablesList);
+        });
+
+        if (result.Count == 0)
+        {
+          MessageBox.Show("No Differences found between Database and ERD Model.");
+
+          return;
+        }
+
+        CompreResults compare = new CompreResults(result);
+
+        compare.AutoSize = true;
+
+        compare.Owner = this;
+
+        compare.Topmost = true;
+
+        compare.Show();
+      }
+      catch (Exception err)
+      {
+        MessageBox.Show(err.InnerExceptionMessage());
+      }
+    }
+
     private async void OpenProject(string fileName)
     {
       try
@@ -941,6 +1021,8 @@ namespace ERD.Viewer
 
           MenuItem defaultRefreshItem = new MenuItem {Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName};
 
+          MenuItem defaultCompareItem = new MenuItem { Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName };
+
           MenuItem defaultForwardItem = new MenuItem {Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName};
 
           defaultReverseItem.Click += this.GetDbTables_Click;
@@ -952,6 +1034,8 @@ namespace ERD.Viewer
           this.uxGetDbTables.Items.Add(defaultReverseItem);
 
           this.uxRefreshFromDB.Items.Add(defaultRefreshItem);
+
+          this.uxCompareToDB.Items.Add(defaultCompareItem);
 
           this.uxForwardEngineer.Items.Add(defaultForwardItem);
         }
@@ -969,6 +1053,8 @@ namespace ERD.Viewer
 
           MenuItem refreshItem = new MenuItem {Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key};
 
+          MenuItem compareItem = new MenuItem { Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key };
+
           MenuItem forwardItem = new MenuItem {Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key};
 
           reverseItem.Click += this.GetDbTables_Click;
@@ -980,6 +1066,8 @@ namespace ERD.Viewer
           this.uxGetDbTables.Items.Add(reverseItem);
 
           this.uxRefreshFromDB.Items.Add(refreshItem);
+
+          this.uxCompareToDB.Items.Add(compareItem);
 
           this.uxForwardEngineer.Items.Add(forwardItem);
         }
@@ -1074,5 +1162,7 @@ namespace ERD.Viewer
         this.uxToolsStack.Children.Add(vertualRelation);
       }
     }
+
+    
   }
 }

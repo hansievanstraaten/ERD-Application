@@ -107,6 +107,9 @@
     <Compile Include="Columns\ColumnsEdit.xaml.cs">
       <DependentUpon>ColumnsEdit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Comparer\CompreResults.xaml.cs">
+      <DependentUpon>CompreResults.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Database\BrowseData.xaml.cs">
       <DependentUpon>BrowseData.xaml</DependentUpon>
     </Compile>
@@ -158,6 +161,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Columns\ColumnsEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comparer\CompreResults.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

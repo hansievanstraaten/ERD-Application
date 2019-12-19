@@ -1,0 +1,84 @@
+﻿<src:WindowBase x:Class="ERD.Viewer.MainWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"
+                xmlns:Specialized="clr-namespace:WPF.Tools.Specialized;assembly=WPF.Tools"
+                xmlns:TabControl="clr-namespace:WPF.Tools.TabControl;assembly=WPF.Tools"
+                mc:Ignorable="d"
+                Title="ViSo-nice ERD" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" MinHeight="26" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="150" />
+            <ColumnDefinition Width="3" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Menu x:Name="uxMainMenu" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
+            <MenuItem Header="File">
+                <MenuItem x:Name="uxNewProject" Header="New Project" Click="NewProject_Click"/>
+                <MenuItem x:Name="uxOpenProject" Header="Open Project" Click="OpenProject_Click"/>
+                <Separator/>
+                <MenuItem x:Name="uxMenuSaveProject" IsEnabled="False" Header="Save Project" Click="Save_Click"/>
+                <Separator/>
+                <MenuItem x:Name="uxExit" Header="Exit" Click="ExitProject_Click"/>
+            </MenuItem>
+            <MenuItem x:Name="uxMenuProject" IsEnabled="False" Header="Project">
+                <MenuItem Header="Edit Project" Click="EditProject_Click" />
+                <Separator />
+                <MenuItem Header="Add Project Canvas" Click="AddCanvas_Click" />
+            </MenuItem>
+            <MenuItem x:Name="uxMenuDatabase" IsEnabled="False" Header="Database">
+                <MenuItem x:Name="uxGetDbTables" Header="Get DB Tables" Click="GetDbTables_Click" />
+                <MenuItem x:Name="uxRefreshFromDB" Header="Refresh Canvases From DB" Click="RefreshFromDB_Click" />
+                <Separator />
+                <MenuItem x:Name="uxForwardEngineer" Header="Forward Engineer" Click="ForwardEngineer_Click" />
+                <MenuItem x:Name="uxScriptChanges" Header="Script Changes" Click="ScriptDbChanges_Click" />
+            </MenuItem>
+            <MenuItem x:Name="uxMenuBuild" IsEnabled="False" Header="Build">
+                <MenuItem x:Name="uxMenuBuildSetup" Header="Script Builder Setup" Click="ScriptBuildSetup_Click" />
+                <MenuItem x:Name="uxMenuBuildRun" Header="Run Script Builder" Click="ScriptBuildRun_Click" />
+            </MenuItem>
+        </Menu>
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="3" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ScrollViewer Grid.Row="0">
+                <StackPanel x:Name="uxToolsStack" Orientation="Vertical">
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <CommonControls:HorizontalGridSplit Grid.Row="1" />
+
+            <CommonControls:LableItem Grid.Row="2" Content="Database Tables" FontWeight="Bold" />
+
+            <Specialized:WatermarkTextBox x:Name="uxTableSearch" Grid.Row="3" WatermarkText="Search Tables" OnTextChanged="TableSearch_Changed" />
+
+            <ScrollViewer Grid.Row="4">
+                <StackPanel x:Name="uxTableStack" Orientation="Vertical" />
+            </ScrollViewer>
+        </Grid>
+
+        <CommonControls:VerticalGridSplit Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" />
+
+        <TabControl:TabControl x:Name="uxTabControl" Grid.Row="1" Grid.Column="2" />
+
+        <Specialized:MessageLabel x:Name="uxMessage" Grid.Row="2" Grid.Column="2" Foreground="DarkRed"  HorizontalContentAlignment="Right" />
+    </Grid>
+</src:WindowBase>

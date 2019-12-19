@@ -1,0 +1,46 @@
+﻿<src:UserControlBase xmlns:DataGridObjects="clr-namespace:WPF.Tools.DataGridObjects;assembly=WPF.Tools"  
+                     x:Class="ERD.Viewer.Tools.TableObject"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                      xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"
+                      Title="Table"
+                     mc:Ignorable="d" 
+                     d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <CommonControls:LableItem x:Name="uxTableName" Grid.Row="0" Background="LightGray" DisplayUnderscore="True" />
+
+        <DataGridObjects:ViSoDataGrid  x:Name="uxTableDataGrid" Grid.Row="1" ItemsSource="{Binding Table.Columns}" SelectedItem="{Binding SelectedColumn}" 
+              AutoGenerateColumns="False" 
+              CanUserSortColumns="False" 
+              CanUserReorderColumns="False"
+              CanUserAddRows="True">
+            <DataGrid.Columns>
+
+                <DataGridTextColumn Header="PK" Binding="{Binding KeyColumn}" IsReadOnly="True" />
+
+                <DataGridTextColumn Header="FK" Binding="{Binding ForeignKeyColumnValue}" IsReadOnly="True" />
+
+                <DataGridTextColumn Header="Column Name" Binding="{Binding ColumnName}" IsReadOnly="True" />
+
+                <DataGridTextColumn Header="Data Type" Binding="{Binding DataType}" IsReadOnly="True" />
+
+                <DataGridCheckBoxColumn Header="Allow Null" Binding="{Binding AllowNulls}" IsReadOnly="True" />
+
+            </DataGrid.Columns>
+        </DataGridObjects:ViSoDataGrid>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="2">
+            <CommonControls:ActionButton ResourceImageName="Add" Click="MenuAddColumn_Clicked" />
+        </StackPanel>
+
+    </Grid>
+</src:UserControlBase>

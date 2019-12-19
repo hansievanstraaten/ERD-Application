@@ -1,0 +1,54 @@
+﻿<UserControl xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls" 
+             x:Class="WPF.Tools.Indicators.ValueMeter"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPF.Tools.Indicators"
+             Background="White"
+             mc:Ignorable="d"
+             d:DesignHeight="100" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26" />
+            <RowDefinition Height="46" />
+            <RowDefinition Height="26" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <CommonControls:LableItem x:Name="uxTitle" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Content="Title" FontWeight="SemiBold" Margin="15,0,0,0" />
+
+        <CommonControls:LableItem x:Name="uxStateMin" Grid.Row="1" Grid.Column="0" Content="0%" FontWeight="SemiBold" Margin="15,11,5,0" />
+
+        <Grid Grid.Row="1" Grid.Column="1" x:Name="uxRangeGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="uxSafeRange" Width="50*" />
+                <ColumnDefinition x:Name="uxWarningRange" Width="30*" />
+                <ColumnDefinition x:Name="uxDangerRange" Width="20*" />
+            </Grid.ColumnDefinitions>
+            
+            <CommonControls:LableItem x:Name="uxSafeColour" Grid.Column="0" Background="#FF24FC24" Height="10" />
+            
+            <CommonControls:LableItem x:Name="uxWarningColour" Grid.Column="1" Background="#FFFCB024" Height="10" />
+            
+            <CommonControls:LableItem x:Name="uxDangerColour" Grid.Column="2" Background="#FFFD2626" Height="10" />
+        </Grid>
+
+        <CommonControls:LableItem x:Name="uxRangeOverlay" Grid.Row="1" Grid.Column="1"
+                                  Background="White" 
+                                  Height="20"
+                                  Width="200"
+                                  HorizontalAlignment="Right"/>
+
+        <CommonControls:LableItem x:Name="uxStateMax" Grid.Row="1" Grid.Column="2" Content="100%" FontWeight="SemiBold" Margin="5,11,15,0" />
+
+        <CommonControls:LableItem x:Name="uxStateValue" Grid.Row="2" Grid.Column="1" Content="0 of 100%" 
+                                  FontWeight="SemiBold" HorizontalAlignment="Center"/>
+
+    </Grid>
+</UserControl>

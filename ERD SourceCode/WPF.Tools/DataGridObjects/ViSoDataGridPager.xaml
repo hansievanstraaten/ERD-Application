@@ -1,0 +1,26 @@
+﻿<src:UserControlBase xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls" 
+                     xmlns:src="clr-namespace:WPF.Tools.BaseClasses"
+                     x:Class="WPF.Tools.DataGridObjects.ViSoDataGridPager"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                     xmlns:local="clr-namespace:WPF.Tools.DataGridObjects"
+                     mc:Ignorable="d" 
+                     Title="Data Grid"
+                     d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+            <CommonControls:ActionButton x:Name="uxButtonLeft" ResourceImageName="ArrowLeft" Width="26" Height="26" Click="LeftButton_Clicked" />
+            <CommonControls:LableItem x:Name="uxRecordsLable" Content="No Records Found" Margin="5" Width="110" HorizontalContentAlignment="Center" />
+            <CommonControls:ActionButton x:Name="uxButtonRight" ResourceImageName="ArrowRight" Width="26" Height="26" Click="RightButton_Clicked"  />
+            <CommonControls:ComboBoxTool x:Name="uxPageNumbers" Margin="5" MinWidth="100" SelectionChanged="PageNumbers_Changed" />
+            <CommonControls:LableItem x:Name="uxSearhLabel" Content="Search Records" Margin="5" />
+            <CommonControls:TextBoxItem x:Name="uxSearchTextBox" Margin="5" MinWidth="150" TextChanged="SearchText_Changed" />
+            <CommonControls:LableItem Content="Rows per Page" Margin="5" />
+            <CommonControls:ComboBoxTool x:Name="uxPageSize" Margin="5" SelectionChanged="PageSize_Changed" MinWidth="100" />
+        </StackPanel>
+            
+    </Grid>
+</src:UserControlBase>

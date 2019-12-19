@@ -1,0 +1,32 @@
+﻿<UserControl xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls" 
+             xmlns:Paneling="clr-namespace:WPF.Tools.Paneling" 
+             x:Class="WPF.Tools.TabControl.TabControlVertical"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPF.Tools.TabControl"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid x:Name="uxMainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" x:Name="uxColumnLeft" />
+            <ColumnDefinition Width="*" x:Name="uxColumnRight"/>
+        </Grid.ColumnDefinitions>
+
+        <WrapPanel x:Name="uxTabs" Grid.Column="0" Grid.Row="0" Orientation="Vertical" VerticalAlignment="Stretch" MinWidth="15" />
+
+        <Popup x:Name="uxPopupContent" PlacementTarget="{Binding ElementName=uxTabs}" Placement="Right" >
+            <Paneling:PinPanel x:Name="uxContent" PinChanged="ContentPin_Changed" 
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
+        </Popup>
+
+        <ContentControl Grid.Row="0" Grid.Column="1" x:Name="uxGridContent" />
+        
+    </Grid>
+</UserControl>

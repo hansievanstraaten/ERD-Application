@@ -1,0 +1,37 @@
+﻿<src:WindowBase xmlns:TabControl="clr-namespace:WPF.Tools.TabControl;assembly=WPF.Tools"  
+                xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
+                x:Class="ERD.Viewer.Build.BuildSetup"
+                xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:local="clr-namespace:ERD.Viewer.Build"
+                Closing="BuildSetup_Closing"
+                Title="Build Setup"
+                WindowState="Maximized"
+                mc:Ignorable="d" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            <CommonControls:ActionButton ResourceImageName="Save" ToolTip="save" Click="Save_Click" />
+            <CommonControls:ActionButton ResourceImageName="Add" ToolTip="Add Build Option" Click="TabAdd_Click" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" x:Name="uxParametersList">
+            <CommonControls:LableItem Content="Script Argument Parameters" FontWeight="Bold" />
+        </StackPanel>
+
+        <TabControl:TabControl Grid.Row="0" Grid.Column="2" x:Name="uxTabs" />
+        
+    </Grid>
+</src:WindowBase>

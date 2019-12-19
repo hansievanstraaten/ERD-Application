@@ -1,0 +1,325 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7B2EBA4D-44AD-4703-8F18-3A4FBC380EA5}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>ERD.Viewer</RootNamespace>
+    <AssemblyName>ERD.Viewer</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>C:\AAA\Hansie\Publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <UpdateUrl>http://localhost:8081/ERD.Viewer/</UpdateUrl>
+    <AutorunEnabled>true</AutorunEnabled>
+    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Win32Resource>
+    </Win32Resource>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>ViSo_nice.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>EB2E9624B72B992ADD2ADAF6C60F7D3E19EC50E8</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>ERD.Viewer_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Build\BuildOption.xaml.cs">
+      <DependentUpon>BuildOption.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Build\BuildSetup.xaml.cs">
+      <DependentUpon>BuildSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Columns\ColumnsEdit.xaml.cs">
+      <DependentUpon>ColumnsEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\BrowseData.xaml.cs">
+      <DependentUpon>BrowseData.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\TableQueryBuilder.cs" />
+    <Compile Include="Database\UserNameAndPassword.xaml.cs">
+      <DependentUpon>UserNameAndPassword.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ObjectViewer.xaml.cs">
+      <DependentUpon>ObjectViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tables\SelectedTables.xaml.cs">
+      <DependentUpon>SelectedTables.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tables\TableEdit.xaml.cs">
+      <DependentUpon>TableEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditor.xaml.cs">
+      <DependentUpon>TextEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Common\ProgressResponce.xaml.cs">
+      <DependentUpon>ProgressResponce.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\ErdTabSetup.xaml.cs">
+      <DependentUpon>ErdTabSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\RelationMenuItem.xaml.cs">
+      <DependentUpon>RelationMenuItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Relations\RelationEditor.xaml.cs">
+      <DependentUpon>RelationEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\TableCanvas.xaml.cs">
+      <DependentUpon>TableCanvas.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\TableMenuItem.xaml.cs">
+      <DependentUpon>TableMenuItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\TableObject.xaml.cs">
+      <DependentUpon>TableObject.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\TableWorkingCanvas.cs" />
+    <Page Include="Build\BuildOption.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Build\BuildSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Columns\ColumnsEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Database\BrowseData.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Database\UserNameAndPassword.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="ObjectViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProjectSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tables\SelectedTables.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tables\TableEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\Common\ProgressResponce.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\ErdTabSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\RelationMenuItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\Relations\RelationEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\TableCanvas.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\TableMenuItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\TableObject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ProjectSetup.xaml.cs">
+      <DependentUpon>ProjectSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ERD.Base\ERD.Base.csproj">
+      <Project>{2a61a104-cb60-4d3e-b4b4-38d4c822babb}</Project>
+      <Name>ERD.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ERD.Build\ERD.Build.csproj">
+      <Project>{cf535f09-25be-488d-86a4-7fa9ecd4a25a}</Project>
+      <Name>ERD.Build</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ERD.Common\ERD.Common.csproj">
+      <Project>{719be630-883f-4009-abfe-3d0965018d4b}</Project>
+      <Name>ERD.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj">
+      <Project>{42d76052-8d0d-4571-8d65-861b7bb5cb6d}</Project>
+      <Name>ERD.DatabaseScripts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ERD.Models\ERD.Models.csproj">
+      <Project>{a3a6b6f4-1959-4a99-a5ca-472bc1b605ea}</Project>
+      <Name>ERD.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj">
+      <Project>{df72187c-d643-4e5f-af68-190c023930a9}</Project>
+      <Name>GeneralExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IconSet\IconSet.csproj">
+      <Project>{8ae0a307-a872-4d6d-a58e-31d28ce5b89d}</Project>
+      <Name>IconSet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViSo.Common\ViSo.Common.csproj">
+      <Project>{cfb74caf-b98c-4387-94e3-ae9afbe16b7e}</Project>
+      <Name>ViSo.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViSo.Dialogs\ViSo.Dialogs.csproj">
+      <Project>{53c1d2ae-46e4-428f-80fb-7e1b238a2276}</Project>
+      <Name>ViSo.Dialogs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj">
+      <Project>{44340843-a61b-4a2b-99d8-7142bf456d85}</Project>
+      <Name>ViSo.SharedEnums</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj">
+      <Project>{53799c60-aa9d-4deb-86e0-8e70dd1844f3}</Project>
+      <Name>WPF.Tools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ViSo_nice.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

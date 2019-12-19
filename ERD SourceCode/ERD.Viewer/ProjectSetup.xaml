@@ -1,0 +1,35 @@
+﻿<src:WindowBase x:Class="ERD.Viewer.ProjectSetup"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"
+                xmlns:ModelViewer="clr-namespace:WPF.Tools.ModelViewer;assembly=WPF.Tools"
+                mc:Ignorable="d"
+                Title="Project Setup" Height="450" Width="800">
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="3" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    
+    <StackPanel x:Name="uxMenuStack" Grid.Column="0">
+      <CommonControls:ActionButton ResourceImageName="Accept"  Click="Accept_Click" />
+      <CommonControls:ActionButton ResourceImageName="Add"  Click="AddConnection_Click" ToolTip="Add Alternative Connection" />
+    </StackPanel>
+
+    <ScrollViewer Grid.Column="1">
+      <ModelViewer:ModelViewer x:Name="uxProjectSetup"  />
+    </ScrollViewer>
+    
+    <CommonControls:VerticalGridSplit Grid.Column="2" />
+
+    <ScrollViewer Grid.Column="3">
+      <ModelViewer:ModelViewer x:Name="uxAlternativeConnections" />
+    </ScrollViewer>
+    </Grid>
+</src:WindowBase>

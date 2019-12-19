@@ -1,0 +1,37 @@
+﻿<src:WindowBase xmlns:DataGridObjects="clr-namespace:WPF.Tools.DataGridObjects;assembly=WPF.Tools"  xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
+                xmlns:Specialized="clr-namespace:WPF.Tools.Specialized;assembly=WPF.Tools"  
+                x:Class="ERD.Viewer.Database.BrowseData"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                mc:Ignorable="d"
+                Title="Browse" Height="450" Width="800">
+  <Grid>
+    <Grid.RowDefinitions>
+      <!--<RowDefinition Height="Auto" MaxHeight="250" />
+      <RowDefinition Height="3" />-->
+      <RowDefinition x:Name="uxColumn0" Height="0" MaxHeight="0" />
+      <RowDefinition x:Name="uxColumn1" Height="0" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    
+    <Specialized:WatermarkTextBox x:Name="uxSqlQuery" Grid.Row="0"
+                                  IsMultiline="True"
+                                  HorizontalAlignment="Stretch"
+                                  RaiseActionKeyEvent="True" 
+                                  ActionKeyPresed="SqlQuert_Action" 
+                                  IsSpellCheckerDisabled="True"/>
+
+    <CommonControls:HorizontalGridSplit Grid.Row="1" />
+   
+    <DataGridObjects:ViSoDataGrid Grid.Row="2" x:Name="uxViewGrid" ItemsSource="{Binding QueryResults}" CanUserAddRows="False" CanUserDeleteRows="False" />
+      
+    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Specialized:MessageLabel x:Name="uxMessage" Margin="5"  />
+      <CommonControls:LableItem x:Name="uxRowCount" Margin="5" />
+    </StackPanel>
+  </Grid>
+</src:WindowBase>

@@ -1,0 +1,25 @@
+﻿<src:UserControlBase xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools" 
+                     x:Class="ViSo.Dialogs.TextEditor.TextEditorControl"
+                     xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                     xmlns:local="clr-namespace:ViSo.Dialogs.TextEditor"
+                     Title="Text Editor"
+                     MinHeight="350"
+                     MinWidth="400"
+                     x:ClassModifier="internal"
+                     mc:Ignorable="d" 
+                     d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <CommonControls:TextBoxItem x:Name="uxText" Grid.Column="1" 
+                                    TextWrapping="Wrap" 
+                                    AcceptsReturn="True" 
+                                    AcceptsTab="True"
+                                    HorizontalScrollBarVisibility="Auto"
+                                    VerticalScrollBarVisibility="Auto"
+                                    HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Stretch" />    
+    </Grid>
+</src:UserControlBase>

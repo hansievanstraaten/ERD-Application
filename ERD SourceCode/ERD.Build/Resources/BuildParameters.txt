@@ -1,0 +1,9 @@
+[[CanvasName]]=Replaces with the Tab Name.,
+[[TableName]]=Replaces with the Table Name.,
+[[PrimaryKey]]=Replaces with the Primary Key(s) in Table.,
+[[ForeignKey]]=Replaces with the Foreign Key(s) in Table.,
+[[ColumnName]]=Replaces with the Column Name.,
+[[DataType]]=Replaces with the Column Data Type.,
+[[ColumnFriendlyName]]=Replaces with the Column Friendly Name.,
+[[ColumnDescription]]=Replaces with the Column Description.,
+[[?*]]=Removes the last occurrence of the specified parameter and replaces the pre-ceding instances with the character specified as the '*'.

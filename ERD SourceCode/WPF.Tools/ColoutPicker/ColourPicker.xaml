@@ -1,0 +1,52 @@
+﻿<src:WindowBase xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls"  x:Class="WPF.Tools.ColoutPicker.ColourPicker"
+                xmlns:src="clr-namespace:WPF.Tools.BaseClasses"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                xmlns:local="clr-namespace:WPF.Tools.ColoutPicker"
+                Title="Color Picker"
+                mc:Ignorable="d" 
+                d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <CommonControls:ActionButton Grid.Row="0" Grid.Column="0" Width="26" Height="26" Margin="15" Background="DarkRed" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="1" Grid.Column="0" Width="26" Height="26" Margin="15" Background="Red" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="2" Grid.Column="0" Width="26" Height="26" Margin="15" Background="Orange" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="3" Grid.Column="0" Width="26" Height="26" Margin="15" Background="Yellow" Click="Colour_Clicked" />
+        
+        <CommonControls:ActionButton Grid.Row="0" Grid.Column="1" Width="26" Height="26" Margin="15" Background="DarkBlue" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="1" Grid.Column="1" Width="26" Height="26" Margin="15" Background="Blue" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="2" Grid.Column="1" Width="26" Height="26" Margin="15" Background="LightBlue" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="3" Grid.Column="1" Width="26" Height="26" Margin="15" Background="AliceBlue" Click="Colour_Clicked" />
+        
+        <CommonControls:ActionButton Grid.Row="0" Grid.Column="2" Width="26" Height="26" Margin="15" Background="DarkGreen" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="1" Grid.Column="2" Width="26" Height="26" Margin="15" Background="SeaGreen" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="2" Grid.Column="2" Width="26" Height="26" Margin="15" Background="Green" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="3" Grid.Column="2" Width="26" Height="26" Margin="15" Background="LightGreen" Click="Colour_Clicked" />
+
+        <CommonControls:ActionButton Grid.Row="0" Grid.Column="3" Width="26" Height="26" Margin="15" Background="Black" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="1" Grid.Column="3" Width="26" Height="26" Margin="15" Background="Gray" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="2" Grid.Column="3" Width="26" Height="26" Margin="15" Background="LightGray" Click="Colour_Clicked" />
+        <CommonControls:ActionButton Grid.Row="3" Grid.Column="3" Width="26" Height="26" Margin="15" Background="White" Click="Colour_Clicked" 
+                                     BorderThickness="1" BorderBrush="Black" />
+
+        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <CommonControls:ActionButton Content="Cancel" Click="Cancel_Clicked" Margin="0,0,15,0"  />
+        </StackPanel>
+    </Grid>
+</src:WindowBase>

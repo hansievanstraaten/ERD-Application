@@ -1,0 +1,9 @@
+﻿<src:ApplicationBase x:Class="ERD.Viewer.App"
+                     xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"  
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:local="clr-namespace:ERD.Viewer"
+                     StartupUri="MainWindow.xaml" Exit="ApplicationBase_Exit">  
+  <Application.Resources>
+    </Application.Resources>
+</src:ApplicationBase>

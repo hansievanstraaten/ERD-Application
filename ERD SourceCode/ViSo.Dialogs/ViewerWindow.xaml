@@ -1,0 +1,27 @@
+﻿<src:WindowBase xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
+                xmlns:ModelViewer="clr-namespace:WPF.Tools.ModelViewer;assembly=WPF.Tools" 
+                xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                x:Class="ViSo.Dialogs.ViewerWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:local="clr-namespace:ViSo.Dialogs"
+                mc:Ignorable="d"
+                Title="Viewer Window" Height="450" Width="800" MaxHeight="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <ModelViewer:ModelViewer x:Name="uxViewer"  ModelViewItemBrowse="ModelItem_Browse" />
+        </ScrollViewer>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
+            <CommonControls:ActionButton Content="OK" Margin="2" Click="OkButton_Clicked" />
+            <CommonControls:ActionButton Content="Cancel" Margin="2" Click="Cancel_Cliked" />
+        </StackPanel>
+    </Grid>
+</src:WindowBase>

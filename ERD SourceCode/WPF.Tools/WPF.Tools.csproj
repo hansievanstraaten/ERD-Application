@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{53799C60-AA9D-4DEB-86E0-8E70DD1844F3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WPF.Tools</RootNamespace>
+    <AssemblyName>WPF.Tools</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\BrowseButtonAttribute.cs" />
+    <Compile Include="Attributes\ItemTypeAttribute.cs" />
+    <Compile Include="Attributes\FieldInformationAttribute.cs" />
+    <Compile Include="Attributes\ModelNameAttribute.cs" />
+    <Compile Include="Attributes\ValuesSourceAttribute.cs" />
+    <Compile Include="BaseClasses\ApplicationBase.cs" />
+    <Compile Include="BaseClasses\BaseInstance.cs" />
+    <Compile Include="BaseClasses\ControlBase.cs" />
+    <Compile Include="BaseClasses\GridSplitterBase.cs" />
+    <Compile Include="BaseClasses\ModelsBase.cs" />
+    <Compile Include="BaseClasses\Propertyname.cs" />
+    <Compile Include="BaseClasses\UserControlBase.cs" />
+    <Compile Include="BaseClasses\WindowBase.cs" />
+    <Compile Include="Collections\DataItemsCollection.cs" />
+    <Compile Include="Collections\ItemsCollection.cs" />
+    <Compile Include="ColoutPicker\ColourPicker.xaml.cs">
+      <DependentUpon>ColourPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CommonControls\ActionButton.cs" />
+    <Compile Include="CommonControls\CheckBoxItem.cs" />
+    <Compile Include="CommonControls\ComboBoxTool.cs" />
+    <Compile Include="CommonControls\HorizontalGridSplit.cs" />
+    <Compile Include="CommonControls\LableItem.cs" />
+    <Compile Include="CommonControls\ScrollViewerPanable.cs" />
+    <Compile Include="CommonControls\TextBoxItem.cs" />
+    <Compile Include="CommonControls\TreeViewItemTool.cs" />
+    <Compile Include="CommonControls\VerticalGridSplit.cs" />
+    <Compile Include="CommonControls\ViSoTreeView.cs" />
+    <Compile Include="Converters\ColorConverter.cs" />
+    <Compile Include="DataGridObjects\DataGridPagerObjectsCollection.cs" />
+    <Compile Include="DataGridObjects\ViSoDataGrid.cs" />
+    <Compile Include="DataGridObjects\ViSoDataGridPager.xaml.cs">
+      <DependentUpon>ViSoDataGridPager.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dictionaries\TranslationDictionary.cs" />
+    <Compile Include="Exstention\ComboBoxExstentions.cs" />
+    <Compile Include="Exstention\DataGridExstentions.cs" />
+    <Compile Include="Exstention\EnumirationExstentions.cs" />
+    <Compile Include="Exstention\UIElmentExstentions.cs" />
+    <Compile Include="Functions\EventParser.cs" />
+    <Compile Include="Functions\Sleep.cs" />
+    <Compile Include="Functions\ViSoGlobalization.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HTML\HTMLEditor.xaml.cs">
+      <DependentUpon>HTMLEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HTML\HyperlinkEdit.xaml.cs">
+      <DependentUpon>HyperlinkEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HTML\Models\HyperLinkModel.cs" />
+    <Compile Include="HTML\ResizingAdorner.cs" />
+    <Compile Include="Indicators\MeterUnitTypeEnum.cs" />
+    <Compile Include="Indicators\ValueMeter.xaml.cs">
+      <DependentUpon>ValueMeter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ModelViewer\ModelItemTypeEnum.cs" />
+    <Compile Include="ModelViewer\ModelViewer.cs" />
+    <Compile Include="ModelViewer\ModelViewerToolTip.cs" />
+    <Compile Include="ModelViewer\ModelViewObject.xaml.cs">
+      <DependentUpon>ModelViewObject.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ModelViewer\ValidationRules\IsRequiredValidationRule.cs" />
+    <Compile Include="ModelViewer\ModelViewItem.xaml.cs">
+      <DependentUpon>ModelViewItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Paneling\PinPanel.xaml.cs">
+      <DependentUpon>PinPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Specialized\DirectionButton.cs" />
+    <Compile Include="Specialized\FlashableLabel.cs" />
+    <Compile Include="Specialized\HighlightRitchTextBox.cs" />
+    <Compile Include="Specialized\MessageLabel.cs" />
+    <Compile Include="Specialized\PasswordBoxBindable.xaml.cs">
+      <DependentUpon>PasswordBoxBindable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Specialized\WatermarkTextBox.cs" />
+    <Compile Include="Stacks\ButtonStack.cs" />
+    <Compile Include="Stacks\SearchStackPanel.xaml.cs">
+      <DependentUpon>SearchStackPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TabControl\TabControl.xaml.cs">
+      <DependentUpon>TabControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TabControl\TabControlVertical.xaml.cs">
+      <DependentUpon>TabControlVertical.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TabControl\TabHeader.cs" />
+    <Compile Include="TabControl\TabItemsCollection.cs" />
+    <Compile Include="TabControl\TabNotification.cs" />
+    <Compile Include="TabControl\TabNotificationTypeEnum.cs" />
+    <Compile Include="TabControl\VerticalTabDocLocationEnum.cs" />
+    <Compile Include="ToolModels\DataItemModel.cs" />
+    <Compile Include="ToolModels\SelectViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="ColoutPicker\ColourPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataGridObjects\ViSoDataGridPager.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HTML\HTMLEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HTML\HyperlinkEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Indicators\ValueMeter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ModelViewer\ModelViewItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ModelViewer\ModelViewObject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Paneling\PinPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Specialized\PasswordBoxBindable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Stacks\SearchStackPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\ApplicationColours.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\WindowStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TabControl\TabControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TabControl\TabControlVertical.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Templates\ControlsTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj">
+      <Project>{df72187c-d643-4e5f-af68-190c023930a9}</Project>
+      <Name>GeneralExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IconSet\IconSet.csproj">
+      <Project>{8ae0a307-a872-4d6d-a58e-31d28ce5b89d}</Project>
+      <Name>IconSet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViSo.Common\ViSo.Common.csproj">
+      <Project>{CFB74CAF-B98C-4387-94E3-AE9AFBE16B7E}</Project>
+      <Name>ViSo.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj">
+      <Project>{44340843-a61b-4a2b-99d8-7142bf456d85}</Project>
+      <Name>ViSo.SharedEnums</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NewHtmlDocument.html" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

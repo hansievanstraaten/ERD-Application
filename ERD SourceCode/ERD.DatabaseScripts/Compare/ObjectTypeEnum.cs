@@ -8,6 +8,9 @@ namespace ERD.DatabaseScripts.Compare
     Table,
 
     [Description("Column")]
-    Column
+    Column,
+
+    [Description("Foreign Key Constraint")]
+    ForeignKeyConstraint
   }
 }

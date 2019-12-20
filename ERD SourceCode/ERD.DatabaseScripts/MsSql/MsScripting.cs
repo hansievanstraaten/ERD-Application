@@ -35,31 +35,14 @@ namespace ERD.Viewer.Database.MsSql
 
       if (table.IsDeleted)
       {
-        result.AppendLine();
-        result.AppendLine("IF EXISTS (SELECT 1");
-        result.AppendLine("                 FROM INFORMATION_SCHEMA.TABLES");
-        result.AppendLine($"                WHERE TABLE_NAME = '{table.TableName}')");
-
-        result.AppendLine("BEGIN");
-        result.AppendLine($"    DROP TABLE {table.TableName}");
-        result.AppendLine("END");
-        result.AppendLine();
+        result.Append(this.DropTable(table));
 
         return result.ToString();
       }
 
       foreach (ColumnObjectModel deletedColumn in table.DeltedColumns)
       {
-        result.AppendLine("IF EXISTS (SELECT 1 ");
-        result.AppendLine("                 FROM INFORMATION_SCHEMA.COLUMNS");
-        result.AppendLine($"                WHERE TABLE_NAME  = '{table.TableName}' ");
-        result.AppendLine($"                  AND COLUMN_NAME = '{deletedColumn.ColumnName}')");
-
-        result.AppendLine("BEGIN");
-        result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-        result.AppendLine($"    DROP COLUMN [{deletedColumn.ColumnName}];");
-        result.AppendLine("END");
-        result.AppendLine();
+        result.Append(this.DropColumn(table.TableName, deletedColumn.ColumnName));
       }
 
       table.DeltedColumns = new ColumnObjectModel[] { };
@@ -112,6 +95,41 @@ namespace ERD.Viewer.Database.MsSql
       result.AppendLine();
 
       result.Append(this.BuildColumnExists(table));
+
+      return result.ToString();
+    }
+
+    public string DropTable(TableModel table)
+    {
+      StringBuilder result = new StringBuilder();
+
+      result.AppendLine();
+      result.AppendLine("IF EXISTS (SELECT 1");
+      result.AppendLine("                 FROM INFORMATION_SCHEMA.TABLES");
+      result.AppendLine($"                WHERE TABLE_NAME = '{table.TableName}')");
+
+      result.AppendLine("BEGIN");
+      result.AppendLine($"    DROP TABLE {table.TableName}");
+      result.AppendLine("END");
+      result.AppendLine();
+
+      return result.ToString();
+    }
+
+    public string DropColumn(string tableName, string columnName)
+    {
+      StringBuilder result = new StringBuilder();
+
+      result.AppendLine("IF EXISTS (SELECT 1 ");
+      result.AppendLine("                 FROM INFORMATION_SCHEMA.COLUMNS");
+      result.AppendLine($"                WHERE TABLE_NAME  = '{tableName}' ");
+      result.AppendLine($"                  AND COLUMN_NAME = '{columnName}')");
+
+      result.AppendLine("BEGIN");
+      result.AppendLine($"    ALTER TABLE [{tableName}]");
+      result.AppendLine($"    DROP COLUMN [{columnName}];");
+      result.AppendLine("END");
+      result.AppendLine();
 
       return result.ToString();
     }
@@ -190,52 +208,84 @@ namespace ERD.Viewer.Database.MsSql
 
       return result.ToString();
     }
-    
+
+    public string BuildeColumnCreate(string tableName, ColumnObjectModel column)
+    {
+      StringBuilder result = new StringBuilder();
+
+      Tuple<object, object> originalName = column["ColumnName"];
+
+      if (originalName != null)
+      {
+        result.AppendLine("IF EXISTS (SELECT 1");
+        result.AppendLine("             FROM INFORMATION_SCHEMA.COLUMNS");
+        result.AppendLine($"            WHERE TABLE_NAME  = '{tableName}' ");
+        result.AppendLine($"              AND COLUMN_NAME = '{originalName.Item1}')");
+        result.AppendLine("BEGIN");
+        result.AppendLine($"    EXEC sp_rename '{tableName}.{originalName.Item1}', '{originalName.Item2}', 'COLUMN';");
+        result.AppendLine("END");
+
+        result.AppendLine();
+      }
+
+      if (column.SqlDataType == SqlDbType.Timestamp)
+      {
+        return result.ToString();
+      }
+
+      result.AppendLine("IF NOT EXISTS (SELECT 1 ");
+      result.AppendLine("                 FROM INFORMATION_SCHEMA.COLUMNS");
+      result.AppendLine($"                WHERE TABLE_NAME  = '{tableName}' ");
+      result.AppendLine($"                  AND COLUMN_NAME = '{column.ColumnName}')");
+
+      result.AppendLine("BEGIN");
+
+      result.AppendLine($"    ALTER TABLE [{tableName}]");
+      if (column.IsIdentity)
+      {
+        result.AppendLine($"    ADD [{column.ColumnName}] [{column.SqlDataType}]  IDENTITY(1,1) NOT NULL");
+      }
+      else
+      {
+        result.AppendLine($"    ADD [{column.ColumnName}] [{this.ColumnDataType(column)}] {this.FieldLength(column)} {this.NullString(column)}");
+      }
+
+      result.AppendLine("END");
+      result.AppendLine();
+
+      return result.ToString();
+    }
+
+    public string BuildColumnAlter(string tableName, ColumnObjectModel column)
+    {
+      StringBuilder result = new StringBuilder();
+
+      if (column.SqlDataType == SqlDbType.Timestamp)
+      {
+        return string.Empty;
+      }
+
+      result.AppendLine("IF EXISTS (SELECT 1");
+      result.AppendLine("             FROM INFORMATION_SCHEMA.COLUMNS");
+      result.AppendLine($"            WHERE TABLE_NAME  = '{tableName}' ");
+      result.AppendLine($"              AND COLUMN_NAME = '{column.ColumnName}')");
+      result.AppendLine("BEGIN");
+      result.AppendLine($"    ALTER TABLE [{tableName}]");
+      result.AppendLine($"    ALTER COLUMN [{column.ColumnName}] [{this.ColumnDataType(column)}] {this.FieldLength(column)} {this.NullString(column)}");
+      result.AppendLine("END");
+
+      result.AppendLine();
+
+      return result.ToString();
+    }
+
     private string BuildColumnExists(TableModel table)
     {
       StringBuilder result = new StringBuilder();
-      
+
       foreach (ColumnObjectModel column in table.Columns)
       {
-        Tuple<object, object> originalName = column["ColumnName"];
-
-        if (originalName != null)
-        {
-          result.AppendLine("IF EXISTS (SELECT 1");
-          result.AppendLine("             FROM INFORMATION_SCHEMA.COLUMNS");
-          result.AppendLine($"            WHERE TABLE_NAME  = '{table.TableName}' ");
-          result.AppendLine($"              AND COLUMN_NAME = '{originalName.Item1}')");
-          result.AppendLine("BEGIN");
-          result.AppendLine($"    EXEC sp_rename '{table.TableName}.{originalName.Item1}', '{originalName.Item2}', 'COLUMN';");
-          result.AppendLine("END");
-
-          result.AppendLine();
-        }
-
-        if (column.SqlDataType == SqlDbType.Timestamp)
-        {
-          continue;
-        }
-
-        result.AppendLine("IF NOT EXISTS (SELECT 1 ");
-        result.AppendLine("                 FROM INFORMATION_SCHEMA.COLUMNS");
-        result.AppendLine($"                WHERE TABLE_NAME  = '{table.TableName}' ");
-        result.AppendLine($"                  AND COLUMN_NAME = '{column.ColumnName}')");
-
-        result.AppendLine("BEGIN");
-
-        result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-        if (column.IsIdentity)
-        {
-          result.AppendLine($"    ADD [{column.ColumnName}] [{column.SqlDataType}]  IDENTITY(1,1) NOT NULL");
-        }
-        else
-        {
-          result.AppendLine($"    ADD [{column.ColumnName}] [{this.ColumnDataType(column)}] {this.FieldLength(column)} {this.NullString(column)}");
-        }
-
-        result.AppendLine("END");
-        result.AppendLine();
+        result.AppendLine(this.BuildeColumnCreate(table.TableName, column));
       }
 
       result.AppendLine(this.BuildColumnChanges(table));
@@ -263,24 +313,10 @@ namespace ERD.Viewer.Database.MsSql
         Tuple<object, object> originalPrecision = column["Precision"];
 
         Tuple<object, object> originalScale = column["Scale"];
-        
+
         if (originalDataType != null || originalNullable != null || originalMaxLen != null || originalPrecision != null || originalScale != null)
         {
-          if (column.SqlDataType == SqlDbType.Timestamp)
-          {
-            continue;
-          }
-
-          result.AppendLine("IF EXISTS (SELECT 1");
-          result.AppendLine("             FROM INFORMATION_SCHEMA.COLUMNS");
-          result.AppendLine($"            WHERE TABLE_NAME  = '{table.TableName}' ");
-          result.AppendLine($"              AND COLUMN_NAME = '{column.ColumnName}')");
-          result.AppendLine("BEGIN");
-          result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-          result.AppendLine($"    ALTER COLUMN [{column.ColumnName}] [{this.ColumnDataType(column)}] {this.FieldLength(column)} {this.NullString(column)}");
-          result.AppendLine("END");
-
-          result.AppendLine();
+          result.Append(this.BuildColumnAlter(table.TableName, column));
         }
       }
 
@@ -411,58 +447,58 @@ namespace ERD.Viewer.Database.MsSql
       return result.ToString();
     }
 
-    private string AlterPrimaryKeyConstraints(TableModel table, int keyCount)
-    {
-      StringBuilder result = new StringBuilder();
+    //private string AlterPrimaryKeyConstraints(TableModel table, int keyCount)
+    //{
+    //  StringBuilder result = new StringBuilder();
 
-      result.AppendLine("IF EXISTS (SELECT 1 ");
-      result.AppendLine("             FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS ");
-      result.AppendLine($"            WHERE CONSTRAINT_NAME = '{table.PrimaryKeyClusterConstraintName}' ");
-      result.AppendLine("              AND CONSTRAINT_TYPE = 'PRIMARY KEY')");
-      result.AppendLine("BEGIN");
-      result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-      result.AppendLine($"    DROP CONSTRAINT [{table.PrimaryKeyClusterConstraintName}]");
-      result.AppendLine("END");
+    //  result.AppendLine("IF EXISTS (SELECT 1 ");
+    //  result.AppendLine("             FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS ");
+    //  result.AppendLine($"            WHERE CONSTRAINT_NAME = '{table.PrimaryKeyClusterConstraintName}' ");
+    //  result.AppendLine("              AND CONSTRAINT_TYPE = 'PRIMARY KEY')");
+    //  result.AppendLine("BEGIN");
+    //  result.AppendLine($"    ALTER TABLE [{table.TableName}]");
+    //  result.AppendLine($"    DROP CONSTRAINT [{table.PrimaryKeyClusterConstraintName}]");
+    //  result.AppendLine("END");
 
-      result.AppendLine();
+    //  result.AppendLine();
 
-      result.AppendLine("IF NOT EXISTS (SELECT 1 ");
-      result.AppendLine("             FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS ");
-      result.AppendLine($"            WHERE CONSTRAINT_NAME = '{table.PrimaryKeyClusterConstraintName}' ");
-      result.AppendLine("              AND CONSTRAINT_TYPE = 'PRIMARY KEY')");
-      result.AppendLine("BEGIN");
+    //  result.AppendLine("IF NOT EXISTS (SELECT 1 ");
+    //  result.AppendLine("             FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS ");
+    //  result.AppendLine($"            WHERE CONSTRAINT_NAME = '{table.PrimaryKeyClusterConstraintName}' ");
+    //  result.AppendLine("              AND CONSTRAINT_TYPE = 'PRIMARY KEY')");
+    //  result.AppendLine("BEGIN");
 
-      if (keyCount == 0)
-      {
-        return result.ToString();
-      }
-      if (keyCount == 1)
-      {
-        ColumnObjectModel column = table.Columns.First(pk => pk.InPrimaryKey);
+    //  if (keyCount == 0)
+    //  {
+    //    return result.ToString();
+    //  }
+    //  if (keyCount == 1)
+    //  {
+    //    ColumnObjectModel column = table.Columns.First(pk => pk.InPrimaryKey);
 
-        result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-        result.AppendLine($"    ADD CONSTRAINT [{table.PrimaryKeyClusterConstraintName}] PRIMARY KEY ([{column.ColumnName}] ASC)");
-      }
-      else
-      {
-        result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-        result.AppendLine($"    ADD CONSTRAINT [{table.PrimaryKeyClusterConstraintName}] PRIMARY KEY (");
+    //    result.AppendLine($"    ALTER TABLE [{table.TableName}]");
+    //    result.AppendLine($"    ADD CONSTRAINT [{table.PrimaryKeyClusterConstraintName}] PRIMARY KEY ([{column.ColumnName}] ASC)");
+    //  }
+    //  else
+    //  {
+    //    result.AppendLine($"    ALTER TABLE [{table.TableName}]");
+    //    result.AppendLine($"    ADD CONSTRAINT [{table.PrimaryKeyClusterConstraintName}] PRIMARY KEY (");
 
-        foreach (ColumnObjectModel column in table.Columns.Where(pkc => pkc.InPrimaryKey))
-        {
-          result.AppendLine($"        [{column.ColumnName}] ASC,");
-        }
+    //    foreach (ColumnObjectModel column in table.Columns.Where(pkc => pkc.InPrimaryKey))
+    //    {
+    //      result.AppendLine($"        [{column.ColumnName}] ASC,");
+    //    }
 
-        result.Remove(result.Length - 3, 3); // Remove three to cater  for the line feed
-        result.AppendLine(" )");
-      }
+    //    result.Remove(result.Length - 3, 3); // Remove three to cater  for the line feed
+    //    result.AppendLine(" )");
+    //  }
       
-      result.AppendLine("END");
+    //  result.AppendLine("END");
 
-      result.AppendLine();
+    //  result.AppendLine();
 
-      return result.ToString();
-    }
+    //  return result.ToString();
+    //}
 
     private string ColumnDataType(ColumnObjectModel column)
     {

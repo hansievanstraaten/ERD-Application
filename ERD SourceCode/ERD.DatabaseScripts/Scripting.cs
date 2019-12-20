@@ -18,6 +18,20 @@ namespace ERD.DatabaseScripts
       return scriptor.ScriptTableCreate(table);
     }
 
+    public static string BuildeColumnCreate(string tableName, ColumnObjectModel column)
+    {
+      IScripting scriptor = Scripting.CreateClass();
+
+      return scriptor.BuildeColumnCreate(tableName, column);
+    }
+
+    public static string BuildColumnAlter(string tableName, ColumnObjectModel column)
+    {
+      IScripting scriptor = Scripting.CreateClass();
+
+      return scripting.BuildColumnAlter(tableName, column);
+    }
+
     public static string BuildForeignKey(TableModel table)
     {
       IScripting scriptor = Scripting.CreateClass();
@@ -32,6 +46,20 @@ namespace ERD.DatabaseScripts
       string[] keySplit = integrityDropString.Split(new string[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
 
       return scripting.DropForeignKey(keySplit[0], keySplit[1]);
+    }
+
+    public static string DropTable(TableModel table)
+    {
+      IScripting scriptor = Scripting.CreateClass();
+
+      return scriptor.DropTable(table);
+    }
+
+    public static string DropColumn(string tableName, string columnName)
+    {
+      IScripting scriptor = Scripting.CreateClass();
+
+      return scriptor.DropColumn(tableName, columnName);
     }
 
     private static IScripting CreateClass()

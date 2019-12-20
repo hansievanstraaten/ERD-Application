@@ -11,19 +11,13 @@ namespace ERD.DatabaseScripts.Compare
   {
     [Description("Drop from Database")]
     DropFromDatabase,
-
-    [Description("Drop from ERD Model")]
-    DropFromERD,
-
+    
     [Description("Create in Database")]
     CreateInDatabase,
 
-    [Description("Correct on Model")]
-    CorrectOnModel,
-
-    [Description("Correct in Database")]
-    CorrectInDatabase,
-
+    [Description("Alter Database")]
+    AlterDatabase,
+    
     [Description("Ignore")]
     Ignore
   }

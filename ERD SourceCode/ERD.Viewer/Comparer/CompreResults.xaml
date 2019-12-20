@@ -20,7 +20,7 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="0" Grid.Column="0">
-            <CommonControls:ActionButton ResourceImageName="Accept" ToolTip="Execute Changes" Click="Accept_Cliked" />
+            <!--<CommonControls:ActionButton ResourceImageName="Accept" ToolTip="Execute Changes" Click="Accept_Cliked" />-->
             <CommonControls:ActionButton ResourceImageName="CenterSmall" ToolTip="Script Changes" Click="Script_Cliked" />
             <CommonControls:ActionButton ResourceImageName="Edit" ToolTip="Edit Discrepancy" Click="Edit_Cliked" />
         </StackPanel>

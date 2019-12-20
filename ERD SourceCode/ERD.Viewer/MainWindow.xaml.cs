@@ -676,8 +676,6 @@ namespace ERD.Viewer
     {
       try
       {
-        MessageBox.Show($"NOTE: THIS FUNCTION IS STILL UNDER WIP,{Environment.NewLine}and lacks scripting functionality.");
-
         Connections.SetConnection(sender);
 
         DatabaseCompare comparer = new DatabaseCompare(this.Dispatcher);

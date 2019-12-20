@@ -9,8 +9,16 @@ namespace ERD.Viewer.Database
 
     string ScriptTableCreate(TableModel table);
 
+    string BuildeColumnCreate(string tableName, ColumnObjectModel column);
+
+    string BuildColumnAlter(string tableName, ColumnObjectModel column);
+
     string BuildForeignKey(TableModel table);
 
     string DropForeignKey(string tableName, string constaintName);
+
+    string DropTable(TableModel table);
+
+    string DropColumn(string tableName, string columnName);
   }
 }

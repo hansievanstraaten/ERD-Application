@@ -35,6 +35,13 @@ namespace ERD.DatabaseScripts.Engineering
       return result.GetTableColumns(tableName);
     }
 
+    public Dictionary<string, List<ColumnObjectModel>> GetInTableColumns(string[] tableNamesArray)
+    {
+      IReverseEngineer result = this.CreateClass(this.dispatch);
+      
+      return result.GetInTableColumns(tableNamesArray);
+    }
+
     public string GetTablePrimaryKeyCluster(string tableName)
     {
       IReverseEngineer result = this.CreateClass(this.dispatch);

@@ -8,7 +8,11 @@
 
     string DatabaseTableColumnsQuery(string tableName);
 
+    string DatabaseInTableColumnsQuery(string[] tableNamesArray);
+
     string DatabaseColumnKeysQuery(string tableName, string columnName);
+
+    string DatabaseInColumnKeysQuery(string tableName, string[] columnNamesArray);
 
     string DatabasePrimaryClusterName(string tableName);
   }

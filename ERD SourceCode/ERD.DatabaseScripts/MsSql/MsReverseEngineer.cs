@@ -117,6 +117,80 @@ namespace ERD.Viewer.Database.MsSql
       return result;
     }
 
+    public Dictionary<string, List<ColumnObjectModel>> GetInTableColumns(string[] tableNamesArray)
+    {
+      EventParser.ParseMessage(this, this.dispatcher, "Reading Tables", "");
+
+      Dictionary<string, List<ColumnObjectModel>> result = new Dictionary<string, List<ColumnObjectModel>>();
+
+      DataAccess dataAccess = new DataAccess(Connections.DatabaseModel);
+
+      XDocument columnsXml = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseInTableColumnsQuery(tableNamesArray));
+
+      Dictionary<string, List<XElement>> groupedTables = new Dictionary<string, List<XElement>>();
+
+      foreach(XElement column in columnsXml.Root.Elements())
+      {
+        string tableName = column.Element("TABLENAME").Value;
+
+        if (!groupedTables.ContainsKey(tableName))
+        {
+          groupedTables.Add(tableName, new List<XElement>());
+        }
+
+        groupedTables[tableName].Add(column);
+      }
+
+      foreach (KeyValuePair<string, List<XElement>> tableColumns in groupedTables)
+      {
+        result.Add(tableColumns.Key, new List<ColumnObjectModel>());
+          
+        EventParser.ParseMessage(this, this.dispatcher, "Reading Columns for ", tableColumns.Key);
+
+        string[] columnNamesArray = tableColumns.Value.Select(c => c.Element("COLUMNNAME").Value).ToArray();
+
+        XDocument primaryKeys = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseInColumnKeysQuery(tableColumns.Key, columnNamesArray));
+
+        foreach (XElement item in tableColumns.Value)
+        {
+          string columnName = item.Element("COLUMNNAME").Value;
+          
+          if (result[tableColumns.Key].Any(col => col.ColumnName == columnName))
+          {
+            continue;
+          }
+
+          string originalPosistion = item.Element("ORDINAL_POSITION").Value;
+
+          XElement primaryKey = primaryKeys.Root.Descendants().FirstOrDefault(co => co.Value == columnName);
+
+          ColumnObjectModel column = new ColumnObjectModel
+          {
+            ColumnName = columnName,
+            IsIdentity = item.Element("IS_IDENTITY").Value.ToBool(),
+            AllowNulls = item.Element("IS_NULLABLE").Value.ToBool(),
+            MaxLength = item.Element("MAX_LENGTH").Value.ToInt32(),
+            Precision = item.Element("PRECISION").Value.ToInt32(),
+            Scale = item.Element("SCALE").Value.ToInt32(),
+            IsForeignkey = !item.Element("PRIMARY_TABLE").Value.IsNullEmptyOrWhiteSpace(),
+            ForeignKeyTable = item.Element("PRIMARY_TABLE").Value,
+            ForeignKeyColumn = item.Element("PRIMARY_COLUMNNAME").Value,
+            ForeignConstraintName = item.Element("FK_CONSTRAINT_NAME").Value,
+            SqlDataType = this.ParseSqlDbType(item.Element("DATA_TYPE").Value),
+            InPrimaryKey = primaryKey == null ? false : primaryKey.Descendants().Any(d => d.Value == "PRIMARY KEY"),
+            Column_Id = item.Element("COLUMN_ID").Value.ToInt32(),
+            OriginalPosition = originalPosistion.IsNullEmptyOrWhiteSpace() ? 0 : originalPosistion.ToInt32()
+          };
+
+          column.HasModelChanged = false;
+
+          result[tableColumns.Key].Add(column);
+        }
+      }
+
+      return result;
+    }
+
     private SqlDbType ParseSqlDbType(string value)
     {
       switch (value.ToLower())

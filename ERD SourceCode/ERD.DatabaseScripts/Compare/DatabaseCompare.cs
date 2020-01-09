@@ -81,11 +81,20 @@ namespace ERD.DatabaseScripts.Compare
 
     private void CheckColumns()
     {
+      string[] databaseTableNames = this.databaseTables.Select(tn => tn.TableName).ToArray();
+
+      string[] erdTableNames = this.canvasTables.Select(tn => tn.TableName).ToArray();
+
+      Dictionary<string, List<ColumnObjectModel>> fromDatabaseList = this.reverse.GetInTableColumns(databaseTableNames);
+
+      Dictionary<string, List<ColumnObjectModel>> fromErdList = this.reverse.GetInTableColumns(erdTableNames);
+
       foreach (TableModel fromDatabase in this.databaseTables)
       {
         EventParser.ParseMessage(this, dispatcher, "Getting Columns", fromDatabase.TableName);
 
-        fromDatabase.Columns = this.reverse.GetTableColumns(fromDatabase.TableName).ToArray();
+        fromDatabase.Columns = fromDatabaseList[fromDatabase.TableName].ToArray();
+          //this.reverse.GetTableColumns(fromDatabase.TableName).ToArray();
 
         TableModel fromCanvas = this.canvasTables.FirstOrDefault(tn => tn.TableName.ToUpper() == fromDatabase.TableName.ToUpper());
 
@@ -100,7 +109,8 @@ namespace ERD.DatabaseScripts.Compare
         {
           // The table is not on A Canvas, but was read on startup
           // We need the columns though
-          fromCanvas.Columns = this.reverse.GetTableColumns(fromDatabase.TableName).ToArray();
+          fromCanvas.Columns = fromErdList[fromDatabase.TableName].ToArray();
+          //this.reverse.GetTableColumns(fromDatabase.TableName).ToArray();
         }
 
         #region COMPARE DATABASE COLUMNS TO MODEL
@@ -165,7 +175,8 @@ namespace ERD.DatabaseScripts.Compare
         EventParser.ParseMessage(this, dispatcher, fromDatabase.TableName, $"Compare Table {fromDatabase.TableName} Foreign Constraints");
 
         Dictionary<string, List<ColumnObjectModel>> databaseForeignkeyStructure = fromDatabase.Columns
-          .Where(dk => dk.IsForeignkey)
+          .Where(dk => dk.IsForeignkey
+                      && !dk.IsVertualRelation)
           .GroupBy(dg => dg.ForeignKeyTable.ToUpper())
           .ToDictionary(dd => dd.Key, dd => dd.ToList());
 
@@ -208,7 +219,8 @@ namespace ERD.DatabaseScripts.Compare
         EventParser.ParseMessage(this, dispatcher, fromCanvas.TableName, $"Compare Table {fromCanvas.TableName} Foreign Constraints");
 
         Dictionary<string, List<ColumnObjectModel>> canvasForeignkeyStructure = fromCanvas.Columns
-          .Where(dk => dk.IsForeignkey)
+          .Where(dk => dk.IsForeignkey
+                      && !dk.IsVertualRelation)
           .GroupBy(dg => dg.ForeignKeyTable.ToUpper())
           .ToDictionary(dd => dd.Key, dd => dd.ToList());
 

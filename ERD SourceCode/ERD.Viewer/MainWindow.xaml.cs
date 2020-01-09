@@ -595,11 +595,13 @@ namespace ERD.Viewer
           {
             foreach (ErdCanvasModel segment in this.canvasDictionary.Values)
             {
+              Dictionary<string, List<ColumnObjectModel>> tableAndColumns = reverse.GetInTableColumns(segment.SegmentTables.Select(tn => tn.TableName).ToArray());
+
               foreach (TableModel table in segment.SegmentTables)
               {
                 table.PrimaryKeyClusterConstraintName = reverse.GetTablePrimaryKeyCluster(table.TableName);
 
-                List<ColumnObjectModel> databaseColumnList = reverse.GetTableColumns(table.TableName);
+                List<ColumnObjectModel> databaseColumnList = tableAndColumns[table.TableName];
 
                 foreach (ColumnObjectModel databaseColumn in databaseColumnList)
                 {
@@ -873,7 +875,6 @@ namespace ERD.Viewer
               {
                 if (column.Column_Id == int.MaxValue || (column.InPrimaryKey && column.OriginalPosition == 0)) 
                 {
-
                   string sqlQuery = SQLQueries.DatabaseQueries.DatabaseColumnKeysQuery(table.TableName, column.ColumnName);
 
                   XDocument sqlResult = dataAccess.ExecuteQuery(sqlQuery);

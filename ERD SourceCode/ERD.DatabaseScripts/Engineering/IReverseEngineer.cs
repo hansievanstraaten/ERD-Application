@@ -10,6 +10,8 @@ namespace ERD.DatabaseScripts.Engineering
 
     List<ColumnObjectModel> GetTableColumns(string tableName);
 
+    Dictionary<string, List<ColumnObjectModel>> GetInTableColumns(string[] tableNamesArray);
+
     string GetTablePrimaryKeyCluster(string tableName);
   }
 }

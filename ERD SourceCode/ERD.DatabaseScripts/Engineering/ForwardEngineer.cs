@@ -3,9 +3,11 @@ using ERD.Models;
 using ERD.Viewer.Database;
 using GeneralExtensions;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using ViSo.Common;
@@ -25,10 +27,11 @@ namespace ERD.DatabaseScripts.Engineering
     
     public void BuildDatabase(TableModel[] tablesArray, bool asScriptOnly)
     {
+      this.CheckConceptualValues(tablesArray);
+
       Type window = Type.GetType("ERD.Viewer.Tools.Common.ProgressResponce,ERD.Viewer");
 
       this.progressWindow = Activator.CreateInstance(window, new object[] {tablesArray.Length + 1}) as WindowBase;
-        //new ProgressResponce(tablesArray.Length + 1);
 
       this.progressWindow.Show();
 
@@ -50,6 +53,68 @@ namespace ERD.DatabaseScripts.Engineering
       }
       
       this.buildWorker.RunWorkerAsync(tablesArray);
+    }
+
+    private void CheckConceptualValues(TableModel[] tablesArray)
+    {
+      if (!General.ProjectModel.KeepColumnsUnique)
+      {
+        return;
+      }
+
+      List<string> checkedList = new List<string>();
+
+      foreach(TableModel table in tablesArray)
+      {
+        foreach(ColumnObjectModel column in table.Columns)
+        {
+          string lowerColumnName = column.ColumnName.ToLower();
+
+          if (checkedList.Contains(lowerColumnName))
+          {
+            continue;
+          }
+
+          checkedList.Add(lowerColumnName);
+
+          List<TableModel> referencedTables = tablesArray
+            .Where(t => t.TableName != table.TableName
+                        && t.Columns.Any(c => c.ColumnName.ToLower() == lowerColumnName))
+            .ToList();
+
+          if (referencedTables.Count == 0)
+          {
+            continue;
+          }
+
+          string columnDataType = column.DataType.Replace(" IDENTITY", string.Empty);
+
+          foreach(TableModel otherTable in referencedTables)
+          {
+            ColumnObjectModel otherColumn = otherTable.Columns.First(f => f.ColumnName.ToLower() == lowerColumnName);
+
+            if (otherColumn.DataType.Replace(" IDENTITY", string.Empty) != columnDataType)
+            {
+              string exceptionMessage = "The conceptual data values for Table {0}, Column {1} differs for the same column in Table {2}.{5}{5}" +
+                                        "The data type in Table {0} is {3} and in Table {2} is {4}.";
+
+              object[] messageParameters = new object[]
+              {
+                table.TableName,
+                column.ColumnName,
+                otherTable.TableName,
+                columnDataType,
+                otherColumn.DataType,
+                Environment.NewLine
+              };
+
+              throw new ApplicationException(String.Format(exceptionMessage, messageParameters));
+            }
+
+          }
+
+        }
+      }
     }
 
     private void ScriptProgress_DoWork(object sender, DoWorkEventArgs e)

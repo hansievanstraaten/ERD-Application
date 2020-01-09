@@ -326,8 +326,6 @@ namespace ERD.Viewer
       {
         ForwardEngineer forward = new ForwardEngineer();
 
-        //forward.ForwardEngineeringCompleted += this.ForwardEngineering_Completed;
-
         List<TableModel> tablesList = new List<TableModel>();
 
         List<TableMenuItem> deleteList = new List<TableMenuItem>();

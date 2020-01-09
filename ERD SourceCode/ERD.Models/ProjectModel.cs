@@ -59,7 +59,7 @@ namespace ERD.Models
       }
     }
 
-    [FieldInformation("Allow Vertual Relations")]
+    [FieldInformation("Allow Virtual Relations")]
     public bool AllowVertualRelations
     {
       get

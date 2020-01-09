@@ -163,16 +163,21 @@ namespace ERD.Viewer.Database.MsSql
       foreach (KeyValuePair<string, ColumnObjectModel[]> foreignKey in constraintDic)
       {
         string fkName = foreignKey.Key;
-        
+
         Dictionary<int, string> columnPosistions = new Dictionary<int, string>();
 
         foreach (ColumnObjectModel column in foreignKey.Value)
         {
           string columnQuery = SQLQueries.DatabaseQueries.DatabaseColumnKeysQuery(column.ForeignKeyTable, column.ForeignKeyColumn);
-          
+
           XDocument columnResult = dataAccess.ExecuteQuery(columnQuery);
 
-          XElement rowItem = columnResult.Root.Elements().First(r => r.Element("CONSTRAINT_TYPE").Value == "PRIMARY KEY");
+          XElement rowItem = columnResult.Root.Elements().FirstOrDefault(r => r.Element("CONSTRAINT_TYPE").Value == "PRIMARY KEY");
+
+          if (rowItem == null)
+          {
+            continue;
+          }
 
           column.OriginalPosition = rowItem.Element("ORDINAL_POSITION").Value.ToInt32();
 
@@ -182,7 +187,12 @@ namespace ERD.Viewer.Database.MsSql
         StringBuilder childColumns = new StringBuilder();
 
         StringBuilder parentColumns = new StringBuilder();
-        
+
+        if (columnPosistions.Count <= 0)
+        {
+          return string.Empty;
+        }
+
         foreach (KeyValuePair<int, string> columnItem in columnPosistions.OrderBy(s => s.Key))
         {
           ColumnObjectModel column = foreignKey.Value.FirstOrDefault(c => c.ColumnName == columnItem.Value);

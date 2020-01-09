@@ -1,0 +1,5 @@
+PROJECT
+{"ModelName":"ViSo Nice","FileDirectory":"C:\\AAA\\Hansie\\ERD Projects\\ViSo_nice","AllowRelations":true,"AllowVertualRelations":true,"KeepColumnsUnique":true,"HasModelChanged":false,"Changes":{}}
+
+DATABASE
+{"DatabaseType":1,"ServerName":"HO-PRG-005\\SQLEXPRESS","DatabaseName":"ViSonice","UserName":"LocalUser","Password":"LocalUser","TrustedConnection":true,"HasModelChanged":false,"Changes":{}}

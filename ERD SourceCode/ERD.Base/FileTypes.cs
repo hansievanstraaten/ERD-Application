@@ -16,5 +16,10 @@
     /// Build Script Setup File
     /// </summary>
     estp = 3,
+
+    /// <summary>
+    /// ERD Lock File
+    /// </summary>
+    eloc = 4
   }
 }

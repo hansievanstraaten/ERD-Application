@@ -41,11 +41,15 @@ namespace ERD.Viewer.Tools
 
     public delegate bool ForeignKeyColumnAddedEvent(object sender, ColumnObjectModel column);
 
+    public delegate void TableColumnChangedEvent(object sender, ColumnObjectModel column);
+
     public event TableMoveEvent TableMove;
 
     public event RemoveTableEvent RemoveTable;
 
     public event ForeignKeyColumnAddedEvent ForeignKeyColumnAdded;
+
+    public event TableColumnChangedEvent TableColumnChanged;
 
     private Point location;
     
@@ -86,9 +90,7 @@ namespace ERD.Viewer.Tools
 
       this.Location = table.CanvasLocation;
     }
-
     
-
     public TableModel Table
     {
       get;
@@ -201,10 +203,7 @@ namespace ERD.Viewer.Tools
 
     private void Remove_Clicked(object sender, RoutedEventArgs e)
     {
-      if (this.RemoveTable != null)
-      {
-        this.RemoveTable(this, this.Table);
-      }
+      this.RemoveTable?.Invoke(this, this.Table);
     }
 
     private void DropTable_Clicked(object sender, RoutedEventArgs e)
@@ -631,6 +630,8 @@ namespace ERD.Viewer.Tools
         {
           this.ForeignKeyColumnAdded?.Invoke(this, column);
         }
+
+        this.TableColumnChanged?.Invoke(this, column);
       }
       catch (Exception err)
       {
@@ -652,6 +653,13 @@ namespace ERD.Viewer.Tools
         ColumnsEdit columnEdit = new ColumnsEdit(this.SelectedColumn, this.Table.TableName);
 
         bool? result = columnEdit.ShowDialog();
+
+        if (result.IsFalse())
+        {
+          return;
+        }
+
+        this.TableColumnChanged?.Invoke(this, this.SelectedColumn);
       }
       catch (Exception err)
       {

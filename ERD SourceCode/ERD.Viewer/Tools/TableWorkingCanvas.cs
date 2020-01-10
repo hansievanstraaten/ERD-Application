@@ -7,12 +7,14 @@ using ERD.Viewer.Tools.Relations;
 using GeneralExtensions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 using WPF.Tools.Exstention;
+using WPF.Tools.Functions;
 
 namespace ERD.Viewer.Tools
 {
@@ -24,11 +26,15 @@ namespace ERD.Viewer.Tools
 
     internal delegate void RemoveTableEvent(object sender, TableModel tableModel);
 
+    internal delegate void CanvasChangedEvent(object sender, object changedItem);
+
     internal event TableMoveEvent TableMove;
 
     internal event TableAddedEvent TableAdded;
 
     internal event RemoveTableEvent RemoveTable;
+
+    internal event CanvasChangedEvent CanvasChanged;
 
     private bool wasFirstLoaded = false;
 
@@ -45,16 +51,22 @@ namespace ERD.Viewer.Tools
 
     public DatabaseModel DatabaseModel {get; set;}
     
-    public void CreateTableObject(TableModel table)
+    public async void CreateTableObject(TableModel table)
     {
       ReverseEngineer reverseEngineer = new ReverseEngineer(this.Dispatcher);
 
-      if (!table.IsNewTable && (table.Columns == null || table.Columns.Count() == 0))
+      await Task.Factory.StartNew(() => 
       {
-        table.Columns = table.Columns.AddRange(reverseEngineer.GetTableColumns(table.TableName).ToArray());
-      }
+        if (!table.IsNewTable && (table.Columns == null || table.Columns.Count() == 0))
+        {
+          EventParser.ParseMessage(this, this.Dispatcher, string.Empty, "Reading table information.");
 
-      table.PrimaryKeyClusterConstraintName = reverseEngineer.GetTablePrimaryKeyCluster(table.TableName);
+          table.Columns = table.Columns.AddRange(reverseEngineer.GetTableColumns(table.TableName).ToArray());
+        
+          table.PrimaryKeyClusterConstraintName = reverseEngineer.GetTablePrimaryKeyCluster(table.TableName);
+        }
+      });
+
       
       table.IsNewTable = false;
 
@@ -87,6 +99,8 @@ namespace ERD.Viewer.Tools
 
         this.AddRelationsDrawing(tableControl);
       }
+
+      tableControl.TableColumnChanged += this.TableColumn_Changed;
     }
     
     protected override void OnDragOver(DragEventArgs e)
@@ -127,6 +141,8 @@ namespace ERD.Viewer.Tools
         #region TABLE/RElATION DROPED FROM LEFT MENU
 
         object dataValue = e.Data.GetData(typeof(TableModel));
+          
+        this.CanvasChanged?.Invoke(this, dataValue);
 
         if (dataValue == null || dataValue.GetType() != typeof(TableModel))
         {
@@ -138,7 +154,7 @@ namespace ERD.Viewer.Tools
           }
 
           this.AddNewRelation((DatabaseRelation)dataValue);
-
+          
           return;
         }
 
@@ -169,10 +185,7 @@ namespace ERD.Viewer.Tools
 
         this.CreateTableObject(table);
 
-        if (this.TableAdded != null)
-        {
-          this.TableAdded(this, table);
-        }
+        this.TableAdded?.Invoke(this, table);
 
         #endregion
       }
@@ -265,7 +278,9 @@ namespace ERD.Viewer.Tools
           this.columnRelationModel.Remove(relation.Key);
         }
 
-        this.RemoveTable(this, tableModel);
+        this.RemoveTable?.Invoke(this, tableModel);
+
+        this.CanvasChanged?.Invoke(this, tableModel);
 
         Integrity.RemoveTableMapping(tableModel);
       }
@@ -318,13 +333,18 @@ namespace ERD.Viewer.Tools
         {
           this.AddRelationsDrawing((TableObject) tableControl);
         }
-
+        
         this.wasFirstLoaded = true;
       }
       catch (Exception err)
       {
         MessageBox.Show(err.GetFullExceptionMessage());
       }
+    }
+
+    private void TableColumn_Changed(object sender, ColumnObjectModel column)
+    {
+      this.CanvasChanged?.Invoke(this, column);
     }
     
     private void DatabaseRelation_Delete(DatabaseRelation sender)

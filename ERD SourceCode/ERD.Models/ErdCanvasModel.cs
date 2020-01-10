@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using GeneralExtensions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using WPF.Tools.Attributes;
-using GeneralExtensions;
 
 namespace ERD.Models
 {
@@ -30,6 +31,8 @@ namespace ERD.Models
         return this.ModelSegmentName.MakeAlphaNumeric();
       }
     }
+
+    public string LockedByUser { get; set; }
 
     public List<TableModel> SegmentTables {get; set;}
 

@@ -18,6 +18,7 @@
             <CommonControls:ActionButton ResourceImageName="Search" ToolTip="Reference Tables from other canvases to include in the Entity Framework build" 
                                          Click="AdditionalTables_Clicked" />
             <CommonControls:LableItem x:Name="uxTabMetadata" Foreground="Blue" />
+            <CommonControls:LableItem x:Name="uxTabLock" Foreground="Red" />
         </StackPanel>
 
     <CommonControls:ScrollViewerPanable x:Name="uxCanvasScroll" Grid.Row="1" IsPannable="True" CanZoom="True">

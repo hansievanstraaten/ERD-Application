@@ -15,8 +15,9 @@ namespace ERD.Models
     private bool allowRelation;
     private bool allowVertualRelation;
     private bool keepColumnsUnique;
+    private bool lockCanvasOnEditing;
 
-    [FieldInformation("Project Name", IsRequired = true)]
+    [FieldInformation("Project Name", IsRequired = true, Sort = 1)]
     public string ModelName
     {
       get
@@ -30,7 +31,7 @@ namespace ERD.Models
       }
     }
 
-    [FieldInformation("File Directory", IsRequired = true)]
+    [FieldInformation("File Directory", IsRequired = true, Sort = 2)]
     [BrowseButtonAttribute("DirectoryBrowse", "...", "SearchFolder")]
     public string FileDirectory 
     {
@@ -45,7 +46,7 @@ namespace ERD.Models
       }
     }
     
-    [FieldInformation("Allow Database Relations")]
+    [FieldInformation("Allow Database Relations", Sort = 3)]
     public bool AllowRelations
     {
       get
@@ -59,7 +60,7 @@ namespace ERD.Models
       }
     }
 
-    [FieldInformation("Allow Virtual Relations")]
+    [FieldInformation("Allow Virtual Relations", Sort = 4)]
     public bool AllowVertualRelations
     {
       get
@@ -73,7 +74,7 @@ namespace ERD.Models
       }
     }
 
-    [FieldInformation("Keep Columns Unique")]
+    [FieldInformation("Keep Columns Unique", Sort = 5)]
     public bool KeepColumnsUnique
     {
       get
@@ -84,6 +85,20 @@ namespace ERD.Models
       set
       {
         base.OnPropertyChanged("KeepColumnsUnique", ref this.keepColumnsUnique, value);
+      }
+    }
+
+    [FieldInformation("Lock Canvas on Editing", Sort = 6)]
+    public bool LockCanvasOnEditing
+    {
+      get
+      {
+        return this.lockCanvasOnEditing;
+      }
+
+      set
+      {
+        base.OnPropertyChanged("LockCanvasOnEditing", ref this.lockCanvasOnEditing, value);
       }
     }
   }

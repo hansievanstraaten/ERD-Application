@@ -5,6 +5,7 @@ using ERD.Common;
 using ERD.DatabaseScripts;
 using ERD.DatabaseScripts.Compare;
 using ERD.DatabaseScripts.Engineering;
+using ERD.FileManagement;
 using ERD.Models;
 using ERD.Viewer.Build;
 using ERD.Viewer.Comparer;
@@ -36,6 +37,8 @@ namespace ERD.Viewer
 
     private List<string> connectionsInMenue = new List<string>();
 
+    private CanvasLocksListener listener = new CanvasLocksListener();
+
     public MainWindow()
     {
       this.InitializeComponent();
@@ -49,15 +52,32 @@ namespace ERD.Viewer
       EventParser.ParseMessageObject += this.Message_Parsed;
 
       EventParser.ParseQueryObject += this.Query_Parsed;
+
+      this.listener.FileChanged += this.ProjectFiles_Changed;
     }
 
     private void MainWindow_Closing(object sender, CancelEventArgs e)
     {
       try
       {
+        foreach (ErdCanvasModel segment in this.canvasDictionary.Values)
+        {
+          string lockedByFileUser = CanvasLocks.Instance.LockedByUser(segment.ModelSegmentControlName);
+
+          if (lockedByFileUser.IsNullEmptyOrWhiteSpace())
+          { // No Lock Applied
+            continue;
+          }
+
+          if (segment.LockedByUser.IsNullEmptyOrWhiteSpace() && Environment.UserName == lockedByFileUser)
+          { // The user worked on this file but did not save the changes
+            CanvasLocks.Instance.UnlockFile(segment.ModelSegmentControlName);
+          }
+        }
+
         this.Dispatcher.InvokeShutdown();
       }
-      catch
+      catch (Exception err)
       {
         // DO NOTHING. Deconstructing
       }
@@ -191,11 +211,13 @@ namespace ERD.Viewer
         ProjectSetup setup = new ProjectSetup(General.ProjectModel, Connections.DefaultDatabaseModel);
 
         bool? result = setup.ShowDialog();
-
+        
         if (result.HasValue && !result.Value)
         {
           return;
         }
+
+        this.listener.StartWatcher();
 
         this.LoadConnectionsMenue();
       }
@@ -292,6 +314,8 @@ namespace ERD.Viewer
 
         foreach (ErdCanvasModel canvas in this.canvasDictionary.Values)
         {
+          canvas.LockedByUser = string.Empty;
+
           tablesList.AddRange(canvas.SegmentTables);
         }
 
@@ -317,6 +341,10 @@ namespace ERD.Viewer
       if (completed)
       {
         this.RefreshColumnIds();
+
+        this.SaveModel();
+
+        CanvasLocks.Instance.RemoveUserLocks(Environment.UserName);
       }
     }
 
@@ -529,6 +557,11 @@ namespace ERD.Viewer
       }
     }
     
+    private void ProjectFiles_Changed(object sender, FileSystemEventArgs e)
+    {
+      this.SetLocks();
+    }
+
     private async void ReverseEngineer(object sender)
     {
       try
@@ -741,6 +774,8 @@ namespace ERD.Viewer
 
             General.ProjectModel = JsonConvert.DeserializeObject(fileLines[1], typeof(ProjectModel)) as ProjectModel;
 
+            this.listener.StartWatcher();
+
             Connections.DefaultDatabaseModel = JsonConvert.DeserializeObject(fileLines[4], typeof(DatabaseModel)) as DatabaseModel;
 
             Connections.DatabaseModel = Connections.DefaultDatabaseModel;
@@ -844,6 +879,8 @@ namespace ERD.Viewer
         {
           throw error;
         }
+
+        this.SetLocks();
       }
       catch (Exception err)
       {
@@ -911,7 +948,7 @@ namespace ERD.Viewer
         }
       }
 
-      this.SaveModel();
+      
     }
 
     private void SaveModel()
@@ -967,8 +1004,6 @@ namespace ERD.Viewer
 
       #endregion
 
-      BuildScript.Save();
-      
       string directory = Path.GetDirectoryName(saveFileFullName);
 
       foreach (ErdCanvasModel segment in this.canvasDictionary.Values)
@@ -976,6 +1011,8 @@ namespace ERD.Viewer
         string segmentName = $"{General.ProjectModel.ModelName}.{segment.ModelSegmentControlName}.{FileTypes.eclu}";
 
         string segmentFilFullName = Path.Combine(directory, segmentName);
+
+        segment.LockedByUser = CanvasLocks.Instance.LockedByUser(segment.ModelSegmentControlName);
 
         File.WriteAllText(segmentFilFullName, JsonConvert.SerializeObject(segment));
       }
@@ -1160,6 +1197,21 @@ namespace ERD.Viewer
       }
     }
 
-    
+    private void SetLocks()
+    {
+      try
+      {
+        List<string> lockedFiles = CanvasLocks.Instance.GetLockedFiles();
+
+        foreach (TableCanvas canvas in this.uxTabControl.Items)
+        {
+          canvas.CheckLockStatus(lockedFiles);
+        }
+      }
+      catch (Exception err)
+      {
+        MessageBox.Show(err.InnerExceptionMessage());
+      }
+    }
   }
 }

@@ -283,6 +283,10 @@
       <Project>{42d76052-8d0d-4571-8d65-861b7bb5cb6d}</Project>
       <Name>ERD.DatabaseScripts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ERD.FileManagement\ERD.FileManagement.csproj">
+      <Project>{6b6583b1-3798-4e85-b287-5db4689a3479}</Project>
+      <Name>ERD.FileManagement</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj">
       <Project>{a3a6b6f4-1959-4a99-a5ca-472bc1b605ea}</Project>
       <Name>ERD.Models</Name>

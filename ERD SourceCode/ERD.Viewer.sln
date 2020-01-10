@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.Tools", "WPF.Tools\WPF.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViSo.SharedEnums", "ViSo.SharedEnums\ViSo.SharedEnums.csproj", "{44340843-A61B-4A2B-99D8-7142BF456D85}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERD.FileManagement", "ERD.FileManagement\ERD.FileManagement.csproj", "{6B6583B1-3798-4E85-B287-5DB4689A3479}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{44340843-A61B-4A2B-99D8-7142BF456D85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44340843-A61B-4A2B-99D8-7142BF456D85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44340843-A61B-4A2B-99D8-7142BF456D85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B6583B1-3798-4E85-B287-5DB4689A3479}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B6583B1-3798-4E85-B287-5DB4689A3479}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B6583B1-3798-4E85-B287-5DB4689A3479}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B6583B1-3798-4E85-B287-5DB4689A3479}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

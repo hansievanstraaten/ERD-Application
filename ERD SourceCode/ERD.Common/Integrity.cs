@@ -32,6 +32,8 @@ namespace ERD.Common
 
     private static Dictionary<string, ColumnObjectModel> columnObjectModels = new Dictionary<string, ColumnObjectModel>();
 
+    private static object globalColumnsCountLock = new object();
+
     public static List<string> DropRelations = new List<string>();
 
     public static bool KeepColumnsUnique {get; set;}
@@ -39,12 +41,15 @@ namespace ERD.Common
     public static bool AllowDatabaseRelations {get; set;}
 
     public static bool AllowVertualRelations {get; set;}
-
+    
     public static bool HasGlobalColumn(string columnName)
     {
-      string columnKey = columnName.ToLower();
+      lock (globalColumnsCountLock)
+      {
+        string columnKey = columnName.ToLower();
 
-      return Integrity.globalColumnsCount.Keys.Any(k => k.ToLower() == columnKey);
+        return Integrity.globalColumnsCount.Keys.Any(k => k.ToLower() == columnKey);
+      }
     }
 
     public static bool IsColumnInThisTable(string tableName, string columnName)
@@ -264,10 +269,13 @@ namespace ERD.Common
 
     public static List<DataItemModel> GetSystemColumns()
     {
-      return Integrity.globalColumnsCount.Select(co => co)
-        .Select(ss => new DataItemModel {DisplayValue = ss.Key, ItemKey = ss.Key})
-        .OrderBy(o => o.ItemKey.ParseToString())
-        .ToList();
+      lock (globalColumnsCountLock)
+      {
+        return Integrity.globalColumnsCount.Select(co => co)
+          .Select(ss => new DataItemModel {DisplayValue = ss.Key, ItemKey = ss.Key})
+          .OrderBy(o => o.ItemKey.ParseToString())
+          .ToList();
+      }
     }
 
     public static List<DataItemModel> GetColumnsForTable(string tableName)
@@ -335,24 +343,27 @@ namespace ERD.Common
         Integrity.foreignKeyConstraintNames.Add(column.ForeignConstraintName); 
       }
 
-      if (!Integrity.globalColumnsCount.Any(gl => gl.Key.ToLower() == columnNameKey))
+      lock (globalColumnsCountLock)
       {
-        Integrity.globalColumnsCount.Add(columnNameKey, 1);
-
-        if (column.SqlDataType.HasValue)
+        if (!Integrity.globalColumnsCount.Any(gl => gl.Key.ToLower() == columnNameKey))
         {
-          Integrity.globalColumnsDataType.Add(column.ColumnName, column.SqlDataType.Value);
+          Integrity.globalColumnsCount.Add(columnNameKey, 1);
+
+          if (column.SqlDataType.HasValue)
+          {
+            Integrity.globalColumnsDataType.Add(column.ColumnName, column.SqlDataType.Value);
+          }
         }
-      }
-      else
-      {
-        int previousCount = Integrity.globalColumnsCount[columnNameKey];
+        else
+        {
+          int previousCount = Integrity.globalColumnsCount[columnNameKey];
 
-        previousCount++;
+          previousCount++;
 
-        Integrity.globalColumnsCount.Remove(columnNameKey);
+          Integrity.globalColumnsCount.Remove(columnNameKey);
 
-        Integrity.globalColumnsCount.Add(columnNameKey, previousCount);
+          Integrity.globalColumnsCount.Add(columnNameKey, previousCount);
+        }
       }
     }
 
@@ -385,16 +396,20 @@ namespace ERD.Common
 
       string columnNameKey = column.ColumnName.ToLower();
 
-      int previousCount = Integrity.globalColumnsCount.ContainsKey(column.ColumnName) ?
-        Integrity.globalColumnsCount[column.ColumnName] : 0;
-
-      previousCount--;
-
-      Integrity.globalColumnsCount.Remove(column.ColumnName);
-      
-      if (previousCount > 0)
+      lock (globalColumnsCountLock)
       {
-        Integrity.globalColumnsCount.Add(columnNameKey, previousCount);
+        int previousCount = Integrity.globalColumnsCount.ContainsKey(column.ColumnName) ?
+          Integrity.globalColumnsCount[column.ColumnName] :
+          0;
+
+        previousCount--;
+
+        Integrity.globalColumnsCount.Remove(column.ColumnName);
+
+        if (previousCount > 0)
+        {
+          Integrity.globalColumnsCount.Add(columnNameKey, previousCount);
+        }
       }
 
       if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => fk.ToLower() == column.ForeignConstraintName.ToLower()))

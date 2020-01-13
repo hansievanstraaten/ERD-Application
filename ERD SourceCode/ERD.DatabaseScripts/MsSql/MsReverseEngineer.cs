@@ -163,7 +163,8 @@ namespace ERD.Viewer.Database.MsSql
           string originalPosistion = item.Element("ORDINAL_POSITION").Value;
 
           XElement primaryKey = primaryKeys.Root.Elements()
-            .FirstOrDefault(el => el.Element("COLUMN_NAME").Value == columnName);
+            .FirstOrDefault(el => el.Element("COLUMN_NAME").Value == columnName
+                                  && el.Element("CONSTRAINT_TYPE").Value == "PRIMARY KEY");
 
           ColumnObjectModel column = new ColumnObjectModel
           {

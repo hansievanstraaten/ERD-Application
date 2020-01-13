@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using WPF.Tools.Functions;
 
 namespace ERD.FileManagement
 {
@@ -39,33 +40,42 @@ namespace ERD.FileManagement
     {
       GC.SuppressFinalize(this);
     }
-    
+
     public string LockedByUser(string modelSegmentControlName)
     {
-      if (!File.Exists(LockFullFileName))
+      if (!File.Exists(this.LockFullFileName))
       {
         return string.Empty;
       }
 
-      string segmantName = $"{modelSegmentControlName}:";
-
-      lock (lockMethodObject)
+      try
       {
-        string fileText = File.ReadAllText(LockFullFileName);
+        this.WaitLockRelease();
 
-        string[] lockedFilesArray = fileText.Split(';');
+        string segmantName = $"{modelSegmentControlName}:";
 
-        foreach(string lockLine in lockedFilesArray)
+        lock (lockMethodObject)
         {
-          if (!lockLine.StartsWith(segmantName))
+          string fileText = File.ReadAllText(this.LockFullFileName);
+
+          string[] lockedFilesArray = fileText.Split(';');
+
+          foreach (string lockLine in lockedFilesArray)
           {
-            continue;
+            if (!lockLine.StartsWith(segmantName))
+            {
+              continue;
+            }
+
+            string[] lockInformation = lockLine.Split(':');
+
+            return lockInformation[1];
           }
-
-          string[] lockInformation = lockLine.Split(':');
-
-          return lockInformation[1];
         }
+      }
+      finally
+      {
+        File.Delete(this.FileLockName);
       }
 
       return string.Empty;
@@ -75,18 +85,27 @@ namespace ERD.FileManagement
     {
       List<string> result = new List<string>();
 
-      if (!File.Exists(LockFullFileName))
+      if (!File.Exists(this.LockFullFileName))
       {
         return result;
       }
 
-      lock(lockMethodObject)
+      try
       {
-        string fileText = File.ReadAllText(LockFullFileName);
+        this.WaitLockRelease();
 
-        string[] lockedFilesArray = fileText.Split(';');
+        lock (lockMethodObject)
+        {
+          string fileText = File.ReadAllText(this.LockFullFileName);
 
-        result.AddRange(lockedFilesArray);
+          string[] lockedFilesArray = fileText.Split(';');
+
+          result.AddRange(lockedFilesArray);
+        }
+      }
+      finally
+      {
+        File.Delete(this.FileLockName);
       }
 
       return result;
@@ -99,36 +118,45 @@ namespace ERD.FileManagement
         return;
       }
 
-      lock (lockMethodObject)
+      try
       {
-        StringBuilder result = new StringBuilder();
+        this.WaitLockRelease();
 
-        if (File.Exists(LockFullFileName))
+        lock (lockMethodObject)
         {
-          result.Append(File.ReadAllText(LockFullFileName));
-        }
+          StringBuilder result = new StringBuilder();
 
-        string segmantName = $"{modelSegmentControlName}:";
-
-        if (result.ToString().Contains(segmantName))
-        {
-          int segmentIndex = result.ToString().IndexOf(segmantName) + segmantName.Length;
-
-          int readToIndex = result.ToString().IndexOf(';', segmentIndex);
-
-          string lockedByUser = result.ToString().Substring(segmentIndex, (readToIndex - segmentIndex));
-
-          if (lockedByUser != Environment.UserName)
+          if (File.Exists(this.LockFullFileName))
           {
-            throw new ApplicationException($"This Canvas is locked by {lockedByUser}.");
+            result.Append(File.ReadAllText(this.LockFullFileName));
           }
 
-          return;
+          string segmantName = $"{modelSegmentControlName}:";
+
+          if (result.ToString().Contains(segmantName))
+          {
+            int segmentIndex = result.ToString().IndexOf(segmantName) + segmantName.Length;
+
+            int readToIndex = result.ToString().IndexOf(';', segmentIndex);
+
+            string lockedByUser = result.ToString().Substring(segmentIndex, (readToIndex - segmentIndex));
+
+            if (lockedByUser != Environment.UserName)
+            {
+              throw new ApplicationException($"This Canvas is locked by {lockedByUser}.");
+            }
+
+            return;
+          }
+
+          result.Append($"{modelSegmentControlName}:{Environment.UserName};");
+
+          File.WriteAllText(this.LockFullFileName, result.ToString());
         }
-
-        result.Append($"{modelSegmentControlName}:{Environment.UserName};");
-
-        File.WriteAllText(LockFullFileName, result.ToString());
+      }
+      finally
+      {
+        File.Delete(this.FileLockName);
       }
     }
 
@@ -139,40 +167,49 @@ namespace ERD.FileManagement
         return;
       }
 
-      if (!File.Exists(LockFullFileName))
+      if (!File.Exists(this.LockFullFileName))
       {
         return;
       }
 
-      lock (lockMethodObject)
+      try
       {
-        StringBuilder fileText = new StringBuilder();
+        this.WaitLockRelease();
 
-        fileText.Append(File.ReadAllText(this.LockFullFileName));
-
-        string segmantName = $"{modelSegmentControlName}:";
-
-        if (fileText.ToString().Contains(segmantName))
+        lock (lockMethodObject)
         {
-          int segmentIndex = fileText.ToString().IndexOf(segmantName) + segmantName.Length;
+          StringBuilder fileText = new StringBuilder();
 
-          int readToIndex = fileText.ToString().IndexOf(';', segmentIndex);
+          fileText.Append(File.ReadAllText(this.LockFullFileName));
 
-          string lockedByUser = fileText.ToString().Substring(segmentIndex, (readToIndex - segmentIndex));
+          string segmantName = $"{modelSegmentControlName}:";
 
-          if (lockedByUser != Environment.UserName)
+          if (fileText.ToString().Contains(segmantName))
           {
-            throw new ApplicationException($"This Canvas is locked by {lockedByUser}.");
+            int segmentIndex = fileText.ToString().IndexOf(segmantName) + segmantName.Length;
+
+            int readToIndex = fileText.ToString().IndexOf(';', segmentIndex);
+
+            string lockedByUser = fileText.ToString().Substring(segmentIndex, (readToIndex - segmentIndex));
+
+            if (lockedByUser != Environment.UserName)
+            {
+              throw new ApplicationException($"This Canvas is locked by {lockedByUser}.");
+            }
+
+            segmentIndex = fileText.ToString().IndexOf(segmantName);
+
+            readToIndex = (readToIndex - segmentIndex + 1);
+
+            fileText.Remove(segmentIndex, readToIndex);
           }
 
-          segmentIndex = fileText.ToString().IndexOf(segmantName);
-
-          readToIndex = (readToIndex - segmentIndex + 1);
-
-          fileText.Remove(segmentIndex, readToIndex);
+          File.WriteAllText(this.LockFullFileName, fileText.ToString());
         }
-
-        File.WriteAllText(LockFullFileName, fileText.ToString());
+      }
+      finally
+      {
+        File.Delete(this.FileLockName);
       }
     }
 
@@ -183,48 +220,67 @@ namespace ERD.FileManagement
         return;
       }
 
-      if (!File.Exists(LockFullFileName))
+      if (!File.Exists(this.LockFullFileName))
       {
         return;
       }
 
-      lock (lockMethodObject)
+      try
       {
-        StringBuilder fileText = new StringBuilder();
+        this.WaitLockRelease();
 
-        fileText.Append(File.ReadAllText(this.LockFullFileName));
-
-        string fileUserName = $":{userName};";
-
-        int usernameInstanceIndex = fileText.ToString().IndexOf(fileUserName);
-
-        while(usernameInstanceIndex > 0)
+        lock (lockMethodObject)
         {
-          int controlIndex = usernameInstanceIndex - 1;
+          StringBuilder fileText = new StringBuilder();
 
-          while(fileText.ToString().Substring(controlIndex, 1) != ";")
+          fileText.Append(File.ReadAllText(this.LockFullFileName));
+
+          string fileUserName = $":{userName};";
+
+          int usernameInstanceIndex = fileText.ToString().IndexOf(fileUserName);
+
+          while (usernameInstanceIndex > 0)
           {
-            --controlIndex;
+            int controlIndex = usernameInstanceIndex - 1;
 
-            if (controlIndex < 0)
+            while (fileText.ToString().Substring(controlIndex, 1) != ";")
             {
-              break;
+              --controlIndex;
+
+              if (controlIndex < 0)
+              {
+                break;
+              }
             }
+
+            ++controlIndex;
+
+            int lengthIndex = ((usernameInstanceIndex - controlIndex) + (userName.Length + 2));
+
+            //string toRemove = fileText.ToString().Substring(controlIndex, lengthIndex);
+
+            fileText.Remove(controlIndex, lengthIndex);
+
+            usernameInstanceIndex = fileText.ToString().IndexOf(fileUserName);
           }
 
-          ++controlIndex;
-
-          int lengthIndex = ((usernameInstanceIndex - controlIndex) + (userName.Length + 2));
-
-          //string toRemove = fileText.ToString().Substring(controlIndex, lengthIndex);
-
-          fileText.Remove(controlIndex, lengthIndex);
-
-          usernameInstanceIndex = fileText.ToString().IndexOf(fileUserName);
+          File.WriteAllText(this.LockFullFileName, fileText.ToString());
         }
-
-        File.WriteAllText(LockFullFileName, fileText.ToString());
       }
+      finally
+      {
+        File.Delete(this.FileLockName);
+      }
+    }
+
+    private void WaitLockRelease()
+    {
+      while(File.Exists(this.FileLockName))
+      {
+        Sleep.ThreadWait(100);
+      }
+
+      File.WriteAllText(this.FileLockName, $"File locked by {Environment.UserName}");
     }
 
     private string LockFullFileName
@@ -232,6 +288,14 @@ namespace ERD.FileManagement
       get
       {
         return Path.Combine(General.ProjectModel.FileDirectory,  $"{General.ProjectModel.ModelName}.FileLocks.{FileTypes.eloc}");
+      }
+    }
+  
+    private string FileLockName
+    {
+      get
+      {
+        return Path.Combine(General.ProjectModel.FileDirectory, $"{General.ProjectModel.ModelName}.FileLocked");
       }
     }
   }

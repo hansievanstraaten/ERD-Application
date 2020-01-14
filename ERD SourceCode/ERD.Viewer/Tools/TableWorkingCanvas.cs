@@ -53,20 +53,19 @@ namespace ERD.Viewer.Tools
     
     public async void CreateTableObject(TableModel table)
     {
-      ReverseEngineer reverseEngineer = new ReverseEngineer(this.Dispatcher);
-
-      await Task.Factory.StartNew(() => 
+      if (!table.IsNewTable && (table.Columns == null || table.Columns.Count() == 0))
       {
-        if (!table.IsNewTable && (table.Columns == null || table.Columns.Count() == 0))
+        await Task.Factory.StartNew(() => 
         {
-          EventParser.ParseMessage(this, this.Dispatcher, string.Empty, "Reading table information.");
+            ReverseEngineer reverseEngineer = new ReverseEngineer(this.Dispatcher);
 
-          table.Columns = table.Columns.AddRange(reverseEngineer.GetTableColumns(table.TableName).ToArray());
+            EventParser.ParseMessage(this, this.Dispatcher, string.Empty, "Reading table information.");
+
+            table.Columns = table.Columns.AddRange(reverseEngineer.GetTableColumns(table.TableName).ToArray());
         
-          table.PrimaryKeyClusterConstraintName = reverseEngineer.GetTablePrimaryKeyCluster(table.TableName);
-        }
-      });
-
+            table.PrimaryKeyClusterConstraintName = reverseEngineer.GetTablePrimaryKeyCluster(table.TableName);
+        });
+      }
       
       table.IsNewTable = false;
 

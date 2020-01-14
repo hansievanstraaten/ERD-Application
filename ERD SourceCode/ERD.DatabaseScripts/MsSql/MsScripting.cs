@@ -96,6 +96,12 @@ namespace ERD.Viewer.Database.MsSql
 
       result.Append(this.BuildColumnExists(table));
 
+      string[] primaryKeyColumns = table.Columns.Any(pk => pk.InPrimaryKey) ? 
+        table.Columns.Where(pkc => pkc.InPrimaryKey).Select(col => col.ColumnName).ToArray() : 
+        new string[] { };
+
+      result.Append(this.BuildePrimaryKeyClusterCheck(table.PrimaryKeyClusterConstraintName, table.TableName, primaryKeyColumns));
+
       return result.ToString();
     }
 
@@ -457,58 +463,36 @@ namespace ERD.Viewer.Database.MsSql
       return result.ToString();
     }
 
-    //private string AlterPrimaryKeyConstraints(TableModel table, int keyCount)
-    //{
-    //  StringBuilder result = new StringBuilder();
+    private string BuildePrimaryKeyClusterCheck(string constarintName, string tableName, string[] primaryKeyColumns)
+    {
+      if (!primaryKeyColumns.HasElements())
+      {
+        return string.Empty;
+      }
 
-    //  result.AppendLine("IF EXISTS (SELECT 1 ");
-    //  result.AppendLine("             FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS ");
-    //  result.AppendLine($"            WHERE CONSTRAINT_NAME = '{table.PrimaryKeyClusterConstraintName}' ");
-    //  result.AppendLine("              AND CONSTRAINT_TYPE = 'PRIMARY KEY')");
-    //  result.AppendLine("BEGIN");
-    //  result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-    //  result.AppendLine($"    DROP CONSTRAINT [{table.PrimaryKeyClusterConstraintName}]");
-    //  result.AppendLine("END");
+      StringBuilder result = new StringBuilder();
 
-    //  result.AppendLine();
+      StringBuilder keyColumns = new StringBuilder();
 
-    //  result.AppendLine("IF NOT EXISTS (SELECT 1 ");
-    //  result.AppendLine("             FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS ");
-    //  result.AppendLine($"            WHERE CONSTRAINT_NAME = '{table.PrimaryKeyClusterConstraintName}' ");
-    //  result.AppendLine("              AND CONSTRAINT_TYPE = 'PRIMARY KEY')");
-    //  result.AppendLine("BEGIN");
+      foreach(string column in primaryKeyColumns)
+      {
+        keyColumns.Append($"[{column}],");
+      }
 
-    //  if (keyCount == 0)
-    //  {
-    //    return result.ToString();
-    //  }
-    //  if (keyCount == 1)
-    //  {
-    //    ColumnObjectModel column = table.Columns.First(pk => pk.InPrimaryKey);
+      keyColumns.Remove(keyColumns.Length - 1, 1);
 
-    //    result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-    //    result.AppendLine($"    ADD CONSTRAINT [{table.PrimaryKeyClusterConstraintName}] PRIMARY KEY ([{column.ColumnName}] ASC)");
-    //  }
-    //  else
-    //  {
-    //    result.AppendLine($"    ALTER TABLE [{table.TableName}]");
-    //    result.AppendLine($"    ADD CONSTRAINT [{table.PrimaryKeyClusterConstraintName}] PRIMARY KEY (");
+      result.AppendLine("IF NOT EXISTS(SELECT 1");
+      result.AppendLine("                FROM SYS.INDEXES");
+      result.AppendLine("               WHERE IS_PRIMARY_KEY = 1");
+      result.AppendLine($"               AND[NAME] = '{constarintName}')");
+      result.AppendLine("BEGIN");
+      result.AppendLine($"    ALTER TABLE[{tableName}]");
+      result.AppendLine($"    ADD CONSTRAINT {constarintName} PRIMARY KEY CLUSTERED({keyColumns.ToString()});");
+      result.AppendLine("END");
 
-    //    foreach (ColumnObjectModel column in table.Columns.Where(pkc => pkc.InPrimaryKey))
-    //    {
-    //      result.AppendLine($"        [{column.ColumnName}] ASC,");
-    //    }
 
-    //    result.Remove(result.Length - 3, 3); // Remove three to cater  for the line feed
-    //    result.AppendLine(" )");
-    //  }
-      
-    //  result.AppendLine("END");
-
-    //  result.AppendLine();
-
-    //  return result.ToString();
-    //}
+      return result.ToString();
+    }
 
     private string ColumnDataType(ColumnObjectModel column)
     {

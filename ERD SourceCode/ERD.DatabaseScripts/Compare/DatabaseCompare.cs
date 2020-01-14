@@ -198,14 +198,14 @@ namespace ERD.DatabaseScripts.Compare
             { // This was handled in the Column Comparison
               continue;
             }
-
+            
             if (databaseColumn.ForeignKeyColumn.ToUpper() != canvasColumn.ForeignKeyColumn.ToUpper())
             {
               this.result.Add(new CompareResultModel
               {
                 TableObject = fromDatabase,
                 ObjectName = databaseColumn.ForeignConstraintName,
-                Message = "Foreign Key Constraint Exist in Database but not on ERD Model.",
+                Message = $"Foreign Key Constraint Exist in Database Model but not on ERD Model. ({databaseColumn.ColumnName})",
                 ObjectType = ObjectTypeEnum.ForeignKeyConstraint,
                 ObjectAction = ObjectActionEnum.DropFromDatabase
               });
@@ -249,9 +249,9 @@ namespace ERD.DatabaseScripts.Compare
               {
                 TableObject = fromCanvas,
                 ObjectName = databaseColumn.ForeignConstraintName,
-                Message = "Foreign Key Constraint Exist on ERD Model but not in Database.",
+                Message = $"Foreign Key Constraint Exist on ERD Model but not in Database. ({databaseColumn.ColumnName})",
                 ObjectType = ObjectTypeEnum.ForeignKeyConstraint,
-                ObjectAction = ObjectActionEnum.Ignore
+                ObjectAction = ObjectActionEnum.CreateInDatabase
               });
             }
           }

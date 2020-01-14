@@ -669,6 +669,16 @@ namespace ERD.Viewer
                       tableColumn.ForeignConstraintName = databaseColumn.ForeignConstraintName;
 
                     }
+                    else if (!tableColumn.IsVertualRelation)
+                    {
+                      tableColumn.IsForeignkey = false;
+
+                      tableColumn.ForeignKeyTable = string.Empty;
+
+                      tableColumn.ForeignKeyColumn = string.Empty;
+
+                      tableColumn.ForeignConstraintName = string.Empty;
+                    }
 
                     continue;
                   }

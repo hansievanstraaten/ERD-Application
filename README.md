@@ -8,7 +8,6 @@ The 'ERD Msi' folder contains an installable (ViSo.Viewer.msi) and a short descr
 
 This Application was developed and is maintained to provide a useful manner in managing database entities, view the data thereof and script recursive code.
 
-It allows for multiple database connections, locking of files by developers, scripting of SQL for distribution, and generating code (Supports C# types) for standard queries. Support for virtual relations makes this allocation ideal for development where actual database relations are a constraint that cannot be implemented but would be nice to view
+It allows for multiple database connections, locking of files by developers, scripting of SQL for distribution, and generating code (Supports C# types) for standard queries. Support for virtual relations makes this application ideal for development where actual database relations are a constraint that cannot be implemented but would be nice to view
 
 The Sample project supplied provides a posable way of ding things. Just change the SQL Connection information in the 'ViSo Nice.eprj' file to a valid database and select the file from the application.
-

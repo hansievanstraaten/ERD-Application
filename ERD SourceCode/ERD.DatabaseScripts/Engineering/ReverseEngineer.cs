@@ -53,7 +53,7 @@ namespace ERD.DatabaseScripts.Engineering
     {
       IReverseEngineer result;
 
-      switch (Connections.DatabaseModel.DatabaseType)
+      switch (Connections.Instance.DatabaseModel.DatabaseType)
       {
         case DatabaseTypeEnum.SQL:
         default:

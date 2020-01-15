@@ -27,11 +27,6 @@ namespace ERD.Viewer.Tools
 
     public TableCanvas(ErdCanvasModel erdSegment, DatabaseModel databaseModel)
     {
-      //if (erdSegment.ModelSegmentName.StartsWith("Stock "))
-      //{
-
-      //}
-
       this.InitializeComponent();
 
       this.ErdSegment = erdSegment;

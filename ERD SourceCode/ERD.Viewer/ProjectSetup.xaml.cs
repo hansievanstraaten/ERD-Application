@@ -28,7 +28,7 @@ namespace ERD.Viewer
 
       this.uxProjectSetup.Items.Add(databaseModel);
 
-      foreach (KeyValuePair<string, AltDatabaseModel> item in Connections.AlternativeModels)
+      foreach (KeyValuePair<string, AltDatabaseModel> item in Connections.Instance.AlternativeModels)
       {
         this.uxAlternativeConnections.Items.Add(item.Value);
       }
@@ -53,12 +53,12 @@ namespace ERD.Viewer
         
         foreach (AltDatabaseModel altModel in this.newAlternativeOptions)
         {
-          if (Connections.AlternativeModels.ContainsKey(altModel.ConnectionName) || altModel.ConnectionName.StartsWith("Default"))
+          if (Connections.Instance.AlternativeModels.ContainsKey(altModel.ConnectionName) || altModel.ConnectionName.StartsWith("Default"))
           {
             throw new ApplicationException($"Duplicate Connection Name {altModel.ConnectionName} not allowed.");
           }
 
-          Connections.AlternativeModels.Add(altModel.ConnectionName, altModel);
+          Connections.Instance.AlternativeModels.Add(altModel.ConnectionName, altModel);
         }
 
         Integrity.KeepColumnsUnique = this.SelectedProjectModel.KeepColumnsUnique;

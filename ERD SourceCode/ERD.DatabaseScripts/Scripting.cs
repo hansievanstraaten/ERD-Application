@@ -64,12 +64,12 @@ namespace ERD.DatabaseScripts
 
     private static IScripting CreateClass()
     {
-      if (Scripting.scripting != null && Scripting.scripting.DatabaseScriptingType == Connections.DatabaseModel.DatabaseType)
+      if (Scripting.scripting != null && Scripting.scripting.DatabaseScriptingType == Connections.Instance.DatabaseModel.DatabaseType)
       {
         return Scripting.scripting;
       }
 
-      switch (Connections.DatabaseModel.DatabaseType)
+      switch (Connections.Instance.DatabaseModel.DatabaseType)
       {
         case DatabaseTypeEnum.SQL:
         default:

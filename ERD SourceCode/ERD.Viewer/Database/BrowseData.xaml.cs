@@ -49,7 +49,7 @@ namespace ERD.Viewer.Database
 
       this.uxColumn1.Height = new GridLength(3, GridUnitType.Pixel);
 
-      this.Title = $"Browse - {Connections.DatabaseModel.ServerName} - {Connections.DatabaseModel.DatabaseName} - {tableModel.TableName}";
+      this.Title = $"Browse - {Connections.Instance.DatabaseModel.ServerName} - {Connections.Instance.DatabaseModel.DatabaseName} - {tableModel.TableName}";
       
       string selectQuery = TableQueryBuilder.BuildSelectTop(tableModel);
       
@@ -87,16 +87,16 @@ namespace ERD.Viewer.Database
       {
         if (this.connectionItem != null)
         {
-          Connections.SetConnection(this.connectionItem);
+          Connections.Instance.SetConnection(this.connectionItem);
         }
-        else
-        {
-          Connections.SetDefaultConnection();
-        }
+        //else
+        //{
+        //  Connections.Instance.SetDefaultConnection();
+        //}
 
         this.uxMessage.Content = "Executing Query";
 
-        DataAccess dataAccess = new DataAccess(Connections.DatabaseModel);
+        DataAccess dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
         List<dynamic> resultList = dataAccess.ExecuteQueryDynamic(this.uxSqlQuery.Text);
 

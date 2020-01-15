@@ -11,7 +11,7 @@ namespace ERD.DatabaseScripts
       {
         ISQLQueries result;
 
-        switch (Connections.DatabaseModel.DatabaseType)
+        switch (Connections.Instance.DatabaseModel.DatabaseType)
         {
           case DatabaseTypeEnum.SQL:
           default:

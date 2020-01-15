@@ -159,7 +159,7 @@ namespace ERD.Viewer.Database.MsSql
     {
       StringBuilder result = new StringBuilder();
 
-      DataAccess dataAccess = new DataAccess(Connections.DatabaseModel);
+      DataAccess dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
       Dictionary<string, ColumnObjectModel[]> constraintDic = table.Columns
         .Where(fk => fk.IsForeignkey && !fk.IsVertualRelation)

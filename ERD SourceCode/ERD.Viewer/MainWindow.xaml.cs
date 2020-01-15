@@ -127,9 +127,21 @@ namespace ERD.Viewer
       {
         switch (e.Title)
         {
+          case "DatabaseConnection":
+
+            this.Dispatcher.Invoke(() => 
+            {
+              this.uxDatabaseConnection.Content = $"Connection: {e.Message}";
+            });
+
+            break;
+
           default:
 
-            this.uxMessage.Content = $"{(e.Title.IsNullEmptyOrWhiteSpace() ? string.Empty : $"{e.Title}: ")}{e.Message} ";
+            this.Dispatcher.Invoke(() => 
+            { 
+              this.uxMessage.Content = $"{(e.Title.IsNullEmptyOrWhiteSpace() ? string.Empty : $"{e.Title}: ")}{e.Message} ";
+            });
 
             break;
         }
@@ -160,9 +172,7 @@ namespace ERD.Viewer
 
         General.ProjectModel = setup.SelectedProjectModel;
 
-        Connections.DefaultDatabaseModel = setup.SelectedDatabaseModel;
-
-        Connections.DatabaseModel = Connections.DefaultDatabaseModel;
+        Connections.Instance.DefaultDatabaseModel = setup.SelectedDatabaseModel;
 
         this.ActivateMenu();
 
@@ -208,7 +218,7 @@ namespace ERD.Viewer
           return;
         }
 
-        ProjectSetup setup = new ProjectSetup(General.ProjectModel, Connections.DefaultDatabaseModel);
+        ProjectSetup setup = new ProjectSetup(General.ProjectModel, Connections.Instance.DefaultDatabaseModel);
 
         bool? result = setup.ShowDialog();
         
@@ -265,10 +275,6 @@ namespace ERD.Viewer
       {
         MessageBox.Show(err.GetFullExceptionMessage());
       }
-      finally
-      {
-        Connections.SetDefaultConnection();
-      }
     }
 
     private void CompareToDB_Click(object sender, RoutedEventArgs e)
@@ -283,10 +289,6 @@ namespace ERD.Viewer
       {
         MessageBox.Show(err.GetFullExceptionMessage());
       }
-      finally
-      {
-        Connections.SetDefaultConnection();
-      }
     }
 
     private void ForwardEngineer_Click(object sender, RoutedEventArgs e)
@@ -295,7 +297,7 @@ namespace ERD.Viewer
       {
         MenuItem item = (MenuItem)e.Source;
 
-        Connections.SetConnection(item);
+        Connections.Instance.SetConnection(item);
 
         ForwardEngineer forward = new ForwardEngineer();
 
@@ -329,10 +331,6 @@ namespace ERD.Viewer
       catch (Exception err)
       {
         MessageBox.Show(err.GetFullExceptionMessage());
-      }
-      finally
-      {
-        Connections.SetDefaultConnection();
       }
     }
     
@@ -574,7 +572,7 @@ namespace ERD.Viewer
           {
             this.Dispatcher.Invoke(() =>
             {
-              Connections.SetConnection((MenuItem)sender);
+              Connections.Instance.SetConnection((MenuItem)sender);
             });
 
             ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
@@ -585,17 +583,13 @@ namespace ERD.Viewer
             {
               this.UpdateTableList(taleModelsList);
             });
-
-            EventParser.ParseMessage(this, this.Dispatcher, string.Empty, "Completed");
           }
           catch (Exception innerErr)
           {
             error = innerErr;
           }
-          finally
-          {
-            Connections.SetDefaultConnection();
-          }
+            
+          EventParser.ParseMessage(this, this.Dispatcher, string.Empty, "Completed");
 
         });
           
@@ -616,7 +610,7 @@ namespace ERD.Viewer
       {
         Exception error = null;
 
-        Connections.SetConnection(sender);
+        Connections.Instance.SetConnection(sender);
 
         ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
 
@@ -719,7 +713,7 @@ namespace ERD.Viewer
     {
       try
       {
-        Connections.SetConnection(sender);
+        Connections.Instance.SetConnection(sender);
 
         DatabaseCompare comparer = new DatabaseCompare(this.Dispatcher);
 
@@ -786,9 +780,9 @@ namespace ERD.Viewer
 
             this.listener.StartWatcher();
 
-            Connections.DefaultDatabaseModel = JsonConvert.DeserializeObject(fileLines[4], typeof(DatabaseModel)) as DatabaseModel;
+            DatabaseModel databaseModel = JsonConvert.DeserializeObject(fileLines[4], typeof(DatabaseModel)) as DatabaseModel;
 
-            Connections.DatabaseModel = Connections.DefaultDatabaseModel;
+            Connections.Instance.DefaultDatabaseModel = databaseModel;
 
             if (fileLines.Length > 5)
             {
@@ -805,7 +799,7 @@ namespace ERD.Viewer
 
                 AltDatabaseModel alternativeConnection = JsonConvert.DeserializeObject(fileLines[x], typeof(AltDatabaseModel)) as AltDatabaseModel;
 
-                Connections.AlternativeModels.Add(alternativeConnection.ConnectionName, alternativeConnection);
+                Connections.Instance.AlternativeModels.Add(alternativeConnection.ConnectionName, alternativeConnection);
               }
             }
 
@@ -904,7 +898,7 @@ namespace ERD.Viewer
 
       ForwardEngineer forward = new ForwardEngineer();
 
-      DataAccess dataAccess = new DataAccess(Connections.DatabaseModel);
+      DataAccess dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
       await Task.Factory.StartNew(() =>
       {
@@ -991,7 +985,7 @@ namespace ERD.Viewer
 
       General.ProjectModel.HasModelChanged = false;
 
-      Connections.DefaultDatabaseModel.HasModelChanged = false;
+      Connections.Instance.DefaultDatabaseModel.HasModelChanged = false;
 
       project.AppendLine(JsonConvert.SerializeObject(General.ProjectModel));
 
@@ -1003,9 +997,9 @@ namespace ERD.Viewer
 
       project.AppendLine("DATABASE");
 
-      project.AppendLine(JsonConvert.SerializeObject(Connections.DefaultDatabaseModel));
+      project.AppendLine(JsonConvert.SerializeObject(Connections.Instance.DefaultDatabaseModel));
 
-      foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.AlternativeModels)
+      foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.Instance.AlternativeModels)
       {
         project.AppendLine(JsonConvert.SerializeObject(connectionKey.Value));
       }
@@ -1049,7 +1043,7 @@ namespace ERD.Viewer
 
     private void LoadConnectionsMenue()
     {
-      if (Connections.AlternativeModels.Count > 0)
+      if (Connections.Instance.AlternativeModels.Count > 0)
       {
         this.uxGetDbTables.Click -= this.GetDbTables_Click;
 
@@ -1057,17 +1051,17 @@ namespace ERD.Viewer
 
         this.uxForwardEngineer.Click -= this.ForwardEngineer_Click;
 
-        if (!this.connectionsInMenue.Contains(Connections.DefaultConnectionName))
+        if (!this.connectionsInMenue.Contains(Connections.Instance.DefaultConnectionName))
         {
-          this.connectionsInMenue.Add(Connections.DefaultConnectionName);
+          this.connectionsInMenue.Add(Connections.Instance.DefaultConnectionName);
 
-          MenuItem defaultReverseItem = new MenuItem {Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName};
+          MenuItem defaultReverseItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
 
-          MenuItem defaultRefreshItem = new MenuItem {Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName};
+          MenuItem defaultRefreshItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
 
-          MenuItem defaultCompareItem = new MenuItem { Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName };
+          MenuItem defaultCompareItem = new MenuItem { Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName };
 
-          MenuItem defaultForwardItem = new MenuItem {Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName};
+          MenuItem defaultForwardItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
 
           defaultReverseItem.Click += this.GetDbTables_Click;
 
@@ -1084,7 +1078,7 @@ namespace ERD.Viewer
           this.uxForwardEngineer.Items.Add(defaultForwardItem);
         }
 
-        foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.AlternativeModels)
+        foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.Instance.AlternativeModels)
         {
           if (this.connectionsInMenue.Contains(connectionKey.Key))
           {
@@ -1127,7 +1121,7 @@ namespace ERD.Viewer
 
       this.canvasDictionary.Add(segment.ModelSegmentControlName, segment);
 
-      TableCanvas canvas = new TableCanvas(segment, Connections.DefaultDatabaseModel) {Name = segment.ModelSegmentControlName, Title = segment.ModelSegmentName};
+      TableCanvas canvas = new TableCanvas(segment, Connections.Instance.DatabaseModel) {Name = segment.ModelSegmentControlName, Title = segment.ModelSegmentName};
 
       canvas.TableAdded += this.CanvasTable_Added;
 

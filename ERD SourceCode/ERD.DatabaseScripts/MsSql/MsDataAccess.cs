@@ -206,11 +206,11 @@ namespace ERD.DatabaseScripts.MsSql
     {
       string sessionKey = $"{databaseModel.ServerName}||{databaseModel.DatabaseName}";
 
-      if (Connections.SessionPasswords.ContainsKey(sessionKey))
+      if (Connections.Instance.SessionPasswords.ContainsKey(sessionKey))
       {
-        this._username = Connections.SessionPasswords[sessionKey].UserName;
+        this._username = Connections.Instance.SessionPasswords[sessionKey].UserName;
 
-        this._password = Connections.SessionPasswords[sessionKey].Password;
+        this._password = Connections.Instance.SessionPasswords[sessionKey].Password;
 
         return;
       }
@@ -239,7 +239,7 @@ namespace ERD.DatabaseScripts.MsSql
 
       this._password = model.Password;
 
-      Connections.SessionPasswords.Add(sessionKey, model);
+      Connections.Instance.SessionPasswords.Add(sessionKey, model);
     }
 
     private IDataReader ExecuteCommand(string sqlQuery)

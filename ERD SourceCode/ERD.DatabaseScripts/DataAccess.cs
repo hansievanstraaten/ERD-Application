@@ -38,7 +38,7 @@ namespace ERD.Viewer.Database
     {
       IDataAccess result;
 
-      switch (Connections.DatabaseModel.DatabaseType)
+      switch (Connections.Instance.DatabaseModel.DatabaseType)
       {
         case DatabaseTypeEnum.SQL:
         default:

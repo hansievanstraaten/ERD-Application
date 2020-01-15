@@ -80,6 +80,10 @@
 
         <TabControl:TabControl x:Name="uxTabControl" Grid.Row="1" Grid.Column="2" />
 
+        <CommonControls:LableItem x:Name="uxDatabaseConnection" Grid.Row="2" Grid.Column="2"  HorizontalContentAlignment="Left" 
+                                  FontWeight="Bold"
+                                  DisplayUnderscore="True"/>
+
         <Specialized:MessageLabel x:Name="uxMessage" Grid.Row="2" Grid.Column="2" Foreground="DarkRed"  HorizontalContentAlignment="Right" />
     </Grid>
 </src:WindowBase>

@@ -23,7 +23,7 @@ namespace ERD.Viewer.Database.MsSql
 
     public string GetTablePrimaryKeyCluster(string tableName)
     {
-      DataAccess dataAccess = new DataAccess(Connections.DatabaseModel);
+      DataAccess dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
       List<dynamic> clusterList = dataAccess.ExecuteQueryDynamic(SQLQueries.DatabaseQueries.DatabasePrimaryClusterName(tableName));
 
@@ -39,9 +39,14 @@ namespace ERD.Viewer.Database.MsSql
     {
       List<TableModel> result = new List<TableModel>();
 
-      DataAccess dataAccess = new DataAccess(Connections.DatabaseModel);
+      DataAccess dataAccess = null;
 
-      XDocument tablesXml = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseTablesQuery(Connections.DatabaseModel.DatabaseName));
+      dispatcher.Invoke(() => 
+      {
+        dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
+      });
+
+      XDocument tablesXml = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseTablesQuery(Connections.Instance.DatabaseModel.DatabaseName));
 
       foreach (XElement rowItem in tablesXml.Root.Elements())
       {
@@ -72,7 +77,7 @@ namespace ERD.Viewer.Database.MsSql
 
       List<ColumnObjectModel> result = new List<ColumnObjectModel>();
 
-      DataAccess dataAccess = new DataAccess(Connections.DatabaseModel);
+      DataAccess dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
       XDocument columnsXml = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseTableColumnsQuery(tableName));
 
@@ -123,7 +128,7 @@ namespace ERD.Viewer.Database.MsSql
 
       Dictionary<string, List<ColumnObjectModel>> result = new Dictionary<string, List<ColumnObjectModel>>();
 
-      DataAccess dataAccess = new DataAccess(Connections.DatabaseModel);
+      DataAccess dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
       XDocument columnsXml = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseInTableColumnsQuery(tableNamesArray));
 

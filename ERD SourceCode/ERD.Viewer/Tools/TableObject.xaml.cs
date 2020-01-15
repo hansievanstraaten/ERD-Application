@@ -238,7 +238,7 @@ namespace ERD.Viewer.Tools
 
         ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
 
-        Connections.SetConnection((MenuItem)sender);
+        Connections.Instance.SetConnection((MenuItem)sender);
 
         string column = this.SelectedColumn.ColumnName;
 
@@ -290,10 +290,10 @@ namespace ERD.Viewer.Tools
       {
         MessageBox.Show(err.GetFullExceptionMessage());
       }
-      finally
-      {
-        Connections.SetDefaultConnection();
-      }
+      //finally
+      //{
+      //  Connections.Instance.SetDefaultConnection();
+      //}
     }
     
     private void ViewDataBaseScript_Clicked(object sender, RoutedEventArgs e)
@@ -434,15 +434,15 @@ namespace ERD.Viewer.Tools
 
       MenuItem viewData = new MenuItem { Header = "View Data" };
 
-      if (Connections.AlternativeModels.Count > 0)
+      if (Connections.Instance.AlternativeModels.Count > 0)
       {
-        MenuItem defaultItem = new MenuItem { Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName };
+        MenuItem defaultItem = new MenuItem { Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName };
 
         defaultItem.Click += this.ViewData_Clicked;
 
         viewData.Items.Add(defaultItem);
 
-        foreach (KeyValuePair<string, AltDatabaseModel> connection in Connections.AlternativeModels)
+        foreach (KeyValuePair<string, AltDatabaseModel> connection in Connections.Instance.AlternativeModels)
         {
           MenuItem item = new MenuItem { Header = $"{connection.Key} ({connection.Value.DatabaseName})", Tag = connection.Key };
 
@@ -451,7 +451,7 @@ namespace ERD.Viewer.Tools
           viewData.Items.Add(item);
         }
       }
-      else // if (Connections.AlternativeModels.Count == 0)
+      else // if (Connections.Instance.AlternativeModels.Count == 0)
       {
         viewData.Click += this.ViewData_Clicked;
       }
@@ -506,15 +506,15 @@ namespace ERD.Viewer.Tools
 
     //  MenuItem viewData = new MenuItem { Header = "View Data" };
 
-    //  if (Connections.AlternativeModels.Count > 0)
+    //  if (Connections.Instance.AlternativeModels.Count > 0)
     //  {
-    //    MenuItem defaultItem = new MenuItem { Header = $"{Connections.DefaultConnectionName} ({Connections.DefaultDatabaseModel.DatabaseName})", Tag = Connections.DefaultConnectionName };
+    //    MenuItem defaultItem = new MenuItem { Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseModel.DatabaseName})", Tag = Connections.Instance.DefaultConnectionName };
 
     //    defaultItem.Click += this.ViewData_Clicked;
 
     //    viewData.Items.Add(defaultItem);
 
-    //    foreach (KeyValuePair<string, AltDatabaseModel> connection in Connections.AlternativeModels)
+    //    foreach (KeyValuePair<string, AltDatabaseModel> connection in Connections.Instance.AlternativeModels)
     //    {
     //      MenuItem item = new MenuItem { Header = $"{connection.Key} ({connection.Value.DatabaseName})", Tag = connection.Key };
 
@@ -523,7 +523,7 @@ namespace ERD.Viewer.Tools
     //      viewData.Items.Add(item);
     //    }
     //  }
-    //  else // if (Connections.AlternativeModels.Count == 0)
+    //  else // if (Connections.Instance.AlternativeModels.Count == 0)
     //  {
     //    viewData.Click += this.ViewData_Clicked;
     //  }

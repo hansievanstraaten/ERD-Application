@@ -161,13 +161,13 @@ namespace ERD.DatabaseScripts.Engineering
           result.AppendLine();
         }
 
-        string outPath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{Connections.DatabaseModel.DatabaseName}.sql");
+        string outPath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{Connections.Instance.DatabaseModel.DatabaseName}.sql");
 
         int outIndex = 1;
 
         while (File.Exists(outPath))
         {
-          outPath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{Connections.DatabaseModel.DatabaseName} ({outIndex}).sql");
+          outPath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{Connections.Instance.DatabaseModel.DatabaseName} ({outIndex}).sql");
 
           ++outIndex;
         }
@@ -186,7 +186,7 @@ namespace ERD.DatabaseScripts.Engineering
     {
       try
       {
-        DataAccess data = new DataAccess(Connections.DatabaseModel);
+        DataAccess data = new DataAccess(Connections.Instance.DatabaseModel);
 
         foreach (string contraint in Integrity.DropRelations)
         {

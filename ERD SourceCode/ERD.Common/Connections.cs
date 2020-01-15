@@ -72,14 +72,14 @@ namespace ERD.Common
       }
     }
 
-    public DatabaseModel DefaultDatabaseModel 
-    { 
+    public DatabaseModel DefaultDatabaseModel
+    {
       get
       {
         return Connections.defaultDatabaseModel;
       }
-      
-      set
+
+      private set
       {
         Connections.defaultDatabaseModel = value;
 
@@ -111,6 +111,11 @@ namespace ERD.Common
 
     public Dictionary<string, AltDatabaseModel> AlternativeModels = new Dictionary<string, AltDatabaseModel>();
 
+    public void SetDefaultDatabaseModel(DatabaseModel model)
+    {
+      this.DefaultDatabaseModel = model;
+    }
+
     public void SetConnection(MenuItem item)
     {
       if (item.Tag == null || item.Tag.ToString() == Connections.Instance.DefaultConnectionName)
@@ -129,7 +134,6 @@ namespace ERD.Common
 
     public void Dispose()
     {
-      throw new NotImplementedException();
     }
   }
 }

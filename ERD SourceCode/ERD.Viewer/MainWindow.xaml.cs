@@ -172,7 +172,7 @@ namespace ERD.Viewer
 
         General.ProjectModel = setup.SelectedProjectModel;
 
-        Connections.Instance.DefaultDatabaseModel = setup.SelectedDatabaseModel;
+        Connections.Instance.SetDefaultDatabaseModel(setup.SelectedDatabaseModel);
 
         this.ActivateMenu();
 
@@ -782,7 +782,7 @@ namespace ERD.Viewer
 
             DatabaseModel databaseModel = JsonConvert.DeserializeObject(fileLines[4], typeof(DatabaseModel)) as DatabaseModel;
 
-            Connections.Instance.DefaultDatabaseModel = databaseModel;
+            Connections.Instance.SetDefaultDatabaseModel(databaseModel);
 
             if (fileLines.Length > 5)
             {

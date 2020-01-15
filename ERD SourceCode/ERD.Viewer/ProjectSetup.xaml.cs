@@ -31,6 +31,12 @@ namespace ERD.Viewer
       foreach (KeyValuePair<string, AltDatabaseModel> item in Connections.Instance.AlternativeModels)
       {
         this.uxAlternativeConnections.Items.Add(item.Value);
+
+        int itemIndex = this.uxAlternativeConnections.Items.Count - 1;
+
+        this.uxAlternativeConnections[itemIndex].Header = $"Database Setup: {item.Value.ConnectionName}";
+
+        this.uxAlternativeConnections[itemIndex].ToggelCollaps(true);
       }
 
       this.uxProjectSetup.AllignAllCaptions();

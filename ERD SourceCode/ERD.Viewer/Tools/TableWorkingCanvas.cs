@@ -383,7 +383,9 @@ namespace ERD.Viewer.Tools
           
         this.columnRelationModel.Remove(dictionaryKey);
 
-        sender.Dispose();
+                this.CanvasChanged?.Invoke(this, sender);
+
+                sender.Dispose();
       }
       catch (Exception err)
       {

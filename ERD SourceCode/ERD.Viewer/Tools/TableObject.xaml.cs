@@ -238,7 +238,7 @@ namespace ERD.Viewer.Tools
 
         ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
 
-        Connections.Instance.SetConnection((MenuItem)sender);
+        Connections.Instance.SetConnection((MenuItem)sender, false);
 
         string column = this.SelectedColumn.ColumnName;
 

@@ -8,6 +8,10 @@ namespace ERD.Common
 {
     public sealed class Connections : IDisposable
     {
+        public delegate void ConnectionChangedEvent(object sender, DatabaseModel model);
+
+        public event ConnectionChangedEvent ConnectionChanged;
+
         private static DatabaseModel databaseModel;
 
         private static DatabaseModel defaultDatabaseModel;
@@ -113,14 +117,19 @@ namespace ERD.Common
 
         public Dictionary<string, AltDatabaseModel> AlternativeModels = new Dictionary<string, AltDatabaseModel>();
 
-        public void SetDefaultDatabaseModel(DatabaseModel model)
+        public void SetDefaultDatabaseModel(DatabaseModel model, bool raiseConnectionChangeEvent)
         {
             this.DefaultDatabaseModel = model;
 
             this.IsDefaultConnection = true;
+
+            if (raiseConnectionChangeEvent)
+            {
+                Connections.Instance.ConnectionChanged?.Invoke(Connections.Instance, model);
+            }
         }
 
-        public void SetConnection(MenuItem item)
+        public void SetConnection(MenuItem item, bool raiseConnectionChangeEvent)
         {
             if (item.Tag == null || item.Tag.ToString() == Connections.Instance.DefaultConnectionName)
             {
@@ -130,6 +139,11 @@ namespace ERD.Common
 
                 this.IsDefaultConnection = true;
 
+                if (raiseConnectionChangeEvent)
+                {
+                    Connections.Instance.ConnectionChanged?.Invoke(Connections.Instance, Connections.Instance.DatabaseModel);
+                }
+                
                 return;
             }
 
@@ -138,6 +152,11 @@ namespace ERD.Common
             EventParser.ParseMessage(Connections.Instance.DatabaseModel, "DatabaseConnection", item.Tag.ToString());
 
             this.IsDefaultConnection = false;
+
+            if (raiseConnectionChangeEvent)
+            {
+                Connections.Instance.ConnectionChanged?.Invoke(Connections.Instance, Connections.Instance.DatabaseModel);
+            }
         }
 
         public void Dispose()

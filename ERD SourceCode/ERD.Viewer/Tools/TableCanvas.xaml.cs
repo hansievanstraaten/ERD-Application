@@ -13,180 +13,184 @@ using WPF.Tools.Functions;
 
 namespace ERD.Viewer.Tools
 {
-  /// <summary>
-  /// Interaction logic for TableCanvas.xaml
-  /// </summary>
-  public partial class TableCanvas : UserControlBase
-  {
-    public delegate void TableAddedEvent(object sender, TableModel table);
-
-    public delegate void TableRemovedEvent(object sender, TableModel tableModel);
-
-    public event TableAddedEvent TableAdded;
-
-    public event TableRemovedEvent TableRemoved;
-
-    public TableCanvas(ErdCanvasModel erdSegment, DatabaseModel databaseModel)
+    /// <summary>
+    /// Interaction logic for TableCanvas.xaml
+    /// </summary>
+    public partial class TableCanvas : UserControlBase
     {
-      this.InitializeComponent();
+        public delegate void TableAddedEvent(object sender, TableModel table);
 
-      this.ErdSegment = erdSegment;
+        public delegate void TableRemovedEvent(object sender, TableModel tableModel);
 
-      this.uxTableCanvas.NewTablePrefix = this.ErdSegment.TablePrefix;
+        public event TableAddedEvent TableAdded;
 
-      foreach (TableModel table in this.ErdSegment.SegmentTables)
-      {
-        this.uxTableCanvas.CreateTableObject(table);
-      }
+        public event TableRemovedEvent TableRemoved;
 
-      this.uxTableCanvas.DatabaseModel = databaseModel;
+        public TableCanvas(ErdCanvasModel erdSegment, DatabaseModel databaseModel)
+        {
+            this.InitializeComponent();
 
-      this.uxTableCanvas.TableAdded += this.Table_Added;
+            this.ErdSegment = erdSegment;
 
-      this.uxTableCanvas.RemoveTable += this.Table_Removed;
+            this.uxTableCanvas.NewTablePrefix = this.ErdSegment.TablePrefix;
 
-      this.uxTableCanvas.CanvasChanged += this.Canvas_Changed;
+            foreach (TableModel table in this.ErdSegment.SegmentTables)
+            {
+                this.uxTableCanvas.CreateTableObject(table);
+            }
 
-      this.SizeChanged += this.TableCanvas_SizeChanged;
-      
-      this.uxTabMetadata.Content = $"Tables Prefix: {this.ErdSegment.TablePrefix}";
+            this.uxTableCanvas.DatabaseModel = databaseModel;
 
-    }
+            this.uxTableCanvas.TableAdded += this.Table_Added;
 
-    private void Canvas_Changed(object sender, object changedItem)
-    {
-      if (!General.ProjectModel.LockCanvasOnEditing)
-      {
-        return;
-      }
+            this.uxTableCanvas.RemoveTable += this.Table_Removed;
 
-      CanvasLocks.Instance.LockFile(this.ErdSegment.ModelSegmentControlName);
+            this.uxTableCanvas.CanvasChanged += this.Canvas_Changed;
 
-      this.uxTabLock.Visibility = Visibility.Visible;
+            this.SizeChanged += this.TableCanvas_SizeChanged;
 
-      this.uxTabLock.Content = "This Canvas is locked by You";
+            this.uxTabMetadata.Content = $"Tables Prefix: {this.ErdSegment.TablePrefix}";
 
+        }
+
+        private void Canvas_Changed(object sender, object changedItem)
+        {
             EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
+            
+            if (!General.ProjectModel.LockCanvasOnEditing)
+            {
+                return;
+            }
+
+            CanvasLocks.Instance.LockFile(this.ErdSegment.ModelSegmentControlName);
+
+            this.uxTabLock.Visibility = Visibility.Visible;
+
+            this.uxTabLock.Content = "This Canvas is locked by You";
         }
 
-    private void Table_Removed(object sender, TableModel tableModel)
-    {
-      if (this.TableRemoved != null)
-      {
-        this.TableRemoved(this, tableModel);
-      }
-    }
-
-    public TableModel this[string tableName]
-    {
-      get
-      {
-        return this.ErdSegment.SegmentTables.FirstOrDefault(tn => tn.TableName == tableName);
-      }
-    }
-
-    public ErdCanvasModel ErdSegment {get; set;}
-
-    public void ZoomTo(Point location)
-    {
-      this.uxCanvasScroll.ZoomTo(location);
-    }
-
-    public async void CheckLockStatus(List<string> lockedFiles)
-    {
-      bool isLocked = false;
-
-      bool haveLock = false;
-
-      string lockedByUser = string.Empty;
-
-      string thisName = $"{this.ErdSegment.ModelSegmentControlName}:";
-
-      await Task.Factory.StartNew(() =>
-      {
-        foreach(string lockedItem in lockedFiles)
+        private void Table_Removed(object sender, TableModel tableModel)
         {
-          if (!lockedItem.StartsWith(thisName))
-          {
-            continue;
-          }
-
-          string[] lockInformation = lockedItem.Split(':');
-
-          lockedByUser = lockInformation[1];
-
-          isLocked = Environment.UserName != lockedByUser;
-
-          if (!isLocked)
-          {
-            lockedByUser = "You";
-          }
-
-          haveLock = true;
+            if (this.TableRemoved != null)
+            {
+                this.TableRemoved(this, tableModel);
+            }
         }
-      });
 
-      this.Dispatcher.Invoke(() => 
-        { 
-          this.uxTabLock.Visibility = haveLock ? Visibility.Visible : Visibility.Collapsed;
-
-          this.uxTabLock.Content = $"This Canvas is locked by {lockedByUser}";
-
-          this.uxTableCanvas.IsEnabled = !isLocked;
-
-          if (lockedByUser == "You")
-          {
-              EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
-          }
-        });
-    }
-
-    private void TableObjet_Move(object sender, bool isDrag)
-    {
-      this.uxCanvasScroll.IsPannable = !isDrag;
-    }
-    
-    private void Table_Added(object sender, TableModel table)
-    {
-      if (!this.ErdSegment.SegmentTables.Any(t => t.TableName == table.TableName))
-      {
-        table.ErdSegmentModelName = this.ErdSegment.ModelSegmentName;
-
-        this.ErdSegment.SegmentTables.Add(table);
-
-        this.TableAdded?.Invoke(this, table);
-      }
-    }
-
-    private void AdditionalTables_Clicked(object sender, RoutedEventArgs e)
-    {
-      try
-      {
-        SelectedTables selector = new SelectedTables(this.ErdSegment.IncludeInContextBuild.ToArray());
-
-        bool? result = selector.ShowDialog();
-
-        if (!result.IsTrue())
+        public TableModel this[string tableName]
         {
-          return;
+            get
+            {
+                return this.ErdSegment.SegmentTables.FirstOrDefault(tn => tn.TableName == tableName);
+            }
         }
 
-        this.ErdSegment.IncludeInContextBuild.Clear();
+        public ErdCanvasModel ErdSegment
+        {
+            get;
+            set;
+        }
 
-        this.ErdSegment.IncludeInContextBuild.AddRange(selector.SelectedModels());
+        public void ZoomTo(Point location)
+        {
+            this.uxCanvasScroll.ZoomTo(location);
+        }
 
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
+        public async void CheckLockStatus(List<string> lockedFiles)
+        {
+            bool isLocked = false;
+
+            bool haveLock = false;
+
+            string lockedByUser = string.Empty;
+
+            string thisName = $"{this.ErdSegment.ModelSegmentControlName}:";
+
+            await Task.Factory.StartNew(() =>
+            {
+                foreach (string lockedItem in lockedFiles)
+                {
+                    if (!lockedItem.StartsWith(thisName))
+                    {
+                        continue;
+                    }
+
+                    string[] lockInformation = lockedItem.Split(':');
+
+                    lockedByUser = lockInformation[1];
+
+                    isLocked = Environment.UserName != lockedByUser;
+
+                    if (!isLocked)
+                    {
+                        lockedByUser = "You";
+                    }
+
+                    haveLock = true;
+                }
+            });
+
+            this.Dispatcher.Invoke(() =>
+            {
+                this.uxTabLock.Visibility = haveLock ? Visibility.Visible : Visibility.Collapsed;
+
+                this.uxTabLock.Content = $"This Canvas is locked by {lockedByUser}";
+
+                this.uxTableCanvas.IsEnabled = !isLocked;
+
+                if (lockedByUser == "You")
+                {
+                    EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
+                }
+            });
+        }
+
+        private void TableObjet_Move(object sender, bool isDrag)
+        {
+            this.uxCanvasScroll.IsPannable = !isDrag;
+        }
+
+        private void Table_Added(object sender, TableModel table)
+        {
+            if (!this.ErdSegment.SegmentTables.Any(t => t.TableName == table.TableName))
+            {
+                table.ErdSegmentModelName = this.ErdSegment.ModelSegmentName;
+
+                this.ErdSegment.SegmentTables.Add(table);
+
+                this.TableAdded?.Invoke(this, table);
+            }
+        }
+
+        private void AdditionalTables_Clicked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SelectedTables selector = new SelectedTables(this.ErdSegment.IncludeInContextBuild.ToArray());
+
+                bool? result = selector.ShowDialog();
+
+                if (!result.IsTrue())
+                {
+                    return;
+                }
+
+                this.ErdSegment.IncludeInContextBuild.Clear();
+
+                this.ErdSegment.IncludeInContextBuild.AddRange(selector.SelectedModels());
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void TableCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.uxTableCanvas.MinWidth = this.uxCanvasScroll.ActualWidth + 1000;
+
+            this.uxTableCanvas.MinHeight = this.uxCanvasScroll.ActualHeight + 1000;
+        }
     }
-
-    private void TableCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-      this.uxTableCanvas.MinWidth = this.uxCanvasScroll.ActualWidth + 1000;
-
-      this.uxTableCanvas.MinHeight = this.uxCanvasScroll.ActualHeight + 1000;
-    }
-  }
 }

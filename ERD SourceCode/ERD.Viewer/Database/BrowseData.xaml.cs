@@ -87,12 +87,8 @@ namespace ERD.Viewer.Database
       {
         if (this.connectionItem != null)
         {
-          Connections.Instance.SetConnection(this.connectionItem);
+          Connections.Instance.SetConnection(this.connectionItem, false);
         }
-        //else
-        //{
-        //  Connections.Instance.SetDefaultConnection();
-        //}
 
         this.uxMessage.Content = "Executing Query";
 

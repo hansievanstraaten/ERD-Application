@@ -54,6 +54,8 @@ namespace ERD.Viewer
             EventParser.ParseQueryObject += this.Query_Parsed;
 
             this.listener.FileChanged += this.ProjectFiles_Changed;
+
+            Connections.Instance.ConnectionChanged += this.Connections_Changed;
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
@@ -90,6 +92,21 @@ namespace ERD.Viewer
             try
             {
                 this.Close();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void Connections_Changed(object sender, DatabaseModel model)
+        {
+            try
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    this.SetForwardEngineerOptions(Connections.Instance.IsDefaultConnection);
+                });
             }
             catch (Exception err)
             {
@@ -134,8 +151,6 @@ namespace ERD.Viewer
                         this.Dispatcher.Invoke(() =>
                         {
                             this.uxDatabaseConnection.Content = $"Connection: {e.Message}";
-
-                            this.SetForwardEngineerOptions(!Connections.Instance.IsDefaultConnection);
                         });
 
                         break;
@@ -144,7 +159,7 @@ namespace ERD.Viewer
 
                         this.Dispatcher.Invoke(() =>
                         {
-                            this.SetForwardEngineerOptions(!Connections.Instance.IsDefaultConnection);
+                            this.SetForwardEngineerOptions(false);
                         });
 
                         break;
@@ -185,7 +200,7 @@ namespace ERD.Viewer
 
                 General.ProjectModel = setup.SelectedProjectModel;
 
-                Connections.Instance.SetDefaultDatabaseModel(setup.SelectedDatabaseModel);
+                Connections.Instance.SetDefaultDatabaseModel(setup.SelectedDatabaseModel, false);
 
                 this.ActivateMenu();
 
@@ -310,7 +325,7 @@ namespace ERD.Viewer
             {
                 MenuItem item = (MenuItem) e.Source;
 
-                Connections.Instance.SetConnection(item);
+                Connections.Instance.SetConnection(item, true);
 
                 ForwardEngineer forward = new ForwardEngineer();
 
@@ -590,7 +605,7 @@ namespace ERD.Viewer
                     {
                         this.Dispatcher.Invoke(() =>
                         {
-                            Connections.Instance.SetConnection((MenuItem) sender);
+                            Connections.Instance.SetConnection((MenuItem) sender, true);
                         });
 
                         ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
@@ -628,7 +643,7 @@ namespace ERD.Viewer
             {
                 Exception error = null;
 
-                Connections.Instance.SetConnection(sender);
+                Connections.Instance.SetConnection(sender, true);
 
                 ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
 
@@ -741,7 +756,7 @@ namespace ERD.Viewer
         {
             try
             {
-                Connections.Instance.SetConnection(sender);
+                Connections.Instance.SetConnection(sender, true);
 
                 DatabaseCompare comparer = new DatabaseCompare(this.Dispatcher);
 
@@ -810,7 +825,7 @@ namespace ERD.Viewer
 
                         DatabaseModel databaseModel = JsonConvert.DeserializeObject(fileLines[4], typeof(DatabaseModel)) as DatabaseModel;
 
-                        Connections.Instance.SetDefaultDatabaseModel(databaseModel);
+                        Connections.Instance.SetDefaultDatabaseModel(databaseModel, false);
 
                         if (fileLines.Length > 5)
                         {

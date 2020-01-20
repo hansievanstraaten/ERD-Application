@@ -458,11 +458,11 @@ namespace ERD.Viewer
                 return;
             }
 
-            string searchText = this.uxTableSearch.Text.ToLower();
+            string searchText = this.uxTableSearch.Text;
 
             foreach (TableMenuItem item in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)))
             {
-                item.Visibility = item.TableModelObject.TableName.ToLower().Contains(searchText) ? Visibility.Visible : Visibility.Collapsed;
+                item.Visibility = item.TableModelObject.TableName.Contains(searchText) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -669,7 +669,7 @@ namespace ERD.Viewer
 
                                 foreach (ColumnObjectModel databaseColumn in databaseColumnList)
                                 {
-                                    ColumnObjectModel tableColumn = table.Columns.FirstOrDefault(cn => cn.ColumnName.ToLower() == databaseColumn.ColumnName.ToLower());
+                                    ColumnObjectModel tableColumn = table.Columns.FirstOrDefault(cn => cn.ColumnName == databaseColumn.ColumnName);
 
                                     if (tableColumn != null)
                                     {
@@ -725,7 +725,7 @@ namespace ERD.Viewer
 
                                 foreach (ColumnObjectModel tableColumn in table.Columns)
                                 {
-                                    if (databaseColumnList.Any(db => db.ColumnName.ToLower() == tableColumn.ColumnName.ToLower()))
+                                    if (databaseColumnList.Any(db => db.ColumnName == tableColumn.ColumnName))
                                     {
                                         continue;
                                     }

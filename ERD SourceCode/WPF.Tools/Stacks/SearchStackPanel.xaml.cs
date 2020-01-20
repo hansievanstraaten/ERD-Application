@@ -88,11 +88,11 @@ namespace WPF.Tools.Stacks
           return;
         }
 
-        string searchText = this.uxSearchBox.Text.ToLower();
+        string searchText = this.uxSearchBox.Text;
 
         foreach (UIElement item in this.uxLablesStack.FindVisualControls(typeof(LableItem)))
         {
-          item.Visibility = ((LableItem)item).Original.ParseToString().ToLower().Contains(searchText) ? Visibility.Visible : Visibility.Collapsed;
+          item.Visibility = ((LableItem)item).Original.ParseToString().Contains(searchText) ? Visibility.Visible : Visibility.Collapsed;
         }
       }
       catch

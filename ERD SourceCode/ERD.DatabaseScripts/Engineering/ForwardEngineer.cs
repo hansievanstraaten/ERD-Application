@@ -68,7 +68,7 @@ namespace ERD.DatabaseScripts.Engineering
       {
         foreach(ColumnObjectModel column in table.Columns)
         {
-          string lowerColumnName = column.ColumnName.ToLower();
+          string lowerColumnName = column.ColumnName;
 
           if (checkedList.Contains(lowerColumnName))
           {
@@ -79,7 +79,7 @@ namespace ERD.DatabaseScripts.Engineering
 
           List<TableModel> referencedTables = tablesArray
             .Where(t => t.TableName != table.TableName
-                        && t.Columns.Any(c => c.ColumnName.ToLower() == lowerColumnName))
+                        && t.Columns.Any(c => c.ColumnName == lowerColumnName))
             .ToList();
 
           if (referencedTables.Count == 0)
@@ -91,7 +91,7 @@ namespace ERD.DatabaseScripts.Engineering
 
           foreach(TableModel otherTable in referencedTables)
           {
-            ColumnObjectModel otherColumn = otherTable.Columns.First(f => f.ColumnName.ToLower() == lowerColumnName);
+            ColumnObjectModel otherColumn = otherTable.Columns.First(f => f.ColumnName == lowerColumnName);
 
             if (otherColumn.DataType.Replace(" IDENTITY", string.Empty) != columnDataType)
             {

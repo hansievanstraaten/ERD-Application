@@ -113,7 +113,7 @@ namespace WPF.Tools.ModelViewer
       {
         foreach (ModelViewItem item in this.uxContent.Children)
         {
-          if (item.Caption.ParseToString().ToLower() == caption.ToLower())
+          if (item.Caption.ParseToString() == caption)
           {
             return item;
           }

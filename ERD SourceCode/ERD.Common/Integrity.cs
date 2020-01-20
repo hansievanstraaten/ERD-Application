@@ -46,36 +46,36 @@ namespace ERD.Common
     {
       lock (globalColumnsCountLock)
       {
-        string columnKey = columnName.ToLower();
+        string columnKey = columnName;
 
-        return Integrity.globalColumnsCount.Keys.Any(k => k.ToLower() == columnKey);
+        return Integrity.globalColumnsCount.Keys.Any(k => k == columnKey);
       }
     }
 
     public static bool IsColumnInThisTable(string tableName, string columnName)
     {
-      string tableNameKey = tableName.ToLower();
+      string tableNameKey = tableName;
 
       if (!Integrity.tableColumns.ContainsKey(tableNameKey))
       {
         return false;
       }
 
-      string columnKey = columnName.ToLower();
+      string columnKey = columnName;
 
-      return Integrity.tableColumns[tableNameKey].Any(k => k.ToLower() == columnKey);
+      return Integrity.tableColumns[tableNameKey].Any(k => k == columnKey);
     }
     
     public static bool IsPrimaryKeyColumn(string columnName)
     {
-      string columnKey = columnName.ToLower();
+      string columnKey = columnName;
 
       return Integrity.primaryColumns.ContainsKey(columnKey);
     }
 
     public static int GetGlobalPrecision(string columnName)
     {
-      string columnKey = $"||{columnName.ToLower()}";
+      string columnKey = $"||{columnName}";
 
       if (!Integrity.columnObjectModels.Any(k => k.Key.Contains(columnKey)))
       {
@@ -87,9 +87,9 @@ namespace ERD.Common
 
     public static int GetGlobalScale(string columnName)
     {
-      string columnKey = $"||{columnName.ToLower()}";
+      string columnKey = $"||{columnName}";
 
-      if (!Integrity.columnObjectModels.Any(k => k.Key.ToLower().Contains(columnKey)))
+      if (!Integrity.columnObjectModels.Any(k => k.Key.Contains(columnKey)))
       {
         return 0;
       }
@@ -99,7 +99,7 @@ namespace ERD.Common
 
     public static int GetGlobalMaxLength(string columnName)
     {
-      string columnKey = $"||{columnName.ToLower()}";
+      string columnKey = $"||{columnName}";
 
       if (!Integrity.columnObjectModels.Any(k => k.Key.Contains(columnKey)))
       {
@@ -111,14 +111,14 @@ namespace ERD.Common
 
     public static SqlDbType? GetGlobalColumnDataType(string columnName)
     {
-      string columnKey = columnName.ToLower();
+      string columnKey = columnName;
 
-      if (!Integrity.globalColumnsDataType.Any(k => k.Key.ToLower() == columnKey))
+      if (!Integrity.globalColumnsDataType.Any(k => k.Key == columnKey))
       {
         return null;
       }
 
-      return Integrity.globalColumnsDataType.First(ck => ck.Key.ToLower() == columnKey).Value;
+      return Integrity.globalColumnsDataType.First(ck => ck.Key == columnKey).Value;
     }
 
     public static string BuildForeighKeyName(string parentTable, string childTable)
@@ -142,7 +142,7 @@ namespace ERD.Common
 
     public static string GetPrimaryKeyTable(string columnName)
     {
-      string columnKey = columnName.ToLower();
+      string columnKey = columnName;
 
       if (!Integrity.primaryColumns.ContainsKey(columnKey))
       {
@@ -154,7 +154,7 @@ namespace ERD.Common
 
     public static string GetFriendlyName(string columnName)
     {
-      string columnNameKey = columnName.ToLower();
+      string columnNameKey = columnName;
 
       string objectModelKey = $"||{columnNameKey}";
 
@@ -178,7 +178,7 @@ namespace ERD.Common
 
     public static string GetDescription(string columnName)
     {
-      string columnNameKey = columnName.ToLower();
+      string columnNameKey = columnName;
 
       string objectModelKey = $"||{columnNameKey}";
 
@@ -202,9 +202,9 @@ namespace ERD.Common
 
     public static ColumnObjectModel GetObjectModel(string ownerTable, string columnName)
     {
-      string ownerTableKey = ownerTable.ToLower();
+      string ownerTableKey = ownerTable;
 
-      string columnNameKey = columnName.ToLower();
+      string columnNameKey = columnName;
 
       string objectModelKey = $"{ownerTableKey}||{columnNameKey}";
 
@@ -218,9 +218,9 @@ namespace ERD.Common
 
     public static List<ColumnRelationMapModel> GetConstraintNames(string ownerTable, string columnName)
     {
-      string ownerTableKey = $"{ownerTable.ToLower()}||";
+      string ownerTableKey = $"{ownerTable}||";
 
-      string columnNameKey = columnName.ToLower();
+      string columnNameKey = columnName;
 
       string searchKey = $"||{columnNameKey}";
 
@@ -252,7 +252,7 @@ namespace ERD.Common
 
     public static List<ColumnObjectModel> GetObjectModel(string ownerTable)
     {
-      string ownerTableKey = $"{ownerTable.ToLower()}||";
+      string ownerTableKey = $"{ownerTable}||";
       
       if (!Integrity.columnObjectModels.Any(k => k.Key.StartsWith(ownerTableKey)))
       {
@@ -280,7 +280,7 @@ namespace ERD.Common
 
     public static List<DataItemModel> GetColumnsForTable(string tableName)
     {
-      tableName = tableName.ToLower();
+      tableName = tableName;
 
       if (!Integrity.tableColumns.ContainsKey(tableName))
       {
@@ -292,9 +292,9 @@ namespace ERD.Common
   
     public static void MapTable(TableModel table)
     {
-      string tableNameKey = table.TableName.ToLower();
+      string tableNameKey = table.TableName;
 
-      if (!Integrity.tableMasterList.Any(t => t.ToLower() == tableNameKey))
+      if (!Integrity.tableMasterList.Any(t => t == tableNameKey))
       { // NOTE: We check case but dont use it
         Integrity.tableMasterList.Add(table.TableName);
       }
@@ -317,9 +317,9 @@ namespace ERD.Common
 
     public static void MapColumn(ColumnObjectModel column, string ownerTable)
     {
-      string ownerTableKey = ownerTable.ToLower();
+      string ownerTableKey = ownerTable;
 
-      string columnNameKey = column.ColumnName.ToLower();
+      string columnNameKey = column.ColumnName;
 
       string objectModelKey = $"{ownerTableKey}||{columnNameKey}";
 
@@ -328,7 +328,7 @@ namespace ERD.Common
         Integrity.columnObjectModels.Add(objectModelKey, column);
       }
 
-      if (!Integrity.tableColumns[ownerTableKey].Any(cn => cn.ToLower() == columnNameKey))
+      if (!Integrity.tableColumns[ownerTableKey].Any(cn => cn == columnNameKey))
       {
         Integrity.tableColumns[ownerTableKey].Add(column.ColumnName);
       }
@@ -338,14 +338,14 @@ namespace ERD.Common
         Integrity.primaryColumns.Add(columnNameKey, ownerTable);
       }
 
-      if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => fk.ToLower() == column.ForeignConstraintName.ToLower()))
+      if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => fk == column.ForeignConstraintName))
       {
         Integrity.foreignKeyConstraintNames.Add(column.ForeignConstraintName); 
       }
 
       lock (globalColumnsCountLock)
       {
-        if (!Integrity.globalColumnsCount.Any(gl => gl.Key.ToLower() == columnNameKey))
+        if (!Integrity.globalColumnsCount.Any(gl => gl.Key == columnNameKey))
         {
           Integrity.globalColumnsCount.Add(columnNameKey, 1);
 
@@ -369,7 +369,7 @@ namespace ERD.Common
 
     public static void RemoveTableMapping(TableModel table)
     {
-      string tableNameKey = table.TableName.ToLower();
+      string tableNameKey = table.TableName;
 
       if (table.Columns.HasElements())
       {
@@ -384,7 +384,7 @@ namespace ERD.Common
         Integrity.tableColumns.Remove(tableNameKey);
       }
 
-      if (!Integrity.tableMasterList.Any(t => t.ToLower() == tableNameKey))
+      if (!Integrity.tableMasterList.Any(t => t == tableNameKey))
       { // NOTE: We check case but dont use it
         Integrity.tableMasterList.Remove(table.TableName);
       }
@@ -392,9 +392,9 @@ namespace ERD.Common
 
     public static void RemoveColumnMapping(ColumnObjectModel column, string ownerTable)
     {
-      ownerTable = ownerTable.ToLower();
+      ownerTable = ownerTable;
 
-      string columnNameKey = column.ColumnName.ToLower();
+      string columnNameKey = column.ColumnName;
 
       lock (globalColumnsCountLock)
       {
@@ -412,7 +412,7 @@ namespace ERD.Common
         }
       }
 
-      if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => fk.ToLower() == column.ForeignConstraintName.ToLower()))
+      if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => fk == column.ForeignConstraintName))
       {
         Integrity.foreignKeyConstraintNames.Remove(column.ForeignConstraintName); 
       }
@@ -422,7 +422,7 @@ namespace ERD.Common
         Integrity.primaryColumns.Remove(columnNameKey);
       }
       
-      if (!Integrity.tableColumns[ownerTable].Any(cn => cn.ToLower() == columnNameKey))
+      if (!Integrity.tableColumns[ownerTable].Any(cn => cn == columnNameKey))
       {
         Integrity.tableColumns[ownerTable].Remove(column.ColumnName);
       }
@@ -432,7 +432,7 @@ namespace ERD.Common
     {
       foreach (ColumnRelationMapModel mappedColumn in relation.Columns)
       {
-        string columnKey = $"{mappedColumn.ChildTable.ToLower()}||{mappedColumn.ChildColumn.ToLower()}";
+        string columnKey = $"{mappedColumn.ChildTable}||{mappedColumn.ChildColumn}";
 
         ColumnObjectModel column = Integrity.columnObjectModels[columnKey];
 

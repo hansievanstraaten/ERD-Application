@@ -54,7 +54,7 @@ namespace ERD.Viewer.Database.MsSql
 
         EventParser.ParseMessage(this, dispatcher, "Reading", tableName);
 
-        if (tableName.ToLower() == "sysdiagrams")
+        if (tableName == "sysdiagrams")
         {
           continue;
         }
@@ -200,7 +200,7 @@ namespace ERD.Viewer.Database.MsSql
 
     private SqlDbType ParseSqlDbType(string value)
     {
-      switch (value.ToLower())
+      switch (value)
       {
         case "bigint": return SqlDbType.BigInt;
         case "binary": return SqlDbType.Binary;

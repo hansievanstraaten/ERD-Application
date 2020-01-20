@@ -467,7 +467,7 @@ namespace GeneralExtensions
 
       var sourceT = source.GetType();
 
-      value = value.ToLower();
+      value = value;
 
       if (removeSpaces)
       {
@@ -483,7 +483,7 @@ namespace GeneralExtensions
 
         try
         {
-          string objVal = item.GetValue(source, null).ParseToString().ToLower();
+          string objVal = item.GetValue(source, null).ParseToString();
 
           if (objVal.IsNullEmptyOrWhiteSpace())
           {

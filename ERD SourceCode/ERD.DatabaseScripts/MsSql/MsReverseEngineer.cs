@@ -92,7 +92,7 @@ namespace ERD.Viewer.Database.MsSql
           continue;
         }
 
-        string originalPosistion = item.Element("ORDINAL_POSITION").Value;
+        string originalPosistion = Connections.Instance.IsDefaultConnection ? item.Element("ORDINAL_POSITION").Value : string.Empty;
 
         XDocument primaryKey = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseColumnKeysQuery(tableName, columnName));
 

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using WPF.Tools.BaseClasses;
+using WPF.Tools.Functions;
 
 namespace ERD.Viewer.Tools
 {
@@ -64,7 +65,9 @@ namespace ERD.Viewer.Tools
       this.uxTabLock.Visibility = Visibility.Visible;
 
       this.uxTabLock.Content = "This Canvas is locked by You";
-    }
+
+            EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
+        }
 
     private void Table_Removed(object sender, TableModel tableModel)
     {
@@ -130,6 +133,11 @@ namespace ERD.Viewer.Tools
           this.uxTabLock.Content = $"This Canvas is locked by {lockedByUser}";
 
           this.uxTableCanvas.IsEnabled = !isLocked;
+
+          if (lockedByUser == "You")
+          {
+              EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
+          }
         });
     }
 

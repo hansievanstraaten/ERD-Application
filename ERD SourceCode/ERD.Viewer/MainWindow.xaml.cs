@@ -458,11 +458,11 @@ namespace ERD.Viewer
                 return;
             }
 
-            string searchText = this.uxTableSearch.Text;
+            string searchText = this.uxTableSearch.Text.ToLower();
 
             foreach (TableMenuItem item in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)))
             {
-                item.Visibility = item.TableModelObject.TableName.Contains(searchText) ? Visibility.Visible : Visibility.Collapsed;
+                item.Visibility = item.TableModelObject.TableName.ToLower().Contains(searchText) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 

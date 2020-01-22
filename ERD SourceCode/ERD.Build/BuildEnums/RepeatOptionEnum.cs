@@ -10,7 +10,7 @@ namespace ERD.Build.BuildEnums
     [Description("Foreach Table in Project")]
     ForeachTableProject,
 
-    [Description("Sinle File for Project")]
+    [Description("Single File for Project")]
     SingleFile
   }
 }

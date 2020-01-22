@@ -509,7 +509,10 @@ namespace ERD.Viewer
 
                 TableMenuItem tableItem = tables.FirstOrDefault(t => ((TableMenuItem) t).Name == itemName) as TableMenuItem;
 
-                tableItem.SetErdCanvas((tableModel.IsDeleted ? "DELETED" : string.Empty), true);
+                if (tableItem != null)
+                {
+                    tableItem.SetErdCanvas((tableModel.IsDeleted ? "DELETED" : string.Empty), true);
+                }
             }
             catch (Exception err)
             {
@@ -1249,16 +1252,52 @@ namespace ERD.Viewer
             }
         }
 
-        private void SetLocks()
+        private async void SetLocks()
         {
             try
             {
-                List<string> lockedFiles = CanvasLocks.Instance.GetLockedFiles();
-
-                foreach (TableCanvas canvas in this.uxTabControl.Items)
+                await Task.Factory.StartNew(() =>
                 {
-                    canvas.CheckLockStatus(lockedFiles);
-                }
+                    try
+                    {
+                        DirectoryInfo dir = new DirectoryInfo(General.ProjectModel.FileDirectory);
+
+                        foreach (FileInfo fileInfo in dir.GetFiles($"{General.ProjectModel.ModelName}.*.{FileTypes.eclu}"))
+                        {
+                            string[] fileData = File.ReadAllLines(fileInfo.FullName);
+
+                            ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
+
+                            if (this.canvasDictionary.ContainsKey(segment.ModelSegmentName))
+                            {
+                                continue;
+                            }
+
+
+                            EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", segment.ModelSegmentControlName);
+
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                int activeTabIndex = this.uxTabControl.SelectedIndex;
+                                
+                                this.AddCanvasObject(segment);
+                            
+                                this.uxTabControl.SetActive(activeTabIndex);
+                            });
+                        }
+
+                        List<string> lockedFiles = CanvasLocks.Instance.GetLockedFiles();
+
+                        foreach (TableCanvas canvas in this.uxTabControl.Items)
+                        {
+                            canvas.CheckLockStatus(lockedFiles);
+                        }
+                    }
+                    catch (Exception err)
+                    {
+
+                    }
+                });
             }
             catch (Exception err)
             {

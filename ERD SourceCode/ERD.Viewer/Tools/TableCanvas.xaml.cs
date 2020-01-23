@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ViSo.Common;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Functions;
 
@@ -59,7 +60,9 @@ namespace ERD.Viewer.Tools
         private void Canvas_Changed(object sender, object changedItem)
         {
             EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
-            
+
+            this.ErdSegment.IsLocked = true; // Alwasy set this to ensure that the canvas will be saved
+
             if (!General.ProjectModel.LockCanvasOnEditing)
             {
                 return;
@@ -99,15 +102,80 @@ namespace ERD.Viewer.Tools
             this.uxCanvasScroll.ZoomTo(location);
         }
 
+        public async void RefreshModel(ErdCanvasModel changedModel)
+        {
+            try
+            {
+                await Task.Factory.StartNew(() =>
+                {
+                    this.uxTableCanvas.CanvasChanged -= this.Canvas_Changed;
+
+                    List<TableModel> removedTables = new List<TableModel>();
+
+                    TableModel[] existingTables = this.ErdSegment.SegmentTables.ToArray();
+
+                    // REMOVE DROPED TABLES
+                    foreach (TableModel existing in existingTables)
+                    {
+                        TableModel table = changedModel.SegmentTables.FirstOrDefault(t => t.TableName.ToLower() == existing.TableName.ToLower());
+
+                        if (table == null)
+                        {
+                            // The table was removed
+                            this.Dispatcher.Invoke(() => 
+                            { 
+                                this.uxTableCanvas.RemoveTableFromCanvas(existing);
+                            });
+
+                            removedTables.Add(existing);
+                        }
+                    }
+
+                    foreach(TableModel remove in removedTables)
+                    {
+                        this.ErdSegment.SegmentTables.Remove(remove);
+                    }
+
+                    foreach (TableModel table in changedModel.SegmentTables)
+                    {
+                        lock (SingletonLock.Instance.LockObject)
+                        {
+                            TableModel existing = this.ErdSegment.SegmentTables.FirstOrDefault(t => t.TableName.ToLower() == table.TableName.ToLower());
+
+                            if (existing == null)
+                            {
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    this.uxTableCanvas.CreateTableObject(table);
+                                });
+
+                                this.ErdSegment.SegmentTables.Add(table);
+                            }
+                            else
+                            {
+                                existing = table.CopyTo(existing);
+
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    this.uxTableCanvas.RefreshTableRelations(existing);
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                this.uxTableCanvas.CanvasChanged += this.Canvas_Changed;
+            }
+        }
+
         public async void CheckLockStatus(List<string> lockedFiles)
         {
-            bool wasLocked = false;
-
-            this.Dispatcher.Invoke(() => 
-            {
-                wasLocked = !this.uxTableCanvas.IsEnabled;
-            });
-
             bool isLocked = false;
 
             bool haveLock = false;
@@ -152,18 +220,6 @@ namespace ERD.Viewer.Tools
                 {
                     EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
                 }
-                else if(lockedByUser != "You" && !haveLock && wasLocked)
-                {   // If the user is not the environment user
-                    // the file have NO lock
-                    // But was locked on entering the mehtod
-                    // Refresh the canvas
-                    this.RefreshCanvas();
-                }
-
-#if DEBUG
-                this.RefreshCanvas();
-#endif
-
             });
         }
 
@@ -213,68 +269,6 @@ namespace ERD.Viewer.Tools
             this.uxTableCanvas.MinWidth = this.uxCanvasScroll.ActualWidth + 1000;
 
             this.uxTableCanvas.MinHeight = this.uxCanvasScroll.ActualHeight + 1000;
-        }
-    
-        private void RefreshCanvas()
-        {
-            try
-            {
-                this.uxTableCanvas.IsEnabled = false;
-
-                // We would not like to relock the canvas on refresh
-                this.uxTableCanvas.CanvasChanged -= this.Canvas_Changed;
-
-                string modelName = $"{General.ProjectModel.ModelName}.{this.ErdSegment.ModelSegmentControlName}.{FileTypes.eclu}";
-
-                string fullName = Path.Combine(General.ProjectModel.FileDirectory , modelName);
-
-                string[] fileData = File.ReadAllLines(fullName);
-
-                ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
-
-                TableModel[] existingTables = this.ErdSegment.SegmentTables.ToArray();
-
-
-                foreach (TableModel existing in existingTables)
-                {
-                    TableModel table = segment.SegmentTables.FirstOrDefault(t => t.TableName.ToLower() == existing.TableName.ToLower());
-
-                    if (table == null)
-                    {   // The table was removed
-                        this.uxTableCanvas.RemoveTableFromCanvas(existing);
-                    }
-                }
-
-                List<TableModel> addedTables = new List<TableModel>();
-
-                foreach (TableModel table in segment.SegmentTables)
-                {
-                    TableModel existing = existingTables.FirstOrDefault(t => t.TableName.ToLower() == table.TableName.ToLower());
-
-                    if (existing == null)
-                    {
-                        this.uxTableCanvas.CreateTableObject(table);
-
-                        addedTables.Add(table);
-                    }
-                    else
-                    {
-                        existing = table.CopyTo(existing);
-                    }
-                }
-
-                this.ErdSegment.SegmentTables.AddRange(addedTables);
-            }
-            catch(Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-            finally
-            {
-                this.uxTableCanvas.CanvasChanged += this.Canvas_Changed;
-
-                this.uxTableCanvas.IsEnabled = true;
-            }
         }
     }
 }

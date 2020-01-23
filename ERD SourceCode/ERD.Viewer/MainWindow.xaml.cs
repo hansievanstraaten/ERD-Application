@@ -25,6 +25,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml.Linq;
+using ViSo.Common;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Exstention;
 using WPF.Tools.Functions;
@@ -38,7 +39,7 @@ namespace ERD.Viewer
         private List<string> connectionsInMenue = new List<string>();
 
         private CanvasLocksListener listener = new CanvasLocksListener();
-
+        
         public MainWindow()
         {
             this.InitializeComponent();
@@ -54,6 +55,8 @@ namespace ERD.Viewer
             EventParser.ParseQueryObject += this.Query_Parsed;
 
             this.listener.FileChanged += this.ProjectFiles_Changed;
+
+            this.listener.FileLockChanged += this.ProjectLocks_Changed;
 
             Connections.Instance.ConnectionChanged += this.Connections_Changed;
         }
@@ -72,12 +75,14 @@ namespace ERD.Viewer
                         continue;
                     }
 
-                    if (segment.LockedByUser.IsNullEmptyOrWhiteSpace() && Environment.UserName == lockedByFileUser)
+                    if (segment.IsLocked)
                     {
                         // The user worked on this file but did not save the changes
                         CanvasLocks.Instance.UnlockFile(segment.ModelSegmentControlName);
                     }
                 }
+
+                CanvasLocks.Instance.RemoveUserFileLockObject();
 
                 this.Dispatcher.InvokeShutdown();
             }
@@ -344,8 +349,6 @@ namespace ERD.Viewer
 
                 foreach (ErdCanvasModel canvas in this.canvasDictionary.Values)
                 {
-                    canvas.LockedByUser = string.Empty;
-
                     tablesList.AddRange(canvas.SegmentTables);
                 }
 
@@ -374,8 +377,6 @@ namespace ERD.Viewer
                 }
                 
                 this.SaveModel();
-
-                CanvasLocks.Instance.RemoveUserLocks(Environment.UserName);
             }
         }
 
@@ -591,11 +592,16 @@ namespace ERD.Viewer
             }
         }
 
-        private void ProjectFiles_Changed(object sender, FileSystemEventArgs e)
+        private void ProjectFiles_Changed(object sender, string fullPathName, ErdCanvasModel changedModel)
         {
-            this.SetLocks();
+            this.LoadModelChanges(changedModel, fullPathName);
         }
-
+        
+        private void ProjectLocks_Changed(object sender, string fullPathName, FileSystemEventArgs e)
+        {
+            this.SetLocks(fullPathName);
+        }
+        
         private async void ReverseEngineer(object sender)
         {
             try
@@ -818,6 +824,8 @@ namespace ERD.Viewer
                 {
                     try
                     {
+                        Paths.WaitFileRelease(fileName);
+
                         string[] fileLines = File.ReadAllLines(fileName);
 
                         #region PROJECT & DATABASE
@@ -857,6 +865,8 @@ namespace ERD.Viewer
 
                         if (File.Exists(buildFileName))
                         {
+                            Paths.WaitFileRelease(buildFileName);
+
                             string buildFile = File.ReadAllText(buildFileName);
 
                             BuildSetupModel buildSetup = JsonConvert.DeserializeObject(buildFile, typeof(BuildSetupModel)) as BuildSetupModel;
@@ -883,6 +893,8 @@ namespace ERD.Viewer
 
                         foreach (FileInfo fileInfo in dir.GetFiles($"{General.ProjectModel.ModelName}.*.{FileTypes.eclu}"))
                         {
+                            Paths.WaitFileRelease(fileInfo.FullName);
+
                             string[] fileData = File.ReadAllLines(fileInfo.FullName);
 
                             ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
@@ -930,7 +942,7 @@ namespace ERD.Viewer
                     throw error;
                 }
 
-                this.SetLocks();
+                this.SetLocks(string.Empty);
             }
             catch (Exception err)
             {
@@ -1059,20 +1071,30 @@ namespace ERD.Viewer
 
             #endregion
 
+            CanvasLocks.Instance.RemoveUserLocks(Environment.UserName);
+
             string directory = Path.GetDirectoryName(saveFileFullName);
 
-            foreach (ErdCanvasModel segment in this.canvasDictionary.Values)
-            {
+            foreach (ErdCanvasModel segment in this.canvasDictionary.Values.Where(il => il.IsLocked))
+            {   // Save only the files that was worked on
                 string segmentName = $"{General.ProjectModel.ModelName}.{segment.ModelSegmentControlName}.{FileTypes.eclu}";
 
                 string segmentFilFullName = Path.Combine(directory, segmentName);
 
-                segment.LockedByUser = CanvasLocks.Instance.LockedByUser(segment.ModelSegmentControlName);
+                lock (CanvasLocks.Instance.IgnoreFiles)
+                {
+                    CanvasLocks.Instance.IgnoreFiles.Add(segmentFilFullName);
+                }
 
                 File.WriteAllText(segmentFilFullName, JsonConvert.SerializeObject(segment));
             }
 
             this.uxMessage.Content = "Project Saved";
+
+            lock (CanvasLocks.Instance.IgnoreFiles)
+            {
+                CanvasLocks.Instance.IgnoreFiles.Clear();
+            }
         }
 
         private void ActivateMenu()
@@ -1252,7 +1274,7 @@ namespace ERD.Viewer
             }
         }
 
-        private async void SetLocks()
+        private async void LoadModelChanges(ErdCanvasModel changedModel, string fullPathName)
         {
             try
             {
@@ -1260,32 +1282,51 @@ namespace ERD.Viewer
                 {
                     try
                     {
-                        DirectoryInfo dir = new DirectoryInfo(General.ProjectModel.FileDirectory);
-
-                        foreach (FileInfo fileInfo in dir.GetFiles($"{General.ProjectModel.ModelName}.*.{FileTypes.eclu}"))
+                        if (!this.canvasDictionary.ContainsKey(changedModel.ModelSegmentName))
                         {
-                            string[] fileData = File.ReadAllLines(fileInfo.FullName);
-
-                            ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
-
-                            if (this.canvasDictionary.ContainsKey(segment.ModelSegmentName))
-                            {
-                                continue;
-                            }
-
-
-                            EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", segment.ModelSegmentControlName);
+                            EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", changedModel.ModelSegmentControlName);
 
                             this.Dispatcher.Invoke(() =>
                             {
                                 int activeTabIndex = this.uxTabControl.SelectedIndex;
-                                
-                                this.AddCanvasObject(segment);
-                            
+
+                                this.AddCanvasObject(changedModel);
+
                                 this.uxTabControl.SetActive(activeTabIndex);
                             });
                         }
+                        else
+                        {
+                            TableCanvas canvas = this.uxTabControl.Items
+                                .FirstOrDefault(cn => ((TableCanvas) cn).ErdSegment.ModelSegmentControlName == changedModel.ModelSegmentControlName)
+                                .To<TableCanvas>();
 
+                            canvas.RefreshModel(changedModel);
+                        }
+                    }
+                    catch (Exception err)
+                    {
+
+                    }
+                    
+                });
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+
+            this.SetLocks(fullPathName);
+        }
+
+        private async void SetLocks(string fullPathName)
+        {
+            try
+            {
+                await Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
                         List<string> lockedFiles = CanvasLocks.Instance.GetLockedFiles();
 
                         foreach (TableCanvas canvas in this.uxTabControl.Items)
@@ -1302,6 +1343,16 @@ namespace ERD.Viewer
             catch (Exception err)
             {
                 MessageBox.Show(err.InnerExceptionMessage());
+            }
+            finally
+            {
+                // The initial lock was set in
+                // ERD.FileManagement.CanvasLocksListener
+                // private void File_Changed(object sender, FileSystemEventArgs e)
+                lock (CanvasLocks.Instance.IgnoreFiles)
+                {
+                    CanvasLocks.Instance.IgnoreFiles.Remove(fullPathName);
+                }
             }
         }
 

@@ -97,6 +97,45 @@ namespace ERD.Viewer.Tools
                 MessageBox.Show(err.InnerExceptionMessage());
             }
         }
+        
+        public void RefreshTableRelations(TableModel tableModel)
+        {
+            TableObject[] tablesArray = this.FindVisualControls(typeof(TableObject)).TryCast<TableObject>();
+
+            TableObject table = tablesArray.FirstOrDefault(t => t.Table.TableName == tableModel.TableName);
+
+            if (table == null)
+            {
+                return;
+            }
+
+            KeyValuePair<string, DatabaseRelation>[] existingRelation = table.ColumnRelationModel.ToArray();
+
+            foreach (KeyValuePair<string, DatabaseRelation> relation in existingRelation)
+            {
+                this.DatabaseRelation_Delete(relation.Value);
+
+                if (this.columnRelationModel.ContainsKey(relation.Key))
+                {
+                    this.columnRelationModel.Remove(relation.Key);
+                }
+            }
+            
+            table.InitializeColumnRemations();
+
+            UIElement[] tableControls = this.FindVisualControls(typeof(TableObject));
+
+            foreach (KeyValuePair<string, DatabaseRelation> relation in table.ColumnRelationModel)
+            {
+                relation.Value.DatabaseRelationDelete += this.DatabaseRelation_Delete;
+
+                this.columnRelationModel.Add(relation.Key, relation.Value);
+                
+                this.DrawRelation(table, tableControls, relation);
+            }
+            
+            this.RedrawTableRelations(table);
+        }
 
         public async void CreateTableObject(TableModel table)
         {
@@ -253,44 +292,7 @@ namespace ERD.Viewer.Tools
 
                     this.ResizeCanvas(mousePos, table.ActualHeight, table.ActualWidth);
 
-                    List<KeyValuePair<string, DatabaseRelation>> changedRelations = new List<KeyValuePair<string, DatabaseRelation>>();
-
-                    foreach (string mapedRelation in table.LinkedRelations)
-                    {
-                        if (!this.columnRelationModel.ContainsKey(mapedRelation))
-                        {
-                            continue;
-                        }
-
-                        DatabaseRelation relationKeyValue = this.columnRelationModel[mapedRelation];
-
-                        foreach (Path relationPath in this.FindVisualControls(typeof(Path)).Where(p => ((Path) p).Name.EndsWith(relationKeyValue.RelationshipName)))
-                        {
-                            this.Children.Remove(relationPath);
-                        }
-
-                        changedRelations.Add(new KeyValuePair<string, DatabaseRelation>(mapedRelation, relationKeyValue));
-                    }
-
-                    UIElement[] tableControls = this.FindVisualControls(typeof(TableObject));
-
-                    foreach (KeyValuePair<string, DatabaseRelation> relation in changedRelations)
-                    {
-                        string[] tablesUsed = relation.Key.Split(new string[] {"||"}, StringSplitOptions.RemoveEmptyEntries);
-
-                        UIElement parentTable = tableControls.FirstOrDefault(to => ((TableObject) to).Table.TableName == tablesUsed[0]);
-
-                        if (parentTable == null)
-                        {
-                            this.DrawStubRelation(table, relation);
-
-                            continue;
-                        }
-
-                        this.DrawRelation((TableObject) parentTable, tableControls, relation);
-                    }
-
-                    table.InvalidateVisual();
+                    this.RedrawTableRelations(table);
                 }
 
                 #endregion
@@ -489,11 +491,53 @@ namespace ERD.Viewer.Tools
                 string dictionaryKey = $"{editor.DatabaseRelation.ParentTable}||{editor.DatabaseRelation.ChildTable}";
 
                 childTable.ColumnRelationModel.Add(dictionaryKey, editor.DatabaseRelation);
-
+                
                 this.columnRelationModel.Add(dictionaryKey, editor.DatabaseRelation);
 
                 this.DrawRelation((TableObject) parentTableControl, tableControls, new KeyValuePair<string, DatabaseRelation>(dictionaryKey, editor.DatabaseRelation));
             }
+        }
+
+        private void RedrawTableRelations(TableObject table)
+        {
+            List<KeyValuePair<string, DatabaseRelation>> changedRelations = new List<KeyValuePair<string, DatabaseRelation>>();
+
+            foreach (string mapedRelation in table.LinkedRelations)
+            {
+                if (!this.columnRelationModel.ContainsKey(mapedRelation))
+                {
+                    continue;
+                }
+
+                DatabaseRelation relationKeyValue = this.columnRelationModel[mapedRelation];
+
+                foreach (Path relationPath in this.FindVisualControls(typeof(Path)).Where(p => ((Path)p).Name.EndsWith(relationKeyValue.RelationshipName)))
+                {
+                    this.Children.Remove(relationPath);
+                }
+
+                changedRelations.Add(new KeyValuePair<string, DatabaseRelation>(mapedRelation, relationKeyValue));
+            }
+
+            UIElement[] tableControls = this.FindVisualControls(typeof(TableObject));
+
+            foreach (KeyValuePair<string, DatabaseRelation> relation in changedRelations)
+            {
+                string[] tablesUsed = relation.Key.Split(new string[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
+
+                UIElement parentTable = tableControls.FirstOrDefault(to => ((TableObject)to).Table.TableName == tablesUsed[0]);
+
+                if (parentTable == null)
+                {
+                    this.DrawStubRelation(table, relation);
+
+                    continue;
+                }
+
+                this.DrawRelation((TableObject)parentTable, tableControls, relation);
+            }
+
+            table.InvalidateVisual();
         }
 
         #region LINE MAINTENANCE

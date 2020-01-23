@@ -175,15 +175,8 @@ namespace ERD.Models
       {
         return;
       }
-
-      //Integrity.RemoveForeighKey(this);
-
+      
       this.DatabaseRelationDelete?.Invoke(this);
-
-      //foreach (Path item in this.linePath)
-      //{
-      //  item.Visibility = Visibility.Collapsed;
-      //}
     }
 
     

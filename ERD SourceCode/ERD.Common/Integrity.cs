@@ -365,6 +365,11 @@ namespace ERD.Common
 
                     if (column.SqlDataType.HasValue)
                     {
+                        if (Integrity.globalColumnsDataType.ContainsKey(column.ColumnName))
+                        {
+                            Integrity.globalColumnsDataType.Remove(column.ColumnName);
+                        }
+                        
                         Integrity.globalColumnsDataType.Add(column.ColumnName, column.SqlDataType.Value);
                     }
                 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using ViSo.Common;
 using WPF.Tools.Functions;
 
 namespace ERD.FileManagement
@@ -40,7 +41,7 @@ namespace ERD.FileManagement
         {
             GC.SuppressFinalize(this);
         }
-
+        
         public string LockedByUser(string modelSegmentControlName)
         {
             if (!File.Exists(this.LockFullFileName))
@@ -50,7 +51,7 @@ namespace ERD.FileManagement
 
             try
             {
-                this.WaitLockRelease();
+                this.WaitExistsLockRelease();
 
                 string segmantName = $"{modelSegmentControlName}:";
 
@@ -75,11 +76,13 @@ namespace ERD.FileManagement
             }
             finally
             {
-                File.Delete(this.FileLockName);
+                this.DeleteLockFile();
             }
 
             return string.Empty;
         }
+
+        public List<string> IgnoreFiles = new List<string>();
 
         public List<string> GetLockedFiles()
         {
@@ -92,7 +95,7 @@ namespace ERD.FileManagement
 
             try
             {
-                this.WaitLockRelease();
+                this.WaitExistsLockRelease();
 
                 lock (lockMethodObject)
                 {
@@ -105,7 +108,7 @@ namespace ERD.FileManagement
             }
             finally
             {
-                File.Delete(this.FileLockName);
+                this.DeleteLockFile();
             }
 
             return result;
@@ -120,7 +123,7 @@ namespace ERD.FileManagement
 
             try
             {
-                this.WaitLockRelease();
+                this.WaitExistsLockRelease();
 
                 lock (lockMethodObject)
                 {
@@ -156,7 +159,7 @@ namespace ERD.FileManagement
             }
             finally
             {
-                File.Delete(this.FileLockName);
+                this.DeleteLockFile();
             }
         }
 
@@ -174,7 +177,7 @@ namespace ERD.FileManagement
 
             try
             {
-                this.WaitLockRelease();
+                this.WaitExistsLockRelease();
 
                 lock (lockMethodObject)
                 {
@@ -209,7 +212,7 @@ namespace ERD.FileManagement
             }
             finally
             {
-                File.Delete(this.FileLockName);
+                this.DeleteLockFile();
             }
         }
 
@@ -227,7 +230,7 @@ namespace ERD.FileManagement
 
             try
             {
-                this.WaitLockRelease();
+                this.WaitExistsLockRelease();
 
                 lock (lockMethodObject)
                 {
@@ -257,8 +260,6 @@ namespace ERD.FileManagement
 
                         int lengthIndex = ((usernameInstanceIndex - controlIndex) + (userName.Length + 2));
 
-                        //string toRemove = fileText.ToString().Substring(controlIndex, lengthIndex);
-
                         fileText.Remove(controlIndex, lengthIndex);
 
                         usernameInstanceIndex = fileText.ToString().IndexOf(fileUserName);
@@ -269,11 +270,33 @@ namespace ERD.FileManagement
             }
             finally
             {
-                File.Delete(this.FileLockName);
+                this.DeleteLockFile();
             }
         }
 
-        private void WaitLockRelease()
+        public void RemoveUserFileLockObject()
+        {
+            try
+            {
+                if (File.Exists(this.FileLockName))
+                {
+                    Paths.WaitFileRelease(this.FileLockName);
+
+                    string[] fileText = File.ReadAllLines(this.FileLockName);
+
+                    if (fileText[0] == Environment.UserName)
+                    {
+                        this.DeleteLockFile();
+                    }
+                }
+            }
+            catch
+            {
+                // DO NOTHING
+            }
+        }
+
+        private void WaitExistsLockRelease()
         {
             REWAIT:
 
@@ -281,10 +304,10 @@ namespace ERD.FileManagement
             {
                 while (File.Exists(this.FileLockName))
                 {
-                    Sleep.ThreadWait(100);
+                    Sleep.ThreadWait(300);
                 }
 
-                File.WriteAllText(this.FileLockName, $"File locked by {Environment.UserName}");
+                File.WriteAllText(this.FileLockName, Environment.UserName);
             }
             catch
             {
@@ -305,6 +328,25 @@ namespace ERD.FileManagement
             get
             {
                 return Path.Combine(General.ProjectModel.FileDirectory, $"{General.ProjectModel.ModelName}.FileLocked");
+            }
+        }
+    
+        private void DeleteLockFile()
+        {
+            try
+            {
+                File.Delete(this.FileLockName);
+
+                while(File.Exists(this.FileLockName))
+                {
+                    Sleep.ThreadWait(200);
+
+                    File.Delete(this.FileLockName);
+                }
+            }
+            catch (Exception err)
+            {
+
             }
         }
     }

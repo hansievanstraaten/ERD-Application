@@ -1077,6 +1077,9 @@ namespace ERD.Viewer
 
             foreach (ErdCanvasModel segment in this.canvasDictionary.Values.Where(il => il.IsLocked))
             {   // Save only the files that was worked on
+
+                segment.IsLocked = false;
+
                 string segmentName = $"{General.ProjectModel.ModelName}.{segment.ModelSegmentControlName}.{FileTypes.eclu}";
 
                 string segmentFilFullName = Path.Combine(directory, segmentName);

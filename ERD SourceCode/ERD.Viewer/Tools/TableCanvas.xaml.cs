@@ -253,6 +253,8 @@ namespace ERD.Viewer.Tools
                     return;
                 }
 
+                this.ErdSegment.IsLocked = true;
+
                 this.ErdSegment.IncludeInContextBuild.Clear();
 
                 this.ErdSegment.IncludeInContextBuild.AddRange(selector.SelectedModels());

@@ -253,12 +253,11 @@ namespace ERD.Viewer.Tools
                     return;
                 }
 
-                this.ErdSegment.IsLocked = true;
-
                 this.ErdSegment.IncludeInContextBuild.Clear();
 
                 this.ErdSegment.IncludeInContextBuild.AddRange(selector.SelectedModels());
 
+                this.Canvas_Changed(this, this.ErdSegment.IncludeInContextBuild);
             }
             catch (Exception err)
             {

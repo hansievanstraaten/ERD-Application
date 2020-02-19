@@ -283,6 +283,7 @@ namespace ERD.Build
             rawText = rawText
                 .Replace("[[CanvasName]]", this.CanvasName)
                 .Replace("[[TableName]]", this.TableName)
+                .Replace("[[TablePluralName]]", this.TablePluraName)
                 .Replace("[[PrimaryKey]]", this.PrimaryKeyColumnName)
                 .Replace("[[ForeignKey]]", this.ForeignKeyColumnName)
                 .Replace("[[NoKeyColumn]]", this.NoKeyColumnColumnName)
@@ -317,6 +318,20 @@ namespace ERD.Build
                 return this.SelectedTable.TableName;
             }
         }
+
+        private string TablePluraName
+        {
+            get
+            {
+                if (this.SelectedTable == null)
+                {
+                    return string.Empty;
+                }
+
+                return this.SelectedTable.PluralName;
+            }
+        }
+
 
         private string PrimaryKeyColumnName
         {

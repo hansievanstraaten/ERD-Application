@@ -1,5 +1,6 @@
 [[CanvasName]]=Replaces with the Tab Name.,
 [[TableName]]=Replaces with the Table Name.,
+[[TablePluralName]]=The Specified table Plural Name.,
 [[PrimaryKey]]=Replaces with the Primary Key(s) in Table.,
 [[ForeignKey]]=Replaces with the Foreign Key(s) in Table.,
 [[ColumnName]]=Replaces with the Column Name.,

@@ -27,6 +27,7 @@ using DragDropEffects = System.Windows.DragDropEffects;
 using MenuItem = System.Windows.Controls.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using ViSo.Dialogs.ModelViewer;
 
 namespace ERD.Viewer.Tools
 {
@@ -428,7 +429,7 @@ namespace ERD.Viewer.Tools
             #region HEADER CONTEXT SETUP
 
             this.uxTableName.ContextMenu = new ContextMenu();
-
+            
             MenuItem viewData = new MenuItem {Header = "View Data"};
 
             if (Connections.Instance.AlternativeModels.Count > 0)
@@ -452,6 +453,8 @@ namespace ERD.Viewer.Tools
             {
                 viewData.Click += this.ViewData_Clicked;
             }
+            
+            MenuItem editHeader = new MenuItem { Header = "Edit Table Header" };
 
             MenuItem viewDbScript = new MenuItem {Header = "View Database Script"};
 
@@ -465,6 +468,8 @@ namespace ERD.Viewer.Tools
 
             MenuItem dropTable = new MenuItem {Header = "Drop Table"};
 
+            editHeader.Click += this.EditHeader_Cliked;
+
             viewDbScript.Click += this.ViewDataBaseScript_Clicked;
 
             viewCSharp.Click += this.ViewCSharpScript_Cliked;
@@ -474,6 +479,8 @@ namespace ERD.Viewer.Tools
             remove.Click += this.Remove_Clicked;
 
             dropTable.Click += this.DropTable_Clicked;
+
+            this.uxTableName.ContextMenu.Items.Add(editHeader);
 
             this.uxTableName.ContextMenu.Items.Add(viewData);
 
@@ -490,7 +497,25 @@ namespace ERD.Viewer.Tools
             this.uxTableName.ContextMenu.Items.Add(dropTable);
 
             #endregion
+        }
 
+        private void EditHeader_Cliked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                TableModel tableCopy = this.Table.CopyTo(new TableModel());
+
+                if (ModelView.ShowDialog("Edit Table Properties", tableCopy).IsFalse())
+                {
+                    return;
+                }
+
+                this.Table = tableCopy.CopyTo(this.Table);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
         }
 
         private void InitializeColumnsContextMenu()

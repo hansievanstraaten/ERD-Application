@@ -899,6 +899,8 @@ namespace ERD.Viewer
 
                             ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
 
+                            segment.IsLocked = false;
+
                             EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", segment.ModelSegmentControlName);
 
                             this.Dispatcher.Invoke(() =>

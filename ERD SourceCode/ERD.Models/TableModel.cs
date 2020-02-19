@@ -5,161 +5,186 @@ using System.Linq;
 
 namespace ERD.Models
 {
-  [ModelName("Table")]
-  public class TableModel : ModelBase
-  {
-    private ColumnObjectModel[] columns;
-
-    private ColumnObjectModel[] deletedColumns;
-    
-    private bool isDeleted;
-
-    private string tableName;
-
-    private string friendlyName;
-
-    private string erdSegmentModelName;
-    
-    private string description;
-
-    private Point canvasLocation;
-
-    public TableModel()
+    [ModelName("Table")]
+    public class TableModel : ModelBase
     {
-    }
+        private ColumnObjectModel[] columns;
 
-    public bool IsDeleted
-    {
-      get
-      {
-        return this.isDeleted;
-      }
+        private ColumnObjectModel[] deletedColumns;
 
-      set
-      {
-        this.isDeleted = value;
+        private bool isDeleted;
 
-        base.OnPropertyChanged("IsDeleted");
-      }
-    }
+        private string tableName;
 
-    public bool IsNewTable {get; set;}
+        private string friendlyName;
 
-    [FieldInformation("Name", IsRequired = true, DisableSpellChecker = true)]
-    public string TableName
-    {
-      get
-      {
-        return this.tableName;
-      }
+        private string erdSegmentModelName;
 
-      set
-      {
-        base.OnPropertyChanged("TableName", ref this.tableName, value);
+        private string description;
 
-      }
-    }
+        private Point canvasLocation;
+        private string pluralName;
 
-    [FieldInformation("Friendly Name")]
-    public string FriendlyName
-    {
-      get
-      {
-        if (this.friendlyName.IsNullEmptyOrWhiteSpace())
+        public TableModel()
         {
-          return this.TableName;
         }
 
-        return this.friendlyName;
-      }
-
-      set
-      {
-        base.OnPropertyChanged("FriendlyName", ref this.friendlyName, value);
-
-      }
-    }
-
-    [FieldInformation("Description")]
-    public string Description
-    {
-      get
-      {
-        return this.description;
-      }
-
-      set
-      {
-        base.OnPropertyChanged("Description", ref this.description, value);
-      }
-    }
-
-    public string ErdSegmentModelName
-    {
-      get
-      {
-        return this.erdSegmentModelName;
-      }
-
-      set
-      {
-        base.OnPropertyChanged("ErdSegmentModelName", ref this.erdSegmentModelName, value);
-      }
-    }
-
-    public string PrimaryKeyClusterConstraintName {get; set;}
-
-    public Point CanvasLocation
-    {
-      get
-      {
-        return this.canvasLocation;
-      }
-
-      set
-      {
-        base.OnPropertyChangedStringCompair("CanvasLocation", ref this.canvasLocation, value);
-      }
-    }
-
-    public ColumnObjectModel[] Columns
-    {
-      get
-      {
-        if (!this.columns.HasElements())
+        public bool IsDeleted
         {
-          this.columns = new ColumnObjectModel[] { };
+            get
+            {
+                return this.isDeleted;
+            }
+
+            set
+            {
+                this.isDeleted = value;
+
+                base.OnPropertyChanged("IsDeleted");
+            }
+        }
+
+        public bool IsNewTable
+        {
+            get;
+            set;
+        }
+
+        [FieldInformation("Name", IsRequired = true, DisableSpellChecker = true, Sort = 1)]
+        public string TableName
+        {
+            get
+            {
+                return this.tableName;
+            }
+
+            set
+            {
+                base.OnPropertyChanged("TableName", ref this.tableName, value);
+
+            }
+        }
+
+        [FieldInformation("Friendly Name", Sort = 2)]
+        public string FriendlyName
+        {
+            get
+            {
+                if (this.friendlyName.IsNullEmptyOrWhiteSpace())
+                {
+                    return this.TableName;
+                }
+
+                return this.friendlyName;
+            }
+
+            set
+            {
+                base.OnPropertyChanged("FriendlyName", ref this.friendlyName, value);
+
+            }
+        }
+
+        [FieldInformation("Plural Name", DisableSpellChecker = true, Sort = 3)]
+        public string PluralName
+        {
+            get
+            {
+                return this.pluralName;
+            }
+
+            set
+            {
+                this.pluralName = value;
+
+                base.OnPropertyChanged("PluralName", ref this.pluralName, value);
+            }
         }
         
-        return this.columns.OrderBy(c => c.Column_Id).ToArray();
-      }
-
-      set
-      {
-        this.columns = value.OrderBy(c => c.Column_Id).ToArray();
-        
-        base.OnPropertyChanged("Columns");
-      }
-    }
-
-    public ColumnObjectModel[] DeltedColumns
-    {
-      get
-      {
-        if (!this.deletedColumns.HasElements())
+        [FieldInformation("Description", Sort = 4)]
+        public string Description
         {
-          this.deletedColumns = new ColumnObjectModel[] { };
+            get
+            {
+                return this.description;
+            }
+
+            set
+            {
+                base.OnPropertyChanged("Description", ref this.description, value);
+            }
         }
 
-        return this.deletedColumns;
-      }
+        public string ErdSegmentModelName
+        {
+            get
+            {
+                return this.erdSegmentModelName;
+            }
 
-      set
-      {
-        this.deletedColumns = value;
+            set
+            {
+                base.OnPropertyChanged("ErdSegmentModelName", ref this.erdSegmentModelName, value);
+            }
+        }
 
-        base.OnPropertyChanged("DeltedColumns");
-      }
+        public string PrimaryKeyClusterConstraintName
+        {
+            get;
+            set;
+        }
+
+        public Point CanvasLocation
+        {
+            get
+            {
+                return this.canvasLocation;
+            }
+
+            set
+            {
+                base.OnPropertyChangedStringCompair("CanvasLocation", ref this.canvasLocation, value);
+            }
+        }
+
+        public ColumnObjectModel[] Columns
+        {
+            get
+            {
+                if (!this.columns.HasElements())
+                {
+                    this.columns = new ColumnObjectModel[] { };
+                }
+
+                return this.columns.OrderBy(c => c.Column_Id).ToArray();
+            }
+
+            set
+            {
+                this.columns = value.OrderBy(c => c.Column_Id).ToArray();
+
+                base.OnPropertyChanged("Columns");
+            }
+        }
+
+        public ColumnObjectModel[] DeltedColumns
+        {
+            get
+            {
+                if (!this.deletedColumns.HasElements())
+                {
+                    this.deletedColumns = new ColumnObjectModel[] { };
+                }
+
+                return this.deletedColumns;
+            }
+
+            set
+            {
+                this.deletedColumns = value;
+
+                base.OnPropertyChanged("DeltedColumns");
+            }
+        }
     }
-  }
 }

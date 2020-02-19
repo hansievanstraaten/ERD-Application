@@ -298,6 +298,93 @@ namespace ERD.Viewer.Database.MsSql
             return result.ToString();
         }
 
+        public string DatabaseDataType(ColumnObjectModel column)
+        {
+            if (column == null)
+            {
+                return string.Empty;
+            }
+
+            switch (column.SqlDataType)
+            {
+                case SqlDbType.VarChar:
+                    if (column.MaxLength == 8016)
+                    {
+                        return "sql_variant";
+                    }
+
+                    goto default;
+
+                case SqlDbType.Variant:
+                    return "numeric";
+
+                default:
+                    return $"{column.SqlDataType}";
+            }
+        }
+
+        public string DatafieldLength(ColumnObjectModel column)
+        {
+            if (column == null)
+            {
+                return string.Empty;
+            }
+
+            switch (column.SqlDataType)
+            {
+                case SqlDbType.Binary:
+                case SqlDbType.Char:
+                case SqlDbType.NChar:
+                case SqlDbType.Time:
+                    return $"({column.MaxLength})";
+
+                case SqlDbType.DateTimeOffset:
+                case SqlDbType.DateTime2:
+                    return $"({column.Scale})";
+
+                case SqlDbType.VarChar:
+
+                    if (column.MaxLength == 8016)
+                    {
+                        return string.Empty;
+                    }
+
+                    return $"({(column.MaxLength <= 0 ? "MAX" : column.MaxLength.ToString())})";
+
+                case SqlDbType.VarBinary:
+                case SqlDbType.NVarChar:
+                    return $"({(column.MaxLength <= 0 ? "MAX" : column.MaxLength.ToString())})";
+
+
+                case SqlDbType.Decimal:
+                case SqlDbType.Variant:
+                    return $"({column.Precision}, {column.Scale})";
+
+                case SqlDbType.BigInt:
+                case SqlDbType.Bit:
+                case SqlDbType.DateTime:
+                case SqlDbType.Float:
+                case SqlDbType.Image:
+                case SqlDbType.Int:
+                case SqlDbType.Money:
+                case SqlDbType.NText:
+                case SqlDbType.Real:
+                case SqlDbType.UniqueIdentifier:
+                case SqlDbType.SmallDateTime:
+                case SqlDbType.SmallInt:
+                case SqlDbType.SmallMoney:
+                case SqlDbType.Text:
+                case SqlDbType.Timestamp:
+                case SqlDbType.TinyInt:
+                case SqlDbType.Xml:
+                case SqlDbType.Udt:
+                case SqlDbType.Structured:
+                case SqlDbType.Date:
+                default:
+                    return string.Empty;
+            }
+        }
+
         private string BuildColumnExists(TableModel table)
         {
             StringBuilder result = new StringBuilder();

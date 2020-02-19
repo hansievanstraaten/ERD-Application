@@ -7,6 +7,8 @@ using ERD.Models;
 using System.Collections.Generic;
 using ERD.Build.DataMappings;
 using System.Data;
+using ERD.DatabaseScripts;
+
 
 namespace ERD.Build
 {
@@ -288,7 +290,8 @@ namespace ERD.Build
                 .Replace("[[ColumnFriendlyName]]", this.ColumnFriendlyName)
                 .Replace("[[ColumnDescription]]", this.ColumnDescription)
                 .Replace("[[DataType]]", this.ColumnDataType)
-                .Replace("[[DatabaseDataType]]", this.SqlDataType)
+                .Replace("[[DatabaseColumnType]]", this.SqlDataType)
+                .Replace("[[DatabaseColumnLength]]", this.FieldLength)
                 .Replace("[[DatabaseNullableType]]", this.SqlNullableDataType);
 
             return rawText;
@@ -413,84 +416,15 @@ namespace ERD.Build
         {
             get
             {
-                if (this.SelectedColumn == null)
-                {
-                    return string.Empty;
-                }
-
-                switch (this.SelectedColumn.SqlDataType)
-                {
-                    case SqlDbType.VarChar:
-                        if (this.SelectedColumn.MaxLength == 8016)
-                        {
-                            return "sql_variant";
-                        }
-
-                        goto default;
-                        
-                    case SqlDbType.Variant:
-                        return "numeric";
-
-                    default: 
-                        return $"{this.SelectedColumn.SqlDataType} {this.FieldLength(this.SelectedColumn)}";
-                }
+                return Scripting.DatabaseDataType(this.SelectedColumn);
             }
         }
 
-        private string FieldLength(ColumnObjectModel column)
+        private string FieldLength
         {
-            switch (column.SqlDataType)
+            get
             {
-                case SqlDbType.Binary:
-                case SqlDbType.Char:
-                case SqlDbType.NChar:
-                case SqlDbType.Time:
-                    return $"({column.MaxLength})";
-
-                case SqlDbType.DateTimeOffset:
-                case SqlDbType.DateTime2:
-                    return $"({column.Scale})";
-
-                case SqlDbType.VarChar:
-
-                    if (column.MaxLength == 8016)
-                    {
-                        return string.Empty;
-                    }
-
-                    return $"({(column.MaxLength <= 0 ? "MAX" : column.MaxLength.ToString())})";
-
-                case SqlDbType.VarBinary:
-                case SqlDbType.NVarChar:
-                    return $"({(column.MaxLength <= 0 ? "MAX" : column.MaxLength.ToString())})";
-
-
-                case SqlDbType.Decimal:
-                case SqlDbType.Variant:
-                    return $"({column.Precision}, {column.Scale})";
-
-                case SqlDbType.BigInt:
-                case SqlDbType.Bit:
-                case SqlDbType.DateTime:
-                case SqlDbType.Float:
-                case SqlDbType.Image:
-                case SqlDbType.Int:
-                case SqlDbType.Money:
-                case SqlDbType.NText:
-                case SqlDbType.Real:
-                case SqlDbType.UniqueIdentifier:
-                case SqlDbType.SmallDateTime:
-                case SqlDbType.SmallInt:
-                case SqlDbType.SmallMoney:
-                case SqlDbType.Text:
-                case SqlDbType.Timestamp:
-                case SqlDbType.TinyInt:
-                case SqlDbType.Xml:
-                case SqlDbType.Udt:
-                case SqlDbType.Structured:
-                case SqlDbType.Date:
-                default:
-                    return string.Empty;
+                return Scripting.DatafieldLength(this.SelectedColumn);
             }
         }
 

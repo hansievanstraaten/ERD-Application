@@ -268,7 +268,7 @@ namespace ERD.Models
 
                 SqlDbType result = SqlDbType.VarChar;
 
-                Enum.TryParse<SqlDbType>(valueSplit[0], true, out result);
+                Enum.TryParse<SqlDbType>(valueSplit[0].Replace(" IDENTITY", string.Empty), true, out result);
 
                 this.SqlDataType = result;
 

@@ -186,8 +186,10 @@ namespace ERD.Viewer.Tools
             }
 
             tableControl.TableColumnChanged += this.TableColumn_Changed;
-        }
 
+            tableControl.TableHeaderChanged += this.TableHeader_Changed;
+        }
+        
         protected override void OnDragOver(DragEventArgs e)
         {
             e.Handled = true;
@@ -393,6 +395,11 @@ namespace ERD.Viewer.Tools
         private void TableColumn_Changed(object sender, ColumnObjectModel column)
         {
             this.CanvasChanged?.Invoke(this, column);
+        }
+
+        private void TableHeader_Changed(object sender)
+        {
+            this.CanvasChanged?.Invoke(this, sender);
         }
 
         private void DatabaseRelation_Delete(DatabaseRelation sender)

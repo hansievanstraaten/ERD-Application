@@ -44,6 +44,8 @@ namespace ERD.Viewer.Tools
 
         public delegate void TableColumnChangedEvent(object sender, ColumnObjectModel column);
 
+        public delegate void TableHeaderChangedEvent(object sender);
+
         public event TableMoveEvent TableMove;
 
         public event RemoveTableEvent RemoveTable;
@@ -51,6 +53,8 @@ namespace ERD.Viewer.Tools
         public event ForeignKeyColumnAddedEvent ForeignKeyColumnAdded;
 
         public event TableColumnChangedEvent TableColumnChanged;
+
+        public event TableHeaderChangedEvent TableHeaderChanged;
 
         private Point location;
 
@@ -424,6 +428,27 @@ namespace ERD.Viewer.Tools
             this.uxTableName.ContextMenu.IsOpen = true;
         }
 
+        private void EditHeader_Cliked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                TableModel tableCopy = this.Table.CopyTo(new TableModel());
+
+                if (ModelView.ShowDialog("Edit Table Properties", tableCopy).IsFalse())
+                {
+                    return;
+                }
+
+                this.Table = tableCopy.CopyTo(this.Table);
+
+                this.TableHeaderChanged?.Invoke(this);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
         private void InitializeTableNameContextMenu()
         {
             #region HEADER CONTEXT SETUP
@@ -498,26 +523,7 @@ namespace ERD.Viewer.Tools
 
             #endregion
         }
-
-        private void EditHeader_Cliked(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TableModel tableCopy = this.Table.CopyTo(new TableModel());
-
-                if (ModelView.ShowDialog("Edit Table Properties", tableCopy).IsFalse())
-                {
-                    return;
-                }
-
-                this.Table = tableCopy.CopyTo(this.Table);
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
-
+    
         private void InitializeColumnsContextMenu()
         {
             #region DATA GRID SETUP

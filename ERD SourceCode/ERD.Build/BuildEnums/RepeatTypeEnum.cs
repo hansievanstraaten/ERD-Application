@@ -19,7 +19,10 @@ namespace ERD.Build.BuildEnums
         ForeachForeignKeyInTable,
 
         [Description("Foreach Non-Key Column in Table")]
-        ForeachNonColumnInTable
+        ForeachNonColumnInTable,
 
-    }
+        [Description("Foreach Referenced Table")]
+        ForeachReferencedTable
+
+  }
 }

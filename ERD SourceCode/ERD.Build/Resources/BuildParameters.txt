@@ -3,6 +3,7 @@
 [[TablePluralName]]=The Specified table Plural Name.,
 [[PrimaryKey]]=Replaces with the Primary Key(s) in Table.,
 [[ForeignKey]]=Replaces with the Foreign Key(s) in Table.,
+[[ForeignTableName]]=Replaces with the Foreign Table(s) Name.,
 [[ColumnName]]=Replaces with the Column Name.,
 [[DataType]]=Replaces with the Column Data Type.,
 [[DatabaseColumnType]]=The database datatype used,

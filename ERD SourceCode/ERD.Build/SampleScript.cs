@@ -16,11 +16,15 @@ namespace ERD.Build
     {
         private ErdCanvasModel ErdCanvas;
 
+        private List<ErdCanvasModel> AllErdCanvasModels;
+
         private TableModel SelectedTable
         {
             get;
             set;
         }
+
+        private TableModel SelectedReferencedTable { get; set; }
 
         private ColumnObjectModel SelectedColumn
         {
@@ -54,7 +58,7 @@ namespace ERD.Build
             return this.RemoveTrailingCharacters(result);
         }
 
-        public string BuildSampleForeachCanvasScript(ErdCanvasModel sampleCanvas, OptionSetupModel classOption)
+        public string BuildSampleForeachCanvasScript(ErdCanvasModel sampleCanvas, List<ErdCanvasModel> allErdModels, OptionSetupModel classOption)
         {
             if (classOption.BuildTypes.Length == 0)
             {
@@ -62,6 +66,8 @@ namespace ERD.Build
             }
 
             this.ErdCanvas = sampleCanvas;
+
+            this.AllErdCanvasModels = allErdModels;
 
             StringBuilder result = new StringBuilder();
 
@@ -76,7 +82,7 @@ namespace ERD.Build
             return this.RemoveTrailingCharacters(result);
         }
 
-        public string BuildSampleForeachTableScript(ErdCanvasModel sampleCanvas, TableModel table, OptionSetupModel classOption)
+        public string BuildSampleForeachTableScript(ErdCanvasModel sampleCanvas, List<ErdCanvasModel> allErdModels, TableModel table, OptionSetupModel classOption)
         {
             if (classOption.BuildTypes.Length == 0)
             {
@@ -84,6 +90,8 @@ namespace ERD.Build
             }
 
             this.ErdCanvas = sampleCanvas;
+
+            this.AllErdCanvasModels = allErdModels;
 
             this.SelectedTable = table;
 
@@ -265,6 +273,34 @@ namespace ERD.Build
 
                     break;
 
+                case RepeatTypeEnum.ForeachReferencedTable:
+
+                    #region FOREACH REFERENCED TABLE
+
+                    List<TableModel> referenceTables = new List<TableModel>();
+
+                    foreach(ErdCanvasModel canvas in this.AllErdCanvasModels)
+                    {
+                        foreach (TableModel table in canvas.SegmentTables)
+                        {
+                            if (table.Columns.Any(col => col.ForeignKeyTable == this.SelectedTable.TableName))
+                            {
+                                referenceTables.Add(table);
+                            }
+                        }
+                    }
+
+                    foreach(TableModel table in referenceTables)
+                    {
+                        this.SelectedReferencedTable = table;
+
+                        injectionText.Append(this.ReplaceParameters(buildType.Code));
+                    }
+
+                    #endregion
+
+                    break;
+
                 case RepeatTypeEnum.Once:
                 default:
                     injectionText.Append(this.ReplaceParameters(buildType.Code));
@@ -293,7 +329,8 @@ namespace ERD.Build
                 .Replace("[[DataType]]", this.ColumnDataType)
                 .Replace("[[DatabaseColumnType]]", this.SqlDataType)
                 .Replace("[[DatabaseColumnLength]]", this.FieldLength)
-                .Replace("[[DatabaseNullableType]]", this.SqlNullableDataType);
+                .Replace("[[DatabaseNullableType]]", this.SqlNullableDataType)
+                .Replace("[[ForeignTableName]]", this.ForeignTableName);
 
             return rawText;
         }
@@ -319,6 +356,19 @@ namespace ERD.Build
             }
         }
 
+        private string ForeignTableName
+        {
+            get
+            {
+                if (this.SelectedReferencedTable == null)
+                {
+                    return string.Empty;
+                }
+
+                return this.SelectedReferencedTable.TableName;
+            }
+        }
+
         private string TablePluraName
         {
             get
@@ -331,8 +381,7 @@ namespace ERD.Build
                 return this.SelectedTable.PluralName;
             }
         }
-
-
+        
         private string PrimaryKeyColumnName
         {
             get

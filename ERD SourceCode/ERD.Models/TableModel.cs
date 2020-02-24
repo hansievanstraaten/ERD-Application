@@ -23,6 +23,7 @@ namespace ERD.Models
         private string description;
 
         private Point canvasLocation;
+
         private string pluralName;
 
         public TableModel()

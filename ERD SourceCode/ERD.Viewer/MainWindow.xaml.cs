@@ -140,6 +140,10 @@ namespace ERD.Viewer
 
                     return this.canvasDictionary.Values.FirstOrDefault(t => t.SegmentTables.Any(a => a.TableName == tableName));
 
+                case "GetAllErdCanvasesAsList":
+
+                    return this.canvasDictionary.Values.ToList();
+
                 default:
                     return null;
             }
@@ -582,7 +586,7 @@ namespace ERD.Viewer
                     throw new ApplicationException("You need at least one Canvas, with at least one Table and some Columns to use this function.");
                 }
 
-                BuildSetup setup = new BuildSetup(this.canvasDictionary.First().Value);
+                BuildSetup setup = new BuildSetup(this.canvasDictionary.First().Value, this.canvasDictionary.Values.ToList());
 
                 setup.ShowDialog();
             }

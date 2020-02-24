@@ -344,7 +344,9 @@ namespace ERD.Viewer.Tools
 
                     string filePath = Path.Combine(Path.GetTempPath(), $"{fileName}.txt");
 
-                    string result = scriptor.BuildSampleForeachTableScript(canvas, this.Table, option);
+                    List<ErdCanvasModel> allErdCancases = EventParser.ParseQuery(this, "GetAllErdCanvasesAsList").To<List<ErdCanvasModel>>();
+
+                    string result = scriptor.BuildSampleForeachTableScript(canvas, allErdCancases, this.Table, option);
 
                     File.WriteAllText(filePath, result);
 

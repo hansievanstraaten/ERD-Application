@@ -156,6 +156,7 @@
     <None Include="Resources\Delivering.png" />
     <None Include="Resources\Print.png" />
     <None Include="Resources\Cancel.png" />
+    <None Include="Resources\CheckList.png" />
     <Content Include="ViSo_nice.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

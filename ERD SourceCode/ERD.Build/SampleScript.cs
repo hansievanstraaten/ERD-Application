@@ -331,7 +331,9 @@ namespace ERD.Build
                 .Replace("[[DatabaseColumnType]]", this.SqlDataType)
                 .Replace("[[DatabaseColumnLength]]", this.FieldLength)
                 .Replace("[[DatabaseNullableType]]", this.SqlNullableDataType)
-                .Replace("[[ForeignTableName]]", this.ForeignTableName);
+                .Replace("[[ForeignTableName]]", this.ForeignTableName)
+                .Replace("[[TableFriendlyName]]", this.TableFriendlyName)
+                .Replace("[[TableDescription]]", this.TableDescription);
 
             return rawText;
         }
@@ -356,7 +358,46 @@ namespace ERD.Build
                 return this.SelectedTable.TableName;
             }
         }
+        
+        private string TablePluraName
+        {
+            get
+            {
+                if (this.SelectedTable == null)
+                {
+                    return string.Empty;
+                }
 
+                return this.SelectedTable.PluralName;
+            }
+        }
+
+        private string TableFriendlyName
+        {
+            get
+            {
+                if (this.SelectedTable == null)
+                {
+                    return string.Empty;
+                }
+
+                return this.SelectedTable.FriendlyName;
+            }
+        }
+
+        private string TableDescription
+        {
+            get
+            {
+                if (this.SelectedTable == null)
+                {
+                    return string.Empty;
+                }
+
+                return this.SelectedTable.Description;
+            }
+        }
+        
         private string ForeignTableName
         {
             get
@@ -370,19 +411,6 @@ namespace ERD.Build
             }
         }
 
-        private string TablePluraName
-        {
-            get
-            {
-                if (this.SelectedTable == null)
-                {
-                    return string.Empty;
-                }
-
-                return this.SelectedTable.PluralName;
-            }
-        }
-        
         private string PrimaryKeyColumnName
         {
             get

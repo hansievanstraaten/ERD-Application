@@ -244,7 +244,11 @@ namespace ERD.Viewer.Tools
         {
             try
             {
-                SelectedTables selector = new SelectedTables(this.ErdSegment.IncludeInContextBuild.ToArray());
+                string[] exludeTables = this.ErdSegment.SegmentTables == null || this.ErdSegment.SegmentTables.Count == 0 ?
+                new string[] { } :    
+                this.ErdSegment.SegmentTables.Select(t => t.TableName).ToArray();
+
+                SelectedTables selector = new SelectedTables(this.ErdSegment.IncludeInContextBuild.ToArray(), exludeTables);
 
                 bool? result = selector.ShowDialog();
 

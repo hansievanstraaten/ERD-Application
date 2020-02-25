@@ -277,20 +277,21 @@ namespace ERD.Build
 
                     #region FOREACH REFERENCED TABLE
 
-                    List<TableModel> referenceTables = new List<TableModel>();
+                    Dictionary<string, TableModel> referenceTables = new Dictionary<string, TableModel>();
 
-                    foreach(ErdCanvasModel canvas in this.AllErdCanvasModels)
+                    foreach (ErdCanvasModel canvas in this.AllErdCanvasModels)
                     {
                         foreach (TableModel table in canvas.SegmentTables)
                         {
-                            if (table.Columns.Any(col => col.ForeignKeyTable == this.SelectedTable.TableName))
+                            if (table.Columns.Any(col => col.ForeignKeyTable == this.SelectedTable.TableName)
+                                                         && !referenceTables.ContainsKey(table.TableName))
                             {
-                                referenceTables.Add(table);
+                                referenceTables.Add(table.TableName, table);
                             }
                         }
                     }
 
-                    foreach(TableModel table in referenceTables)
+                    foreach(TableModel table in referenceTables.Values)
                     {
                         this.SelectedReferencedTable = table;
 

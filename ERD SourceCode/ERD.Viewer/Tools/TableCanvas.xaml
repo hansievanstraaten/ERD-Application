@@ -15,7 +15,7 @@
     </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <CommonControls:ActionButton ResourceImageName="CheckList" ToolTip="Reference Tables from other canvases to include in the Entity Framework build" 
+            <CommonControls:ActionButton ResourceImageName="CheckList" ToolTip="Reference Tables from other canvases to include in the Script Files build." 
                                          Click="AdditionalTables_Clicked" />
             <CommonControls:LableItem x:Name="uxTabMetadata" Foreground="Blue" />
             <CommonControls:LableItem x:Name="uxTabLock" Foreground="Red" />

@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using ViSo.Common;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Functions;
@@ -274,6 +275,31 @@ namespace ERD.Viewer.Tools
             this.uxTableCanvas.MinWidth = this.uxCanvasScroll.ActualWidth + 1000;
 
             this.uxTableCanvas.MinHeight = this.uxCanvasScroll.ActualHeight + 1000;
+        }
+
+        private void PrintCanvas_Clicked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                PrintDialog print = new PrintDialog();
+
+                if (print.ShowDialog().IsFalse())
+                {
+                    return;
+                }
+
+                Size pageSize = new Size(print.PrintableAreaWidth, print.PrintableAreaHeight);
+
+                this.uxTableCanvas.Measure(pageSize);
+
+                this.uxTableCanvas.Arrange(new Rect(5, 5, pageSize.Width, pageSize.Height));
+                
+                print.PrintVisual(this.uxTableCanvas, "Printing Canvas");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
         }
     }
 }

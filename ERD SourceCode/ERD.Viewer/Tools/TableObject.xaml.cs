@@ -283,7 +283,6 @@ namespace ERD.Viewer.Tools
             this.Table.DeltedColumns = this.Table.DeltedColumns.Add(this.SelectedColumn);
 
             this.Table.Columns = this.Table.Columns.Remove(this.SelectedColumn);
-
         }
 
         private void ViewData_Clicked(object sender, RoutedEventArgs e)

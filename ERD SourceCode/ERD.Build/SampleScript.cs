@@ -319,21 +319,29 @@ namespace ERD.Build
 
             rawText = rawText
                 .Replace("[[CanvasName]]", this.CanvasName)
+
                 .Replace("[[TableName]]", this.TableName)
+                .Replace("[[TableFriendlyName]]", this.TableFriendlyName)
                 .Replace("[[TablePluralName]]", this.TablePluraName)
+                .Replace("[[TableDescription]]", this.TableDescription)
+
                 .Replace("[[PrimaryKey]]", this.PrimaryKeyColumnName)
                 .Replace("[[ForeignKey]]", this.ForeignKeyColumnName)
                 .Replace("[[NoKeyColumn]]", this.NoKeyColumnColumnName)
+
+                .Replace("[[ForeignTableName]]", this.ForeignTableName)
+                .Replace("[[ForeignTableFriendlyName]]", this.ForeignTableFriendlyName)
+                .Replace("[[ForeignTablePluralName]]", this.ForeignTablePluralName)
+                .Replace("[[ForeignTableDescription]]", this.ForeignTableDescription)
+                
                 .Replace("[[ColumnName]]", this.ColumnName)
                 .Replace("[[ColumnFriendlyName]]", this.ColumnFriendlyName)
                 .Replace("[[ColumnDescription]]", this.ColumnDescription)
+
                 .Replace("[[DataType]]", this.ColumnDataType)
                 .Replace("[[DatabaseColumnType]]", this.SqlDataType)
                 .Replace("[[DatabaseColumnLength]]", this.FieldLength)
-                .Replace("[[DatabaseNullableType]]", this.SqlNullableDataType)
-                .Replace("[[ForeignTableName]]", this.ForeignTableName)
-                .Replace("[[TableFriendlyName]]", this.TableFriendlyName)
-                .Replace("[[TableDescription]]", this.TableDescription);
+                .Replace("[[DatabaseNullableType]]", this.SqlNullableDataType)                ;
 
             return rawText;
         }
@@ -411,6 +419,49 @@ namespace ERD.Build
             }
         }
 
+        private string ForeignTableFriendlyName
+        {
+          get
+          {
+            if (this.SelectedReferencedTable == null)
+            {
+              return string.Empty;
+            }
+
+            return this.SelectedReferencedTable.FriendlyName;
+          }
+        }
+
+
+        private string ForeignTablePluralName
+        {
+            get
+            {
+                if (this.SelectedReferencedTable == null)
+                {
+                    return string.Empty;
+                }
+
+                return this.SelectedReferencedTable.PluralName;
+            }
+        }
+
+
+        private string ForeignTableDescription
+        {
+            get
+            {
+                if (this.SelectedReferencedTable == null)
+                {
+                    return string.Empty;
+                }
+
+                return this.SelectedReferencedTable.Description;
+            }
+        }
+
+
+
         private string PrimaryKeyColumnName
         {
             get
@@ -426,7 +477,6 @@ namespace ERD.Build
 
         private string NoKeyColumnColumnName
         {
-
             get
             {
                 if (this.SelectedColumn == null

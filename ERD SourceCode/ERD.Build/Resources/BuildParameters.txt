@@ -1,16 +1,27 @@
 [[CanvasName]]=Replaces with the Tab Name.,
+
 [[TableName]]=Replaces with the Table Name.,
 [[TableFriendlyName]]=Replaces with the table Friendly Name,
 [[TablePluralName]]=Replaces with the table Plural Name.,
 [[TableDescription]]=Replaces with the table description.,
+
 [[PrimaryKey]]=Replaces with the Primary Key(s) in Table.,
 [[ForeignKey]]=Replaces with the Foreign Key(s) in Table.,
+[[NoKeyColumn]]=Replaces with the column name only id the column is not in the primary key cluster or a foreign key.,
+
 [[ForeignTableName]]=Replaces with the Foreign Table(s) Name.,
+[[ForeignTableFriendlyName]]=Replaces with the Foreign table Friendly Name,
+[[ForeignTablePluralName]]=Replaces with the Foreign table Plural Name.,
+[[ForeignTableDescription]]=Replaces with the Foreign table description.,
+
+
 [[ColumnName]]=Replaces with the Column Name.,
-[[DataType]]=Replaces with the Column Data Type.,
-[[DatabaseColumnType]]=The database datatype used,
-[[DatabaseColumnLength]]=
-[[DatabaseNullableType]]=Database Nullable type. E.g. 'NULL' or 'NOT NULL',
 [[ColumnFriendlyName]]=Replaces with the Column Friendly Name.,
 [[ColumnDescription]]=Replaces with the Column Description.,
+
+[[DataType]]=Replaces with the Column Data Type.,
+[[DatabaseColumnType]]=Replaces with the database datatype used,
+[[DatabaseColumnLength]]=Replaces with the  column length,
+[[DatabaseNullableType]]=Replaces with the Database Nullable type. E.g. 'NULL' or 'NOT NULL',
+
 [[?*]]=Removes the last occurrence of the specified parameter and replaces the pre-ceding instances with the character specified as the '*'.

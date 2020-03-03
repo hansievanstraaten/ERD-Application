@@ -44,6 +44,8 @@ namespace ERD.Viewer
         {
             this.InitializeComponent();
 
+            this.SetTitle();
+
             this.Closing += this.MainWindow_Closing;
 
             this.DataContext = this;
@@ -1108,7 +1110,7 @@ namespace ERD.Viewer
 
         private void ActivateMenu()
         {
-            this.Title = $"ViSo - ERD Model - {General.ProjectModel.ModelName}";
+            this.SetTitle();
 
             this.uxNewProject.IsEnabled = false;
 
@@ -1381,6 +1383,35 @@ namespace ERD.Viewer
 
                 item.IsEnabled = isEnabled;
             }
+        }
+    
+        private async void SetTitle()
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    string resultText = General.ProjectModel == null ?
+                    $"ViSo-nice (Version {General.GetProductVersion("ViSo.Viewer")})" 
+                    :
+                    $"ViSo-nice (Version {General.GetProductVersion("ViSo.Viewer")}) - {General.ProjectModel.ModelName}";
+
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        this.Title = resultText;
+                    });
+                }
+                catch
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        this.Title = General.ProjectModel == null ?
+                        "ViSo-nice"
+                        :
+                        $"ViSo-nice - {General.ProjectModel.ModelName}";
+                    });
+                }
+            });
         }
     }
 }

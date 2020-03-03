@@ -8,7 +8,7 @@
                 xmlns:Specialized="clr-namespace:WPF.Tools.Specialized;assembly=WPF.Tools"
                 xmlns:TabControl="clr-namespace:WPF.Tools.TabControl;assembly=WPF.Tools"
                 mc:Ignorable="d"
-                Title="ViSo-nice ERD" Height="450" Width="800">
+                Title="ViSo-nice" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

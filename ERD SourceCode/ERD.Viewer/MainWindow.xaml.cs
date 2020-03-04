@@ -662,7 +662,8 @@ namespace ERD.Viewer
 
                 ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
 
-                string[] skipCompareRead = new string[] { "OriginalPosition", "FriendlyName" };
+                string[] skipCompareRead = new string[] { "OriginalPosition", "FriendlyName", "IsForeignkey", "IsVertualRelation", "ForeignKeyTable",
+                "ForeignKeyColumn", "ForeignConstraintName", "ForeignKeyColumnValue", "Description"};
 
                 await Task.Factory.StartNew(() =>
                 {
@@ -723,6 +724,14 @@ namespace ERD.Viewer
                                         if (databaseColumn.IsForeignkey)
                                         {
                                             // Protect Virtual Relations
+                                            if (!segment.IsLocked && databaseColumn.IsForeignkey != tableColumn.IsForeignkey)
+                                            {   // This runs slow as it is so we try not to perform unnecessary dispatcher work
+                                                this.Dispatcher.Invoke(() =>
+                                                {
+                                                    segment.SetLock(true, true);
+                                                });
+                                            }
+
                                             tableColumn.IsForeignkey = databaseColumn.IsForeignkey;
 
                                             tableColumn.ForeignKeyTable = databaseColumn.ForeignKeyTable;
@@ -756,7 +765,6 @@ namespace ERD.Viewer
                                             segment.SetLock(true, true);
                                         });
                                     }
-
                                 }
 
                                 foreach (ColumnObjectModel tableColumn in table.Columns)
@@ -925,8 +933,8 @@ namespace ERD.Viewer
                             string[] fileData = File.ReadAllLines(fileInfo.FullName);
 
                             ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
-
-                            segment.SetLock(false, true);
+                                
+                            segment.SetLock(false, false);
 
                             EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", segment.ModelSegmentControlName);
 

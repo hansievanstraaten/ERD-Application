@@ -230,14 +230,57 @@ namespace GeneralExtensions
                         return false;
                     }
                 }
-                catch
+                catch (Exception err)
                 {
-                    return null;
+                    //return null;
                 }
             }
 
             return true;
+        }
 
+        public static bool? AreEqual<T>(this T source, object compareTo, string[] skipProperties, out List<string> failedProperties)
+        {
+            var sourceType = source.GetType();
+
+            var compareType = compareTo.GetType();
+
+            failedProperties = new List<string>();
+
+            bool result = true;
+
+            foreach (PropertyInfo item in sourceType.GetProperties())
+            {
+                if (!item.CanRead || skipProperties.Contains(item.Name))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var resultP = compareType.GetProperty(item.Name);
+
+                    if (resultP == null)
+                    {
+                        failedProperties.Add(item.Name);
+
+                        result = false;
+                    }
+
+                    if (item.GetValue(source, null).ParseToString() != resultP.GetValue(compareTo, null).ParseToString())
+                    {
+                        failedProperties.Add(item.Name);
+
+                        result = false;
+                    }
+                }
+                catch (Exception err)
+                {
+                    //return null;
+                }
+            }
+
+            return result;
         }
 
         public static T CopyTo<T>(this T source, T result)

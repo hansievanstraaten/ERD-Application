@@ -662,6 +662,8 @@ namespace ERD.Viewer
 
                 ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
 
+                string[] skipCompareRead = new string[] { "OriginalPosition", "FriendlyName" };
+
                 await Task.Factory.StartNew(() =>
                 {
                     try
@@ -688,6 +690,15 @@ namespace ERD.Viewer
 
                                     if (tableColumn != null)
                                     {
+                                        if (!segment.IsLocked && tableColumn.AreEqual(databaseColumn, skipCompareRead).IsFalse())
+                                        {   // This runs slow as it is so we try not to perform unnecessary dispatcher work
+                                            // Lock canvas
+                                            this.Dispatcher.Invoke(() => 
+                                            { 
+                                                segment.SetLock(true, true);
+                                            });
+                                        }
+
                                         tableColumn.IsIdentity = databaseColumn.IsIdentity;
 
                                         tableColumn.AllowNulls = databaseColumn.AllowNulls;
@@ -731,11 +742,21 @@ namespace ERD.Viewer
 
                                             tableColumn.ForeignConstraintName = string.Empty;
                                         }
-
+                                        
                                         continue;
                                     }
 
                                     table.Columns = table.Columns.Add(databaseColumn);
+
+                                    // Lock Canvas
+                                    if (!segment.IsLocked)
+                                    {   // This runs slow as it is so we try not to perform unnecessary dispatcher work
+                                        this.Dispatcher.Invoke(() =>
+                                        {
+                                            segment.SetLock(true, true);
+                                        });
+                                    }
+
                                 }
 
                                 foreach (ColumnObjectModel tableColumn in table.Columns)
@@ -905,7 +926,7 @@ namespace ERD.Viewer
 
                             ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
 
-                            segment.IsLocked = false;
+                            segment.SetLock(false, true);
 
                             EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", segment.ModelSegmentControlName);
 
@@ -1086,7 +1107,7 @@ namespace ERD.Viewer
             foreach (ErdCanvasModel segment in this.canvasDictionary.Values.Where(il => il.IsLocked))
             {   // Save only the files that was worked on
 
-                segment.IsLocked = false;
+                segment.SetLock(false, false);
 
                 string segmentName = $"{General.ProjectModel.ModelName}.{segment.ModelSegmentControlName}.{FileTypes.eclu}";
 

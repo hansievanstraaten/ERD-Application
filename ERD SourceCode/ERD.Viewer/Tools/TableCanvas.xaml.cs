@@ -37,6 +37,8 @@ namespace ERD.Viewer.Tools
 
             this.ErdSegment = erdSegment;
 
+            this.ErdSegment.ErdCanvasModelLockChanged += this.ErdSegmentLock_Changed;
+
             this.uxTableCanvas.NewTablePrefix = this.ErdSegment.TablePrefix;
 
             foreach (TableModel table in this.ErdSegment.SegmentTables)
@@ -58,22 +60,14 @@ namespace ERD.Viewer.Tools
 
         }
 
+        private void ErdSegmentLock_Changed(object sender, bool lockStatus)
+        {
+            this.SetLock();
+        }
+
         private void Canvas_Changed(object sender, object changedItem)
         {
-            EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
-
-            this.ErdSegment.IsLocked = true; // Alwasy set this to ensure that the canvas will be saved
-
-            if (!General.ProjectModel.LockCanvasOnEditing)
-            {
-                return;
-            }
-
-            CanvasLocks.Instance.LockFile(this.ErdSegment.ModelSegmentControlName);
-
-            this.uxTabLock.Visibility = Visibility.Visible;
-
-            this.uxTabLock.Content = "This Canvas is locked by You";
+            this.SetLock();
         }
 
         private void Table_Removed(object sender, TableModel tableModel)
@@ -300,6 +294,24 @@ namespace ERD.Viewer.Tools
             {
                 MessageBox.Show(err.InnerExceptionMessage());
             }
+        }
+    
+        private void SetLock()
+        {
+            EventParser.ParseMessage(this, "SetForwardEngineerOption", string.Empty);
+
+            this.ErdSegment.SetLock(true, false); // Alwasy set this to ensure that the canvas will be saved
+
+            if (!General.ProjectModel.LockCanvasOnEditing)
+            {
+                return;
+            }
+
+            CanvasLocks.Instance.LockFile(this.ErdSegment.ModelSegmentControlName);
+
+            this.uxTabLock.Visibility = Visibility.Visible;
+
+            this.uxTabLock.Content = "This Canvas is locked by You";
         }
     }
 }

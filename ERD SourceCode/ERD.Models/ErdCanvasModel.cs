@@ -9,6 +9,10 @@ namespace ERD.Models
     [ModelName("Canvas")]
     public class ErdCanvasModel
     {
+        public delegate void ErdCanvasModelLockChangedEvent(object sender, bool lockStatus);
+
+        public event ErdCanvasModelLockChangedEvent ErdCanvasModelLockChanged;
+
         private bool isLocked;
 
         public ErdCanvasModel()
@@ -29,7 +33,7 @@ namespace ERD.Models
                 return this.isLocked;
             }
             
-            set
+            private set
             {
                 if (!value && this.SegmentTables != null)
                 {
@@ -85,6 +89,16 @@ namespace ERD.Models
         {
             get;
             set;
+        }
+    
+        public void SetLock(bool isLockedValue, bool raiseEvent)
+        {
+            this.IsLocked = isLockedValue;
+
+            if (raiseEvent)
+            {
+                this.ErdCanvasModelLockChanged?.Invoke(this, isLockedValue);
+            }
         }
     }
 }

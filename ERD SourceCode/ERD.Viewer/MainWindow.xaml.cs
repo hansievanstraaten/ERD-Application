@@ -867,6 +867,8 @@ namespace ERD.Viewer
 
                         General.ProjectModel = JsonConvert.DeserializeObject(fileLines[1], typeof(ProjectModel)) as ProjectModel;
 
+                        General.ProjectModel.FileDirectory = Path.GetDirectoryName(fileName);
+
                         this.listener.StartWatcher();
 
                         DatabaseModel databaseModel = JsonConvert.DeserializeObject(fileLines[4], typeof(DatabaseModel)) as DatabaseModel;
@@ -916,15 +918,13 @@ namespace ERD.Viewer
                             EventParser.ParseMessage(this, "Loading", General.ProjectModel.ModelName);
                         });
 
-                        string directoryPath = Path.GetDirectoryName(fileName);
-
                         Integrity.KeepColumnsUnique = General.ProjectModel.KeepColumnsUnique;
 
                         Integrity.AllowDatabaseRelations = General.ProjectModel.AllowRelations;
 
                         Integrity.AllowVertualRelations = General.ProjectModel.AllowVertualRelations;
 
-                        DirectoryInfo dir = new DirectoryInfo(directoryPath);
+                        DirectoryInfo dir = new DirectoryInfo(General.ProjectModel.FileDirectory);
 
                         foreach (FileInfo fileInfo in dir.GetFiles($"{General.ProjectModel.ModelName}.*.{FileTypes.eclu}"))
                         {

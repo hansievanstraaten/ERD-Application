@@ -1,3 +1,4 @@
+<meta name="google-site-verification" content="38kYglhbxjlpieXktL1PYbHf0OWmXSAeWUHgsBjtmn0" />
 Welcome to ViSo-Nice ERD Application.
 
 <a style="color:#0000FF" href="https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/ViSo.Viewer.msi" download="ViSo.Viewer.msi">Download Application</a>

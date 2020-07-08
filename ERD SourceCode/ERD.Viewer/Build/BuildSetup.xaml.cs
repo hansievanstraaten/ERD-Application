@@ -61,6 +61,11 @@ namespace ERD.Viewer.Build
         {
             try
             {
+                if (this.uxTabs.Content == null)
+                {
+                    return;
+                }
+
                 this.uxTabs.Content.MaxHeight = e.NewSize.Height - 65;
             }
             catch
@@ -73,13 +78,7 @@ namespace ERD.Viewer.Build
         {
             try
             {
-                BuildScript.Setup.BuildOptions.Clear();
-
-                foreach (BuildOption option in this.uxTabs.Items)
-                {
-                    BuildScript.Setup.BuildOptions.Add(option.OptionSetup);
-                }
-
+                this.SetBuildOptions();
             }
             catch (Exception err)
             {
@@ -93,6 +92,8 @@ namespace ERD.Viewer.Build
         {
             try
             {
+                this.SetBuildOptions();
+
                 BuildScript.Save();
             }
             catch (Exception err)
@@ -166,6 +167,16 @@ namespace ERD.Viewer.Build
                 };
 
                 this.uxParametersList.Children.Add(item);
+            }
+        }
+    
+        private void SetBuildOptions()
+        {
+            BuildScript.Setup.BuildOptions.Clear();
+
+            foreach (BuildOption option in this.uxTabs.Items)
+            {
+                BuildScript.Setup.BuildOptions.Add(option.OptionSetup);
             }
         }
     }

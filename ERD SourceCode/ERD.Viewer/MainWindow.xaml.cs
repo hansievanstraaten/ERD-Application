@@ -216,6 +216,10 @@ namespace ERD.Viewer
                 this.ActivateMenu();
 
                 this.LoadToolsStack();
+
+                this.LoadConnectionsMenue();
+
+                this.listener.StartWatcher();
             }
             catch (Exception err)
             {
@@ -955,8 +959,6 @@ namespace ERD.Viewer
                             this.ActivateMenu();
 
                             this.LoadToolsStack();
-
-                            this.LoadConnectionsMenue();
 
                             this.LoadConnectionsMenue();
 

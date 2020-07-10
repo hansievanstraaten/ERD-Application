@@ -41,10 +41,8 @@ namespace ERD.FileManagement
         public void StartWatcher()
         {
             this.StartFileChangeWatcher();
-
-            //this.StartFileLockWatcher();
         }
-        
+
         public void Dispose()
         {
             Dispose(true);

@@ -1422,15 +1422,30 @@ namespace ERD.Viewer
             {
                 try
                 {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        this.uxInstallUpdates.StartAnimation();
+                    });
+
+
+                    string thisVersion = General.GetProductVersion("ViSo.Viewer");
+
                     string resultText = General.ProjectModel == null ?
-                    $"ViSo-nice (Version {General.GetProductVersion("ViSo.Viewer")})" 
+                    $"ViSo-nice (Version {thisVersion})" 
                     :
-                    $"ViSo-nice (Version {General.GetProductVersion("ViSo.Viewer")}) - {General.ProjectModel.ModelName}";
+                    $"ViSo-nice (Version {thisVersion}) - {General.ProjectModel.ModelName}";
 
                     this.Dispatcher.Invoke(() =>
                     {
                         this.Title = resultText;
                     });
+
+                    VersionManager version = new VersionManager();
+
+                    if (version.HaveUpdates(thisVersion))
+                    {
+
+                    }
                 }
                 catch
                 {

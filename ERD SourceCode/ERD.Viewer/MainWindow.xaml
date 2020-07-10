@@ -48,6 +48,7 @@
                 <MenuItem x:Name="uxMenuBuildSetup" Header="Script Builder Setup" Click="ScriptBuildSetup_Click" />
                 <MenuItem x:Name="uxMenuBuildRun" Header="Run Script Builder" Click="ScriptBuildRun_Click" />
             </MenuItem>
+            <Specialized:FlashableLabel Content="Install Updates" x:Name="uxInstallUpdates" />
         </Menu>
 
         <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">

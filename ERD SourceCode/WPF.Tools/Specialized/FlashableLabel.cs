@@ -90,7 +90,7 @@ namespace WPF.Tools.Specialized
 
       this.Background = this.animationBrush;
 
-      this.animation = new ColorAnimation(start, this.EndColor, new Duration(TimeSpan.FromSeconds(this.duration)));
+      this.animation = new ColorAnimation(start, this.EndColor, new Duration(TimeSpan.FromSeconds(this.DurationSeconds)));
 
       this.animation.AutoReverse = true;
 

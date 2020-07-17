@@ -640,6 +640,10 @@ namespace ERD.Viewer
                     {
                         this.SaveModel();
                     }
+                    else if (result != MessageBoxResult.No)
+                    {
+                        return;
+                    }
                 }
 
                 VersionManager version = new VersionManager();

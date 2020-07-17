@@ -611,7 +611,19 @@ namespace ERD.Viewer
         {
             this.SetLocks(fullPathName);
         }
-        
+
+        private void InstallUpdates_Cliked(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
         private async void ReverseEngineer(object sender)
         {
             try
@@ -1422,12 +1434,6 @@ namespace ERD.Viewer
             {
                 try
                 {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        this.uxInstallUpdates.StartAnimation();
-                    });
-
-
                     string thisVersion = General.GetProductVersion("ViSo.Viewer");
 
                     string resultText = General.ProjectModel == null ?
@@ -1444,7 +1450,19 @@ namespace ERD.Viewer
 
                     if (version.HaveUpdates(thisVersion))
                     {
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            this.uxInstallUpdates.Visibility = Visibility.Visible;
 
+                            this.uxInstallUpdates.StartAnimation();
+                        });
+
+                        Sleep.ThreadWaitSeconds(10);
+
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            this.uxInstallUpdates.EndAnimation();
+                        });
                     }
                 }
                 catch
@@ -1459,5 +1477,7 @@ namespace ERD.Viewer
                 }
             });
         }
+
+        
     }
 }

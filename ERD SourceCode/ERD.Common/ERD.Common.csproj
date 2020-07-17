@@ -56,6 +56,10 @@
       <Project>{df72187c-d643-4e5f-af68-190c023930a9}</Project>
       <Name>GeneralExtensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ViSo.Common\ViSo.Common.csproj">
+      <Project>{CFB74CAF-B98C-4387-94E3-AE9AFBE16B7E}</Project>
+      <Name>ViSo.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj">
       <Project>{53799c60-aa9d-4deb-86e0-8e70dd1844f3}</Project>
       <Name>WPF.Tools</Name>

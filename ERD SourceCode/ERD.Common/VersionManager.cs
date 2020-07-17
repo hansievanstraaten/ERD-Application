@@ -1,9 +1,19 @@
-﻿namespace ERD.Common
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using ViSo.Common;
+
+namespace ERD.Common
 {
     public class VersionManager
     {
         private readonly string downloadUrl = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/";
         private readonly string versionFile = "VersionFile.txt";
+        private readonly string msiFile = "ViSo.Viewer";
+        private readonly string msiExstention = ".msi";
+        
+        public static string ServerVersion { get; set; }
 
         public bool HaveUpdates(string thisVersion)
         {
@@ -18,14 +28,38 @@
                     client.DownloadFile(downloadFile, saveVersionFile);
                 }
 
-                string serverVersion = File.ReadAllText(saveVersionFile);
+                VersionManager.ServerVersion = File.ReadAllText(saveVersionFile)
+                    .Replace("\n", string.Empty)
+                    .Replace("\r", string.Empty);
 
-                return thisVersion == serverVersion;
+                File.Delete(saveVersionFile);
+
+                return thisVersion != VersionManager.ServerVersion;
             }
             catch (Exception err)
             {
-                //<a style="color:#0000FF" href="https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/VersionFile.txt" download="ViSo.Viewer.msi">Download Application</a>
                 return false;
+            }
+        }
+
+        public void InstallUpdates()
+        {
+            try
+            {
+                string downloadFile = Path.Combine(this.downloadUrl, $"{this.msiFile}{this.msiExstention}");
+
+                string saveVersionFile = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{this.msiFile}.{VersionManager.ServerVersion}{this.msiExstention}");
+
+                using (DownloadWebClient client = new DownloadWebClient())
+                {
+                    client.DownloadFile(downloadFile, saveVersionFile);
+                }
+
+                Process.Start(saveVersionFile);
+            }
+            catch (Exception err)
+            {
+                throw;
             }
         }
 

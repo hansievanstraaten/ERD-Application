@@ -616,7 +616,37 @@ namespace ERD.Viewer
         {
             try
             {
+                string message = $"Would you like to Download and Install version {VersionManager.ServerVersion} now?";
 
+                if (MessageBox.Show(message, "New Version", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+
+                if (General.ProjectModel != null)
+                {
+                    string saveModelMessage = string.Format("Would you like to save your work?{0}{0}" +
+                                              " - Yes, to save and Continue with updates{0}" +
+                                              " - No, to Continue with updates{0}" +
+                                              " - Cancel to no save and cancel updates{0}", Environment.NewLine);
+
+                    MessageBoxResult result = MessageBox.Show(saveModelMessage, "Save", MessageBoxButton.YesNoCancel);
+
+                    if (result == MessageBoxResult.Cancel)
+                    {
+                        return;
+                    }
+                    else if (result == MessageBoxResult.Yes)
+                    {
+                        this.SaveModel();
+                    }
+                }
+
+                VersionManager version = new VersionManager();
+
+                version.InstallUpdates();
+
+                Application.Current.Shutdown();
             }
             catch (Exception err)
             {

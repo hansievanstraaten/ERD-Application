@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using ViSo.Common;
-
-namespace ERD.Common
+﻿namespace ERD.Common
 {
     public class VersionManager
     {
@@ -25,7 +15,7 @@ namespace ERD.Common
 
                 using(DownloadWebClient client = new DownloadWebClient())
                 {
-                    client.DownloadFile(downloadUrl, saveVersionFile);
+                    client.DownloadFile(downloadFile, saveVersionFile);
                 }
 
                 string serverVersion = File.ReadAllText(saveVersionFile);

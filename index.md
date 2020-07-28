@@ -1,9 +1,5 @@
-<html>
-	<head>
-		<meta name="msvalidate.01" content="38F9DFAC225565BA82DE475535B2BC6A" />
-		<meta name="google-site-verification" content="38kYglhbxjlpieXktL1PYbHf0OWmXSAeWUHgsBjtmn0" />		
-	</head>
-<body>
+<meta name="msvalidate.01" content="38F9DFAC225565BA82DE475535B2BC6A" />
+<meta name="google-site-verification" content="38kYglhbxjlpieXktL1PYbHf0OWmXSAeWUHgsBjtmn0" />	
 Welcome to ViSo-Nice ERD Application.
 
 <a style="color:#0000FF" href="https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/ViSo.Viewer.msi" download="ViSo.Viewer.msi">Download Application</a>
@@ -29,5 +25,3 @@ The Msi Build will change after each stable version.
 
 Happy Huntings
 Hope you can use this application to your own benefit.
-	</body>
-</html>

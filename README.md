@@ -4,7 +4,6 @@
 <meta name="msvalidate.01" content="38F9DFAC225565BA82DE475535B2BC6A" />
 </head>
 	<body>
-		Add to Bing Test
 	</body>
 </html>
 

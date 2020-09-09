@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WPF.Tools</RootNamespace>
     <AssemblyName>WPF.Tools</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -223,7 +224,7 @@
       <Name>IconSet</Name>
     </ProjectReference>
     <ProjectReference Include="..\ViSo.Common\ViSo.Common.csproj">
-      <Project>{CFB74CAF-B98C-4387-94E3-AE9AFBE16B7E}</Project>
+      <Project>{cfb74caf-b98c-4387-94e3-ae9afbe16b7e}</Project>
       <Name>ViSo.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj">

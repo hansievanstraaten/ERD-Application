@@ -19,7 +19,7 @@ namespace ERD.Build.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,10 +61,16 @@ namespace ERD.Build.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [[CanvasName]],
-        ///[[TableName]],
-        ///[[ColumnName]],
-        ///[[DataType]].
+        ///   Looks up a localized string similar to [[CanvasName]]=Replaces with the Tab Name.,
+        ///
+        ///[[TableName]]=Replaces with the Table Name.,
+        ///[[TableFriendlyName]]=Replaces with the table Friendly Name,
+        ///[[TablePluralName]]=Replaces with the table Plural Name.,
+        ///[[TableDescription]]=Replaces with the table description.,
+        ///
+        ///[[PrimaryKey]]=Replaces with the Primary Key(s) in Table.,
+        ///[[ForeignKey]]=Replaces with the Foreign Key(s) in Table.,
+        ///[[NoKeyColumn]]=Replaces with the column name only id the column is not in the primary key cluster or a foreign key. [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string BuildParameters {
             get {

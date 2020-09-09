@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ViSo.Dialogs.Properties {
+namespace REPORT.Builder.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViSo.SharedEnums", "ViSo.Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERD.FileManagement", "ERD.FileManagement\ERD.FileManagement.csproj", "{6B6583B1-3798-4E85-B287-5DB4689A3479}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REPORT.Builder", "REPORT.Builder\REPORT.Builder.csproj", "{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{6B6583B1-3798-4E85-B287-5DB4689A3479}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B6583B1-3798-4E85-B287-5DB4689A3479}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B6583B1-3798-4E85-B287-5DB4689A3479}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>ERD.Viewer</RootNamespace>
     <AssemblyName>ERD.Viewer</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -32,6 +32,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -298,6 +299,10 @@
     <ProjectReference Include="..\IconSet\IconSet.csproj">
       <Project>{8ae0a307-a872-4d6d-a58e-31d28ce5b89d}</Project>
       <Name>IconSet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\REPORT.Builder\REPORT.Builder.csproj">
+      <Project>{ad4e4ceb-2e5b-4e40-b63a-1a05b81f8d47}</Project>
+      <Name>REPORT.Builder</Name>
     </ProjectReference>
     <ProjectReference Include="..\ViSo.Common\ViSo.Common.csproj">
       <Project>{cfb74caf-b98c-4387-94e3-ae9afbe16b7e}</Project>

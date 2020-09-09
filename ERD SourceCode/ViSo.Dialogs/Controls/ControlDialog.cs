@@ -9,11 +9,11 @@ namespace ViSo.Dialogs.Controls
   {
     private static ControlWindow window;
 
-    public static bool? ShowDialog(string windowTitle, UserControlBase control, string boolUpdateMethod)
+    public static bool? ShowDialog(string windowTitle, UserControlBase control, string boolUpdateMethod, bool showOkButton = true, bool showCancelButton = true)
     {
       try
       {
-        ControlDialog.window = new ControlWindow(windowTitle, control, boolUpdateMethod);
+        ControlDialog.window = new ControlWindow(windowTitle, control, boolUpdateMethod, showOkButton, showCancelButton);
 
         return ControlDialog.window.ShowDialog();
       }

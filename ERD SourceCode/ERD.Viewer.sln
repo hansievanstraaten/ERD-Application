@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERD.FileManagement", "ERD.F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REPORT.Builder", "REPORT.Builder\REPORT.Builder.csproj", "{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REPORT.Data", "REPORT.Data\REPORT.Data.csproj", "{F5216B32-35A2-46F0-90C2-9667F7F80BCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5216B32-35A2-46F0-90C2-9667F7F80BCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5216B32-35A2-46F0-90C2-9667F7F80BCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5216B32-35A2-46F0-90C2-9667F7F80BCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5216B32-35A2-46F0-90C2-9667F7F80BCD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

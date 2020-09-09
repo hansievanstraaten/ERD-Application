@@ -6,57 +6,61 @@ using GeneralExtensions;
 
 namespace ViSo.Dialogs.Controls
 {
-  /// <summary>
-  /// Interaction logic for ControlWindow.xaml
-  /// </summary>
-  public partial class ControlWindow : WindowBase
-  {
-    private string boolUpdateMethodName;
-
-    public ControlWindow(string windowTitle, UserControlBase control, string boolUpdateMethod)
+    /// <summary>
+    /// Interaction logic for ControlWindow.xaml
+    /// </summary>
+    public partial class ControlWindow : WindowBase
     {
-      this.InitializeComponent();
+        private string boolUpdateMethodName;
 
-      this.Title = windowTitle; 
-
-      this.uxContent.Content = control;
-
-      this.boolUpdateMethodName = boolUpdateMethod;
-
-      this.Loaded += this.ControlWindow_Loaded;
-    }
-
-    private void ControlWindow_Loaded(object sender, RoutedEventArgs e)
-    {
-      this.AutoSize = true;
-    }
-
-    private void OkButton_Clicked(object sender, RoutedEventArgs e)
-    {
-      try
-      {
-        if (!this.boolUpdateMethodName.IsNullEmptyOrWhiteSpace())
+        public ControlWindow(string windowTitle, UserControlBase control, string boolUpdateMethod, bool showOkButton, bool showCancelButton)
         {
-          bool updateResult = this.InvokeMethod(this.uxContent.Content, this.boolUpdateMethodName, new object[] { }).TryToBool();
+            this.InitializeComponent();
 
-          if (!updateResult)
-          {
-            return;
-          }
+            this.Title = windowTitle;
+
+            this.uxContent.Content = control;
+
+            this.boolUpdateMethodName = boolUpdateMethod;
+
+            this.uxButtonOk.Visibility = showOkButton ? Visibility.Visible : Visibility.Collapsed;
+
+            this.uxButtonCancel.Visibility = showCancelButton ? Visibility.Visible : Visibility.Collapsed;
+
+            this.Loaded += this.ControlWindow_Loaded;
         }
 
-        this.DialogResult = true;
-        
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
-    }
+        private void ControlWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.AutoSize = true;
+        }
 
-    private void Cancel_Cliked(object sender, RoutedEventArgs e)
-    {
-      this.Close();
+        private void OkButton_Clicked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!this.boolUpdateMethodName.IsNullEmptyOrWhiteSpace())
+                {
+                    bool updateResult = this.InvokeMethod(this.uxContent.Content, this.boolUpdateMethodName, new object[] { }).TryToBool();
+
+                    if (!updateResult)
+                    {
+                        return;
+                    }
+                }
+
+                this.DialogResult = true;
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void Cancel_Cliked(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
-  }
 }

@@ -2,7 +2,7 @@
 
 namespace REPORT.Builder.ReportEnums
 {
-    public enum ReportSystemSetupEnum
+    public enum StorageTypeEnum
     {
         [Description("File System")]
         FileSystem = 1,

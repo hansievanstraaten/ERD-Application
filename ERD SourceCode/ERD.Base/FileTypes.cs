@@ -20,6 +20,11 @@
     /// <summary>
     /// ERD Lock File
     /// </summary>
-    eloc = 4
+    eloc = 4,
+
+    /// <summary>
+    /// ERD Report Setup file
+    /// </summary>
+    erpt = 5
   }
 }

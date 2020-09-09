@@ -14,6 +14,7 @@ using ERD.Viewer.Tools;
 using GeneralExtensions;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using REPORT.Builder;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,6 +27,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml.Linq;
 using ViSo.Common;
+using ViSo.Dialogs.Controls;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Exstention;
 using WPF.Tools.Functions;
@@ -610,6 +612,40 @@ namespace ERD.Viewer
         private void ProjectLocks_Changed(object sender, string fullPathName, FileSystemEventArgs e)
         {
             this.SetLocks(fullPathName);
+        }
+
+        private void ReportSystemSetup_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ReportSystemSetup setup = new ReportSystemSetup(General.ProjectModel.FileDirectory);
+
+                if (ControlDialog.ShowDialog("Setup", setup, "Save").IsFalse())
+                {
+                    return;
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void SelectReport_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ReportSelector selector = new ReportSelector(General.ProjectModel.FileDirectory);
+
+                if (ControlDialog.ShowDialog("reports", selector, string.Empty, showOkButton: false).IsFalse())
+                {
+                    return;
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
         }
 
         private void InstallUpdates_Cliked(object sender, MouseButtonEventArgs e)
@@ -1200,6 +1236,8 @@ namespace ERD.Viewer
             this.uxMenuDatabase.IsEnabled = true;
 
             this.uxMenuBuild.IsEnabled = true;
+
+            this.uxMenuReport.IsEnabled = true;
         }
 
         private void LoadConnectionsMenue()

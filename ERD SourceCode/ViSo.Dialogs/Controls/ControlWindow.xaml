@@ -22,8 +22,8 @@
                         VerticalContentAlignment="Stretch"/>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <CommonControls:ActionButton Content="OK" Margin="2" Click="OkButton_Clicked" />
-            <CommonControls:ActionButton Content="Cancel" Margin="2" Click="Cancel_Cliked" />
+            <CommonControls:ActionButton x:Name="uxButtonOk" Content="OK" Margin="2" Click="OkButton_Clicked" />
+            <CommonControls:ActionButton x:Name="uxButtonCancel" Content="Cancel" Margin="2" Click="Cancel_Cliked" />
         </StackPanel>
     </Grid>
 </src:WindowBase>

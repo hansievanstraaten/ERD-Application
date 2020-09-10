@@ -55,6 +55,10 @@
     <Compile Include="IncludeTableModel.cs" />
     <Compile Include="ModelBase.cs" />
     <Compile Include="ProjectModel.cs" />
+    <Compile Include="ReportModels\ReportSetupModel.cs" />
+    <Compile Include="ReportModels\StructureModels\Lookup.cs" />
+    <Compile Include="ReportModels\StructureModels\ReportMaster.cs" />
+    <Compile Include="ReportModels\StructureModels\ReportXML.cs" />
     <Compile Include="TableModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserNameAndPasswordModel.cs" />
@@ -63,6 +67,10 @@
     <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj">
       <Project>{df72187c-d643-4e5f-af68-190c023930a9}</Project>
       <Name>GeneralExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj">
+      <Project>{44340843-A61B-4A2B-99D8-7142BF456D85}</Project>
+      <Name>ViSo.SharedEnums</Name>
     </ProjectReference>
     <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj">
       <Project>{53799C60-AA9D-4DEB-86E0-8E70DD1844F3}</Project>

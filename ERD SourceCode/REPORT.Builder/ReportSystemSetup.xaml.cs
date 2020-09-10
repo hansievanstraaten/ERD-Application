@@ -1,14 +1,13 @@
-﻿using System;
-using WPF.Tools.BaseClasses;
+﻿using ERD.Models.ReportModels;
 using GeneralExtensions;
-using System.Windows;
-using REPORT.Builder.Models;
-using System.IO;
-using WPF.Tools.Exstention;
-using ERD.Base;
 using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
-using REPORT.Builder.ReportEnums;
+using System.IO;
+using System.Windows;
+using ViSo.SharedEnums.ReportEnums;
+using WPF.Tools.BaseClasses;
+using WPF.Tools.Exstention;
 
 namespace REPORT.Builder
 {

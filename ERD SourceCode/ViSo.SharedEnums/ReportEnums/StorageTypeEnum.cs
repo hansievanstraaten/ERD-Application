@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace REPORT.Builder.ReportEnums
+namespace ViSo.SharedEnums.ReportEnums
 {
     public enum StorageTypeEnum
     {

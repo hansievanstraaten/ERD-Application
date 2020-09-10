@@ -1,6 +1,7 @@
-﻿using GeneralExtensions;
+﻿using ERD.Models.ReportModels;
+using GeneralExtensions;
 using Newtonsoft.Json;
-using REPORT.Builder.Models;
+using REPORT.Data;
 using System;
 using System.IO;
 using System.Windows;
@@ -43,6 +44,8 @@ namespace REPORT.Builder
                 string fileContent = File.ReadAllText(this.ReportFileName);
 
                 this.ReportSetup = JsonConvert.DeserializeObject(fileContent, typeof(ReportSetupModel)) as ReportSetupModel;
+
+                DatabaseConnection.Instance.InitializeConnectionString(this.ReportSetup);
             }
             catch (Exception err)
             {

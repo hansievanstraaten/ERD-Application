@@ -1,9 +1,8 @@
-﻿using ERD.Models;
-using REPORT.Builder.ReportEnums;
+﻿using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.Attributes;
 using WPF.Tools.BaseClasses;
 
-namespace REPORT.Builder.Models
+namespace ERD.Models.ReportModels
 {
     [ModelName("Reports Setup")]
     public class ReportSetupModel : ModelsBase

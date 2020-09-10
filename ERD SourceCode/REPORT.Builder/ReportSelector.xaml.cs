@@ -15,6 +15,8 @@ namespace REPORT.Builder
     /// </summary>
     public partial class ReportSelector : UserControlBase
     {
+        private ReportHeaderFooters uxHeadersAndFooters = new ReportHeaderFooters() { Title  = "Headers and Footers" };
+
         public ReportSelector(string projectFileDirectory)
         {
             this.InitializeComponent();
@@ -22,6 +24,8 @@ namespace REPORT.Builder
             this.ReportFileName = Path.Combine(projectFileDirectory, Constants.Constants.ReportSetupFileName);
 
             this.Loaded += this.ReportSelector_Loaded;
+
+            this.uxMainTab.Items.Add(this.uxHeadersAndFooters);
         }
 
         public string ReportFileName { get; private set; }

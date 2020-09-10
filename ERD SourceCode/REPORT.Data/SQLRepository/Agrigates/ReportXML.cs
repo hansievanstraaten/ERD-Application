@@ -1,7 +1,7 @@
 using System;
 using WPF.Tools.BaseClasses;
 
-namespace ERD.Models.ReportModels.StructureModels
+namespace REPORT.Data.SQLRepository.Agrigates
 {
     public class ReportXML : ModelsBase
     {

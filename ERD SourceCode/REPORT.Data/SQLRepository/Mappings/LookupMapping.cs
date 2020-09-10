@@ -1,4 +1,4 @@
-using ERD.Models.ReportModels.StructureModels;
+using REPORT.Data.SQLRepository.Agrigates;
 using System.Data.Entity.ModelConfiguration;
 
 namespace REPORT.Data.SQLRepository.Mappings

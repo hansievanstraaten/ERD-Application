@@ -56,9 +56,6 @@
     <Compile Include="ModelBase.cs" />
     <Compile Include="ProjectModel.cs" />
     <Compile Include="ReportModels\ReportSetupModel.cs" />
-    <Compile Include="ReportModels\StructureModels\Lookup.cs" />
-    <Compile Include="ReportModels\StructureModels\ReportMaster.cs" />
-    <Compile Include="ReportModels\StructureModels\ReportXML.cs" />
     <Compile Include="TableModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserNameAndPasswordModel.cs" />

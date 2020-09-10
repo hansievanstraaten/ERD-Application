@@ -1,9 +1,9 @@
 using System;
 using WPF.Tools.BaseClasses;
 
-namespace ERD.Models.ReportModels.StructureModels
+namespace REPORT.Data.SQLRepository.Agrigates
 {
-    public class Lookup : ModelsBase
+    public class LookupModel : ModelsBase
     {
 	private string _LookupGroup;
 	private int _GroupKey;

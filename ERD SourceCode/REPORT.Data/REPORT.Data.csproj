@@ -43,6 +43,9 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SqlClient, Version=4.6.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SqlClient.4.8.2\lib\net461\System.Data.SqlClient.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,7 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseConnection.cs" />
-    <Compile Include="DatabaseMaintenance.cs" />
+    <Compile Include="Models\LookupModel.cs" />
+    <Compile Include="Models\ReportMasterModel.cs" />
+    <Compile Include="Models\ReportXMLModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -64,6 +69,13 @@
     <Compile Include="SQLRepository\Mappings\LookupMapping.cs" />
     <Compile Include="SQLRepository\Mappings\ReportMasterMapping.cs" />
     <Compile Include="SQLRepository\Mappings\ReportXMLMapping.cs" />
+    <Compile Include="SQLRepository\Agrigates\Lookup.cs" />
+    <Compile Include="SQLRepository\Agrigates\ReportMaster.cs" />
+    <Compile Include="SQLRepository\Agrigates\ReportXML.cs" />
+    <Compile Include="SQLRepository\Repositories\Base\ReportTablesRepository_Base.cs" />
+    <Compile Include="SQLRepository\Repositories\Base\SystemTablesRepository_Base.cs" />
+    <Compile Include="SQLRepository\Repositories\User\ReportTablesRepository.cs" />
+    <Compile Include="SQLRepository\Repositories\User\SystemTablesRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -74,22 +86,26 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Resources\ERD_Print.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj">
       <Project>{A3A6B6F4-1959-4A99-A5CA-472BC1B605EA}</Project>
       <Name>ERD.Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj">
+      <Project>{DF72187C-D643-4E5F-AF68-190C023930A9}</Project>
+      <Name>GeneralExtensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj">
       <Project>{44340843-A61B-4A2B-99D8-7142BF456D85}</Project>
       <Name>ViSo.SharedEnums</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj">
+      <Project>{53799C60-AA9D-4DEB-86E0-8E70DD1844F3}</Project>
+      <Name>WPF.Tools</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SQLRepository\Repositories\Base\" />
-    <Folder Include="SQLRepository\Repositories\User\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

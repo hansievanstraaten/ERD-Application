@@ -15,8 +15,8 @@ namespace REPORT.Data.SQLRepository.Repositories
 		{
 			this.dataContext = new SystemTablesContext();
 		}
-
-		public LookupModel GetLookupByPrimaryKey (string LookupGroup, int GroupKey )
+		
+		public LookupModel GetLookupByPrimaryKey (string LookupGroup, int GroupKey  )
 		{
 			Lookup result =this.dataContext
 				.Lookups
@@ -31,6 +31,21 @@ namespace REPORT.Data.SQLRepository.Repositories
 		}
 
 
+		
+		public List<LookupModel> GetLookupByBinaryXML (string GroupDescription)
+		{
+			List<Lookup> result = this.dataContext
+				.Lookups
+				.Where(fk => fk.GroupDescription == GroupDescription)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<LookupModel>();
+			}
+
+			return result.TryCast<LookupModel>().ToList();
+		}
 
 	}
 }

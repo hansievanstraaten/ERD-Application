@@ -15,8 +15,8 @@ namespace REPORT.Data.SQLRepository.Repositories
 		{
 			this.dataContext = new ReportTablesContext();
 		}
-
-		public ReportMasterModel GetReportMasterByPrimaryKey (Int64 MasterReport_Id )
+		
+		public ReportMasterModel GetReportMasterByPrimaryKey (Int64 MasterReport_Id  )
 		{
 			ReportMaster result =this.dataContext
 				.ReportsMaster
@@ -29,8 +29,8 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.CopyToObject(new ReportMasterModel()) as ReportMasterModel;
 		}
-
-		public ReportXMLModel GetReportXMLByPrimaryKey (int ReportXMLVersion, Int64 MasterReport_Id )
+		
+		public ReportXMLModel GetReportXMLByPrimaryKey (int ReportXMLVersion, Int64 MasterReport_Id  )
 		{
 			ReportXML result =this.dataContext
 				.ReportsXML
@@ -44,8 +44,8 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;
 		}
 
-
-		public List<ReportXMLModel> GetReportXMLByMasterReport_Id (Int64 MasterReport_Id)
+		
+		public List<ReportXMLModel> GetReportXMLByForeignKeyMasterReport_Id (Int64 MasterReport_Id)
 		{
 			List<ReportXML> result = this.dataContext
 				.ReportsXML
@@ -59,5 +59,82 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.TryCast<ReportXMLModel>().ToList();
 		}
+
+		
+		public List<ReportMasterModel> GetReportMasterByBinaryXML (string ReportName)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.ReportName == ReportName)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			return result.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByBinaryXML (byte[] Description)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.Description == Description)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			return result.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByBinaryXML (int ReportTypeEnum)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.ReportTypeEnum == ReportTypeEnum)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			return result.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportXMLModel> GetReportXMLByBinaryXML (byte[] BinaryXML)
+		{
+			List<ReportXML> result = this.dataContext
+				.ReportsXML
+				.Where(fk => fk.BinaryXML == BinaryXML)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportXMLModel>();
+			}
+
+			return result.TryCast<ReportXMLModel>().ToList();
+		}
+		
+		public List<ReportXMLModel> GetReportXMLByBinaryXML (Int64 PrintCount)
+		{
+			List<ReportXML> result = this.dataContext
+				.ReportsXML
+				.Where(fk => fk.PrintCount == PrintCount)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportXMLModel>();
+			}
+
+			return result.TryCast<ReportXMLModel>().ToList();
+		}
+
 	}
 }

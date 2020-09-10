@@ -1,4 +1,6 @@
 ﻿using REPORT.Data.SQLRepository.Agrigates;
+using REPORT.Data.SQLRepository.Repositories;
+using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.BaseClasses;
 
 namespace REPORT.Builder
@@ -8,9 +10,17 @@ namespace REPORT.Builder
     /// </summary>
     public partial class ReportHeaderFooters : UserControlBase
     {
-        public ReportHeaderFooters()
+        private ReportTypeEnum selectedreportType;
+
+        public ReportHeaderFooters(ReportTypeEnum reportType)
         {
             this.InitializeComponent();
+
+            this.selectedreportType = reportType;
+
+            ReportTablesRepository repo = new ReportTablesRepository();
+
+            this.HeadersAndFooters = repo.GetReportMasterByPrimaryKey
         }
 
         public ReportMasterModel HeadersAndFooters

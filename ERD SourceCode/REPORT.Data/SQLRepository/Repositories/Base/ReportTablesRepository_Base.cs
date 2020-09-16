@@ -57,11 +57,14 @@ namespace REPORT.Data.SQLRepository.Repositories
 				return new List<ReportXMLModel>();
 			}
 
-			return result.TryCast<ReportXMLModel>().ToList();
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLModel));
+
+			return objectList.TryCast<ReportXMLModel>().ToList();
 		}
 
 		
-		public List<ReportMasterModel> GetReportMasterByBinaryXML (string ReportName)
+		public List<ReportMasterModel> GetReportMasterByReportName (string ReportName)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
@@ -73,10 +76,13 @@ namespace REPORT.Data.SQLRepository.Repositories
 				return new List<ReportMasterModel>();
 			}
 
-			return result.TryCast<ReportMasterModel>().ToList();
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
-		public List<ReportMasterModel> GetReportMasterByBinaryXML (byte[] Description)
+		public List<ReportMasterModel> GetReportMasterByDescription (byte[] Description)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
@@ -88,10 +94,13 @@ namespace REPORT.Data.SQLRepository.Repositories
 				return new List<ReportMasterModel>();
 			}
 
-			return result.TryCast<ReportMasterModel>().ToList();
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
-		public List<ReportMasterModel> GetReportMasterByBinaryXML (int ReportTypeEnum)
+		public List<ReportMasterModel> GetReportMasterByReportTypeEnum (int ReportTypeEnum)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
@@ -103,7 +112,10 @@ namespace REPORT.Data.SQLRepository.Repositories
 				return new List<ReportMasterModel>();
 			}
 
-			return result.TryCast<ReportMasterModel>().ToList();
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
 		public List<ReportXMLModel> GetReportXMLByBinaryXML (byte[] BinaryXML)
@@ -118,10 +130,13 @@ namespace REPORT.Data.SQLRepository.Repositories
 				return new List<ReportXMLModel>();
 			}
 
-			return result.TryCast<ReportXMLModel>().ToList();
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLModel));
+
+			return objectList.TryCast<ReportXMLModel>().ToList();
 		}
 		
-		public List<ReportXMLModel> GetReportXMLByBinaryXML (Int64 PrintCount)
+		public List<ReportXMLModel> GetReportXMLByPrintCount (Int64 PrintCount)
 		{
 			List<ReportXML> result = this.dataContext
 				.ReportsXML
@@ -133,8 +148,58 @@ namespace REPORT.Data.SQLRepository.Repositories
 				return new List<ReportXMLModel>();
 			}
 
-			return result.TryCast<ReportXMLModel>().ToList();
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLModel));
+
+			return objectList.TryCast<ReportXMLModel>().ToList();
 		}
+
+		public void UpdateReportMaster(ReportMasterModel model)
+		{
+			ReportMaster existing = this.dataContext
+				.ReportsMaster
+				.Where(rx => rx.MasterReport_Id == model.MasterReport_Id  )
+				.FirstOrDefault();
+
+			if (existing == null)
+			{
+				existing = model.CopyToObject(new ReportMaster()) as ReportMaster;
+
+				this.dataContext.ReportsMaster.Add(existing);
+			}
+			else
+			{
+				existing = model.CopyToObject(existing) as ReportMaster;
+			}
+
+			this.dataContext.SaveChanges();
+
+			model = existing.CopyToObject(model) as ReportMasterModel;
+		}
+
+		public void UpdateReportXML(ReportXMLModel model)
+		{
+			ReportXML existing = this.dataContext
+				.ReportsXML
+				.Where(rx => rx.ReportXMLVersion == model.ReportXMLVersion && rx.MasterReport_Id == model.MasterReport_Id  )
+				.FirstOrDefault();
+
+			if (existing == null)
+			{
+				existing = model.CopyToObject(new ReportXML()) as ReportXML;
+
+				this.dataContext.ReportsXML.Add(existing);
+			}
+			else
+			{
+				existing = model.CopyToObject(existing) as ReportXML;
+			}
+
+			this.dataContext.SaveChanges();
+
+			model = existing.CopyToObject(model) as ReportXMLModel;
+		}
+
 
 	}
 }

@@ -43,9 +43,11 @@
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
+    <Reference Include="ReachFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,6 +63,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\ObjectCreator.cs" />
     <Compile Include="Constants\Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -75,6 +78,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ReportComponents\PageSetupOptions.cs" />
+    <Compile Include="ReportComponents\ReportSection.xaml.cs">
+      <DependentUpon>ReportSection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ReportComponents\SectionCanvas.cs" />
+    <Compile Include="ReportComponents\ToolsMenuItem.xaml.cs">
+      <DependentUpon>ToolsMenuItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ReportDesigner.xaml.cs">
       <DependentUpon>ReportDesigner.xaml</DependentUpon>
     </Compile>
@@ -87,6 +98,8 @@
     <Compile Include="ReportSystemSetup.xaml.cs">
       <DependentUpon>ReportSystemSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ReportTools\LabelBase.cs" />
+    <Compile Include="ReportTools\ReportLabel.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -99,6 +112,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ReportComponents\ReportSection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ReportComponents\ToolsMenuItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ReportDesigner.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

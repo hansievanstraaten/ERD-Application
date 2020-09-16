@@ -1,4 +1,5 @@
-﻿<src:UserControlBase xmlns:DataGridObjects="clr-namespace:WPF.Tools.DataGridObjects;assembly=WPF.Tools"  
+﻿<src:UserControlBase xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools" 
+                     xmlns:DataGridObjects="clr-namespace:WPF.Tools.DataGridObjects;assembly=WPF.Tools"  
                      x:Class="REPORT.Builder.ReportHeaderFooters"
                      xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"             
                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -9,8 +10,29 @@
                      mc:Ignorable="d" 
                      d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <DataGridObjects:ViSoDataGrid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            <CommonControls:ActionButton x:Name="uxButtonAdd" ResourceImageName="Add" Click="OnAdd_Click" />
+            <CommonControls:ActionButton x:Name="uxButtonEdit" ResourceImageName="Edit" Click="OnEdit_Click" />
+        </StackPanel>
+        
+        <DataGridObjects:ViSoDataGrid Grid.Row="0" Grid.Column="1"
+                                      AutoGenerateColumns="False"
+                                      ItemsSource="{Binding HeadersAndFooters}"
+                                      SelectedItem="{Binding SelectedHeaderAndFooter}">
+            <DataGridObjects:ViSoDataGrid.Columns>
+                <DataGridTextColumn Header="Report Name" Binding="{Binding ReportName}" />
+                <DataGridTextColumn Header="Report Type" Binding="{Binding ReportTypeEnumValue}" />
+            </DataGridObjects:ViSoDataGrid.Columns>            
         </DataGridObjects:ViSoDataGrid>     
     </Grid>
 </src:UserControlBase>

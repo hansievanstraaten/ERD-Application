@@ -6,22 +6,21 @@
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 xmlns:local="clr-namespace:ViSo.Dialogs.Controls"
-                mc:Ignorable="d"
+                mc:Ignorable="d"                
                 Title="ControlWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <ContentControl Grid.Row="0" x:Name="uxContent"
-                        IsTabStop="False"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        VerticalContentAlignment="Stretch"/>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <ContentControl Grid.Row="0" Grid.Column="0" x:Name="uxContent" IsTabStop="False"/>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right">
             <CommonControls:ActionButton x:Name="uxButtonOk" Content="OK" Margin="2" Click="OkButton_Clicked" />
             <CommonControls:ActionButton x:Name="uxButtonCancel" Content="Cancel" Margin="2" Click="Cancel_Cliked" />
         </StackPanel>

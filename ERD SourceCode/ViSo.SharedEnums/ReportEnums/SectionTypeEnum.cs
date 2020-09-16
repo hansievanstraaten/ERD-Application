@@ -11,6 +11,9 @@ namespace ViSo.SharedEnums.ReportEnums
         Content = 2,
 
         [Description("Footer")]
-        Footer = 3
+        Footer = 3,
+
+        [Description("Page")]
+        Page = 4
     }
 }

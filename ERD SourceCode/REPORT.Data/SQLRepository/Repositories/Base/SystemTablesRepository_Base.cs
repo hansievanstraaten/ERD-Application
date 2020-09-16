@@ -32,7 +32,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 
 		
-		public List<LookupModel> GetLookupByBinaryXML (string GroupDescription)
+		public List<LookupModel> GetLookupByGroupDescription (string GroupDescription)
 		{
 			List<Lookup> result = this.dataContext
 				.Lookups
@@ -44,8 +44,35 @@ namespace REPORT.Data.SQLRepository.Repositories
 				return new List<LookupModel>();
 			}
 
-			return result.TryCast<LookupModel>().ToList();
+			
+			List<object> objectList = result.CopyToObject(typeof(LookupModel));
+
+			return objectList.TryCast<LookupModel>().ToList();
 		}
+
+		public void UpdateLookup(LookupModel model)
+		{
+			Lookup existing = this.dataContext
+				.Lookups
+				.Where(rx => rx.LookupGroup == model.LookupGroup && rx.GroupKey == model.GroupKey  )
+				.FirstOrDefault();
+
+			if (existing == null)
+			{
+				existing = model.CopyToObject(new Lookup()) as Lookup;
+
+				this.dataContext.Lookups.Add(existing);
+			}
+			else
+			{
+				existing = model.CopyToObject(existing) as Lookup;
+			}
+
+			this.dataContext.SaveChanges();
+
+			model = existing.CopyToObject(model) as LookupModel;
+		}
+
 
 	}
 }

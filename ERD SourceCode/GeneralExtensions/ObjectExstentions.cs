@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Windows.Media;
 using ViSo.SharedEnums;
 
 namespace GeneralExtensions
@@ -402,6 +403,51 @@ namespace GeneralExtensions
                 //value = Convert.ChangeType(value, target);
 
                 info.SetValue(source, value, null);
+            }
+            catch
+            {
+                // DO NOTHING: This may be because the property was not initialized and is NULL
+                throw;
+            }
+        }
+
+        public static void SetPropertyValue<T>(this T source, string name, string value) //, bool converter = true)
+        {
+            Type obj = source.GetType();
+
+            PropertyInfo info = obj.GetProperty(name);
+
+            if (info == null)
+            {
+                return;
+            }
+
+            try
+            {
+                Type propertyType = info.PropertyType;
+
+                Type targetType = propertyType.IsNullableType() ? Nullable.GetUnderlyingType(info.PropertyType) : info.PropertyType;
+
+                object objectValue = null;
+
+                if (targetType == typeof(Brush))
+                {
+                    objectValue = (SolidColorBrush)new BrushConverter().ConvertFromString(value);
+                }
+                else if (targetType == typeof(FontFamily))
+                {
+                    objectValue = new FontFamily(value);
+                }
+                else if (targetType.BaseType == typeof(Enum))
+                {
+                    objectValue = Enum.Parse(targetType, value);
+                }
+                else
+                {
+                    objectValue = Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
+                }
+
+                info.SetValue(source, objectValue, null);
             }
             catch
             {

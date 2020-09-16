@@ -1,21 +1,25 @@
 using GeneralExtensions;
 using System;
+using WPF.Tools.Attributes;
 using WPF.Tools.BaseClasses;
 
 namespace REPORT.Data.SQLRepository.Agrigates
 {
+	[ModelNameAttribute("Report", allowHeaderCollapse: true)]
 	public class ReportMasterModel : ModelsBase
 	{
 		private Int64 _MasterReport_Id;
 		private string _ReportName;
+		private string _DescriptionText;
 		private byte[] _Description;
 		private int _ReportTypeEnum;
+        private int _ReportXMLVersion;
 
-		/// <summary>
-		/// <para>Master Report ID</para>
-		/// <para>Master Report ID</para>
-		/// </summary>
-		public Int64 MasterReport_Id
+        /// <summary>
+        /// <para>Master Report ID</para>
+        /// <para>Master Report ID</para>
+        /// </summary>
+        public Int64 MasterReport_Id
 		{
 			get
 			{
@@ -32,6 +36,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		/// <para>Report Name</para>
 		/// <para></para>
 		/// </summary>
+		[FieldInformationAttribute("Name", IsRequired = true)]
 		public string ReportName
 		{
 			get
@@ -62,6 +67,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 			}
 		}
 
+		[FieldInformation("Description")]
+		[BrowseButtonAttribute("DescriptionText", "Edit", "Edit")]
 		public string DescriptionText
         {
 			get
@@ -84,6 +91,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
                 {
 					this.Description = value.ZipFile();
                 }
+
+				base.OnPropertyChanged("DescriptionText", ref this._DescriptionText, value);
             }
         }
 
@@ -103,5 +112,38 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("ReportTypeEnum", ref this._ReportTypeEnum, value);
 			}
 		}
+
+		[FieldInformation("Report Type", IsReadOnly = true)]
+		public string ReportTypeEnumValue
+        {
+			get
+            {
+				if (this.ReportTypeEnum == 0)
+                {
+					return "Not Set";
+                }
+
+				ViSo.SharedEnums.ReportEnums.ReportTypeEnum result = (ViSo.SharedEnums.ReportEnums.ReportTypeEnum)this.ReportTypeEnum;
+
+				return result.GetDescriptionAttribute();
+			}
+        }
+
+		[FieldInformation("Report Version", IsRequired = true)]
+		public int ReportXMLVersion
+        {
+			get
+            {
+				return this._ReportXMLVersion == 0 ? 1 : this._ReportXMLVersion;
+			}
+
+			set
+            {
+				this._ReportXMLVersion = value;
+
+				base.OnPropertyChanged("ReportXMLVersion", ref this._ReportXMLVersion, value);
+
+			}
+        }
 	}
 }

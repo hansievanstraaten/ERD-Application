@@ -2,6 +2,7 @@
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
 using System;
+using System.Drawing.Printing;
 using System.IO;
 using System.Windows;
 using ViSo.Dialogs.Controls;
@@ -68,7 +69,11 @@ namespace REPORT.Builder
         {
             try
             {
-                ReportDesigner designer = new ReportDesigner(new ReportMasterModel { ReportTypeEnum = (int)this.selectedreportType });
+                ReportDesigner designer = new ReportDesigner(new ReportMasterModel 
+                { 
+                    ReportTypeEnum = (int)this.selectedreportType,
+                    PaperKindEnum = (int)PaperKind.A4
+                });
                 
                 if (ControlDialog.ShowDialog($"New {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized).IsFalse())
                 {

@@ -1,7 +1,12 @@
 using GeneralExtensions;
 using System;
+using System.Drawing.Printing;
 using WPF.Tools.Attributes;
 using WPF.Tools.BaseClasses;
+using WPF.Tools.ToolModels;
+using WPF.Tools.Exstention;
+using System.Collections.Generic;
+using WPF.Tools.ModelViewer;
 
 namespace REPORT.Data.SQLRepository.Agrigates
 {
@@ -14,12 +19,13 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		private byte[] _Description;
 		private int _ReportTypeEnum;
         private int _ReportXMLVersion;
+		private int _PaperKindEnum;
 
-        /// <summary>
-        /// <para>Master Report ID</para>
-        /// <para>Master Report ID</para>
-        /// </summary>
-        public Int64 MasterReport_Id
+		/// <summary>
+		/// <para>Master Report ID</para>
+		/// <para>Master Report ID</para>
+		/// </summary>
+		public Int64 MasterReport_Id
 		{
 			get
 			{
@@ -144,6 +150,43 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("ReportXMLVersion", ref this._ReportXMLVersion, value);
 
 			}
+        }
+
+		/// <summary>
+		/// <para>PaperKind</para>
+		/// <para></para>
+		/// </summary>
+		[FieldInformation("Paper Kind", IsRequired = true)]
+		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit:false)]
+		[ValuesSource("PaperKindValues")]
+		public int PaperKindEnum
+		{
+			get
+			{
+				return this._PaperKindEnum;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("PaperKindEnum", ref this._PaperKindEnum, value);
+			}
+		}
+
+		public DataItemModel[] PaperKindValues
+        {
+			get
+            {
+				List<DataItemModel> result = new List<DataItemModel>();
+
+				foreach (PaperKind kind in Enum.GetValues(typeof(PaperKind)))
+				{
+					result.Add(new DataItemModel { DisplayValue = kind.ToString(), ItemKey = (int)kind });
+				}
+
+				return result.ToArray();
+
+			}
+
         }
 	}
 }

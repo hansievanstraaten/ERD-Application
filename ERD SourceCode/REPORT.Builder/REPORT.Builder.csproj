@@ -99,6 +99,7 @@
       <DependentUpon>ReportSystemSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="ReportTools\LabelBase.cs" />
+    <Compile Include="ReportTools\ReportBorder.cs" />
     <Compile Include="ReportTools\ReportLabel.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

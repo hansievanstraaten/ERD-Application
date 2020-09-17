@@ -53,8 +53,6 @@ namespace REPORT.Builder.ReportComponents
                         UIElement child = ObjectCreator.CreateReportObject(item);
 
                         this.AddReportToolItem(child);
-
-                        //this.Children.Add(child as UIElement);
                     }
                     else
                     {
@@ -119,9 +117,9 @@ namespace REPORT.Builder.ReportComponents
                 {
                     Point currentPosition = e.GetPosition(this);
 
-                    double elementLeft = (currentPosition.X - startPoint.X) + selectedElementOrigins.X;
+                    double elementLeft = (currentPosition.X - this.startPoint.X) + this.selectedElementOrigins.X;
                     
-                    double elementTop = (currentPosition.Y - startPoint.Y) + selectedElementOrigins.Y;
+                    double elementTop = (currentPosition.Y - this.startPoint.Y) + this.selectedElementOrigins.Y;
 
                     if (elementLeft < 0)
                     {

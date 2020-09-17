@@ -37,8 +37,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                
-                <Mesurements:RulerControl Grid.Row="0" x:Name="uxHorizontalRuler" Orientation="Horizontal" />
+
+                <Mesurements:RulerControl Grid.Row="0" x:Name="uxHorizontalRuler" Orientation="Horizontal" Panel.ZIndex="99999" Margin="20,0,0,0" />
                 
                 <StackPanel Grid.Row="1" x:Name="uxReportSections" Background="LightGray" HorizontalAlignment="Stretch" />            
             </Grid>

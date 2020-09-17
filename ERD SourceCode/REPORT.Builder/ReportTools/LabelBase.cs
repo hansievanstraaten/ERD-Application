@@ -1,6 +1,9 @@
 ﻿using GeneralExtensions;
+using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Xml.Linq;
@@ -11,6 +14,7 @@ using WPF.Tools.ToolModels;
 
 namespace REPORT.Builder.ReportTools
 {
+    [ModelName("Label")]
     public class LabelBase : LableItem
     {
         public XElement ItemXml
@@ -25,24 +29,20 @@ namespace REPORT.Builder.ReportTools
                 result.Add(new XAttribute("Foreground", this.Foreground));                
                 result.Add(new XAttribute("FontSize", this.FontSize));                
                 result.Add(new XAttribute("FontFamily", this.FontFamily));
-                
-                //result.Add(new XElement("Top"), this.Top);
-                //result.Add(new XElement("Top"), this.Top);
-                //result.Add(new XElement("Top"), this.Top);
 
                 return result;
             }
 
             set
             {
-                foreach(XElement element in value.Elements())
+                foreach(XAttribute element in value.Attributes())
                 {
                     this.SetPropertyValue(element.Name.LocalName, element.Value);
                 }
             }
         }
 
-        [FieldInformation("Top", Sort = 101)]
+        //[FieldInformation("Top", Sort = 101)]
         public double Top
         {
             get
@@ -56,7 +56,7 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
-        [FieldInformation("Left", Sort = 102)]
+        //[FieldInformation("Left", Sort = 102)]
         public double Left
         {
             get
@@ -98,7 +98,7 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
-        [FieldInformation("FontSize", Sort = 105)]
+        [FieldInformation("Font Size", Sort = 105)]
         new public double FontSize
         {
             get
@@ -109,12 +109,10 @@ namespace REPORT.Builder.ReportTools
             set
             {
                 base.FontSize = value;
-
-                //base.FontFamily
             }
         }
 
-        [FieldInformation("FontFamily", Sort = 106)]
+        [FieldInformation("Font Family", Sort = 106)]
         [ItemType(ModelItemTypeEnum.ComboBox, false)]
         [ValuesSource("FontFamalies")]
         new public FontFamily FontFamily
@@ -127,6 +125,24 @@ namespace REPORT.Builder.ReportTools
             set
             {
                 base.FontFamily = value;
+
+                //base.FontWeight
+            }
+        }
+
+        [FieldInformation("Font Weight", Sort = 107)]
+        [ItemType(ModelItemTypeEnum.ComboBox, false)]
+        [ValuesSource("FontWeightsList")]
+        new public FontWeight FontWeight
+        {
+            get
+            {
+                return base.FontWeight;
+            }
+
+            set
+            {
+                base.FontWeight = value;
             }
         }
 
@@ -145,5 +161,28 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
+        public DataItemModel[] FontWeightsList
+        {
+            get
+            {
+                List<DataItemModel> result = new List<DataItemModel>();
+
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Black.ToString(), ItemKey = FontWeights.Black });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Bold.ToString(), ItemKey = FontWeights.Bold });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.DemiBold.ToString(), ItemKey = FontWeights.DemiBold});
+                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraBlack.ToString(), ItemKey = FontWeights.ExtraBlack });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraBold.ToString(), ItemKey = FontWeights.ExtraBold });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraLight.ToString(), ItemKey = FontWeights.ExtraLight });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Heavy.ToString(), ItemKey = FontWeights.Heavy});
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Light.ToString(), ItemKey = FontWeights.Light});
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Medium.ToString(), ItemKey = FontWeights.Medium});
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Normal.ToString(), ItemKey = FontWeights.Normal});
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Regular.ToString(), ItemKey = FontWeights.Regular});
+                result.Add(new DataItemModel { DisplayValue = FontWeights.SemiBold.ToString(), ItemKey = FontWeights.SemiBold});
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Thin.ToString(), ItemKey = FontWeights.Thin });
+
+                return result.ToArray();
+            }
+        }
     }
 }

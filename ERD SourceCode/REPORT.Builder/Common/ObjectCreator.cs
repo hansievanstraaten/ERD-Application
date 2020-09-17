@@ -25,6 +25,14 @@ namespace REPORT.Builder.Common
 
                     return lbl as UIElement;
 
+                case "ReportBorder":
+
+                    ReportBorder border = new ReportBorder();
+
+                    border.ItemXml = xmlObject;
+
+                    return border as UIElement;
+
                 default:
 
                     return new ReportLabel() as UIElement;

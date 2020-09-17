@@ -18,11 +18,13 @@ namespace REPORT.Builder.ReportComponents
 
         public event ReportObjectSelectedEvent ReportObjectSelected;
 
+        private double markerMargin = 79;
+
         private double canvasHeight;
 
         private SectionTypeEnum sectionType;
 
-        private PaperKind paperKind = PaperKind.A4;
+        private PaperKind paperKind;
 
         private PageMediaSize pageSize;
 
@@ -120,6 +122,15 @@ namespace REPORT.Builder.ReportComponents
                 this.sectionType = value;
 
                 this.SetPageAndCanvasSize();
+
+                //if (value == SectionTypeEnum.Page)
+                //{
+                //    this.uxVerticalRuler.ClearMarkers(true);
+
+                //    this.uxVerticalRuler.AddMarker(this.markerMargin, true);
+
+                //    this.uxVerticalRuler.AddMarker((this.pageSize.Height.Value - this.markerMargin), true);
+                //}
             }
         }
 
@@ -135,6 +146,15 @@ namespace REPORT.Builder.ReportComponents
                 this.paperKind = value;
 
                 this.SetPageAndCanvasSize();
+
+                if (this.SectionType == SectionTypeEnum.Page)
+                {
+                    this.uxVerticalRuler.ClearMarkers(true);
+
+                    this.uxVerticalRuler.AddMarker(this.markerMargin, true);
+
+                    this.uxVerticalRuler.AddMarker((this.pageSize.Height.Value - this.markerMargin), true);
+                }
             }
         }
 
@@ -153,7 +173,7 @@ namespace REPORT.Builder.ReportComponents
 
         private void ReportSection_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.RefreshRuler(this.uxMainGrid.RowDefinitions[1].ActualHeight);
+            this.RefreshRuler(this.uxMainGrid.RowDefinitions[1].ActualHeight, this.uxMainGrid.ColumnDefinitions[2].ActualWidth);
         }
 
         private void Collapse_Clicked(object sender, System.Windows.RoutedEventArgs e)
@@ -167,6 +187,8 @@ namespace REPORT.Builder.ReportComponents
                     this.CanvasHeight = this.uxMainGrid.RowDefinitions[1].Height.Value;
 
                     this.uxSectionCanvas.Visibility = Visibility.Collapsed;
+
+                    this.uxVerticalRuler.Visibility = Visibility.Collapsed;
                     
                     this.uxMainGrid.RowDefinitions[1].Height = new GridLength(0);
 
@@ -184,7 +206,9 @@ namespace REPORT.Builder.ReportComponents
 
                     this.uxSectionCanvas.Visibility = Visibility.Visible;
 
-                    this.RefreshRuler(this.CanvasHeight);
+                    this.uxVerticalRuler.Visibility = Visibility.Visible;
+
+                    this.RefreshRuler(this.CanvasHeight, this.uxMainGrid.ColumnDefinitions[2].ActualWidth);
                 }
 
                 this.ReportObjectSelected?.Invoke(null);
@@ -230,12 +254,12 @@ namespace REPORT.Builder.ReportComponents
 
             }
 
-            this.RefreshRuler(this.uxSectionCanvas.Height);
+            this.RefreshRuler(this.uxSectionCanvas.Height, this.uxMainGrid.ColumnDefinitions[2].ActualWidth);
         }
 
-        private void RefreshRuler(double heigh)
+        private void RefreshRuler(double heigh, double traceLength)
         {
-            this.uxVerticalRuler.Refresh(25, heigh);
+            this.uxVerticalRuler.Refresh(25, heigh, traceLength + 25);
         }
     }
 }

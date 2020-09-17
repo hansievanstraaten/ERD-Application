@@ -15,6 +15,7 @@ namespace REPORT.Data.SQLRepository.Mappings
 			Property(colReportName =>  colReportName.ReportName).HasColumnName("ReportName");
 			Property(colDescription =>  colDescription.Description).HasColumnName("Description");
 			Property(colReportTypeEnum =>  colReportTypeEnum.ReportTypeEnum).HasColumnName("ReportTypeEnum");
+			Property(colPaperKindEnum =>  colPaperKindEnum.PaperKindEnum).HasColumnName("PaperKindEnum");
 
 		}
 	}

@@ -9,6 +9,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	private string _ReportName;
 	private byte[] _Description;
 	private int _ReportTypeEnum;
+	private int _PaperKindEnum;
 
 	/// <summary>
 	/// <para>Master Report ID</para>
@@ -75,6 +76,23 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		set
 		{
 			base.OnPropertyChanged("ReportTypeEnum", ref this._ReportTypeEnum, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>PaperKind</para>
+	/// <para></para>
+	/// </summary>
+	public int PaperKindEnum
+	{ 
+		get
+		{
+			return this._PaperKindEnum;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("PaperKindEnum", ref this._PaperKindEnum, value);
 		}
 	}
 

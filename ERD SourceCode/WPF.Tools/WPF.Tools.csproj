@@ -108,6 +108,8 @@
       <DependentUpon>ValueMeter.xaml</DependentUpon>
     </Compile>
     <Compile Include="Mesurements\DistanceConverter.cs" />
+    <Compile Include="Mesurements\Marker.cs" />
+    <Compile Include="Mesurements\RulerControl.cs" />
     <Compile Include="Mesurements\RulerOrientationEnum.cs" />
     <Compile Include="ModelViewer\ModelItemTypeEnum.cs" />
     <Compile Include="ModelViewer\ModelViewer.cs" />
@@ -135,7 +137,7 @@
     <Compile Include="Specialized\PasswordBoxBindable.xaml.cs">
       <DependentUpon>PasswordBoxBindable.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Mesurements\RulerControl.cs" />
+    <Compile Include="Mesurements\RulerImage.cs" />
     <Compile Include="Specialized\WatermarkTextBox.cs" />
     <Compile Include="Stacks\ButtonStack.cs" />
     <Compile Include="Stacks\SearchStackPanel.xaml.cs">

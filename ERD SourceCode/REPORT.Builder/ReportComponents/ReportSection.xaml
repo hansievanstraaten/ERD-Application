@@ -29,7 +29,7 @@
             <CommonControls:LableItem x:Name="uxSectionCaption" FontWeight="SemiBold" Content="Content Description"/>
         </StackPanel>
 
-        <Mesurements:RulerControl Grid.Row="1" Grid.Column="1" Orientation="Vertical" x:Name="uxVerticalRuler" />
+        <Mesurements:RulerControl Grid.Row="1" Grid.Column="1" Orientation="Vertical" x:Name="uxVerticalRuler" Panel.ZIndex="999" />
 
         <local:SectionCanvas Grid.Row="1" Grid.Column="2" x:Name="uxSectionCanvas" Background="White" />
 

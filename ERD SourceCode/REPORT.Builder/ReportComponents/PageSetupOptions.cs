@@ -1,9 +1,7 @@
-﻿using GeneralExtensions;
-using System;
+﻿using System;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Printing;
-using System.Windows;
 
 namespace REPORT.Builder.ReportComponents
 {
@@ -12,6 +10,11 @@ namespace REPORT.Builder.ReportComponents
         public static PageMediaSize GetPageMediaSize(PaperKind paperKind)
         {
             PaperSize pageSize = GetPaperSize(paperKind);
+
+            if (pageSize == null)
+            {
+                throw new ApplicationException($"Paper kind {paperKind} not supported.");
+            }
 
             double pageWidth = ConvertPaperSizeToPx(pageSize.Width);
 

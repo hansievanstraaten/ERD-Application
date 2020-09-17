@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Windows;
 using System.Windows.Media;
 using ViSo.SharedEnums;
 
@@ -441,6 +442,25 @@ namespace GeneralExtensions
                 else if (targetType.BaseType == typeof(Enum))
                 {
                     objectValue = Enum.Parse(targetType, value);
+                }
+                else if (targetType == typeof(Thickness))
+                {
+                    string[] thicknessValues = value.Split(',');
+
+                    if (thicknessValues.Length == 1)
+                    {
+                        objectValue = new Thickness(thicknessValues[0].ToDouble());
+                    }
+                    else
+                    {
+                        objectValue = new Thickness
+                            (
+                                thicknessValues[0].ToDouble(),
+                                thicknessValues[1].ToDouble(),
+                                thicknessValues[2].ToDouble(),
+                                thicknessValues[3].ToDouble()
+                            );
+                    }
                 }
                 else
                 {

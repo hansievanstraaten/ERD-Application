@@ -1,12 +1,18 @@
-﻿using IconSet;
-using System;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace WPF.Tools.Mesurements
 {
-    public class RulerControl : Image
+    public class RulerControl : Canvas
     {
-        private System.Drawing.Bitmap bmp;
+        private RulerImage ruler;
+
+        private double lastTraceLenght = 100;
+
+        private Point rightClick;
+
+        private Marker selecteMarker;
 
         public RulerControl()
         {
@@ -20,217 +26,250 @@ namespace WPF.Tools.Mesurements
             set;
         }
 
-        public void Refresh(double width, double height)
+        public double WithValue
         {
-            this.Width = width;
+            get;
 
-            this.Height = height;
+            set;
+        }
 
-            if (this.Orientation == RulerOrientationEnum.Horizontal)
+        public double TraceLength
+        {
+            get
             {
-                this.DrawHorizontalRuler();
+                return this.lastTraceLenght;
             }
-            else
+
+            set
             {
-                this.DrawVerticalRuler();
+                this.lastTraceLenght = value;
+
+                foreach (UIElement item in this.Children)
+                {
+                    if (item.GetType() == typeof(Marker))
+                    {
+                        ((Marker)item).TraceLength = value;
+                    }
+                }
             }
+        }
 
-            this.Source = ImageConverters.ConvertToImageSource(this.bmp);
+        public bool IsViewOnly
+        {
+            get;
 
-            this.bmp = null;
+            set;
+        }
+
+        public void Refresh(double pxWidth, double pxHeight, double traceLenght)
+        {
+            this.TraceLength = traceLenght;
+
+            this.Width = pxWidth;
+
+            this.Height = pxHeight;
+
+            this.ruler.Refresh(pxWidth, pxHeight);
         }
 
         private void Initialize()
         {
-            this.Orientation = RulerOrientationEnum.Horizontal;
+            this.WithValue = 25;
+
+            this.Loaded += Ruler_Loaded;
+
+            this.ruler = new RulerImage();
+
+            Canvas.SetZIndex(this.ruler, 0);
+
+            this.Children.Add(this.ruler);
         }
 
-        private void DrawHorizontalRuler()
+        public void ClearMarkers(bool staticOnly)
         {
-            if (this.bmp == null)
+            List<Marker> clearList = new List<Marker>();
+
+            foreach (UIElement item in this.Children)
             {
-                int width = this.ActualWidth < 0.1 ? 3 : (int)this.Width;
-
-                int height = this.ActualHeight < 0.1 ? 3 : (int)this.Height;
-
-                if (width <= 0)
+                if (item.GetType() != typeof(Marker))
                 {
-                    width = 1;
+                    continue;
                 }
 
-                this.bmp = new System.Drawing.Bitmap(width, height);
+                Marker mark = (Marker)item;
 
-                System.Drawing.Graphics grap = System.Drawing.Graphics.FromImage(bmp);
-
-                try
+                if (!mark.IsStatic && staticOnly)
                 {
-                    double cmVal = DistanceConverter.ConvertPixelToCm(this.Width);
-
-                    double iSmall = Math.Abs(DistanceConverter.ConvertCmToPixel(0.1));
-
-                    grap.FillRectangle(System.Drawing.Brushes.WhiteSmoke, 0, 0, this.bmp.Width, bmp.Height);
-
-                    for (int x = 0; x < cmVal; x++)
-                    {
-                        int iX = Convert.ToInt32(Math.Abs(DistanceConverter.ConvertCmToPixel(x)));
-
-                        double iStart = Math.Abs(DistanceConverter.ConvertCmToPixel(x)) + iSmall;
-
-                        double iEnd = Math.Abs(DistanceConverter.ConvertCmToPixel(x + 1));
-
-                        int midCount = 1;
-
-                        this.DrawRulerLine(grap, iX, iX, 15, 0);
-
-                        if (x > 0)
-                        {
-                            this.DrawRulerNumber(grap, x, iX);
-                        }
-
-                        while (Convert.ToInt32(iStart) < Convert.ToInt32(iEnd))
-                        {
-                            int iS = Convert.ToInt32(iStart);
-
-                            this.DrawRulerLine(grap, iS, iS, midCount == 5 ? 10 : 6, 0);
-
-                            iStart += iSmall;
-
-                            midCount++;
-                        }
-
-                    }
+                    continue;
                 }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    grap.Dispose();
-                }
+
+                clearList.Add(mark);
+            }
+
+            foreach (Marker item in clearList)
+            {
+                item.Dispose();
+
+                this.Children.Remove(item);
             }
         }
 
-        private void DrawVerticalRuler()
+        public void AddMarker(double atPoint, bool isStatic)
         {
-            if (this.bmp == null)
+            if (this.IsViewOnly)
             {
-                int width = this.ActualWidth < 0.1 ? 3 : (int)this.Width;
-
-                int height = this.ActualHeight < 0.1 ? 3 : (int)this.Height;
-
-                if (height <= 0)
-                {
-                    height = 1;
-                }
-
-                this.bmp = new System.Drawing.Bitmap(width, height);
-
-                System.Drawing.Graphics grap = System.Drawing.Graphics.FromImage(bmp);
-
-                try
-                {
-                    double cmVal = DistanceConverter.ConvertPixelToCm(this.Height);
-
-                    double iSmall = Math.Abs(DistanceConverter.ConvertCmToPixel(0.1));
-
-                    grap.FillRectangle(System.Drawing.Brushes.WhiteSmoke, 0, 0, this.bmp.Width, bmp.Height);
-
-                    for (int x = 0; x < cmVal; x++)
-                    {
-                        int iX = Convert.ToInt32(Math.Abs(DistanceConverter.ConvertCmToPixel(x)));
-
-                        double iStart = Math.Abs(DistanceConverter.ConvertCmToPixel(x)) + iSmall;
-
-                        double iEnd = Math.Abs(DistanceConverter.ConvertCmToPixel(x + 1));
-
-                        int midCount = 1;
-
-                        this.DrawRulerLine(grap, 0, 15, iX, iX);
-
-                        if (x > 0)
-                        {
-                            this.DrawRulerNumber(grap, x, iX);
-                        }
-
-                        while (Convert.ToInt32(iStart) < Convert.ToInt32(iEnd))
-                        {
-                            int iS = Convert.ToInt32(iStart);
-
-                            this.DrawRulerLine(grap, 0, midCount == 5 ? 10 : 6, iS, iS);
-
-                            iStart += iSmall;
-
-                            midCount++;
-                        }
-
-                    }
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    grap.Dispose();
-                }
+                return;
             }
+
+            Marker mark = new Marker(isStatic);
+
+            mark.Orientation = this.Orientation;
+
+            Canvas.SetLeft(mark, this.Orientation == RulerOrientationEnum.Horizontal ? atPoint - 3 : 3);
+
+            Canvas.SetTop(mark, this.Orientation == RulerOrientationEnum.Horizontal ? 3 : atPoint - 3);
+
+            Canvas.SetZIndex(mark, 1);
+
+            this.Children.Add(mark);
         }
 
-        private void DrawRulerNumber(System.Drawing.Graphics grap, int value, int posistion)
+        private void AddMarker()
         {
-            System.Drawing.StringFormat format = new System.Drawing.StringFormat(System.Drawing.StringFormatFlags.MeasureTrailingSpaces);
-
-            System.Drawing.Font font = null;
-
-            if (this.Orientation == RulerOrientationEnum.Vertical)
+            if (this.IsViewOnly)
             {
-                format.FormatFlags |= System.Drawing.StringFormatFlags.DirectionVertical;
+                return;
+            }
 
-                font = new System.Drawing.Font("Segoe UI", (float)(this.Width / 3));
+            Marker mark = new Marker();
+
+            mark.Orientation = this.Orientation;
+
+            Canvas.SetLeft(mark, this.Orientation == RulerOrientationEnum.Horizontal ? this.rightClick.X - 3 : 3);
+
+            Canvas.SetTop(mark, this.Orientation == RulerOrientationEnum.Horizontal ? 3 : this.rightClick.Y - 3);
+
+            Canvas.SetZIndex(mark, 1);
+
+            this.Children.Add(mark);
+        }
+
+        private void DeleteMarker()
+        {
+            if (this.selecteMarker == null)
+            {
+                return;
+            }
+
+            if (this.selecteMarker.IsStatic)
+            {
+                return;
+            }
+
+            this.selecteMarker.Dispose();
+
+            this.Children.Remove(this.selecteMarker);
+        }
+
+        protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            UIElement item = System.Windows.Input.Mouse.DirectlyOver as UIElement;
+
+            if (item.GetType() == typeof(Marker))
+            {
+                return;
+            }
+
+            this.rightClick = e.GetPosition(this);
+
+            this.AddMarker();
+
+            base.OnMouseLeftButtonDown(e);
+        }
+
+        protected override void OnMouseRightButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (this.IsViewOnly)
+            {
+                return;
+            }
+
+            UIElement item = System.Windows.Input.Mouse.DirectlyOver as UIElement;
+
+            MenuItem mItem = (MenuItem)this.ContextMenu.Items[1];
+
+            if (item.GetType() != typeof(Marker))
+            {
+                mItem.Visibility = System.Windows.Visibility.Collapsed;
+
+                this.selecteMarker = null;
             }
             else
             {
-                font = new System.Drawing.Font("Segoe UI", (float)(this.Height / 3));
+                mItem.Visibility = System.Windows.Visibility.Visible;
+
+                this.selecteMarker = (Marker)item;
             }
 
-            System.Drawing.SizeF size = grap.MeasureString((value).ToString(), font, 30, format);
+            this.rightClick = e.GetPosition(this);
 
-            int x = 0;
+            base.OnMouseRightButtonDown(e);
+        }
 
-            int y = 0;
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = (MenuItem)sender;
+
+            switch (item.Name)
+            {
+                case "uxAdd":
+                    this.AddMarker();
+
+                    break;
+
+                case "uxDelete":
+                    this.DeleteMarker();
+
+                    break;
+            }
+        }
+
+        private void Ruler_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (!this.IsViewOnly)
+            {
+                this.CreateContextMenu();
+            }
+
+            this.ruler.Orientation = this.Orientation;
 
             if (this.Orientation == RulerOrientationEnum.Horizontal)
             {
-                x = posistion - (int)size.Width - 3;
+                this.ruler.Refresh(this.DesiredSize.Width, this.WithValue);
 
-                y = (int)this.Height - (int)size.Height;
-            }
-            else
-            {
-                x = (int)this.Width - (int)size.Width;
-
-                y = posistion + 5 - (int)size.Height / 2;
+                return;
             }
 
-            System.Drawing.Point drawAt = new System.Drawing.Point(x, y);
-
-            grap.DrawString(value.ToString(), font, System.Drawing.Brushes.DarkGray, drawAt, format);
+            this.ruler.Refresh(this.WithValue, this.DesiredSize.Height);
         }
 
-        private void DrawRulerLine(System.Drawing.Graphics grap, int x1, int x2, int y1, int y2)
+        private void CreateContextMenu()
         {
-            using (System.Drawing.SolidBrush brush = new System.Drawing.SolidBrush(System.Drawing.Color.DarkGray))
-            {
-                using (System.Drawing.Pen pen = new System.Drawing.Pen(brush, (float)0.3))
-                {
-                    grap.DrawLine(pen, x1, y1, x2, y2);
+            ContextMenu menu = new ContextMenu();
 
-                    pen.Dispose();
+            MenuItem add = new MenuItem { Name = "uxAdd", Header = "Add Marker" };
 
-                    brush.Dispose();
-                }
-            }
+            MenuItem delete = new MenuItem { Name = "uxDelete", Header = "Delete Marker" };
+
+            add.Click += MenuItem_Click;
+
+            delete.Click += MenuItem_Click;
+
+            menu.Items.Add(add);
+
+            menu.Items.Add(delete);
+
+            this.ContextMenu = menu;
         }
     }
 }

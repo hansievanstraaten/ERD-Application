@@ -118,6 +118,24 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
+		public List<ReportMasterModel> GetReportMasterByPaperKindEnum (int PaperKindEnum)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.PaperKindEnum == PaperKindEnum)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
 		public List<ReportXMLModel> GetReportXMLByBinaryXML (byte[] BinaryXML)
 		{
 			List<ReportXML> result = this.dataContext

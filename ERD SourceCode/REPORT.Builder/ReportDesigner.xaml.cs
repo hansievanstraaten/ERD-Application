@@ -4,13 +4,18 @@ using REPORT.Builder.ReportTools;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
 using System;
+using System.ComponentModel;
+using System.Drawing.Printing;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Xml.Linq;
 using ViSo.Dialogs.TextEditor;
 using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.BaseClasses;
+using WPF.Tools.Exstention;
 
 namespace REPORT.Builder
 {
@@ -19,9 +24,13 @@ namespace REPORT.Builder
     /// </summary>
     public partial class ReportDesigner : UserControlBase
     {
+        private double markerMargin = 79;
+
         private ReportTypeEnum reportDesignType;
 
         private ReportMasterModel reportMaster;
+
+        private UIElement selectedReportObject;
 
         public ReportDesigner(ReportMasterModel masterModel)
         {
@@ -30,8 +39,6 @@ namespace REPORT.Builder
             this.InitializeToolsStack();
 
             this.SizeChanged += this.ReportDesigner_SizeChanged;
-
-            this.Loaded += this.ReportDesigner_Loaded;
 
             this.reportDesignType = (ReportTypeEnum)masterModel.ReportTypeEnum;
 
@@ -71,9 +78,11 @@ namespace REPORT.Builder
                 }
             }
 
-            double pageWidth = ((ReportSection)this.uxReportSections.Children[0]).PageSize.Width.Value;
+            this.uxReportSections.MinWidth = this.CanvasWidth + 200;
 
-            this.uxReportSections.MinWidth = pageWidth + 200;
+            this.AddMarginMarkers();
+
+            this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
         }
 
         public ReportMasterModel ReportMaster
@@ -146,14 +155,9 @@ namespace REPORT.Builder
             }
         }
 
-        private void ReportDesigner_Loaded(object sender, RoutedEventArgs e)
-        {
-            //this.uxHorizontalRuler.Refresh(((ReportSection)this.uxReportSections.Children[0]).PageSize.Width.Value, 5);
-        }
-
         private void ReportDesigner_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.uxHorizontalRuler.Refresh(((ReportSection)this.uxReportSections.Children[0]).PageSize.Width.Value, 20);
+            this.uxHorizontalRuler.Refresh(((ReportSection)this.uxReportSections.Children[0]).PageSize.Width.Value, 20, this.CanvasHeight);
         }
 
         private void ReportObject_Selected(object sender)
@@ -162,12 +166,94 @@ namespace REPORT.Builder
             {
                 this.uxProperties.Items.Clear();
 
+                if (this.selectedReportObject != null)
+                {
+                    if (this.selectedReportObject.GetType() != typeof(ReportBorder))
+                    {
+                        this.selectedReportObject.SetPropertyValue("BorderThickness", new Thickness(0));
+
+                        this.selectedReportObject.SetPropertyValue("BorderBrush", Brushes.Transparent);
+                    }
+
+                    this.selectedReportObject = null;
+                }
+
                 if (sender == null)
                 {
                     return;
                 }
 
+                this.selectedReportObject = sender as UIElement;
+
+                this.selectedReportObject.PreviewMouseRightButtonUp += this.SelecteReportObject_RightClick;
+
+                if (this.selectedReportObject.GetType() != typeof(ReportBorder))
+                {
+                    this.selectedReportObject.SetPropertyValue("BorderThickness", new Thickness(2));
+
+                    this.selectedReportObject.SetPropertyValue("BorderBrush", Brushes.DarkGray);
+                }
                 this.uxProperties.Items.Add(sender);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void SelecteReportObject_RightClick(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                ContextMenu menu = new ContextMenu();
+
+                MenuItem delete = new MenuItem { Name = "uxDelete", Header = "Delete Object" };
+
+                delete.Click += this.SelectedMenuItem_Click;
+
+                menu.Items.Add(delete);
+
+                menu.IsOpen = true;
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void SelectedMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SectionCanvas parent = (SectionCanvas)this.selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
+
+                parent.Children.Remove(this.selectedReportObject);
+
+                this.selectedReportObject = null;
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void ReportMaster_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                switch(e.PropertyName)
+                {
+                    case "PaperKindEnum":
+
+                        foreach(ReportSection section in this.uxReportSections.Children)
+                        {
+                            section.PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum;
+                        }
+
+                        break;
+                }
+
+                this.AddMarginMarkers();
             }
             catch (Exception err)
             {
@@ -206,7 +292,8 @@ namespace REPORT.Builder
                         SectionTitle = this.reportDesignType.GetDescriptionAttribute(),
                         SectionIndex = 0,
                         SectionType = SectionTypeEnum.Page,
-                        IsDesignMode = true
+                        IsDesignMode = true,
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum
                     }); ;
 
                     break;
@@ -221,7 +308,8 @@ namespace REPORT.Builder
                         SectionTitle = "Page Header", 
                         SectionIndex = 0,
                         SectionType = SectionTypeEnum.Header,
-                        IsDesignMode = true
+                        IsDesignMode = true,
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum
                     });
 
                     this.uxReportSections.Children.Add(new ReportSection 
@@ -229,7 +317,8 @@ namespace REPORT.Builder
                         SectionTitle = "Page Footer", 
                         SectionIndex = 1,
                         SectionType = SectionTypeEnum.Footer,
-                        IsDesignMode = true
+                        IsDesignMode = true,
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum
                     });
 
 
@@ -245,6 +334,37 @@ namespace REPORT.Builder
         private void InitializeToolsStack()
         {
             this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Label",  ToolType = typeof(ReportLabel) });
+            this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Border", ToolType = typeof(ReportBorder) });
+        }
+    
+        private void AddMarginMarkers()
+        {
+            double pageWidth = this.CanvasWidth;
+
+            this.uxHorizontalRuler.ClearMarkers(true);
+
+            this.uxHorizontalRuler.Refresh(pageWidth, 25, this.CanvasHeight);
+
+            this.uxHorizontalRuler.AddMarker(this.markerMargin, true);
+
+            this.uxHorizontalRuler.AddMarker((pageWidth - this.markerMargin), true);
+        }
+
+        private double CanvasWidth
+        {
+            get
+            {
+                return ((ReportSection)this.uxReportSections.Children[0]).PageSize.Width.Value;
+            }
+        }
+
+        private double CanvasHeight
+        {
+            get
+            {
+                return this.uxReportSections.ActualHeight + 25;
+            }
+
         }
     }
 }

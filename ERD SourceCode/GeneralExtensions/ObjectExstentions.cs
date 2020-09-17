@@ -462,6 +462,12 @@ namespace GeneralExtensions
                             );
                     }
                 }
+                else if (targetType == typeof(FontWeight))
+                {
+                    FontWeightConverter converter = new FontWeightConverter();
+
+                    objectValue = (FontWeight)converter.ConvertFromString(value);
+                }
                 else
                 {
                     objectValue = Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);

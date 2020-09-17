@@ -98,6 +98,7 @@
     <Compile Include="ReportSystemSetup.xaml.cs">
       <DependentUpon>ReportSystemSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ReportTools\CurrentDate.cs" />
     <Compile Include="ReportTools\LabelBase.cs" />
     <Compile Include="ReportTools\ReportBorder.cs" />
     <Compile Include="ReportTools\ReportLabel.cs" />

@@ -90,10 +90,15 @@ namespace REPORT.Builder
 
         private void OnEdit_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+            if (this.SelectedHeaderAndFooter == null)
+            {
+                MessageBox.Show("Please select a Report Object");
+
+                return;
+            }
+
             try
             {
-                string reportXml = File.ReadAllText("C:\\temp\\TestReport.xml");
-
                 ReportDesigner designer = new ReportDesigner(this.SelectedHeaderAndFooter);
 
                 if (ControlDialog.ShowDialog($"Edit {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized).IsFalse())

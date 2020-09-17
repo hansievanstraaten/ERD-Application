@@ -33,6 +33,14 @@ namespace REPORT.Builder.Common
 
                     return border as UIElement;
 
+                case "CurrentDate":
+
+                    CurrentDate date = new CurrentDate();
+
+                    date.ItemXml = xmlObject;
+
+                    return date as UIElement;
+
                 default:
 
                     return new ReportLabel() as UIElement;

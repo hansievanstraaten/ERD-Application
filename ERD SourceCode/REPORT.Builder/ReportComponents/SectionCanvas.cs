@@ -117,6 +117,10 @@ namespace REPORT.Builder.ReportComponents
                 {
                     Point currentPosition = e.GetPosition(this);
 
+                    double elementWidth = this.selectedElement.GetPropertyValue("ActualWidth").ToDouble();
+
+                    double elementHeigth = this.selectedElement.GetPropertyValue("ActualHeight").ToDouble();
+
                     double elementLeft = (currentPosition.X - this.startPoint.X) + this.selectedElementOrigins.X;
                     
                     double elementTop = (currentPosition.Y - this.startPoint.Y) + this.selectedElementOrigins.Y;
@@ -131,12 +135,12 @@ namespace REPORT.Builder.ReportComponents
                         elementTop = 0;
                     }
 
-                    if (base.ActualWidth > elementLeft)
+                    if (base.ActualWidth > (elementLeft + elementWidth))
                     {
                         Canvas.SetLeft(this.selectedElement, elementLeft);
                     }
 
-                    if ((base.ActualHeight - 26) > elementTop)
+                    if (base.ActualHeight > (elementTop + elementHeigth))
                     {
                         Canvas.SetTop(this.selectedElement, elementTop);
                     }
@@ -220,6 +224,8 @@ namespace REPORT.Builder.ReportComponents
             toolObject.SetPropertyValue("Left", location.X);
 
             this.AddReportToolItem(toolObject);
+
+            this.ReportObjectSelected?.Invoke(toolObject);
         }
 
         private void AddReportToolItem(UIElement toolObject)

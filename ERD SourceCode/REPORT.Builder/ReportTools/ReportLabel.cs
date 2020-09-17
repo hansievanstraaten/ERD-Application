@@ -11,9 +11,11 @@ namespace REPORT.Builder.ReportTools
     {
         public ReportLabel()
         {
+            this.DataContext = this;
+
             base.Loaded += this.ReportLabel_Loaded;
 
-            base.Content = "Label";
+            base.Text = "Label";
         }
 
         new public XElement ItemXml
@@ -36,25 +38,18 @@ namespace REPORT.Builder.ReportTools
                 }
             }
         }
-
-        public bool IsDesignMode
-        {
-            get;
-
-            set;
-        }
-
-        [FieldInformation("Caption", Sort = 0)]
+        
+        [FieldInformation("Text", Sort = 0)]
         public string Caption
         {
             get
             {
-                return base.Content.ParseToString();
+                return base.Text;
             }
 
             set
             {
-                base.Content = value;
+                base.Text = value;
             }
         }
 

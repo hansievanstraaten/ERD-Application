@@ -1,6 +1,7 @@
 ﻿using GeneralExtensions;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,8 +16,10 @@ using WPF.Tools.ToolModels;
 namespace REPORT.Builder.ReportTools
 {
     [ModelName("Label")]
-    public class LabelBase : LableItem
+    public class LabelBase : TextBlock
     {
+        private bool itemSelected;
+        
         public XElement ItemXml
         {
             get
@@ -25,10 +28,20 @@ namespace REPORT.Builder.ReportTools
 
                 result.Add(new XAttribute("Top", this.Top));
                 result.Add(new XAttribute("Left", this.Left));
-                result.Add(new XAttribute("Background", this.Background));                
-                result.Add(new XAttribute("Foreground", this.Foreground));                
-                result.Add(new XAttribute("FontSize", this.FontSize));                
+                result.Add(new XAttribute("Foreground", this.Foreground));
+                result.Add(new XAttribute("FontSize", this.FontSize));
                 result.Add(new XAttribute("FontFamily", this.FontFamily));
+                result.Add(new XAttribute("FontWeight", this.FontWeight));
+                result.Add(new XAttribute("HorizontalAlignment", this.HorizontalAlignment));
+                result.Add(new XAttribute("VerticalAlignment", this.VerticalAlignment));
+                result.Add(new XAttribute("TextWrapping", this.TextWrapping));
+                result.Add(new XAttribute("Width", this.Width));
+                result.Add(new XAttribute("Height", this.Height));
+
+                if (this.Background != null)
+                {
+                    result.Add(new XAttribute("Background", this.Background));
+                }
 
                 return result;
             }
@@ -40,6 +53,26 @@ namespace REPORT.Builder.ReportTools
                     this.SetPropertyValue(element.Name.LocalName, element.Value);
                 }
             }
+        }
+
+        public bool ItemSelected
+        {
+            get
+            {
+                return this.itemSelected;
+            }
+            
+            set
+            {
+                this.itemSelected = value;
+            }
+        }
+
+        public bool IsDesignMode
+        {
+            get;
+
+            set;
         }
 
         //[FieldInformation("Top", Sort = 101)]
@@ -182,6 +215,76 @@ namespace REPORT.Builder.ReportTools
                 result.Add(new DataItemModel { DisplayValue = FontWeights.Thin.ToString(), ItemKey = FontWeights.Thin });
 
                 return result.ToArray();
+            }
+        }
+
+        [FieldInformation("Horizontal Alignment", Sort = 108)]
+        new public HorizontalAlignment HorizontalAlignment
+        {
+            get
+            {
+                return base.HorizontalAlignment;
+            }
+
+            set
+            {
+                base.HorizontalAlignment = value;
+            }
+        }
+
+        [FieldInformation("Vertical Alignment", Sort = 109)]
+        new public VerticalAlignment VerticalAlignment
+        {
+            get
+            {
+                return base.VerticalAlignment;
+            }
+
+            set
+            {
+                base.VerticalAlignment = value;
+            }
+        }
+
+        [FieldInformation("Text Wrapping", Sort = 110)]
+        new public TextWrapping TextWrapping
+        { 
+            get
+            {
+                return base.TextWrapping; 
+            }
+
+            set
+            {
+                base.TextWrapping = value;
+            }
+        }
+
+        [FieldInformation("Width", Sort = 111)]
+        new public double Width
+        {
+            get
+            {
+                return base.Width;
+            }
+
+            set
+            {
+                base.Width = value;
+            }
+        }
+
+        [FieldInformation("Height", Sort = 112)]
+        new public double Height
+        {
+            get
+            {
+                return base.Height;
+            }
+
+            set
+            {
+                base.Height = value;
             }
         }
     }

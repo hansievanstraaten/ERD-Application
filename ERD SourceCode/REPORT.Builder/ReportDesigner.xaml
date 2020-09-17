@@ -21,7 +21,7 @@
             <ColumnDefinition Width="3"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="3"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="400"/>
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="0" Grid.Column="0" x:Name="uxToolsStack">

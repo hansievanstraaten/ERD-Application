@@ -168,13 +168,8 @@ namespace REPORT.Builder
 
                 if (this.selectedReportObject != null)
                 {
-                    if (this.selectedReportObject.GetType() != typeof(ReportBorder))
-                    {
-                        this.selectedReportObject.SetPropertyValue("BorderThickness", new Thickness(0));
-
-                        this.selectedReportObject.SetPropertyValue("BorderBrush", Brushes.Transparent);
-                    }
-
+                    this.selectedReportObject.SetPropertyValue("ItemSelected", false);
+                    
                     this.selectedReportObject = null;
                 }
 
@@ -186,13 +181,9 @@ namespace REPORT.Builder
                 this.selectedReportObject = sender as UIElement;
 
                 this.selectedReportObject.PreviewMouseRightButtonUp += this.SelecteReportObject_RightClick;
+                    
+                this.selectedReportObject.SetPropertyValue("ItemSelected", true);
 
-                if (this.selectedReportObject.GetType() != typeof(ReportBorder))
-                {
-                    this.selectedReportObject.SetPropertyValue("BorderThickness", new Thickness(2));
-
-                    this.selectedReportObject.SetPropertyValue("BorderBrush", Brushes.DarkGray);
-                }
                 this.uxProperties.Items.Add(sender);
             }
             catch (Exception err)
@@ -334,7 +325,10 @@ namespace REPORT.Builder
         private void InitializeToolsStack()
         {
             this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Label",  ToolType = typeof(ReportLabel) });
+
             this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Border", ToolType = typeof(ReportBorder) });
+
+            this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Current Date", ToolType = typeof(CurrentDate) });
         }
     
         private void AddMarginMarkers()

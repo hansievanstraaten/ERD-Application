@@ -11,13 +11,20 @@ namespace REPORT.Builder.ReportTools
     [ModelName("Border")]
     public class ReportBorder : Border
     {
+        private bool itemSelected;
+
         public ReportBorder()
         {
-            base.BorderThickness = new Thickness(2);
+            this.DataContext = this;
 
-            base.BorderBrush = Brushes.Black;
+            this.BorderThickness = new Thickness(2);
+
+            this.BorderBrush = Brushes.Black;
+
+            this.Background = Brushes.Transparent;
 
             base.Width = 100;
+
             base.Height = 40;
         }
 
@@ -35,6 +42,11 @@ namespace REPORT.Builder.ReportTools
                 result.Add(new XAttribute("Top", this.Top));
                 result.Add(new XAttribute("Left", this.Left));
 
+                if (this.Background != null)
+                {
+                    result.Add(new XAttribute("Background", this.Background));
+                }
+
                 return result;
             }
 
@@ -45,6 +57,26 @@ namespace REPORT.Builder.ReportTools
                     this.SetPropertyValue(element.Name.LocalName, element.Value);
                 }
             }
+        }
+
+        public bool ItemSelected
+        {
+            get
+            {
+                return this.itemSelected;
+            }
+            
+            set
+            {
+                this.itemSelected = value;
+            }
+        }
+
+        public bool IsDesignMode
+        {
+            get;
+
+            set;
         }
 
         [FieldInformation("Width", Sort = 1)]
@@ -100,6 +132,20 @@ namespace REPORT.Builder.ReportTools
             set
             {
                 base.BorderBrush = value;
+            }
+        }
+
+        [FieldInformation("Background", Sort = 5)]
+        new public Brush Background
+        {
+            get
+            {
+                return base.Background;
+            }
+
+            set
+            {
+                base.Background = value;
             }
         }
 

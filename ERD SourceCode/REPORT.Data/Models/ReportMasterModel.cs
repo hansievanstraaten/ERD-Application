@@ -263,6 +263,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
             {
 				List<DataItemModel> result = new List<DataItemModel>();
 
+				result.Add(new DataItemModel { DisplayValue = "<None>", ItemKey = 0 });
+
 				ReportTablesRepository repo = new ReportTablesRepository();
 
 				foreach(ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.CoverPage))
@@ -280,6 +282,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 			{
 				List<DataItemModel> result = new List<DataItemModel>();
 
+				result.Add(new DataItemModel { DisplayValue = "<None>", ItemKey = 0 });
+
 				ReportTablesRepository repo = new ReportTablesRepository();
 
 				foreach (ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.PageHeaderAndFooter))
@@ -296,6 +300,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 			get
 			{
 				List<DataItemModel> result = new List<DataItemModel>();
+
+				result.Add(new DataItemModel { DisplayValue = "<None>", ItemKey = 0 });
 
 				ReportTablesRepository repo = new ReportTablesRepository();
 

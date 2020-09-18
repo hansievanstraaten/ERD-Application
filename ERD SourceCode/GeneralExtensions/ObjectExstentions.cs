@@ -84,7 +84,7 @@ namespace GeneralExtensions
 
         public static double ToDouble<T>(this T value)
         {
-            return Convert.ToDouble(value);
+            return Convert.ToDouble(value, CultureInfo.InvariantCulture);
         }
 
         public static string ParseToString<T>(this T value)

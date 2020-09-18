@@ -59,12 +59,14 @@ namespace REPORT.Builder.ReportComponents
 
             set
             {
+                this.uxSectionCanvas.CanvasXml = value.Element("CanvasXml");
+
                 foreach (XAttribute property in value.Attributes())
                 {
                     this.SetPropertyValue(property.Name.LocalName, property.Value);
                 }
 
-                this.uxSectionCanvas.CanvasXml = value.Element("CanvasXml");
+                this.CanvasHeight = value.Attribute("CanvasHeight").Value.ToDouble();
             }
         }
 

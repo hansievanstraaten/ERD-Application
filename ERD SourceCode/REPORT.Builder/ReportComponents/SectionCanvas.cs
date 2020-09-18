@@ -36,6 +36,8 @@ namespace REPORT.Builder.ReportComponents
             {
                 XElement result = new XElement("CanvasXml");
 
+                //result.Add(new XAttribute("Height", this.ActualHeight));
+
                 foreach(UIElement child in this.Children)
                 {
                     result.Add(child.GetPropertyValue("ItemXml") as XElement);
@@ -58,7 +60,12 @@ namespace REPORT.Builder.ReportComponents
                     {
                         this.SetPropertyValue(item.Name.LocalName, item.Value);
                     }
-                }                
+                }
+                
+                //foreach(XAttribute element in value.Attributes())
+                //{
+                //    this.SetPropertyValue(element.Name.LocalName, element.Value);
+                //}
             }
         }
 

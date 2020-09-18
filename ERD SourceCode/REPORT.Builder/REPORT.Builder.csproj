@@ -101,7 +101,12 @@
     <Compile Include="ReportTools\CurrentDate.cs" />
     <Compile Include="ReportTools\LabelBase.cs" />
     <Compile Include="ReportTools\ReportBorder.cs" />
+    <Compile Include="ReportTools\ReportHorizontalLine.cs" />
+    <Compile Include="ReportTools\ReportImage.cs" />
     <Compile Include="ReportTools\ReportLabel.cs" />
+    <Compile Include="ReportTools\ReportLineBase.cs" />
+    <Compile Include="ReportTools\ReportPageBreak.cs" />
+    <Compile Include="ReportTools\ReportVerticalLine.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

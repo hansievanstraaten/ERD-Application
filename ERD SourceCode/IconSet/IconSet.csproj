@@ -51,6 +51,7 @@
     <Compile Include="ColourConverters.cs" />
     <Compile Include="IconSets.cs" />
     <Compile Include="ImageConverters.cs" />
+    <Compile Include="ImageFiles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -158,6 +159,7 @@
     <None Include="Resources\Print.png" />
     <None Include="Resources\Cancel.png" />
     <None Include="Resources\CheckList.png" />
+    <None Include="Resources\DefaultImage.png" />
     <Content Include="ViSo_nice.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,5 @@
 ﻿using GeneralExtensions;
+using Microsoft.Win32;
 using REPORT.Builder.ReportComponents;
 using REPORT.Builder.ReportTools;
 using REPORT.Data.SQLRepository.Agrigates;
@@ -82,6 +83,8 @@ namespace REPORT.Builder
 
             this.AddMarginMarkers();
 
+            this.SetupDataReportsOptions();
+
             this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
         }
 
@@ -157,7 +160,7 @@ namespace REPORT.Builder
 
         private void ReportDesigner_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.uxHorizontalRuler.Refresh(((ReportSection)this.uxReportSections.Children[0]).PageSize.Width.Value, 20, this.CanvasHeight);
+            this.uxHorizontalRuler.Refresh(this.CanvasWidth, 20, this.CanvasHeight);
         }
 
         private void ReportObject_Selected(object sender)
@@ -168,8 +171,9 @@ namespace REPORT.Builder
 
                 if (this.selectedReportObject != null)
                 {
-                    this.selectedReportObject.SetPropertyValue("ItemSelected", false);
-                    
+                    // TODO: Remove Selected Heiglight from object
+                    //this.selectedReportObject.SetPropertyValue("ItemSelected", false);
+
                     this.selectedReportObject = null;
                 }
 
@@ -182,7 +186,8 @@ namespace REPORT.Builder
 
                 this.selectedReportObject.PreviewMouseRightButtonUp += this.SelecteReportObject_RightClick;
                     
-                this.selectedReportObject.SetPropertyValue("ItemSelected", true);
+                // TODO: Heiglight Selected object for resizing
+                //this.selectedReportObject.SetPropertyValue("ItemSelected", true);
 
                 this.uxProperties.Items.Add(sender);
             }
@@ -242,6 +247,16 @@ namespace REPORT.Builder
                         }
 
                         break;
+
+                    case "PageOrientationEnum":
+
+                        foreach (ReportSection section in this.uxReportSections.Children)
+                        {
+                            section.PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum;
+                        }
+
+                        break;
+
                 }
 
                 this.AddMarginMarkers();
@@ -269,6 +284,39 @@ namespace REPORT.Builder
             }
         }
 
+        private void PropertiesObject_Browse(object sender, string buttonKey)
+        {
+            try
+            {
+                switch(buttonKey)
+                {
+                    case "ReportImageKey":
+
+                        OpenFileDialog dlg = new OpenFileDialog();
+
+                        bool? result = dlg.ShowDialog();
+
+                        if (!result.HasValue || !result.Value)
+                        {
+                            return;
+                        }
+
+                        this.selectedReportObject.SetPropertyValue("ImagePath", dlg.FileName);
+
+                        break;
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void DataSourseSelect_Browse(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void InitializeReportSections()
         {
             this.uxReportSections.Children.Clear();
@@ -284,12 +332,44 @@ namespace REPORT.Builder
                         SectionIndex = 0,
                         SectionType = SectionTypeEnum.Page,
                         IsDesignMode = true,
-                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
                     }); ;
 
                     break;
 
                 case ReportTypeEnum.ReportContent:
+
+                    this.uxReportSections.Children.Add(new ReportSection
+                    {
+                        SectionTitle = "Table Header",
+                        SectionIndex = 0,
+                        SectionType = SectionTypeEnum.TableHeader,
+                        IsDesignMode = true,
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                    });
+
+                    this.uxReportSections.Children.Add(new ReportSection
+                    {
+                        SectionTitle = "Table Data",
+                        SectionIndex = 1,
+                        SectionType = SectionTypeEnum.TableData,
+                        IsDesignMode = true,
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                    });
+
+                    this.uxReportSections.Children.Add(new ReportSection
+                    {
+                        SectionTitle = "Table Footer",
+                        SectionIndex = 2,
+                        SectionType = SectionTypeEnum.TableFooter,
+                        IsDesignMode = true,
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                    });
+
                     break;
 
                 case ReportTypeEnum.PageHeaderAndFooter:
@@ -300,7 +380,8 @@ namespace REPORT.Builder
                         SectionIndex = 0,
                         SectionType = SectionTypeEnum.Header,
                         IsDesignMode = true,
-                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
                     });
 
                     this.uxReportSections.Children.Add(new ReportSection 
@@ -309,9 +390,9 @@ namespace REPORT.Builder
                         SectionIndex = 1,
                         SectionType = SectionTypeEnum.Footer,
                         IsDesignMode = true,
-                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum
+                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
                     });
-
 
                     break;
             }
@@ -329,8 +410,16 @@ namespace REPORT.Builder
             this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Border", ToolType = typeof(ReportBorder) });
 
             this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Current Date", ToolType = typeof(CurrentDate) });
+
+            this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Image", ToolType = typeof(ReportImage) });
+
+            this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Horizontal Line", ToolType = typeof(ReportHorizontalLine) });
+
+            this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Vertical Line", ToolType = typeof(ReportVerticalLine) });
+
+            this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Page Break", ToolType = typeof(ReportPageBreak) });
         }
-    
+
         private void AddMarginMarkers()
         {
             double pageWidth = this.CanvasWidth;
@@ -344,11 +433,31 @@ namespace REPORT.Builder
             this.uxHorizontalRuler.AddMarker((pageWidth - this.markerMargin), true);
         }
 
+        private void SetupDataReportsOptions()
+        {
+            if (this.reportDesignType != ReportTypeEnum.ReportContent)
+            {
+                return;
+            }
+
+            this.uxReportMasterModel["Cover Page"].Visibility = Visibility.Visible;
+
+            this.uxReportMasterModel["Page Headers and Footers"].Visibility = Visibility.Visible;
+
+            this.uxReportMasterModel["Final Page"].Visibility = Visibility.Visible;
+
+            this.uxDataMenueBorder.Visibility = Visibility.Visible;
+
+            this.uxDataMenue.Visibility = Visibility.Visible;
+
+            this.uxTableTree.Visibility = Visibility.Visible;
+        }
+
         private double CanvasWidth
         {
             get
             {
-                return ((ReportSection)this.uxReportSections.Children[0]).PageSize.Width.Value;
+                return ((ReportSection)this.uxReportSections.Children[0]).GetPropertyValue("PageWidth").ToDouble();
             }
         }
 
@@ -358,7 +467,6 @@ namespace REPORT.Builder
             {
                 return this.uxReportSections.ActualHeight + 25;
             }
-
         }
     }
 }

@@ -18,7 +18,7 @@ namespace REPORT.Builder.ReportTools
     [ModelName("Label")]
     public class LabelBase : TextBlock
     {
-        private bool itemSelected;
+        //private bool itemSelected;
         
         public XElement ItemXml
         {
@@ -55,18 +55,18 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
-        public bool ItemSelected
-        {
-            get
-            {
-                return this.itemSelected;
-            }
+        //public bool ItemSelected
+        //{
+        //    get
+        //    {
+        //        return this.itemSelected;
+        //    }
             
-            set
-            {
-                this.itemSelected = value;
-            }
-        }
+        //    set
+        //    {
+        //        this.itemSelected = value;
+        //    }
+        //}
 
         public bool IsDesignMode
         {

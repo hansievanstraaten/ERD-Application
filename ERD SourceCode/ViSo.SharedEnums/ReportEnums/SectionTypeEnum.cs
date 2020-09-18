@@ -7,13 +7,19 @@ namespace ViSo.SharedEnums.ReportEnums
         [Description("Header")]
         Header = 1,
 
-        [Description("Content")]
-        Content = 2,
-
         [Description("Footer")]
-        Footer = 3,
+        Footer = 2,
 
         [Description("Page")]
-        Page = 4
+        Page = 3,
+
+        [Description("Header")]
+        TableHeader = 4,
+
+        [Description("Data")]
+        TableData = 5,
+
+        [Description("Footer")]
+        TableFooter = 6
     }
 }

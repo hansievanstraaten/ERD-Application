@@ -41,6 +41,38 @@ namespace REPORT.Builder.Common
 
                     return date as UIElement;
 
+                case "ReportImage":
+
+                    ReportImage image = new ReportImage();
+
+                    image.ItemXml = xmlObject;
+
+                    return image as UIElement;
+
+                case "ReportHorizontalLine":
+
+                    ReportHorizontalLine horizontalLine = new ReportHorizontalLine();
+
+                    horizontalLine.ItemXml = xmlObject;
+
+                    return horizontalLine as UIElement;
+
+                case "ReportVerticalLine":
+
+                    ReportVerticalLine verticalLine = new ReportVerticalLine();
+
+                    verticalLine.ItemXml = xmlObject;
+
+                    return verticalLine as UIElement;
+
+                case "ReportPageBreak":
+
+                    ReportPageBreak pageBreak = new ReportPageBreak();
+
+                    pageBreak.ItemXml = xmlObject;
+
+                    return pageBreak as UIElement;
+
                 default:
 
                     return new ReportLabel() as UIElement;

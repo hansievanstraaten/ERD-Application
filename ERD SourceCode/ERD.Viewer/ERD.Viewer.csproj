@@ -315,6 +315,10 @@
       <Project>{ad4e4ceb-2e5b-4e40-b63a-1a05b81f8d47}</Project>
       <Name>REPORT.Builder</Name>
     </ProjectReference>
+    <ProjectReference Include="..\REPORT.Data\REPORT.Data.csproj">
+      <Project>{f5216b32-35a2-46f0-90c2-9667f7f80bcd}</Project>
+      <Name>REPORT.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ViSo.Common\ViSo.Common.csproj">
       <Project>{cfb74caf-b98c-4387-94e3-ae9afbe16b7e}</Project>
       <Name>ViSo.Common</Name>

@@ -24,9 +24,22 @@
             <ColumnDefinition Width="400"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0" x:Name="uxToolsStack">
+        <StackPanel Grid.Row="0" Grid.Column="0" x:Name="uxMenuStack">
             <ModelViewer:ModelViewer x:Name="uxReportMasterModel" ModelViewItemBrowse="ReportMasterDescription_Browse" />
             <CommonControls:LableItem Content="Tools" FontWeight="Bold" />
+            
+            <StackPanel x:Name="uxToolsStack">
+
+            </StackPanel>
+            <Border x:Name="uxDataMenueBorder" Margin="0,5,0,0" BorderThickness="0,3,0,1" BorderBrush="Black" Visibility="Collapsed">
+                <StackPanel x:Name="uxDataMenue" 
+                            Visibility="Collapsed" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Left">
+                    <CommonControls:ActionButton ResourceImageName="CheckList" ToolTip="Select Data Source" Click="DataSourseSelect_Browse" />
+                </StackPanel>
+            </Border>
+            <CommonControls:ViSoTreeView x:Name="uxTableTree" Visibility="Collapsed" />
         </StackPanel>
 
         <CommonControls:VerticalGridSplit Grid.Row="0" Grid.Column="1" />
@@ -47,7 +60,7 @@
 
         <StackPanel Grid.Row="0" Grid.Column="4">
             <CommonControls:LableItem Content="Selected Object Properties" FontWeight="ExtraBold" />
-            <ModelViewer:ModelViewer x:Name="uxProperties" />            
+            <ModelViewer:ModelViewer x:Name="uxProperties" ModelViewItemBrowse="PropertiesObject_Browse" />            
         </StackPanel>
         
     </Grid>

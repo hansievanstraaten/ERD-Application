@@ -28,6 +28,8 @@ namespace REPORT.Builder.ReportComponents
 
         private PageMediaSize pageSize;
 
+        private PageOrientationEnum pageOrientation;
+
         public ReportSection()
         {
             this.InitializeComponent();
@@ -48,6 +50,7 @@ namespace REPORT.Builder.ReportComponents
                 result.Add(new XAttribute("PaperKind", this.PaperKind));
                 result.Add(new XAttribute("SectionIndex", this.SectionIndex));
                 result.Add(new XAttribute("CanvasHeight", this.uxMainGrid.RowDefinitions[1].Height.Value));
+                result.Add(new XAttribute("PageOrientation", this.PageOrientation));
 
                 result.Add(this.uxSectionCanvas.CanvasXml);
 
@@ -56,7 +59,7 @@ namespace REPORT.Builder.ReportComponents
 
             set
             {
-                foreach(XAttribute property in value.Attributes())
+                foreach (XAttribute property in value.Attributes())
                 {
                     this.SetPropertyValue(property.Name.LocalName, property.Value);
                 }
@@ -82,13 +85,13 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        public bool IsDesignMode 
-        { 
+        public bool IsDesignMode
+        {
             get
             {
                 return this.uxSectionCanvas.IsDesignMode;
             }
-            
+
             set
             {
                 this.uxSectionCanvas.IsDesignMode = value;
@@ -110,7 +113,7 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        public SectionTypeEnum SectionType 
+        public SectionTypeEnum SectionType
         {
             get
             {
@@ -122,15 +125,6 @@ namespace REPORT.Builder.ReportComponents
                 this.sectionType = value;
 
                 this.SetPageAndCanvasSize();
-
-                //if (value == SectionTypeEnum.Page)
-                //{
-                //    this.uxVerticalRuler.ClearMarkers(true);
-
-                //    this.uxVerticalRuler.AddMarker(this.markerMargin, true);
-
-                //    this.uxVerticalRuler.AddMarker((this.pageSize.Height.Value - this.markerMargin), true);
-                //}
             }
         }
 
@@ -149,11 +143,27 @@ namespace REPORT.Builder.ReportComponents
 
                 if (this.SectionType == SectionTypeEnum.Page)
                 {
-                    this.uxVerticalRuler.ClearMarkers(true);
+                    this.RefreshPageStaticMarkers();
+                }
+            }
+        }
 
-                    this.uxVerticalRuler.AddMarker(this.markerMargin, true);
+        public PageOrientationEnum PageOrientation 
+        { 
+            get
+            {
+                return this.pageOrientation;
+            }
 
-                    this.uxVerticalRuler.AddMarker((this.pageSize.Height.Value - this.markerMargin), true);
+            set
+            {
+                this.pageOrientation = value;
+
+                this.SetPageAndCanvasSize();
+
+                if (this.SectionType == SectionTypeEnum.Page)
+                {
+                    this.RefreshPageStaticMarkers();
                 }
             }
         }
@@ -228,19 +238,19 @@ namespace REPORT.Builder.ReportComponents
         {
             this.PageSize = PageSetupOptions.GetPageMediaSize(this.PaperKind);
 
-            this.uxSectionCanvas.Width = this.PageSize.Width.Value;
+            this.uxSectionCanvas.Width = this.PageWidth;
 
             switch (this.SectionType)
             {
                 case SectionTypeEnum.Page:
 
-                    this.uxMainGrid.RowDefinitions[1].Height = new GridLength(this.PageSize.Height.Value);
+                    this.uxMainGrid.RowDefinitions[1].Height = new GridLength(this.PageHeight);
 
                     this.uxMainGrid.RowDefinitions[2].Height = new GridLength(0);
 
                     this.uxBottomHandle.Visibility = Visibility.Collapsed;
 
-                    this.uxSectionCanvas.Height = this.PageSize.Height.Value;
+                    this.uxSectionCanvas.Height = this.PageHeight;
 
                     break;
 
@@ -260,6 +270,31 @@ namespace REPORT.Builder.ReportComponents
         private void RefreshRuler(double heigh, double traceLength)
         {
             this.uxVerticalRuler.Refresh(25, heigh, traceLength + 25);
+        }
+
+        private void RefreshPageStaticMarkers()
+        {
+            this.uxVerticalRuler.ClearMarkers(true);
+
+            this.uxVerticalRuler.AddMarker(this.markerMargin, true);
+
+            this.uxVerticalRuler.AddMarker((this.PageHeight - this.markerMargin), true);
+        }
+
+        public double PageHeight
+        {
+            get
+            {
+                return this.PageOrientation == PageOrientationEnum.Portrait ? this.PageSize.Height.Value : this.PageSize.Width.Value;
+            }
+        }
+
+        public double PageWidth
+        {
+            get
+            {
+                return this.PageOrientation == PageOrientationEnum.Portrait ? this.PageSize.Width.Value : this.PageSize.Height.Value;
+            }
         }
     }
 }

@@ -16,6 +16,10 @@ namespace REPORT.Data.SQLRepository.Mappings
 			Property(colDescription =>  colDescription.Description).HasColumnName("Description");
 			Property(colReportTypeEnum =>  colReportTypeEnum.ReportTypeEnum).HasColumnName("ReportTypeEnum");
 			Property(colPaperKindEnum =>  colPaperKindEnum.PaperKindEnum).HasColumnName("PaperKindEnum");
+			Property(colPageOrientationEnum =>  colPageOrientationEnum.PageOrientationEnum).HasColumnName("PageOrientationEnum");
+			Property(colCoverPage_Id =>  colCoverPage_Id.CoverPage_Id).HasColumnName("CoverPage_Id");
+			Property(colHeaderAndFooterPage_Id =>  colHeaderAndFooterPage_Id.HeaderAndFooterPage_Id).HasColumnName("HeaderAndFooterPage_Id");
+			Property(colFinalPage_Id =>  colFinalPage_Id.FinalPage_Id).HasColumnName("FinalPage_Id");
 
 		}
 	}

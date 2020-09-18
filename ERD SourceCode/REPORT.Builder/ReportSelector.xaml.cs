@@ -22,6 +22,8 @@ namespace REPORT.Builder
 
         private ReportHeaderFooters uxFinalPage;
 
+        private ReportHeaderFooters uxDataPages;
+
         public ReportSelector(string projectFileDirectory)
         {
             this.InitializeComponent();
@@ -39,6 +41,7 @@ namespace REPORT.Builder
         {
             try
             {
+                #region DB SETUP OPTIONS
                 if (!File.Exists(this.ReportFileName))
                 {
                     MessageBox.Show("Setup not Found");
@@ -54,11 +57,19 @@ namespace REPORT.Builder
 
                 DatabaseConnection.Instance.InitializeConnectionString(this.ReportSetup);
 
+                #endregion
+
+                #region INITIALIZE TABS
+
+                this.uxDataPages = new ReportHeaderFooters(ReportTypeEnum.ReportContent) { Title = "Data Report" };
+
                 this.uxCoverPage = new ReportHeaderFooters(ReportTypeEnum.CoverPage) { Title = "Cover Pages" };
 
                 this.uxHeadersAndFooters = new ReportHeaderFooters(ReportTypeEnum.PageHeaderAndFooter) { Title = "Headers and Footers" };
 
                 this.uxFinalPage = new ReportHeaderFooters(ReportTypeEnum.FinalPage) { Title = "Final Pages" };
+
+                this.uxMainTab.Items.Add(this.uxDataPages);
 
                 this.uxMainTab.Items.Add(this.uxCoverPage);
 
@@ -67,6 +78,8 @@ namespace REPORT.Builder
                 this.uxMainTab.Items.Add(this.uxFinalPage);
 
                 this.uxMainTab.SetActive(0);
+                
+                #endregion
             }
             catch (Exception err)
             {

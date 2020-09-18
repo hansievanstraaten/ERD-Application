@@ -10,6 +10,10 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	private byte[] _Description;
 	private int _ReportTypeEnum;
 	private int _PaperKindEnum;
+	private int _PageOrientationEnum;
+	private Int64? _CoverPage_Id;
+	private Int64? _HeaderAndFooterPage_Id;
+	private Int64? _FinalPage_Id;
 
 	/// <summary>
 	/// <para>Master Report ID</para>
@@ -93,6 +97,74 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		set
 		{
 			base.OnPropertyChanged("PaperKindEnum", ref this._PaperKindEnum, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>PageOrientation</para>
+	/// <para></para>
+	/// </summary>
+	public int PageOrientationEnum
+	{ 
+		get
+		{
+			return this._PageOrientationEnum;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("PageOrientationEnum", ref this._PageOrientationEnum, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Cover Page ID</para>
+	/// <para></para>
+	/// </summary>
+	public Int64? CoverPage_Id
+	{ 
+		get
+		{
+			return this._CoverPage_Id;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("CoverPage_Id", ref this._CoverPage_Id, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Headers and Footers Page ID</para>
+	/// <para></para>
+	/// </summary>
+	public Int64? HeaderAndFooterPage_Id
+	{ 
+		get
+		{
+			return this._HeaderAndFooterPage_Id;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("HeaderAndFooterPage_Id", ref this._HeaderAndFooterPage_Id, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Final Page ID</para>
+	/// <para></para>
+	/// </summary>
+	public Int64? FinalPage_Id
+	{ 
+		get
+		{
+			return this._FinalPage_Id;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("FinalPage_Id", ref this._FinalPage_Id, value);
 		}
 	}
 

@@ -468,6 +468,10 @@ namespace GeneralExtensions
 
                     objectValue = (FontWeight)converter.ConvertFromString(value);
                 }
+                else if (targetType == typeof(System.Windows.Media.Color))
+                {
+                    objectValue = (Color)ColorConverter.ConvertFromString(value);
+                }
                 else
                 {
                     objectValue = Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);

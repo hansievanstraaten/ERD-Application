@@ -74,15 +74,22 @@ namespace REPORT.Builder.ReportComponents
                 {
                     this.startPoint = e.GetPosition(this);
 
-                    this.selectedElement = e.Source as UIElement;
+                    if (e.Source.GetType() == typeof(System.Windows.Shapes.Line))
+                    {
+                        this.selectedElement = ((System.Windows.Shapes.Line)e.Source as System.Windows.Shapes.Line).Parent as UIElement;
+                    }
+                    else
+                    {
+                        this.selectedElement = e.Source as UIElement;
+                    }
 
-                    this.CaptureMouse();
+                    this.selectedElementOrigins = new Point(Canvas.GetLeft(this.selectedElement), Canvas.GetTop(this.selectedElement));
 
                     this.isDragging = true;
 
-                    this.selectedElementOrigins = new Point(Canvas.GetLeft(selectedElement), Canvas.GetTop(selectedElement));
+                    this.CaptureMouse();
 
-                    this.ReportObjectSelected?.Invoke(e.Source);
+                    this.ReportObjectSelected?.Invoke(this.selectedElement);
                 }
 
                 e.Handled = true;

@@ -136,6 +136,78 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
+		public List<ReportMasterModel> GetReportMasterByPageOrientationEnum (int PageOrientationEnum)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.PageOrientationEnum == PageOrientationEnum)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByCoverPage_Id (Int64? CoverPage_Id)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.CoverPage_Id == CoverPage_Id)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByHeaderAndFooterPage_Id (Int64? HeaderAndFooterPage_Id)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.HeaderAndFooterPage_Id == HeaderAndFooterPage_Id)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByFinalPage_Id (Int64? FinalPage_Id)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.FinalPage_Id == FinalPage_Id)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
 		public List<ReportXMLModel> GetReportXMLByBinaryXML (byte[] BinaryXML)
 		{
 			List<ReportXML> result = this.dataContext

@@ -72,7 +72,8 @@ namespace REPORT.Builder
                 ReportDesigner designer = new ReportDesigner(new ReportMasterModel 
                 { 
                     ReportTypeEnum = (int)this.selectedreportType,
-                    PaperKindEnum = (int)PaperKind.A4
+                    PaperKindEnum = (int)PaperKind.A4,
+                    PageOrientationEnum = (int)PageOrientationEnum.Portrait
                 });
                 
                 if (ControlDialog.ShowDialog($"New {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized).IsFalse())

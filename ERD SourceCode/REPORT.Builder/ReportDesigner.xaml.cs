@@ -314,7 +314,14 @@ namespace REPORT.Builder
 
         private void DataSourseSelect_Browse(object sender, RoutedEventArgs e)
         {
+            try
+            {
 
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
         }
 
         private void InitializeReportSections()

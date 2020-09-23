@@ -42,6 +42,7 @@ namespace REPORT.Builder
             try
             {
                 #region DB SETUP OPTIONS
+
                 if (!File.Exists(this.ReportFileName))
                 {
                     MessageBox.Show("Setup not Found");

@@ -959,6 +959,11 @@ namespace ERD.Viewer
 
                         DatabaseModel databaseModel = JsonConvert.DeserializeObject(fileLines[4], typeof(DatabaseModel)) as DatabaseModel;
 
+                        if (databaseModel.IsEncrypted)
+                        {
+                            databaseModel.Password = databaseModel.Password.Decrypt();
+                        }
+
                         Connections.Instance.SetDefaultDatabaseModel(databaseModel, false);
 
                         if (fileLines.Length > 5)
@@ -975,6 +980,11 @@ namespace ERD.Viewer
                                 }
 
                                 AltDatabaseModel alternativeConnection = JsonConvert.DeserializeObject(fileLines[x], typeof(AltDatabaseModel)) as AltDatabaseModel;
+
+                                if (alternativeConnection.IsEncrypted)
+                                {
+                                    alternativeConnection.Password = alternativeConnection.Password.Decrypt();
+                                }
 
                                 Connections.Instance.AlternativeModels.Add(alternativeConnection.ConnectionName, alternativeConnection);
                             }
@@ -1181,11 +1191,27 @@ namespace ERD.Viewer
 
             project.AppendLine("DATABASE");
 
+            Connections.Instance.DefaultDatabaseModel.Password = Connections.Instance.DefaultDatabaseModel.Password.Encrypt();
+
+            Connections.Instance.DefaultDatabaseModel.IsEncrypted = true;
+
             project.AppendLine(JsonConvert.SerializeObject(Connections.Instance.DefaultDatabaseModel));
+
+            Connections.Instance.DefaultDatabaseModel.Password = Connections.Instance.DefaultDatabaseModel.Password.Decrypt();
+
+            Connections.Instance.DefaultDatabaseModel.IsEncrypted = false;
 
             foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.Instance.AlternativeModels)
             {
+                connectionKey.Value.Password = connectionKey.Value.Password.Encrypt();
+
+                connectionKey.Value.IsEncrypted = true;
+
                 project.AppendLine(JsonConvert.SerializeObject(connectionKey.Value));
+
+                connectionKey.Value.Password = connectionKey.Value.Password.Decrypt();
+
+                connectionKey.Value.IsEncrypted = false;
             }
 
             File.WriteAllText(saveFileFullName, project.ToString());

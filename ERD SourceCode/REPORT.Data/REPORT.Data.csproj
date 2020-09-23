@@ -56,7 +56,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseConnection.cs" />
+    <Compile Include="Models\DataSourceMasterModel.cs" />
+    <Compile Include="Models\DataSourceTableModel.cs" />
     <Compile Include="Models\LookupModel.cs" />
+    <Compile Include="Models\ReportColumnModel.cs" />
+    <Compile Include="Models\ReportConnectionModel.cs" />
     <Compile Include="Models\ReportMasterModel.cs" />
     <Compile Include="Models\ReportXMLModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -65,16 +69,31 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SQLRepository\Agrigates\Base\DataSourceMasterBase.cs" />
+    <Compile Include="SQLRepository\Agrigates\Base\DataSourceTableBase.cs" />
+    <Compile Include="SQLRepository\Agrigates\Base\LookupBase.cs" />
+    <Compile Include="SQLRepository\Agrigates\Base\ReportConnectionBase.cs" />
+    <Compile Include="SQLRepository\Agrigates\Base\ReportMasterBase.cs" />
+    <Compile Include="SQLRepository\Agrigates\Base\ReportXMLBase.cs" />
+    <Compile Include="SQLRepository\Agrigates\User\DataSourceMaster.cs" />
+    <Compile Include="SQLRepository\Agrigates\User\DataSourceTable.cs" />
+    <Compile Include="SQLRepository\Agrigates\User\Lookup.cs" />
+    <Compile Include="SQLRepository\Agrigates\User\ReportConnection.cs" />
+    <Compile Include="SQLRepository\Agrigates\User\ReportMaster.cs" />
+    <Compile Include="SQLRepository\Agrigates\User\ReportXML.cs" />
+    <Compile Include="SQLRepository\DataContext\DataSourceContext.cs" />
     <Compile Include="SQLRepository\DataContext\ReportTablesContext.cs" />
     <Compile Include="SQLRepository\DataContext\SystemTablesContext.cs" />
+    <Compile Include="SQLRepository\Mappings\DataSourceMasterMapping.cs" />
+    <Compile Include="SQLRepository\Mappings\DataSourceTableMapping.cs" />
     <Compile Include="SQLRepository\Mappings\LookupMapping.cs" />
+    <Compile Include="SQLRepository\Mappings\ReportConnectionMapping.cs" />
     <Compile Include="SQLRepository\Mappings\ReportMasterMapping.cs" />
     <Compile Include="SQLRepository\Mappings\ReportXMLMapping.cs" />
-    <Compile Include="SQLRepository\Agrigates\Lookup.cs" />
-    <Compile Include="SQLRepository\Agrigates\ReportMaster.cs" />
-    <Compile Include="SQLRepository\Agrigates\ReportXML.cs" />
+    <Compile Include="SQLRepository\Repositories\Base\DataSourceRepository_Base.cs" />
     <Compile Include="SQLRepository\Repositories\Base\ReportTablesRepository_Base.cs" />
     <Compile Include="SQLRepository\Repositories\Base\SystemTablesRepository_Base.cs" />
+    <Compile Include="SQLRepository\Repositories\User\DataSourceRepository.cs" />
     <Compile Include="SQLRepository\Repositories\User\ReportTablesRepository.cs" />
     <Compile Include="SQLRepository\Repositories\User\SystemTablesRepository.cs" />
   </ItemGroup>
@@ -89,6 +108,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ERD.Common\ERD.Common.csproj">
+      <Project>{719be630-883f-4009-abfe-3d0965018d4b}</Project>
+      <Name>ERD.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj">
       <Project>{A3A6B6F4-1959-4A99-A5CA-472BC1B605EA}</Project>
       <Name>ERD.Models</Name>

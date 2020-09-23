@@ -3,7 +3,7 @@ using WPF.Tools.BaseClasses;
 
 namespace REPORT.Data.SQLRepository.Agrigates
 {
-    public class ReportXML : ModelsBase
+    public abstract class ReportXMLBase : ModelsBase
     {
 	private int _ReportXMLVersion;
 	private Int64 _MasterReport_Id;

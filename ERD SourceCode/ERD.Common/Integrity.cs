@@ -274,6 +274,28 @@ namespace ERD.Common
             return Integrity.columnObjectModels.Where(tk => tk.Key.StartsWith(ownerTableKey)).Select(v => v.Value).ToList();
         }
 
+        public static List<ColumnObjectModel> GetTablePrimaryKeys(string ownerTable)
+        {
+            string ownerTableKey = $"{ownerTable}||";
+
+            if (!Integrity.columnObjectModels.Any(k => k.Key.StartsWith(ownerTableKey)))
+            {
+                return null;
+            }
+
+            return Integrity.columnObjectModels.Where(tk => tk.Key.StartsWith(ownerTableKey)
+                                                         && tk.Value.InPrimaryKey)
+                .Select(v => v.Value).ToList();
+        }
+
+        public static List<ColumnObjectModel> GetForeignKeyColumns(string tableName, string columnName)
+        {
+            return Integrity.columnObjectModels
+                .Where(tk => tk.Value.ForeignKeyColumn == columnName
+                            && tk.Value.ForeignKeyTable == tableName)
+                .Select(v => v.Value).ToList();
+        }
+
         public static List<DataItemModel> GetSystemTables()
         {
             return Integrity.tableMasterList.Select(tm => new DataItemModel {DisplayValue = tm, ItemKey = tm}).OrderBy(s => s.DisplayValue).ToList();
@@ -292,7 +314,7 @@ namespace ERD.Common
 
         public static List<DataItemModel> GetColumnsForTable(string tableName)
         {
-            tableName = tableName;
+            //tableName = tableName;
 
             if (!Integrity.tableColumns.ContainsKey(tableName))
             {

@@ -31,7 +31,10 @@
 
         <Mesurements:RulerControl Grid.Row="1" Grid.Column="1" Orientation="Vertical" x:Name="uxVerticalRuler" Panel.ZIndex="999" />
 
-        <local:SectionCanvas Grid.Row="1" Grid.Column="2" x:Name="uxSectionCanvas" Background="White" />
+        <local:SectionCanvas Grid.Row="1" Grid.Column="2" x:Name="uxSectionCanvas" Background="White"
+                             ReportObjectSelected="ReportObject_Selected"
+                             ReportColumnAdded="ReportColumn_Added"
+                             RequestNewDataSections="SectionCanvas_RequestNewDataSection"/>
 
         <CommonControls:HorizontalGridSplit Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="uxBottomHandle" />
         

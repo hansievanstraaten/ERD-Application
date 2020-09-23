@@ -63,8 +63,12 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DatabaseOptions\IDataToSQL.cs" />
     <Compile Include="Common\ObjectCreator.cs" />
     <Compile Include="Constants\Constants.cs" />
+    <Compile Include="DatasourceSelector.xaml.cs">
+      <DependentUpon>DatasourceSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -78,6 +82,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ReportComponents\CanvasSqlManager.cs" />
     <Compile Include="ReportComponents\PageSetupOptions.cs" />
     <Compile Include="ReportComponents\ReportSection.xaml.cs">
       <DependentUpon>ReportSection.xaml</DependentUpon>
@@ -101,6 +106,7 @@
     <Compile Include="ReportTools\CurrentDate.cs" />
     <Compile Include="ReportTools\LabelBase.cs" />
     <Compile Include="ReportTools\ReportBorder.cs" />
+    <Compile Include="ReportTools\ReportDataObject.cs" />
     <Compile Include="ReportTools\ReportHorizontalLine.cs" />
     <Compile Include="ReportTools\ReportImage.cs" />
     <Compile Include="ReportTools\ReportLabel.cs" />
@@ -119,6 +125,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="DatasourceSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ReportComponents\ReportSection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -148,6 +158,10 @@
     <ProjectReference Include="..\ERD.Base\ERD.Base.csproj">
       <Project>{2a61a104-cb60-4d3e-b4b4-38d4c822babb}</Project>
       <Name>ERD.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ERD.Common\ERD.Common.csproj">
+      <Project>{719BE630-883F-4009-ABFE-3D0965018D4B}</Project>
+      <Name>ERD.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj">
       <Project>{a3a6b6f4-1959-4a99-a5ca-472bc1b605ea}</Project>

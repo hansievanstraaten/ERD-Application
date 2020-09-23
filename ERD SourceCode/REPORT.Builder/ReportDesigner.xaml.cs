@@ -1,10 +1,13 @@
-﻿using GeneralExtensions;
+﻿using ERD.Common;
+using ERD.Models;
+using GeneralExtensions;
 using Microsoft.Win32;
 using REPORT.Builder.ReportComponents;
 using REPORT.Builder.ReportTools;
-using REPORT.Data.SQLRepository.Agrigates;
+using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Repositories;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Printing;
 using System.Linq;
@@ -13,10 +16,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Linq;
+using ViSo.Dialogs.Controls;
 using ViSo.Dialogs.TextEditor;
 using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Exstention;
+using WPF.Tools.ToolModels;
 
 namespace REPORT.Builder
 {
@@ -32,6 +37,10 @@ namespace REPORT.Builder
         private ReportMasterModel reportMaster;
 
         private UIElement selectedReportObject;
+
+        private DataSourceMasterModel dataSourceModel;
+
+        private List<ReportSection> dataReportSections = new List<ReportSection>();
 
         public ReportDesigner(ReportMasterModel masterModel)
         {
@@ -76,6 +85,15 @@ namespace REPORT.Builder
                     this.uxReportSections.Children.Add(section);
 
                     section.ReportObjectSelected += this.ReportObject_Selected;
+
+                    if (section.SectionType == SectionTypeEnum.TableData)
+                    {
+                        section.RequestNewDataSections += this.NewDataSection_Requested;
+
+                        section.ReportColumnAdded += this.ReportColumn_Added;
+                    }
+
+                    this.dataReportSections.Add(section);
                 }
             }
 
@@ -114,6 +132,8 @@ namespace REPORT.Builder
 
                 repo.UpdateReportMaster(this.ReportMaster);
 
+                #region REPORT XML
+
                 XDocument result = new XDocument();
 
                 XElement root = new XElement("Root");
@@ -146,7 +166,29 @@ namespace REPORT.Builder
                 reportXml.BinaryXML = result.ToString().ZipFile();
 
                 repo.UpdateReportXML(reportXml);
-                //result.Save("C:\\temp\\TestReport.xml");
+
+                #endregion
+
+                #region REPORT CONNECTIONS
+                    
+                ReportConnectionModel connection = new ReportConnectionModel
+                {
+                    MasterReport_Id = this.ReportMaster.MasterReport_Id,
+                    ReportConnection_Id = 0
+                };
+
+                if (this.ReportMaster.ProductionConnection == 0)
+                {   // Use the Default Connection
+                    //connection.DatabaseTypeEnum = Connections.Instance[]
+
+                    //Connections.Instance.DefaultConnectionName
+                }
+                else
+                {
+
+                }
+
+                #endregion
 
                 return true;
             }
@@ -190,6 +232,46 @@ namespace REPORT.Builder
                 //this.selectedReportObject.SetPropertyValue("ItemSelected", true);
 
                 this.uxProperties.Items.Add(sender);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void ReportColumn_Added(object sender, ReportColumnModel column, int sectionGroupIndex)
+        {
+            try
+            {
+                this.SetSectionTitle(column, sectionGroupIndex);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void NewDataSection_Requested(object sender, ReportColumnModel column, int sectionGroupIndex)
+        {
+            try
+            {
+                ReportSection dataSection = this.dataReportSections
+                    .FirstOrDefault(rp => rp.SectionTableName == column.TableName
+                                        && rp.SectionType == SectionTypeEnum.TableData);
+
+                if (dataSection == null)
+                {
+                    int newGroupIndex =this.CreateDatareportSections();
+
+                    this.SetSectionTitle(column, newGroupIndex);
+
+                    dataSection = this.dataReportSections
+                    .FirstOrDefault(rp => rp.SectionGroupIndex == newGroupIndex
+                                        && rp.SectionType == SectionTypeEnum.TableData);
+
+                }
+                
+                dataSection.AddReportColumn(column);
             }
             catch (Exception err)
             {
@@ -316,7 +398,24 @@ namespace REPORT.Builder
         {
             try
             {
+                if (this.ReportMaster.MasterReport_Id <= 0)
+                {
+                    if (!this.Save())
+                    {
+                        return;
+                    }
+                }
 
+                DatasourceSelector selector = new DatasourceSelector(this.ReportMaster.MasterReport_Id);
+
+                if (ControlDialog.ShowDialog("Data Source", selector, "Accept").IsFalse())
+                {
+                    return;
+                }
+
+                this.dataSourceModel = selector.MainTable;
+
+                this.LoadDataSource();
             }
             catch (Exception err)
             {
@@ -337,6 +436,7 @@ namespace REPORT.Builder
                     {
                         SectionTitle = this.reportDesignType.GetDescriptionAttribute(),
                         SectionIndex = 0,
+                        SectionGroupIndex = 0,
                         SectionType = SectionTypeEnum.Page,
                         IsDesignMode = true,
                         PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
@@ -347,35 +447,7 @@ namespace REPORT.Builder
 
                 case ReportTypeEnum.ReportContent:
 
-                    this.uxReportSections.Children.Add(new ReportSection
-                    {
-                        SectionTitle = "Table Header",
-                        SectionIndex = 0,
-                        SectionType = SectionTypeEnum.TableHeader,
-                        IsDesignMode = true,
-                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
-                    });
-
-                    this.uxReportSections.Children.Add(new ReportSection
-                    {
-                        SectionTitle = "Table Data",
-                        SectionIndex = 1,
-                        SectionType = SectionTypeEnum.TableData,
-                        IsDesignMode = true,
-                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
-                    });
-
-                    this.uxReportSections.Children.Add(new ReportSection
-                    {
-                        SectionTitle = "Table Footer",
-                        SectionIndex = 2,
-                        SectionType = SectionTypeEnum.TableFooter,
-                        IsDesignMode = true,
-                        PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
-                    });
+                    this.CreateDatareportSections();                    
 
                     break;
 
@@ -385,6 +457,7 @@ namespace REPORT.Builder
                     { 
                         SectionTitle = "Page Header", 
                         SectionIndex = 0,
+                        SectionGroupIndex = 0,
                         SectionType = SectionTypeEnum.Header,
                         IsDesignMode = true,
                         PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
@@ -395,6 +468,7 @@ namespace REPORT.Builder
                     { 
                         SectionTitle = "Page Footer", 
                         SectionIndex = 1,
+                        SectionGroupIndex = 0,
                         SectionType = SectionTypeEnum.Footer,
                         IsDesignMode = true,
                         PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
@@ -407,6 +481,13 @@ namespace REPORT.Builder
             foreach(ReportSection section in this.uxReportSections.Children)
             {
                 section.ReportObjectSelected += this.ReportObject_Selected;
+
+                if (section.SectionType == SectionTypeEnum.TableData)
+                {
+                    section.RequestNewDataSections += this.NewDataSection_Requested;
+
+                    section.ReportColumnAdded += this.ReportColumn_Added;
+                }
             }
         }
 
@@ -453,11 +534,93 @@ namespace REPORT.Builder
 
             this.uxReportMasterModel["Final Page"].Visibility = Visibility.Visible;
 
+            this.uxReportMasterModel["Production Connection"].Visibility = Visibility.Visible;
+
+            this.uxReportMasterModel["Production Connection"].IsRequired = true;
+
             this.uxDataMenueBorder.Visibility = Visibility.Visible;
 
             this.uxDataMenue.Visibility = Visibility.Visible;
 
             this.uxTableTree.Visibility = Visibility.Visible;
+
+            DataSourceRepository repo = new DataSourceRepository();
+
+            DataSourceMasterModel sourceMaster = repo.GetDataSourceMasterByPrimaryKey(this.ReportMaster.MasterReport_Id);
+
+            if (sourceMaster != null)
+            {
+                sourceMaster.SelectedSourceTables.AddRange(repo.GetDataSourceTableByForeignKeyMasterReport_Id(this.ReportMaster.MasterReport_Id));
+
+                this.dataSourceModel = sourceMaster;
+
+                this.LoadDataSource();
+            }
+        }
+
+        private void LoadDataSource()
+        {
+            this.uxTableTree.Items.Clear();
+
+            foreach (ReportSection section in this.uxReportSections.Children)
+            {
+                if (section.SectionGroupIndex != 0)
+                {
+                    continue;
+                }
+
+                section.SectionTitle = $"{this.dataSourceModel.MainTableName} - {section.SectionType.GetDescriptionAttribute()}";
+
+                section.SectionTableName = this.dataSourceModel.MainTableName; // Do this to reserve the first section for the main data source
+            }
+
+            TreeViewItem mainTreeItem = new TreeViewItem { Header = this.dataSourceModel.MainTableName };
+
+            foreach(DataItemModel column in Integrity.GetColumnsForTable(this.dataSourceModel.MainTableName))
+            {
+                ColumnObjectModel tableColumn = Integrity.GetObjectModel(this.dataSourceModel.MainTableName, column.DisplayValue);
+
+                ReportColumnModel reportColumn = tableColumn.CopyToObject(new ReportColumnModel { TableName = this.dataSourceModel.MainTableName }) as ReportColumnModel;
+
+                ToolsMenuItem treeMainColumn = new ToolsMenuItem
+                {
+                    Caption = column.DisplayValue,
+                    ToolType = typeof(ReportDataObject),
+                    Tag = column.CopyToObject(reportColumn)
+                };
+
+                mainTreeItem.Items.Add(treeMainColumn);
+            }
+
+            this.uxTableTree.Items.Add(mainTreeItem);
+
+            foreach(DataSourceTableModel sourceTable in this.dataSourceModel.SelectedSourceTables)
+            {
+                if (sourceTable.TableName == this.dataSourceModel.MainTableName)
+                {
+                    continue;
+                }
+
+                TreeViewItem childTreeItem = new TreeViewItem { Header = sourceTable.TableName };
+
+                foreach (DataItemModel column in Integrity.GetColumnsForTable(sourceTable.TableName))
+                {
+                    ColumnObjectModel tableColumn = Integrity.GetObjectModel(sourceTable.TableName, column.DisplayValue);
+
+                    ReportColumnModel reportColumn = tableColumn.CopyToObject(new ReportColumnModel { TableName = sourceTable.TableName }) as ReportColumnModel;
+
+                    ToolsMenuItem treeChildColumn = new ToolsMenuItem
+                    {
+                        Caption = column.DisplayValue,
+                        ToolType = typeof(ReportDataObject),
+                        Tag = column.CopyToObject(reportColumn)
+                    };
+
+                    childTreeItem.Items.Add(treeChildColumn);
+                }
+
+                this.uxTableTree.Items.Add(childTreeItem);
+            }            
         }
 
         private double CanvasWidth
@@ -475,5 +638,124 @@ namespace REPORT.Builder
                 return this.uxReportSections.ActualHeight + 25;
             }
         }
+
+        #region NEW DATA SECTION METHODS
+
+        private int CreateDatareportSections()
+        {
+            int groupSectionId = this.NextGroupIndex();
+
+            int[] sectionIndex = this.CalculateSectionIndexes();
+
+            ReportSection header = new ReportSection
+            {
+                SectionTitle = "Table Header",
+                SectionIndex = sectionIndex[0],
+                SectionGroupIndex = groupSectionId,
+                SectionType = SectionTypeEnum.TableHeader,
+                IsDesignMode = true,
+                PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+            };
+
+            this.uxReportSections.Children.Insert(sectionIndex[0], header);
+
+            this.dataReportSections.Add(header);
+
+            ReportSection data = new ReportSection
+            {
+                SectionTitle = "Table Data",
+                SectionIndex = sectionIndex[1],
+                SectionGroupIndex = groupSectionId,
+                SectionType = SectionTypeEnum.TableData,
+                IsDesignMode = true,
+                PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+            };
+
+            this.uxReportSections.Children.Insert(sectionIndex[1], data);
+
+            this.dataReportSections.Add(data);
+
+            ReportSection footer = new ReportSection
+            {
+                SectionTitle = "Table Footer",
+                SectionIndex = sectionIndex[2],
+                SectionGroupIndex = groupSectionId,
+                SectionType = SectionTypeEnum.TableFooter,
+                IsDesignMode = true,
+                PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+            };
+
+            this.uxReportSections.Children.Insert(sectionIndex[2], footer);
+
+            this.dataReportSections.Add(footer);
+
+            header.ReportObjectSelected += this.ReportObject_Selected;
+
+            data.ReportObjectSelected += this.ReportObject_Selected;
+
+            data.RequestNewDataSections += this.NewDataSection_Requested;
+
+            data.ReportColumnAdded += this.ReportColumn_Added;
+
+            footer.ReportObjectSelected += this.ReportObject_Selected;
+
+            return groupSectionId;
+        }
+
+        private void SetSectionTitle(ReportColumnModel column, int sectionGroupIndex)
+        {
+            foreach (ReportSection section in this.dataReportSections.Where(gr => gr.SectionGroupIndex == sectionGroupIndex))
+            {
+                section.SectionTitle = $"{column.TableName} - {section.SectionType.GetDescriptionAttribute()}";
+            }
+        }
+
+        private int NextGroupIndex()
+        {
+            return this.dataReportSections.Count == 0 ? 0 :
+                (this.dataReportSections.Select(gr => gr.SectionGroupIndex).Max() + 1);
+        }
+
+        private int GetMaxSectionIndex()
+        {   // Zero based index
+            return this.dataReportSections.Count == 0 ? 2 :
+                (this.dataReportSections.Select(gr => gr.SectionIndex).Max());
+        }
+
+        private int[] CalculateSectionIndexes()
+        {
+            int nextGroupIndex = this.NextGroupIndex();
+
+            if (nextGroupIndex == 0)
+            {
+                return new int[] { 0, 1, 2 };
+            }
+
+            int maxSectionIndex = this.GetMaxSectionIndex();
+
+            int insertIndexStart = ((maxSectionIndex + 1) / 3) + ((maxSectionIndex + 1) / 3);
+
+            int[] result = new int[3];
+
+            result[0] = insertIndexStart;
+            result[1] = insertIndexStart + 1;
+            result[2] = insertIndexStart + 2;
+
+            int shiftIndex = result[2] + 1;
+
+            for (int x = insertIndexStart; x < this.dataReportSections.Count; ++x)
+            {
+                this.dataReportSections[x].SectionIndex = shiftIndex;
+
+                ++shiftIndex;
+            }
+
+            return result;
+        }
+
+        #endregion
     }
 }

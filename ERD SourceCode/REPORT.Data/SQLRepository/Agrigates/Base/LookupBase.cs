@@ -3,7 +3,7 @@ using WPF.Tools.BaseClasses;
 
 namespace REPORT.Data.SQLRepository.Agrigates
 {
-    public class Lookup : ModelsBase
+    public abstract class LookupBase : ModelsBase
     {
 	private string _LookupGroup;
 	private int _GroupKey;

@@ -1,4 +1,5 @@
 using GeneralExtensions;
+using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.DataContext;
 using System;
@@ -43,6 +44,20 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;
 		}
+		
+		public ReportConnectionModel GetReportConnectionByPrimaryKey (Int64 MasterReport_Id, int ReportConnection_Id  )
+		{
+			ReportConnection result =this.dataContext
+				.ReportConnections
+				.FirstOrDefault(pk => pk.MasterReport_Id == MasterReport_Id && pk.ReportConnection_Id == ReportConnection_Id  );
+
+			if (result == null)
+			{
+				return null;
+			}
+
+			return result.CopyToObject(new ReportConnectionModel()) as ReportConnectionModel;
+		}
 
 		
 		public List<ReportXMLModel> GetReportXMLByForeignKeyMasterReport_Id (Int64 MasterReport_Id)
@@ -61,6 +76,24 @@ namespace REPORT.Data.SQLRepository.Repositories
 			List<object> objectList = result.CopyToObject(typeof(ReportXMLModel));
 
 			return objectList.TryCast<ReportXMLModel>().ToList();
+		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByForeignKeyMasterReport_Id (Int64 MasterReport_Id)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.MasterReport_Id == MasterReport_Id)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
 		}
 
 		
@@ -243,6 +276,150 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return objectList.TryCast<ReportXMLModel>().ToList();
 		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByDatabaseTypeEnum (int DatabaseTypeEnum)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.DatabaseTypeEnum == DatabaseTypeEnum)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByServerName (string ServerName)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.ServerName == ServerName)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByDatabaseName (string DatabaseName)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.DatabaseName == DatabaseName)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByUserName (string UserName)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.UserName == UserName)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByPassword (string Password)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.Password == Password)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByTrustedConnection (bool TrustedConnection)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.TrustedConnection == TrustedConnection)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByConnectionName (string ConnectionName)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.ConnectionName == ConnectionName)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
+		
+		public List<ReportConnectionModel> GetReportConnectionByIsProductionConnection (bool IsProductionConnection)
+		{
+			List<ReportConnection> result = this.dataContext
+				.ReportConnections
+				.Where(fk => fk.IsProductionConnection == IsProductionConnection)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportConnectionModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
+
+			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
 
 		public void UpdateReportMaster(ReportMasterModel model)
 		{
@@ -288,6 +465,29 @@ namespace REPORT.Data.SQLRepository.Repositories
 			this.dataContext.SaveChanges();
 
 			model = existing.CopyToObject(model) as ReportXMLModel;
+		}
+
+		public void UpdateReportConnection(ReportConnectionModel model)
+		{
+			ReportConnection existing = this.dataContext
+				.ReportConnections
+				.Where(rx => rx.MasterReport_Id == model.MasterReport_Id && rx.ReportConnection_Id == model.ReportConnection_Id  )
+				.FirstOrDefault();
+
+			if (existing == null)
+			{
+				existing = model.CopyToObject(new ReportConnection()) as ReportConnection;
+
+				this.dataContext.ReportConnections.Add(existing);
+			}
+			else
+			{
+				existing = model.CopyToObject(existing) as ReportConnection;
+			}
+
+			this.dataContext.SaveChanges();
+
+			model = existing.CopyToObject(model) as ReportConnectionModel;
 		}
 
 

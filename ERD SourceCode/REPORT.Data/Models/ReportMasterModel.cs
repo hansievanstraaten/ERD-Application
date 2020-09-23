@@ -1,3 +1,5 @@
+using ERD.Common;
+using ERD.Models;
 using GeneralExtensions;
 using REPORT.Data.SQLRepository.Repositories;
 using System;
@@ -9,9 +11,9 @@ using WPF.Tools.BaseClasses;
 using WPF.Tools.ModelViewer;
 using WPF.Tools.ToolModels;
 
-namespace REPORT.Data.SQLRepository.Agrigates
+namespace REPORT.Data.Models
 {
-    [ModelNameAttribute("Report", allowHeaderCollapse: true)]
+	[ModelNameAttribute("Report", allowHeaderCollapse: true)]
 	public class ReportMasterModel : ModelsBase
 	{
 		private Int64 _MasterReport_Id;
@@ -19,18 +21,19 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		private string _DescriptionText;
 		private byte[] _Description;
 		private int _ReportTypeEnum;
-        private int _ReportXMLVersion;
+		private int _ReportXMLVersion;
 		private int _PaperKindEnum;
 		private int _PageOrientationEnum;
 		private Int64? _CoverPage_Id;
 		private Int64? _HeaderAndFooterPage_Id;
 		private Int64? _FinalPage_Id;
+        private int productionConnection;
 
-		/// <summary>
-		/// <para>Master Report ID</para>
-		/// <para>Master Report ID</para>
-		/// </summary>
-		public Int64 MasterReport_Id
+        /// <summary>
+        /// <para>Master Report ID</para>
+        /// <para>Master Report ID</para>
+        /// </summary>
+        public Int64 MasterReport_Id
 		{
 			get
 			{
@@ -81,31 +84,31 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		[FieldInformation("Description", Sort = 2)]
 		[BrowseButtonAttribute("DescriptionText", "Edit", "Edit")]
 		public string DescriptionText
-        {
+		{
 			get
-            {
+			{
 				if (this.Description.HasElements())
-                {
+				{
 					return this.Description.UnzipFile().ParseToString();
-                }
+				}
 
 				return string.Empty;
-            }
+			}
 
 			set
-            {
+			{
 				if (value.IsNullEmptyOrWhiteSpace())
-                {
+				{
 					this.Description = new byte[] { };
-                }
+				}
 				else
-                {
+				{
 					this.Description = value.ZipFile();
-                }
+				}
 
 				base.OnPropertyChanged("DescriptionText", ref this._DescriptionText, value);
-            }
-        }
+			}
+		}
 
 		/// <summary>
 		/// <para>Report Type Enumerator</para>
@@ -126,43 +129,43 @@ namespace REPORT.Data.SQLRepository.Agrigates
 
 		[FieldInformation("Report Type", IsReadOnly = true, Sort = 3)]
 		public string ReportTypeEnumValue
-        {
+		{
 			get
-            {
+			{
 				if (this.ReportTypeEnum == 0)
-                {
+				{
 					return "Not Set";
-                }
+				}
 
 				ViSo.SharedEnums.ReportEnums.ReportTypeEnum result = (ViSo.SharedEnums.ReportEnums.ReportTypeEnum)this.ReportTypeEnum;
 
 				return result.GetDescriptionAttribute();
 			}
-        }
+		}
 
 		[FieldInformation("Report Version", IsRequired = true, Sort = 4)]
 		public int ReportXMLVersion
-        {
+		{
 			get
-            {
+			{
 				return this._ReportXMLVersion == 0 ? 1 : this._ReportXMLVersion;
 			}
 
 			set
-            {
+			{
 				this._ReportXMLVersion = value;
 
 				base.OnPropertyChanged("ReportXMLVersion", ref this._ReportXMLVersion, value);
 
 			}
-        }
+		}
 
 		/// <summary>
 		/// <para>PaperKind</para>
 		/// <para></para>
 		/// </summary>
 		[FieldInformation("Paper Kind", IsRequired = true, Sort = 5)]
-		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit:false)]
+		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("PaperKindValues")]
 		public int PaperKindEnum
 		{
@@ -257,24 +260,63 @@ namespace REPORT.Data.SQLRepository.Agrigates
 			}
 		}
 
-		public DataItemModel[] CoverPageValues
+		[FieldInformation("Production Connection", IsVisible = false, Sort = 10)]
+		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
+		[ValuesSource("ProductionConnectionValues")]
+		public int ProductionConnection
         {
 			get
             {
+				return this.productionConnection;
+            }
+
+			set
+            {
+				this.productionConnection = value;
+
+				base.OnPropertyChanged(() => this.ProductionConnection);
+            }
+        }
+
+		public DataItemModel[] ProductionConnectionValues
+        {
+			get
+            {
+				List<DataItemModel> result = new List<DataItemModel>();
+
+				result.Add(new DataItemModel { DisplayValue = Connections.Instance.DefaultConnectionName, ItemKey = 0 });
+
+				int index = 1;
+
+				foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.Instance.AlternativeModels)
+                {
+					result.Add(new DataItemModel { DisplayValue = connectionKey.Value.ConnectionName, ItemKey = index });
+
+					++index;
+                }
+
+				return result.ToArray();
+            }
+        }
+
+		public DataItemModel[] CoverPageValues
+		{
+			get
+			{
 				List<DataItemModel> result = new List<DataItemModel>();
 
 				result.Add(new DataItemModel { DisplayValue = "<None>", ItemKey = 0 });
 
 				ReportTablesRepository repo = new ReportTablesRepository();
 
-				foreach(ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.CoverPage))
-                {
+				foreach (ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.CoverPage))
+				{
 					result.Add(new DataItemModel { DisplayValue = item.ReportName, ItemKey = item.MasterReport_Id });
-                }
+				}
 
 				return result.ToArray();
-            }
-        }
+			}
+		}
 
 		public DataItemModel[] PageHeadersAndFootersValues
 		{
@@ -315,9 +357,9 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		}
 
 		public DataItemModel[] PaperKindValues
-        {
+		{
 			get
-            {
+			{
 				List<DataItemModel> result = new List<DataItemModel>();
 
 				foreach (PaperKind kind in Enum.GetValues(typeof(PaperKind)))
@@ -328,21 +370,21 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				return result.ToArray();
 
 			}
-        }
-	
+		}
+
 		public DataItemModel[] PageOrientationValues
-        {
+		{
 			get
-            {
+			{
 				List<DataItemModel> result = new List<DataItemModel>();
 
-				foreach(PageOrientationEnum item in Enum.GetValues(typeof(PageOrientationEnum)))
-                {
+				foreach (PageOrientationEnum item in Enum.GetValues(typeof(PageOrientationEnum)))
+				{
 					result.Add(new DataItemModel { DisplayValue = item.ToString(), ItemKey = (int)item });
 				}
 
 				return result.ToArray();
-            }
-        }
+			}
+		}
 	}
 }

@@ -68,7 +68,7 @@ namespace REPORT.Builder.ReportComponents
                 data.SetData(DataFormats.StringFormat, this.Caption);
                 data.SetData(this);
 
-                DragDrop.DoDragDrop(this, data, DragDropEffects.Copy | DragDropEffects.Move);
+                DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
             }
         }
 
@@ -83,11 +83,12 @@ namespace REPORT.Builder.ReportComponents
             //    return;
             //}
 
-            if (e.Effects.HasFlag(DragDropEffects.Copy))
-            {
-                Mouse.SetCursor(Cursors.Cross);
-            }
-            else if (e.Effects.HasFlag(DragDropEffects.Move))
+            //if (e.Effects.HasFlag(DragDropEffects.Copy))
+            //{
+            //    Mouse.SetCursor(Cursors.Cross);
+            //}
+            //else 
+            if (e.Effects.HasFlag(DragDropEffects.Move))
             {
                 Mouse.SetCursor(Cursors.Pen);
             }

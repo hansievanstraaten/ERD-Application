@@ -1,17 +1,28 @@
-﻿using GeneralExtensions;
+﻿using ERD.Models;
+using GeneralExtensions;
 using REPORT.Builder.Common;
 using REPORT.Builder.ReportTools;
+using REPORT.Data.Models;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml.Linq;
+using ViSo.SharedEnums.ReportEnums;
 
 namespace REPORT.Builder.ReportComponents
 {
     public class SectionCanvas : Canvas
     {
+        public delegate void RequestNewDataSectionsEvent(object sender, ReportColumnModel column);
+
+        public delegate void ReportColumnAddedEvent(object sender, ReportColumnModel column);
+
         public delegate void ReportObjectSelectedEvent(object sender);
+
+        public event RequestNewDataSectionsEvent RequestNewDataSections;
+
+        public event ReportColumnAddedEvent ReportColumnAdded;
 
         public event ReportObjectSelectedEvent ReportObjectSelected;
 
@@ -22,6 +33,8 @@ namespace REPORT.Builder.ReportComponents
         private Point selectedElementOrigins;
 
         private UIElement selectedElement;
+
+        private CanvasSqlManager sqlManager = new CanvasSqlManager();
 
         public SectionCanvas()
         {
@@ -35,8 +48,6 @@ namespace REPORT.Builder.ReportComponents
             get
             {
                 XElement result = new XElement("CanvasXml");
-
-                //result.Add(new XAttribute("Height", this.ActualHeight));
 
                 foreach(UIElement child in this.Children)
                 {
@@ -70,6 +81,45 @@ namespace REPORT.Builder.ReportComponents
         }
 
         public bool IsDesignMode { get; set; }
+
+        public string SectionTableName { get; set; }
+
+        public SectionTypeEnum SectionType { get; set; }
+
+        public CanvasSqlManager SqlManager 
+        { 
+            get
+            {
+                return this.sqlManager;
+            }
+
+            private set
+            {
+                this.sqlManager = value;
+            }
+        }
+
+        public void AddReportColumn(ReportColumnModel column)
+        {
+            UIElement toolObject = Activator.CreateInstance(typeof(ReportDataObject)) as UIElement;
+
+            toolObject.SetPropertyValue("Top", column.DropY);
+
+            toolObject.SetPropertyValue("Left", column.DropX);
+
+            toolObject.SetPropertyValue("ColumnModel", column);
+
+            this.AddReportToolItem(toolObject);
+
+            this.ReportObjectSelected?.Invoke(toolObject);
+
+            if (this.SectionTableName.IsNullEmptyOrWhiteSpace())
+            {
+                this.SectionTableName = column.TableName;
+            }
+
+            this.SqlManager.AddColumn(column);
+        }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
@@ -161,7 +211,7 @@ namespace REPORT.Builder.ReportComponents
                 }
             }
         }
-
+                
         protected override void OnDragOver(DragEventArgs e)
         {
             e.Handled = true;
@@ -172,12 +222,21 @@ namespace REPORT.Builder.ReportComponents
             {
                 if (e.Data.GetDataPresent(DataFormats.StringFormat))
                 {
-                    object dataValue = e.Data.GetData(typeof(UIElement));
+                    object dragItem = e.Data.GetData(typeof(ToolsMenuItem));
 
-                    //if (dataValue == null || dataValue.GetType() != typeof(TableModel))
-                    //{
-                    //    return;
-                    //}
+                    if (dragItem == null)
+                    {
+                        return;
+                    }
+
+                    object dataObject = ((ToolsMenuItem)dragItem).Tag;
+
+                    if (dataObject != null && this.SectionType != SectionTypeEnum.TableData)
+                    {
+                        e.Effects = DragDropEffects.None;
+
+                        return;
+                    }
 
                     if (e.KeyStates.HasFlag(DragDropKeyStates.ControlKey))
                     {
@@ -233,6 +292,22 @@ namespace REPORT.Builder.ReportComponents
         {
             UIElement toolObject = Activator.CreateInstance(toolItem.ToolType) as UIElement;
 
+            if (toolItem.ToolType == typeof(ReportDataObject) && this.SectionType == SectionTypeEnum.TableData)
+            {
+                ReportColumnModel column = toolItem.Tag.To<ReportColumnModel>();
+                
+                column.DropX = location.X;
+
+                column.DropY = location.Y;
+
+                if (!this.MayAddColumn(column))
+                {
+                    return;
+                }
+
+                toolObject.SetPropertyValue("ColumnModel", column);
+            }
+
             toolObject.SetPropertyValue("Top", location.Y);
 
             toolObject.SetPropertyValue("Left", location.X);
@@ -249,6 +324,24 @@ namespace REPORT.Builder.ReportComponents
             toolObject.SetPropertyValue("IsDesignMode", this.IsDesignMode);
 
             this.Children.Add(toolObject as UIElement);
+        }
+    
+        private bool MayAddColumn(ReportColumnModel column)
+        {
+            if (!this.SectionTableName.IsNullEmptyOrWhiteSpace() && column.TableName != this.SectionTableName)
+            {
+                this.RequestNewDataSections?.Invoke(this, column);
+
+                return false;
+            }
+
+            this.SectionTableName = column.TableName;
+
+            this.SqlManager.AddColumn(column);
+
+            this.ReportColumnAdded?.Invoke(this, column);
+
+            return true;
         }
     }
 }

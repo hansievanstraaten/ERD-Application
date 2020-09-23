@@ -1,4 +1,5 @@
 using GeneralExtensions;
+using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.DataContext;
 using System;

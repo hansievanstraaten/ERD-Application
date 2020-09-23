@@ -1,10 +1,13 @@
-﻿using REPORT.Builder.ReportTools;
+﻿using ERD.Models;
+using REPORT.Builder.ReportTools;
+using REPORT.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace REPORT.Builder.Common
@@ -17,6 +20,14 @@ namespace REPORT.Builder.Common
 
             switch (objectTypeName)
             {
+                case "ReportDataObject":
+
+                    ReportDataObject column = new ReportDataObject();
+
+                    column.ItemXml = xmlObject;
+
+                    return column as UIElement;
+
                 case "ReportLabel":
 
                     ReportLabel lbl = new ReportLabel();
@@ -77,6 +88,12 @@ namespace REPORT.Builder.Common
 
                     return new ReportLabel() as UIElement;
             }
+        }
+    
+        internal static string GetCanvasSQL(ReportColumnModel[] columns)
+        {
+
+            return string.Empty;
         }
     }
 }

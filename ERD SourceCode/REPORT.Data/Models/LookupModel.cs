@@ -1,7 +1,7 @@
 using System;
 using WPF.Tools.BaseClasses;
 
-namespace REPORT.Data.SQLRepository.Agrigates
+namespace REPORT.Data.Models
 {
     public class LookupModel : ModelsBase
     {

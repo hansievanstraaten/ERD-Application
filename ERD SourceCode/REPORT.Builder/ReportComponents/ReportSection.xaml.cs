@@ -1,4 +1,6 @@
-﻿using GeneralExtensions;
+﻿using ERD.Models;
+using GeneralExtensions;
+using REPORT.Data.Models;
 using System;
 using System.Drawing.Printing;
 using System.Printing;
@@ -14,7 +16,15 @@ namespace REPORT.Builder.ReportComponents
     /// </summary>
     public partial class ReportSection : UserControlBase
     {
+        public delegate void RequestNewDataSectionsEvent(object sender, ReportColumnModel column, int sectionGroupIndex);
+
+        public delegate void ReportColumnAddedEvent(object sender, ReportColumnModel column, int sectionGroupIndex);
+
         public delegate void ReportObjectSelectedEvent(object sender);
+
+        public event RequestNewDataSectionsEvent RequestNewDataSections;
+
+        public event ReportColumnAddedEvent ReportColumnAdded;
 
         public event ReportObjectSelectedEvent ReportObjectSelected;
 
@@ -35,8 +45,6 @@ namespace REPORT.Builder.ReportComponents
             this.InitializeComponent();
 
             this.SizeChanged += this.ReportSection_SizeChanged;
-
-            this.uxSectionCanvas.ReportObjectSelected += this.ReportObject_Selected;
         }
 
         public XElement SectionXml
@@ -49,6 +57,7 @@ namespace REPORT.Builder.ReportComponents
                 result.Add(new XAttribute("SectionTitle", this.SectionTitle));
                 result.Add(new XAttribute("PaperKind", this.PaperKind));
                 result.Add(new XAttribute("SectionIndex", this.SectionIndex));
+                result.Add(new XAttribute("SectionGroupIndex", this.SectionGroupIndex));
                 result.Add(new XAttribute("CanvasHeight", this.uxMainGrid.RowDefinitions[1].Height.Value));
                 result.Add(new XAttribute("PageOrientation", this.PageOrientation));
 
@@ -71,6 +80,8 @@ namespace REPORT.Builder.ReportComponents
         }
 
         public int SectionIndex { get; set; }
+
+        public int SectionGroupIndex { get; set; }
 
         public double CanvasHeight
         {
@@ -115,6 +126,19 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
+        public string SectionTableName
+        {
+            get
+            {
+                return this.uxSectionCanvas.SectionTableName;
+            }
+
+            set
+            {
+                this.uxSectionCanvas.SectionTableName = value;
+            }
+        }
+
         public SectionTypeEnum SectionType
         {
             get
@@ -125,6 +149,8 @@ namespace REPORT.Builder.ReportComponents
             set
             {
                 this.sectionType = value;
+
+                this.uxSectionCanvas.SectionType = value;
 
                 this.SetPageAndCanvasSize();
             }
@@ -183,6 +209,11 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
+        public void AddReportColumn(ReportColumnModel column)
+        {
+            this.uxSectionCanvas.AddReportColumn(column);
+        }
+
         private void ReportSection_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             this.RefreshRuler(this.uxMainGrid.RowDefinitions[1].ActualHeight, this.uxMainGrid.ColumnDefinitions[2].ActualWidth);
@@ -236,6 +267,16 @@ namespace REPORT.Builder.ReportComponents
             this.ReportObjectSelected?.Invoke(sender);
         }
 
+        private void ReportColumn_Added(object sender, ReportColumnModel column)
+        {
+            this.ReportColumnAdded?.Invoke(sender, column, this.SectionGroupIndex);
+        }
+
+        private void SectionCanvas_RequestNewDataSection(object sender, ReportColumnModel column)
+        {
+            this.RequestNewDataSections?.Invoke(sender, column, this.SectionGroupIndex);
+        }
+
         private void SetPageAndCanvasSize()
         {
             this.PageSize = PageSetupOptions.GetPageMediaSize(this.PaperKind);
@@ -268,7 +309,7 @@ namespace REPORT.Builder.ReportComponents
 
             this.RefreshRuler(this.uxSectionCanvas.Height, this.uxMainGrid.ColumnDefinitions[2].ActualWidth);
         }
-
+        
         private void RefreshRuler(double heigh, double traceLength)
         {
             this.uxVerticalRuler.Refresh(25, heigh, traceLength + 25);

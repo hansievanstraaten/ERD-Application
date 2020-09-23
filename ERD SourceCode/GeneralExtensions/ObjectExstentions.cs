@@ -506,7 +506,7 @@ namespace GeneralExtensions
             {
                 return info.GetValue(source, null);
             }
-            catch
+            catch (Exception err)
             {
                 return null;
             }

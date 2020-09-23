@@ -205,11 +205,15 @@ namespace REPORT.Builder
             this.uxHorizontalRuler.Refresh(this.CanvasWidth, 20, this.CanvasHeight);
         }
 
-        private void ReportObject_Selected(object sender)
+        private void ReportObject_Selected(object sender, object reportObject)
         {
             try
             {
                 this.uxProperties.Items.Clear();
+
+                this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
+
+                this.uxWhereBuilder.AddSectionOptions(this.dataReportSections.ToArray(), sender.GetPropertyValue("SectionGroupIndex").ToInt32());
 
                 if (this.selectedReportObject != null)
                 {
@@ -219,19 +223,19 @@ namespace REPORT.Builder
                     this.selectedReportObject = null;
                 }
 
-                if (sender == null)
+                if (reportObject == null)
                 {
                     return;
                 }
 
-                this.selectedReportObject = sender as UIElement;
+                this.selectedReportObject = reportObject as UIElement;
 
                 this.selectedReportObject.PreviewMouseRightButtonUp += this.SelecteReportObject_RightClick;
                     
                 // TODO: Heiglight Selected object for resizing
                 //this.selectedReportObject.SetPropertyValue("ItemSelected", true);
 
-                this.uxProperties.Items.Add(sender);
+                this.uxProperties.Items.Add(reportObject);
             }
             catch (Exception err)
             {
@@ -709,7 +713,7 @@ namespace REPORT.Builder
         {
             foreach (ReportSection section in this.dataReportSections.Where(gr => gr.SectionGroupIndex == sectionGroupIndex))
             {
-                section.SectionTitle = $"{column.TableName} - {section.SectionType.GetDescriptionAttribute()}";
+                section.SectionTitle = $"{section.SectionIndex} - {column.TableName} - {section.SectionType.GetDescriptionAttribute()}";
             }
         }
 

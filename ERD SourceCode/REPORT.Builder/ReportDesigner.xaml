@@ -56,11 +56,16 @@
                 <StackPanel Grid.Row="1" x:Name="uxReportSections" Background="LightGray" HorizontalAlignment="Stretch" />            
             </Grid>
         </ScrollViewer>
+        
         <CommonControls:VerticalGridSplit Grid.Row="0" Grid.Column="3" />
 
         <StackPanel Grid.Row="0" Grid.Column="4">
             <CommonControls:LableItem Content="Selected Object Properties" FontWeight="ExtraBold" />
-            <ModelViewer:ModelViewer x:Name="uxProperties" ModelViewItemBrowse="PropertiesObject_Browse" />            
+            <ModelViewer:ModelViewer x:Name="uxProperties" ModelViewItemBrowse="PropertiesObject_Browse" />
+            <CommonControls:LableItem Content="Section Link" FontWeight="ExtraBold" />
+            <local:WhereBuilder x:Name="uxWhereBuilder" />
+            <CommonControls:LableItem Content="Canvas SQL" FontWeight="ExtraBold" />
+            <CommonControls:TextBoxItem IsReadOnly="True" TextWrapping="WrapWithOverflow" x:Name="uxCanvasSql" />
         </StackPanel>
         
     </Grid>

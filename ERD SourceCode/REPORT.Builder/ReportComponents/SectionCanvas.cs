@@ -4,6 +4,7 @@ using REPORT.Builder.Common;
 using REPORT.Builder.ReportTools;
 using REPORT.Data.Models;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -66,6 +67,11 @@ namespace REPORT.Builder.ReportComponents
                         UIElement child = ObjectCreator.CreateReportObject(item);
 
                         this.AddReportToolItem(child);
+
+                        if (child.GetType() == typeof(ReportDataObject))
+                        {
+                            this.SqlManager.AddColumn(child.GetPropertyValue("ColumnModel") as ReportColumnModel);
+                        }
                     }
                     else
                     {
@@ -83,6 +89,22 @@ namespace REPORT.Builder.ReportComponents
         public bool IsDesignMode { get; set; }
 
         public string SectionTableName { get; set; }
+
+        public string SQLQuery
+        {
+            get
+            {
+                return this.SqlManager.SQLQuery;
+            }
+        }
+
+        public List<ReportColumnModel> ReportColumns
+        {
+            get
+            {
+                return this.SqlManager.ReportColumns;
+            }
+        }
 
         public SectionTypeEnum SectionType { get; set; }
 

@@ -58,6 +58,11 @@ namespace WPF.Tools.Mesurements
                     width = 1;
                 }
 
+                if (height <= 0)
+                {
+                    height = 1;
+                }
+
                 this.bmp = new System.Drawing.Bitmap(width, height);
 
                 System.Drawing.Graphics grap = System.Drawing.Graphics.FromImage(bmp);

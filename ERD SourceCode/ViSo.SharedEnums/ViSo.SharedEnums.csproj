@@ -59,6 +59,7 @@
     <Compile Include="ReportEnums\ReportTypeEnum.cs" />
     <Compile Include="ReportEnums\SectionTypeEnum.cs" />
     <Compile Include="RoleTypeEnum.cs" />
+    <Compile Include="SqlWhereOperatorsEnum.cs" />
     <Compile Include="StockTypeEnum.cs" />
     <Compile Include="ReportEnums\StorageTypeEnum.cs" />
     <Compile Include="TableIndexEnum.cs" />

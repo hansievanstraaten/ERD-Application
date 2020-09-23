@@ -2,6 +2,7 @@
 using GeneralExtensions;
 using REPORT.Data.Models;
 using System;
+using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Printing;
 using System.Windows;
@@ -20,7 +21,7 @@ namespace REPORT.Builder.ReportComponents
 
         public delegate void ReportColumnAddedEvent(object sender, ReportColumnModel column, int sectionGroupIndex);
 
-        public delegate void ReportObjectSelectedEvent(object sender);
+        public delegate void ReportObjectSelectedEvent(object sender, object reportObject);
 
         public event RequestNewDataSectionsEvent RequestNewDataSections;
 
@@ -139,6 +140,14 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
+        public string SQLQuery
+        {
+            get
+            {
+                return this.uxSectionCanvas.SQLQuery;
+            }
+        }
+
         public SectionTypeEnum SectionType
         {
             get
@@ -209,6 +218,14 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
+        public List<ReportColumnModel> ReportColumns
+        {
+            get
+            {
+                return this.uxSectionCanvas.ReportColumns;
+            }
+        }
+
         public void AddReportColumn(ReportColumnModel column)
         {
             this.uxSectionCanvas.AddReportColumn(column);
@@ -254,7 +271,7 @@ namespace REPORT.Builder.ReportComponents
                     this.RefreshRuler(this.CanvasHeight, this.uxMainGrid.ColumnDefinitions[2].ActualWidth);
                 }
 
-                this.ReportObjectSelected?.Invoke(null);
+                this.ReportObjectSelected?.Invoke(this, null);
             }
             catch (Exception err)
             {
@@ -264,9 +281,9 @@ namespace REPORT.Builder.ReportComponents
 
         private void ReportObject_Selected(object sender)
         {
-            this.ReportObjectSelected?.Invoke(sender);
+            this.ReportObjectSelected?.Invoke(this, sender);
         }
-
+        
         private void ReportColumn_Added(object sender, ReportColumnModel column)
         {
             this.ReportColumnAdded?.Invoke(sender, column, this.SectionGroupIndex);

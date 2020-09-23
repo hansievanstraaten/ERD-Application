@@ -1,13 +1,10 @@
-﻿using REPORT.Data.Models;
+﻿using ERD.Models;
+using GeneralExtensions;
+using REPORT.Builder.Common;
+using REPORT.Data.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GeneralExtensions;
-using ERD.Models;
 
 namespace REPORT.Builder.ReportComponents
 {
@@ -17,10 +14,26 @@ namespace REPORT.Builder.ReportComponents
 
         private Dictionary<string, ReportColumnModel> columnsDictionary = new Dictionary<string, ReportColumnModel>();
 
-        public ColumnObjectModel[] Columns { get; private set; }
+        //public ColumnObjectModel[] Columns { get; private set; }
+
+        public string SQLQuery
+        {
+            get
+            {
+                return ObjectCreator.GetCanvasSQL(this.columnsDictionary.Values.ToArray());
+            }
+        }
 
         public string TableName { get; private set; }
         
+        public List<ReportColumnModel> ReportColumns
+        {
+            get
+            {
+                return this.columnsDictionary.Values.ToList();
+            }
+        }
+
         public void AddColumn(ReportColumnModel column)
         {
             if (!this.TableName.IsNullEmptyOrWhiteSpace() && this.TableName != column.TableName)

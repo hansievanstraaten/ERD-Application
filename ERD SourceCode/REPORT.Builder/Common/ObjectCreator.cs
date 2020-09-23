@@ -1,13 +1,9 @@
-﻿using ERD.Models;
+﻿using ERD.Base;
+using ERD.Common;
+using REPORT.Builder.Common.DatabaseOptions;
 using REPORT.Builder.ReportTools;
 using REPORT.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace REPORT.Builder.Common
@@ -92,8 +88,19 @@ namespace REPORT.Builder.Common
     
         internal static string GetCanvasSQL(ReportColumnModel[] columns)
         {
+            DatabaseTypeEnum buildType = Connections.Instance.DatabaseModel.DatabaseType;
 
-            return string.Empty;
+            IDataToSQL sql = null;
+
+            switch(buildType)
+            {
+                case DatabaseTypeEnum.SQL:
+                default:
+
+                    sql = new MsSQL();
+
+                    return sql.BuildSelectQuery(columns);
+            }
         }
     }
 }

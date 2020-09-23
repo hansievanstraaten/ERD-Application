@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\DatabaseOptions\IDataToSQL.cs" />
+    <Compile Include="Common\DatabaseOptions\MsSQL.cs" />
     <Compile Include="Common\ObjectCreator.cs" />
     <Compile Include="Constants\Constants.cs" />
     <Compile Include="DatasourceSelector.xaml.cs">
@@ -113,6 +114,9 @@
     <Compile Include="ReportTools\ReportLineBase.cs" />
     <Compile Include="ReportTools\ReportPageBreak.cs" />
     <Compile Include="ReportTools\ReportVerticalLine.cs" />
+    <Compile Include="WhereBuilder.xaml.cs">
+      <DependentUpon>WhereBuilder.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -150,6 +154,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ReportSystemSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WhereBuilder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,5 +1,7 @@
 using GeneralExtensions;
+using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace REPORT.Data.SQLRepository.Repositories
@@ -23,6 +25,38 @@ namespace REPORT.Data.SQLRepository.Repositories
             }
 
 			return result;
+		}
+	
+		public void SetReportConnectionsSttus(long masterReportId, bool isProduction, bool isActive)
+        {
+			List<ReportConnection> connections = base.dataContext
+				.ReportConnections
+				.Where(cn => cn.MasterReport_Id == masterReportId)
+				.ToList();
+
+			foreach (ReportConnection connection in connections)
+            {
+				connection.IsProductionConnection = isProduction;
+
+				connection.IsActive = isActive;
+            }
+
+			base.dataContext.SaveChanges();
+        }
+	
+		public ReportConnectionModel GetProductionOrConnectionModel(long masterReport_Id)
+        {
+			ReportConnection result = base.dataContext
+				.ReportConnections
+				.FirstOrDefault(d => d.IsProductionConnection == true
+							&& d.IsActive == true);
+
+			if (result == null)
+            {
+				return null;
+            }
+
+			return result.CopyToObject(new ReportConnectionModel()) as ReportConnectionModel;
 		}
 	}
 }

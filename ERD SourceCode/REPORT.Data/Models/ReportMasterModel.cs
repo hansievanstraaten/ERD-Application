@@ -19,6 +19,7 @@ namespace REPORT.Data.Models
 		private Int64 _MasterReport_Id;
 		private string _ReportName;
 		private string _DescriptionText;
+        private string productionConnection;
 		private byte[] _Description;
 		private int _ReportTypeEnum;
 		private int _ReportXMLVersion;
@@ -27,7 +28,6 @@ namespace REPORT.Data.Models
 		private Int64? _CoverPage_Id;
 		private Int64? _HeaderAndFooterPage_Id;
 		private Int64? _FinalPage_Id;
-        private int productionConnection;
 
         /// <summary>
         /// <para>Master Report ID</para>
@@ -260,10 +260,10 @@ namespace REPORT.Data.Models
 			}
 		}
 
-		[FieldInformation("Production Connection", IsVisible = false, Sort = 10)]
+		[FieldInformation("Production Connection", IsVisible = false, IsRequired = true, Sort = 10)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("ProductionConnectionValues")]
-		public int ProductionConnection
+		public string ProductionConnection
         {
 			get
             {
@@ -284,15 +284,11 @@ namespace REPORT.Data.Models
             {
 				List<DataItemModel> result = new List<DataItemModel>();
 
-				result.Add(new DataItemModel { DisplayValue = Connections.Instance.DefaultConnectionName, ItemKey = 0 });
-
-				int index = 1;
+				result.Add(new DataItemModel { DisplayValue = Connections.Instance.DefaultConnectionName, ItemKey = Connections.Instance.DefaultConnectionName });
 
 				foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.Instance.AlternativeModels)
                 {
-					result.Add(new DataItemModel { DisplayValue = connectionKey.Value.ConnectionName, ItemKey = index });
-
-					++index;
+					result.Add(new DataItemModel { DisplayValue = connectionKey.Value.ConnectionName, ItemKey = connectionKey.Value.ConnectionName });
                 }
 
 				return result.ToArray();

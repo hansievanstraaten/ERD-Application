@@ -4,6 +4,9 @@ namespace ViSo.SharedEnums
 {
     public enum SqlWhereOperatorsEnum
     {
+        [Description("<None>")]
+        None,
+
         [Description("AND")]
         AND,
 

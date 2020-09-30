@@ -34,6 +34,16 @@ namespace REPORT.Builder
             this.uxButtonAdd.ToolTip = $"Add new {this.selectedreportType.GetDescriptionAttribute()}";
 
             this.HeadersAndFooters = repo.GetReportMasterByReportTypeEnum((int)this.selectedreportType).ToArray();
+
+            if (reportType == ReportTypeEnum.ReportContent)
+            {
+                foreach (ReportMasterModel report in this.HeadersAndFooters)
+                {
+                    ReportConnectionModel connection = repo.GetProductionOrConnectionModel(report.MasterReport_Id);
+
+                    report.ProductionConnection = connection == null ? string.Empty : connection.ReportConnectionName;
+                }
+            }
         }
 
         public ReportMasterModel SelectedHeaderAndFooter

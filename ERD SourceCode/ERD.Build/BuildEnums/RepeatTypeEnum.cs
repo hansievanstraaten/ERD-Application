@@ -22,7 +22,10 @@ namespace ERD.Build.BuildEnums
         ForeachNonColumnInTable,
 
         [Description("Foreach Referenced Table")]
-        ForeachReferencedTable
+        ForeachReferencedTable,
 
-  }
+        [Description("Foreach Table in Project")]
+        ForeachTableInProject
+
+    }
 }

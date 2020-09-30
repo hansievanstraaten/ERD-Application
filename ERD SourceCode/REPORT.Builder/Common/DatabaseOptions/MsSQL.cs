@@ -1,12 +1,15 @@
 ﻿using REPORT.Data.Models;
 using System.Text;
 using GeneralExtensions;
+using System.Collections.Generic;
+using System.Linq;
+using ViSo.SharedEnums;
 
 namespace REPORT.Builder.Common.DatabaseOptions
 {
     internal class MsSQL : IDataToSQL
     {
-        public string BuildSelectQuery(ReportColumnModel[] columns)
+        public string BuildSelectQuery(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel)
         {
             if (!columns.HasElements())
             {
@@ -35,9 +38,18 @@ namespace REPORT.Builder.Common.DatabaseOptions
                 }
             }
 
-            result.AppendLine($" FROM [{columns[0].TableName}] WITH(NOLOCK)");
+            result.AppendLine($" FROM [{columns[0].TableName}] WITH(NOLOCK) ");
+
+            if (whereParameterModel.Count > 0)
+            {
+                result.Append("WHERE ");
+            }
 
             // TODO: Add Where Clause
+            foreach(WhereParameterModel parameter in  whereParameterModel.OrderBy(so => so.OperatorIndex))
+            {
+                result.AppendLine($"{parameter.ColumnName} = @{parameter.ParameterName} {(parameter.AndOrOperator == SqlWhereOperatorsEnum.None ? string.Empty : parameter.AndOrOperator.ParseToString())} ");
+            }
 
             return result.ToString();
         }

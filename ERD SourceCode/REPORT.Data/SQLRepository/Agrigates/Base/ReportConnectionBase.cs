@@ -6,15 +6,15 @@ namespace REPORT.Data.SQLRepository.Agrigates
     public abstract class ReportConnectionBase : ModelsBase
     {
 	private Int64 _MasterReport_Id;
-	private int _ReportConnection_Id;
+	private string _ReportConnectionName;
 	private int _DatabaseTypeEnum;
 	private string _ServerName;
 	private string _DatabaseName;
 	private string _UserName;
 	private string _Password;
 	private bool _TrustedConnection;
-	private string _ConnectionName;
 	private bool _IsProductionConnection;
+	private bool _IsActive;
 
 	/// <summary>
 	/// <para>Master Report ID</para>
@@ -34,19 +34,19 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	}
 
 	/// <summary>
-	/// <para>Report Connection ID</para>
+	/// <para></para>
 	/// <para></para>
 	/// </summary>
-	public int ReportConnection_Id
+	public string ReportConnectionName
 	{ 
 		get
 		{
-			return this._ReportConnection_Id;
+			return this._ReportConnectionName;
 		}
 
 		set
 		{
-			base.OnPropertyChanged("ReportConnection_Id", ref this._ReportConnection_Id, value);
+			base.OnPropertyChanged("ReportConnectionName", ref this._ReportConnectionName, value);
 		}
 	}
 
@@ -153,23 +153,6 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	}
 
 	/// <summary>
-	/// <para>Connection Name</para>
-	/// <para></para>
-	/// </summary>
-	public string ConnectionName
-	{ 
-		get
-		{
-			return this._ConnectionName;
-		}
-
-		set
-		{
-			base.OnPropertyChanged("ConnectionName", ref this._ConnectionName, value);
-		}
-	}
-
-	/// <summary>
 	/// <para>Is Production Connection</para>
 	/// <para></para>
 	/// </summary>
@@ -183,6 +166,23 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		set
 		{
 			base.OnPropertyChanged("IsProductionConnection", ref this._IsProductionConnection, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>IsActive</para>
+	/// <para></para>
+	/// </summary>
+	public bool IsActive
+	{ 
+		get
+		{
+			return this._IsActive;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("IsActive", ref this._IsActive, value);
 		}
 	}
 

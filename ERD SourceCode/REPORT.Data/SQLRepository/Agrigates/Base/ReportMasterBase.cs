@@ -9,7 +9,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	private string _ReportName;
 	private byte[] _Description;
 	private int _ReportTypeEnum;
-	private int _PaperKindEnum;
+	private int? _PaperKindEnum;
 	private int _PageOrientationEnum;
 	private Int64? _CoverPage_Id;
 	private Int64? _HeaderAndFooterPage_Id;
@@ -87,7 +87,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	/// <para>PaperKind</para>
 	/// <para></para>
 	/// </summary>
-	public int PaperKindEnum
+	public int? PaperKindEnum
 	{ 
 		get
 		{

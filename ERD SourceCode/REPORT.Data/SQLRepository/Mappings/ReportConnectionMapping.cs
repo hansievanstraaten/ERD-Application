@@ -9,18 +9,18 @@ namespace REPORT.Data.SQLRepository.Mappings
 		{
 			ToTable("ReportConnection");
 
-			HasKey(k => new {  k.MasterReport_Id , k.ReportConnection_Id   });
+			HasKey(k => new {  k.MasterReport_Id , k.ReportConnectionName   });
 
 			Property(colMasterReport_Id =>  colMasterReport_Id.MasterReport_Id).HasColumnName("MasterReport_Id");
-			Property(colReportConnection_Id =>  colReportConnection_Id.ReportConnection_Id).HasColumnName("ReportConnection_Id");
+			Property(colReportConnectionName =>  colReportConnectionName.ReportConnectionName).HasColumnName("ReportConnectionName");
 			Property(colDatabaseTypeEnum =>  colDatabaseTypeEnum.DatabaseTypeEnum).HasColumnName("DatabaseTypeEnum");
 			Property(colServerName =>  colServerName.ServerName).HasColumnName("ServerName");
 			Property(colDatabaseName =>  colDatabaseName.DatabaseName).HasColumnName("DatabaseName");
 			Property(colUserName =>  colUserName.UserName).HasColumnName("UserName");
 			Property(colPassword =>  colPassword.Password).HasColumnName("Password");
 			Property(colTrustedConnection =>  colTrustedConnection.TrustedConnection).HasColumnName("TrustedConnection");
-			Property(colConnectionName =>  colConnectionName.ConnectionName).HasColumnName("ConnectionName");
 			Property(colIsProductionConnection =>  colIsProductionConnection.IsProductionConnection).HasColumnName("IsProductionConnection");
+			Property(colIsActive =>  colIsActive.IsActive).HasColumnName("IsActive");
 
 		}
 	}

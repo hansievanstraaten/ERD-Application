@@ -10,23 +10,44 @@ namespace REPORT.Builder.ReportComponents
 {
     public class CanvasSqlManager
     {
-        private Dictionary<string, int> columnCountDictionary = new Dictionary<string, int>();
+        private Dictionary<string, int> columnCountDictionary;
 
-        private Dictionary<string, ReportColumnModel> columnsDictionary = new Dictionary<string, ReportColumnModel>();
+        private Dictionary<string, ReportColumnModel> columnsDictionary;
 
-        //public ColumnObjectModel[] Columns { get; private set; }
+        private List<WhereParameterModel> whereParameterModel;
 
-        public string SQLQuery
+        private List<int> foreignGroupIndexes;
+
+        internal CanvasSqlManager()
+        {
+            this.columnCountDictionary = new Dictionary<string, int>();
+
+            this.columnsDictionary = new Dictionary<string, ReportColumnModel>();
+
+            this.whereParameterModel = new List<WhereParameterModel>();
+
+            this.foreignGroupIndexes = new List<int>();
+        }
+
+        internal string SQLQuery
         {
             get
             {
-                return ObjectCreator.GetCanvasSQL(this.columnsDictionary.Values.ToArray());
+                return ObjectCreator.GetCanvasSQL(this.columnsDictionary.Values.ToArray(), this.whereParameterModel);
             }
         }
 
-        public string TableName { get; private set; }
-        
-        public List<ReportColumnModel> ReportColumns
+        internal string TableName { get; private set; }
+
+        internal List<int> ForeignGroupIndexes
+        {
+            get
+            {
+                return this.foreignGroupIndexes;
+            }
+        }
+
+        internal List<ReportColumnModel> ReportColumns
         {
             get
             {
@@ -34,7 +55,51 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        public void AddColumn(ReportColumnModel column)
+        internal List<WhereParameterModel> WhereParameterModel
+        {
+            get
+            {
+                return this.whereParameterModel;
+            }
+        }
+
+        internal bool HaveForeignGroupIndex(int index)
+        {
+            return this.foreignGroupIndexes.Contains(index);
+        }
+
+        internal void Reset()
+        {
+            this.columnCountDictionary.Clear();
+
+            this.columnsDictionary.Clear();
+
+            this.whereParameterModel.Clear();
+
+            this.foreignGroupIndexes.Clear();
+        }
+
+        internal void AddForeignGroupIndex(int index)
+        {
+            if (this.foreignGroupIndexes.Contains(index))
+            {
+                return;
+            }
+
+            this.foreignGroupIndexes.Add(index);
+        }
+
+        internal void RemoveForeignGroupIndex(int index)
+        {
+            if (!this.foreignGroupIndexes.Contains(index))
+            {
+                return;
+            }
+
+            this.foreignGroupIndexes.Remove(index);
+        }
+
+        internal void AddColumn(ReportColumnModel column)
         {
             if (!this.TableName.IsNullEmptyOrWhiteSpace() && this.TableName != column.TableName)
             {
@@ -53,7 +118,7 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        public void RemoveColumn(string columnName)
+        internal void RemoveColumn(string columnName)
         {
             if (!this.columnCountDictionary.ContainsKey(columnName))
             {
@@ -76,6 +141,13 @@ namespace REPORT.Builder.ReportComponents
             --lastCount;
 
             this.columnCountDictionary.Add(columnName, lastCount);
+        }
+
+        internal void AddWhereModels(WhereParameterModel[] whereModels)
+        {
+            this.whereParameterModel.Clear();
+
+            this.whereParameterModel.AddRange(whereModels);
         }
 
         private void AddColumnCount(string columnName)

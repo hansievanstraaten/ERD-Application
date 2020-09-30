@@ -3,6 +3,7 @@ using ERD.Common;
 using REPORT.Builder.Common.DatabaseOptions;
 using REPORT.Builder.ReportTools;
 using REPORT.Data.Models;
+using System.Collections.Generic;
 using System.Windows;
 using System.Xml.Linq;
 
@@ -10,7 +11,7 @@ namespace REPORT.Builder.Common
 {
     internal class ObjectCreator
     {
-        internal static UIElement CreateReportObject(XElement xmlObject)
+        internal static UIElement CreateReportObject(XElement xmlObject, bool isDesignMode)
         {
             string objectTypeName = xmlObject.Attribute("ObjectType").Value;
 
@@ -20,6 +21,8 @@ namespace REPORT.Builder.Common
 
                     ReportDataObject column = new ReportDataObject();
 
+                    column.IsDesignMode = isDesignMode;
+
                     column.ItemXml = xmlObject;
 
                     return column as UIElement;
@@ -27,6 +30,8 @@ namespace REPORT.Builder.Common
                 case "ReportLabel":
 
                     ReportLabel lbl = new ReportLabel();
+
+                    lbl.IsDesignMode = isDesignMode;
 
                     lbl.ItemXml = xmlObject;
 
@@ -36,6 +41,8 @@ namespace REPORT.Builder.Common
 
                     ReportBorder border = new ReportBorder();
 
+                    border.IsDesignMode = isDesignMode;
+
                     border.ItemXml = xmlObject;
 
                     return border as UIElement;
@@ -43,6 +50,8 @@ namespace REPORT.Builder.Common
                 case "CurrentDate":
 
                     CurrentDate date = new CurrentDate();
+
+                    date.IsDesignMode = isDesignMode;
 
                     date.ItemXml = xmlObject;
 
@@ -52,6 +61,8 @@ namespace REPORT.Builder.Common
 
                     ReportImage image = new ReportImage();
 
+                    //image.IsDesignMode = isDesignMode;
+
                     image.ItemXml = xmlObject;
 
                     return image as UIElement;
@@ -59,6 +70,8 @@ namespace REPORT.Builder.Common
                 case "ReportHorizontalLine":
 
                     ReportHorizontalLine horizontalLine = new ReportHorizontalLine();
+
+                    //horizontalLine.IsDesignMode = isDesignMode;
 
                     horizontalLine.ItemXml = xmlObject;
 
@@ -86,7 +99,7 @@ namespace REPORT.Builder.Common
             }
         }
     
-        internal static string GetCanvasSQL(ReportColumnModel[] columns)
+        internal static string GetCanvasSQL(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel)
         {
             DatabaseTypeEnum buildType = Connections.Instance.DatabaseModel.DatabaseType;
 
@@ -99,7 +112,7 @@ namespace REPORT.Builder.Common
 
                     sql = new MsSQL();
 
-                    return sql.BuildSelectQuery(columns);
+                    return sql.BuildSelectQuery(columns, whereParameterModel);
             }
         }
     }

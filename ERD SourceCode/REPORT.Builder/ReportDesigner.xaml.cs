@@ -2,6 +2,7 @@
 using ERD.Models;
 using GeneralExtensions;
 using Microsoft.Win32;
+using REPORT.Builder.Printing;
 using REPORT.Builder.ReportComponents;
 using REPORT.Builder.ReportTools;
 using REPORT.Data.Models;
@@ -14,7 +15,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Xml.Linq;
 using ViSo.Dialogs.Controls;
 using ViSo.Dialogs.TextEditor;
@@ -38,7 +38,7 @@ namespace REPORT.Builder
 
         private UIElement selectedReportObject;
 
-        private DataSourceMasterModel dataSourceModel;
+        private DataSourceMasterModel dataSourceMainTable;
 
         private List<ReportSection> dataReportSections = new List<ReportSection>();
 
@@ -91,6 +91,8 @@ namespace REPORT.Builder
                         section.RequestNewDataSections += this.NewDataSection_Requested;
 
                         section.ReportColumnAdded += this.ReportColumn_Added;
+
+                        section.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
                     }
 
                     this.dataReportSections.Add(section);
@@ -119,6 +121,19 @@ namespace REPORT.Builder
             }
         }
 
+        public DataSourceMasterModel DataSourceMainTable
+        {
+            get
+            {
+                return this.dataSourceMainTable;
+            }
+
+            set
+            {
+                this.dataSourceMainTable = value;
+            }
+        }
+
         public bool Save()
         {
             try
@@ -134,23 +149,6 @@ namespace REPORT.Builder
 
                 #region REPORT XML
 
-                XDocument result = new XDocument();
-
-                XElement root = new XElement("Root");
-
-                XElement report = new XElement("ReportSettings");
-
-                report.Add(new XAttribute("ReportTypeEnum", (int)this.reportDesignType));
-
-                foreach(ReportSection section in this.uxReportSections.Children)
-                {
-                    report.Add(section.SectionXml);
-                }
-
-                root.Add(report);
-
-                result.Add(root);
-
                 ReportXMLModel reportXml = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, this.ReportMaster.MasterReport_Id);
 
                 if (reportXml == null)
@@ -163,29 +161,54 @@ namespace REPORT.Builder
                     };
                 }
 
-                reportXml.BinaryXML = result.ToString().ZipFile();
+                reportXml.BinaryXML = this.GetReportXml().ToString().ZipFile();
 
                 repo.UpdateReportXML(reportXml);
 
                 #endregion
 
                 #region REPORT CONNECTIONS
-                    
+
+                repo.SetReportConnectionsSttus(this.ReportMaster.MasterReport_Id, false, false);
+
+                DatabaseModel databaseModel = Connections.Instance.GetConnection(this.reportMaster.ProductionConnection);
+
                 ReportConnectionModel connection = new ReportConnectionModel
                 {
                     MasterReport_Id = this.ReportMaster.MasterReport_Id,
-                    ReportConnection_Id = 0
+                    ReportConnectionName = this.reportMaster.ProductionConnection,
+                    DatabaseTypeEnum = (int)databaseModel.DatabaseType,
+                    ServerName = databaseModel.ServerName,
+                    DatabaseName = databaseModel.DatabaseName,
+                    UserName = databaseModel.UserName,
+                    Password = databaseModel.Password.Encrypt(),
+                    TrustedConnection = databaseModel.TrustedConnection,
+                    IsProductionConnection = true,
+                    IsActive = true
                 };
 
-                if (this.ReportMaster.ProductionConnection == 0)
-                {   // Use the Default Connection
-                    //connection.DatabaseTypeEnum = Connections.Instance[]
+                repo.UpdateReportConnection(connection);
 
-                    //Connections.Instance.DefaultConnectionName
-                }
-                else
+                #endregion
+
+                #region SAVE DATASOURCE SELECTION
+
+                if (this.DataSourceMainTable != null)
                 {
+                    DataSourceRepository sourceRepo = new DataSourceRepository();
 
+                    this.DataSourceMainTable.MasterReport_Id = this.ReportMaster.MasterReport_Id;
+
+                    sourceRepo.UpdateDataSourceMaster(this.DataSourceMainTable);
+
+                    sourceRepo.SetIsAvailable(this.ReportMaster.MasterReport_Id, false);
+
+                    foreach (DataSourceTableModel sourceModel in this.DataSourceMainTable.SelectedSourceTables)
+                    {
+                        sourceModel.MasterReport_Id = this.ReportMaster.MasterReport_Id;
+
+                        sourceRepo.UpdateDataSourceTable(sourceModel);
+                    }
                 }
 
                 #endregion
@@ -211,31 +234,70 @@ namespace REPORT.Builder
             {
                 this.uxProperties.Items.Clear();
 
-                this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
+                int sectionGroupIndex = sender.GetPropertyValue("SectionGroupIndex").ToInt32();
 
-                this.uxWhereBuilder.AddSectionOptions(this.dataReportSections.ToArray(), sender.GetPropertyValue("SectionGroupIndex").ToInt32());
-
-                if (this.selectedReportObject != null)
+                if (sectionGroupIndex > 0 && reportObject == null)
                 {
+                    this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
+                    
+                    this.uxWhereBuilder.AddSectionOptions(this.dataReportSections.ToArray(), sender.GetPropertyValue("SectionGroupIndex").ToInt32());
+
+                    this.uxPropertiesCaption.Visibility = Visibility.Collapsed;
+
+                    this.uxProperties.Visibility = Visibility.Collapsed;
+
+                    this.uxWhereBuilder.Visibility = Visibility.Visible;
+
+                    this.uxWhereBuilderCaption.Visibility = Visibility.Visible;
+
+                    this.uxCanvasSql.Visibility = Visibility.Visible;
+
+                    this.uxCanvasSqlCaption.Visibility = Visibility.Visible;
+
+                    return;
+                }
+                else if (sectionGroupIndex == 0 && reportObject == null)
+                {
+                    this.uxPropertiesCaption.Visibility = Visibility.Collapsed;
+
+                    this.uxProperties.Visibility = Visibility.Collapsed;
+
+                    this.uxWhereBuilder.Visibility = Visibility.Collapsed;
+
+                    this.uxWhereBuilderCaption.Visibility = Visibility.Collapsed;
+
+                    this.uxCanvasSql.Visibility = Visibility.Collapsed;
+
+                    this.uxCanvasSqlCaption.Visibility = Visibility.Collapsed;
+                }
+                else if (reportObject != null)
+                {
+                    this.uxPropertiesCaption.Visibility = Visibility.Visible;
+
+                    this.uxProperties.Visibility = Visibility.Visible;
+
+                    this.uxWhereBuilder.Visibility = Visibility.Collapsed;
+
+                    this.uxWhereBuilderCaption.Visibility = Visibility.Collapsed;
+
+                    this.uxCanvasSql.Visibility = Visibility.Collapsed;
+
+                    this.uxCanvasSqlCaption.Visibility = Visibility.Collapsed;
+                    
                     // TODO: Remove Selected Heiglight from object
                     //this.selectedReportObject.SetPropertyValue("ItemSelected", false);
 
                     this.selectedReportObject = null;
-                }
+                
+                    this.selectedReportObject = reportObject as UIElement;
 
-                if (reportObject == null)
-                {
-                    return;
-                }
-
-                this.selectedReportObject = reportObject as UIElement;
-
-                this.selectedReportObject.PreviewMouseRightButtonUp += this.SelecteReportObject_RightClick;
+                    this.selectedReportObject.PreviewMouseRightButtonUp += this.SelecteReportObject_RightClick;
                     
-                // TODO: Heiglight Selected object for resizing
-                //this.selectedReportObject.SetPropertyValue("ItemSelected", true);
+                    // TODO: Heiglight Selected object for resizing
+                    //this.selectedReportObject.SetPropertyValue("ItemSelected", true);
 
-                this.uxProperties.Items.Add(reportObject);
+                    this.uxProperties.Items.Add(reportObject);
+                }
             }
             catch (Exception err)
             {
@@ -247,7 +309,19 @@ namespace REPORT.Builder
         {
             try
             {
-                this.SetSectionTitle(column, sectionGroupIndex);
+                this.RefreshSectionTitles();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void ReportSectionWhereClause_Changed(object sender, int sectionGroupIndex)
+        {
+            try
+            {
+                this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
             }
             catch (Exception err)
             {
@@ -267,15 +341,19 @@ namespace REPORT.Builder
                 {
                     int newGroupIndex =this.CreateDatareportSections();
 
-                    this.SetSectionTitle(column, newGroupIndex);
+                    foreach(ReportSection section in this.dataReportSections.Where(si => si.SectionGroupIndex == newGroupIndex))
+                    {
+                        section.SectionTableName = column.TableName;
+                    }
 
                     dataSection = this.dataReportSections
                     .FirstOrDefault(rp => rp.SectionGroupIndex == newGroupIndex
                                         && rp.SectionType == SectionTypeEnum.TableData);
-
                 }
                 
                 dataSection.AddReportColumn(column);
+                    
+                this.RefreshSectionTitles();
             }
             catch (Exception err)
             {
@@ -402,14 +480,6 @@ namespace REPORT.Builder
         {
             try
             {
-                if (this.ReportMaster.MasterReport_Id <= 0)
-                {
-                    if (!this.Save())
-                    {
-                        return;
-                    }
-                }
-
                 DatasourceSelector selector = new DatasourceSelector(this.ReportMaster.MasterReport_Id);
 
                 if (ControlDialog.ShowDialog("Data Source", selector, "Accept").IsFalse())
@@ -417,9 +487,65 @@ namespace REPORT.Builder
                     return;
                 }
 
-                this.dataSourceModel = selector.MainTable;
+                this.DataSourceMainTable = selector.MainTable;
 
                 this.LoadDataSource();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void ReportPrint_Cliked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ContextMenu menu = new ContextMenu();
+                
+
+                MenuItem defaultItem = new MenuItem
+                {
+                    Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})",
+                    Tag = Connections.Instance.DefaultConnectionName
+                };
+
+                defaultItem.Click += this.ReportConnection_Cliked;
+
+                menu.Items.Add(defaultItem);
+
+                foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.Instance.AlternativeModels)
+                {
+                    MenuItem alternativeItem = new MenuItem 
+                    { 
+                        Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", 
+                        Tag = connectionKey.Key 
+                    };
+
+                    alternativeItem.Click += this.ReportConnection_Cliked;
+
+                    menu.Items.Add(alternativeItem);
+                }
+
+                menu.IsOpen = true;
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void ReportConnection_Cliked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MenuItem item = (MenuItem)e.Source;
+
+                DatabaseModel connection = Connections.Instance.GetConnection(item.Tag.ParseToString());
+
+                BuildReportXML xmlBuild = new BuildReportXML();
+
+                XDocument repotXml = xmlBuild.GetReport(this.GetReportXml(), connection);
             }
             catch (Exception err)
             {
@@ -438,7 +564,6 @@ namespace REPORT.Builder
 
                     this.uxReportSections.Children.Add(new ReportSection
                     {
-                        SectionTitle = this.reportDesignType.GetDescriptionAttribute(),
                         SectionIndex = 0,
                         SectionGroupIndex = 0,
                         SectionType = SectionTypeEnum.Page,
@@ -459,7 +584,6 @@ namespace REPORT.Builder
 
                     this.uxReportSections.Children.Add(new ReportSection 
                     { 
-                        SectionTitle = "Page Header", 
                         SectionIndex = 0,
                         SectionGroupIndex = 0,
                         SectionType = SectionTypeEnum.Header,
@@ -470,7 +594,6 @@ namespace REPORT.Builder
 
                     this.uxReportSections.Children.Add(new ReportSection 
                     { 
-                        SectionTitle = "Page Footer", 
                         SectionIndex = 1,
                         SectionGroupIndex = 0,
                         SectionType = SectionTypeEnum.Footer,
@@ -556,7 +679,7 @@ namespace REPORT.Builder
             {
                 sourceMaster.SelectedSourceTables.AddRange(repo.GetDataSourceTableByForeignKeyMasterReport_Id(this.ReportMaster.MasterReport_Id));
 
-                this.dataSourceModel = sourceMaster;
+                this.DataSourceMainTable = sourceMaster;
 
                 this.LoadDataSource();
             }
@@ -572,19 +695,19 @@ namespace REPORT.Builder
                 {
                     continue;
                 }
+                                
+                section.SectionTableName = this.DataSourceMainTable.MainTableName; // Do this to reserve the first section for the main data source
 
-                section.SectionTitle = $"{this.dataSourceModel.MainTableName} - {section.SectionType.GetDescriptionAttribute()}";
-
-                section.SectionTableName = this.dataSourceModel.MainTableName; // Do this to reserve the first section for the main data source
+                section.RefresSectionTitle();
             }
 
-            TreeViewItem mainTreeItem = new TreeViewItem { Header = this.dataSourceModel.MainTableName };
+            TreeViewItem mainTreeItem = new TreeViewItem { Header = this.DataSourceMainTable.MainTableName };
 
-            foreach(DataItemModel column in Integrity.GetColumnsForTable(this.dataSourceModel.MainTableName))
+            foreach(DataItemModel column in Integrity.GetColumnsForTable(this.DataSourceMainTable.MainTableName))
             {
-                ColumnObjectModel tableColumn = Integrity.GetObjectModel(this.dataSourceModel.MainTableName, column.DisplayValue);
+                ColumnObjectModel tableColumn = Integrity.GetObjectModel(this.DataSourceMainTable.MainTableName, column.DisplayValue);
 
-                ReportColumnModel reportColumn = tableColumn.CopyToObject(new ReportColumnModel { TableName = this.dataSourceModel.MainTableName }) as ReportColumnModel;
+                ReportColumnModel reportColumn = tableColumn.CopyToObject(new ReportColumnModel { TableName = this.DataSourceMainTable.MainTableName }) as ReportColumnModel;
 
                 ToolsMenuItem treeMainColumn = new ToolsMenuItem
                 {
@@ -598,9 +721,9 @@ namespace REPORT.Builder
 
             this.uxTableTree.Items.Add(mainTreeItem);
 
-            foreach(DataSourceTableModel sourceTable in this.dataSourceModel.SelectedSourceTables)
+            foreach(DataSourceTableModel sourceTable in this.DataSourceMainTable.SelectedSourceTables)
             {
-                if (sourceTable.TableName == this.dataSourceModel.MainTableName)
+                if (sourceTable.TableName == this.DataSourceMainTable.MainTableName)
                 {
                     continue;
                 }
@@ -643,6 +766,40 @@ namespace REPORT.Builder
             }
         }
 
+        private XDocument GetReportXml()
+        {
+            XDocument result = new XDocument();
+
+            XElement root = new XElement("Root");
+
+            XElement report = new XElement("ReportSettings");
+
+            report.Add(new XAttribute("ReportTypeEnum", (int)this.reportDesignType));
+
+            foreach (ReportSection section in this.uxReportSections.Children)
+            {
+                report.Add(section.SectionXml);
+            }
+
+            root.Add(report);
+
+            result.Add(root);
+
+            //ReportXMLModel reportXml = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, this.ReportMaster.MasterReport_Id);
+
+            //if (reportXml == null)
+            //{
+            //    reportXml = new ReportXMLModel
+            //    {
+            //        MasterReport_Id = this.ReportMaster.MasterReport_Id,
+            //        ReportXMLVersion = this.ReportMaster.ReportXMLVersion,
+            //        PrintCount = 0
+            //    };
+            //}
+
+            return result;
+        }
+
         #region NEW DATA SECTION METHODS
 
         private int CreateDatareportSections()
@@ -653,7 +810,6 @@ namespace REPORT.Builder
 
             ReportSection header = new ReportSection
             {
-                SectionTitle = "Table Header",
                 SectionIndex = sectionIndex[0],
                 SectionGroupIndex = groupSectionId,
                 SectionType = SectionTypeEnum.TableHeader,
@@ -668,7 +824,6 @@ namespace REPORT.Builder
 
             ReportSection data = new ReportSection
             {
-                SectionTitle = "Table Data",
                 SectionIndex = sectionIndex[1],
                 SectionGroupIndex = groupSectionId,
                 SectionType = SectionTypeEnum.TableData,
@@ -683,7 +838,6 @@ namespace REPORT.Builder
 
             ReportSection footer = new ReportSection
             {
-                SectionTitle = "Table Footer",
                 SectionIndex = sectionIndex[2],
                 SectionGroupIndex = groupSectionId,
                 SectionType = SectionTypeEnum.TableFooter,
@@ -704,16 +858,18 @@ namespace REPORT.Builder
 
             data.ReportColumnAdded += this.ReportColumn_Added;
 
+            data.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
+
             footer.ReportObjectSelected += this.ReportObject_Selected;
 
             return groupSectionId;
         }
-
-        private void SetSectionTitle(ReportColumnModel column, int sectionGroupIndex)
+        
+        private void RefreshSectionTitles()
         {
-            foreach (ReportSection section in this.dataReportSections.Where(gr => gr.SectionGroupIndex == sectionGroupIndex))
+            foreach (ReportSection section in this.dataReportSections)
             {
-                section.SectionTitle = $"{section.SectionIndex} - {column.TableName} - {section.SectionType.GetDescriptionAttribute()}";
+                section.RefresSectionTitle();
             }
         }
 
@@ -750,9 +906,14 @@ namespace REPORT.Builder
 
             int shiftIndex = result[2] + 1;
 
-            for (int x = insertIndexStart; x < this.dataReportSections.Count; ++x)
+            ReportSection[] changeSections = this.dataReportSections
+                .Where(si => si.SectionIndex >= insertIndexStart)
+                .OrderBy(oi => oi.SectionIndex)
+                .ToArray();
+
+            foreach(ReportSection section in changeSections)
             {
-                this.dataReportSections[x].SectionIndex = shiftIndex;
+                section.SectionIndex = shiftIndex;
 
                 ++shiftIndex;
             }
@@ -761,5 +922,7 @@ namespace REPORT.Builder
         }
 
         #endregion
+
+        
     }
 }

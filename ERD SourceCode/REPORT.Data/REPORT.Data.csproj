@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SQLRepository\Repositories\BuildReportRepository.cs" />
     <Compile Include="DatabaseConnection.cs" />
     <Compile Include="Models\DataSourceMasterModel.cs" />
     <Compile Include="Models\DataSourceTableModel.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="Models\ReportConnectionModel.cs" />
     <Compile Include="Models\ReportMasterModel.cs" />
     <Compile Include="Models\ReportXMLModel.cs" />
-    <Compile Include="Models\SectionLinkModel.cs" />
+    <Compile Include="Models\WhereParameterModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -83,6 +84,7 @@
     <Compile Include="SQLRepository\Agrigates\User\ReportMaster.cs" />
     <Compile Include="SQLRepository\Agrigates\User\ReportXML.cs" />
     <Compile Include="SQLRepository\DataContext\DataSourceContext.cs" />
+    <Compile Include="SQLRepository\DataContext\ReportsBuildContext.cs" />
     <Compile Include="SQLRepository\DataContext\ReportTablesContext.cs" />
     <Compile Include="SQLRepository\DataContext\SystemTablesContext.cs" />
     <Compile Include="SQLRepository\Mappings\DataSourceMasterMapping.cs" />

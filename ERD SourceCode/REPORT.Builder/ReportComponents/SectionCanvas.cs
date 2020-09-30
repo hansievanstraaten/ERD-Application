@@ -50,21 +50,43 @@ namespace REPORT.Builder.ReportComponents
             {
                 XElement result = new XElement("CanvasXml");
 
-                foreach(UIElement child in this.Children)
+                XElement objectModels = new XElement("ObjectModels");
+
+                XElement parameterModels = new XElement("ParameterModels");
+
+                XElement foreignGroupIndex = new XElement("ForeignGroupIndexes");
+
+                foreach (UIElement child in this.Children)
                 {
-                    result.Add(child.GetPropertyValue("ItemXml") as XElement);
+                    objectModels.Add(child.GetPropertyValue("ItemXml") as XElement);
                 }
+
+                foreach(WhereParameterModel parameter in this.SqlManager.WhereParameterModel)
+                {
+                    parameterModels.Add(parameter.ItemXml);
+                }
+
+                foreach(int foreignIndex in this.SqlManager.ForeignGroupIndexes)
+                {
+                    foreignGroupIndex.Add(new XElement("Index", foreignIndex));
+                }
+
+                result.Add(objectModels);
+
+                result.Add(parameterModels);
+
+                result.Add(foreignGroupIndex);
 
                 return result;
             }
 
             set
             {
-                foreach (XElement item in value.Elements())
+                foreach (XElement item in value.Element("ObjectModels").Elements())
                 {
                     if (item.Name.LocalName == "ReportObject")
                     {
-                        UIElement child = ObjectCreator.CreateReportObject(item);
+                        UIElement child = ObjectCreator.CreateReportObject(item, this.IsDesignMode);
 
                         this.AddReportToolItem(child);
 
@@ -78,11 +100,23 @@ namespace REPORT.Builder.ReportComponents
                         this.SetPropertyValue(item.Name.LocalName, item.Value);
                     }
                 }
-                
-                //foreach(XAttribute element in value.Attributes())
-                //{
-                //    this.SetPropertyValue(element.Name.LocalName, element.Value);
-                //}
+
+                List<WhereParameterModel> paramatersList = new List<WhereParameterModel>();
+
+                foreach(XElement index in value.Element("ForeignGroupIndexes").Elements())
+                {
+                    this.SqlManager.AddForeignGroupIndex(index.Value.ToInt32());
+                }
+
+                foreach (XElement item in value.Element("ParameterModels").Elements())
+                {
+                    paramatersList.Add(new WhereParameterModel { ItemXml = item });
+
+                }
+                    
+                this.SqlManager.AddWhereModels(paramatersList.ToArray());
+
+                this.SectionTableName = this.SqlManager.TableName;
             }
         }
 

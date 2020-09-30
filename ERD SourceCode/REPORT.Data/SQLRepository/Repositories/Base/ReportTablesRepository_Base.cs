@@ -45,11 +45,11 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;
 		}
 		
-		public ReportConnectionModel GetReportConnectionByPrimaryKey (Int64 MasterReport_Id, int ReportConnection_Id  )
+		public ReportConnectionModel GetReportConnectionByPrimaryKey (Int64 MasterReport_Id, string ReportConnectionName  )
 		{
 			ReportConnection result =this.dataContext
 				.ReportConnections
-				.FirstOrDefault(pk => pk.MasterReport_Id == MasterReport_Id && pk.ReportConnection_Id == ReportConnection_Id  );
+				.FirstOrDefault(pk => pk.MasterReport_Id == MasterReport_Id && pk.ReportConnectionName == ReportConnectionName  );
 
 			if (result == null)
 			{
@@ -151,7 +151,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
-		public List<ReportMasterModel> GetReportMasterByPaperKindEnum (int PaperKindEnum)
+		public List<ReportMasterModel> GetReportMasterByPaperKindEnum (int? PaperKindEnum)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
@@ -385,11 +385,11 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportConnectionModel>().ToList();
 		}
 		
-		public List<ReportConnectionModel> GetReportConnectionByConnectionName (string ConnectionName)
+		public List<ReportConnectionModel> GetReportConnectionByIsProductionConnection (bool IsProductionConnection)
 		{
 			List<ReportConnection> result = this.dataContext
 				.ReportConnections
-				.Where(fk => fk.ConnectionName == ConnectionName)
+				.Where(fk => fk.IsProductionConnection == IsProductionConnection)
 				.ToList();
 
 			if (result.Count == 0)
@@ -403,11 +403,11 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportConnectionModel>().ToList();
 		}
 		
-		public List<ReportConnectionModel> GetReportConnectionByIsProductionConnection (bool IsProductionConnection)
+		public List<ReportConnectionModel> GetReportConnectionByIsActive (bool IsActive)
 		{
 			List<ReportConnection> result = this.dataContext
 				.ReportConnections
-				.Where(fk => fk.IsProductionConnection == IsProductionConnection)
+				.Where(fk => fk.IsActive == IsActive)
 				.ToList();
 
 			if (result.Count == 0)
@@ -471,7 +471,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 		{
 			ReportConnection existing = this.dataContext
 				.ReportConnections
-				.Where(rx => rx.MasterReport_Id == model.MasterReport_Id && rx.ReportConnection_Id == model.ReportConnection_Id  )
+				.Where(rx => rx.MasterReport_Id == model.MasterReport_Id && rx.ReportConnectionName == model.ReportConnectionName  )
 				.FirstOrDefault();
 
 			if (existing == null)

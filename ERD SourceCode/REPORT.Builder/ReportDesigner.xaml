@@ -24,23 +24,30 @@
             <ColumnDefinition Width="400"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0" x:Name="uxMenuStack">
-            <ModelViewer:ModelViewer x:Name="uxReportMasterModel" ModelViewItemBrowse="ReportMasterDescription_Browse" />
-            <CommonControls:LableItem Content="Tools" FontWeight="Bold" />
-            
-            <StackPanel x:Name="uxToolsStack">
-
-            </StackPanel>
-            <Border x:Name="uxDataMenueBorder" Margin="0,5,0,0" BorderThickness="0,3,0,1" BorderBrush="Black" Visibility="Collapsed">
-                <StackPanel x:Name="uxDataMenue" 
-                            Visibility="Collapsed" 
-                            Orientation="Horizontal" 
-                            HorizontalAlignment="Left">
-                    <CommonControls:ActionButton ResourceImageName="CheckList" ToolTip="Select Data Source" Click="DataSourseSelect_Browse" />
+        <ScrollViewer Grid.Row="0" Grid.Column="0">        
+            <StackPanel  x:Name="uxMenuStack">
+                <StackPanel Orientation="Horizontal">
+                    <CommonControls:ActionButton ResourceImageName="Print" ToolTip="Print Report" Click="ReportPrint_Cliked" />
                 </StackPanel>
-            </Border>
-            <CommonControls:ViSoTreeView x:Name="uxTableTree" Visibility="Collapsed" />
-        </StackPanel>
+                <ModelViewer:ModelViewer x:Name="uxReportMasterModel" ModelViewItemBrowse="ReportMasterDescription_Browse" />
+                <CommonControls:LableItem Content="Tools" FontWeight="Bold" />
+                
+                <StackPanel x:Name="uxToolsStack">
+
+                </StackPanel>
+                
+                <Border x:Name="uxDataMenueBorder" Margin="0,5,0,0" BorderThickness="0,3,0,1" BorderBrush="Black" Visibility="Collapsed">
+                    <StackPanel x:Name="uxDataMenue" 
+                                Visibility="Collapsed" 
+                                Orientation="Horizontal" 
+                                HorizontalAlignment="Left">
+                        <CommonControls:ActionButton ResourceImageName="CheckList" ToolTip="Select Data Source" Click="DataSourseSelect_Browse" />
+                    </StackPanel>
+                </Border>
+                <CommonControls:ViSoTreeView x:Name="uxTableTree" Visibility="Collapsed" />
+            </StackPanel>
+            
+        </ScrollViewer>
 
         <CommonControls:VerticalGridSplit Grid.Row="0" Grid.Column="1" />
 
@@ -60,12 +67,12 @@
         <CommonControls:VerticalGridSplit Grid.Row="0" Grid.Column="3" />
 
         <StackPanel Grid.Row="0" Grid.Column="4">
-            <CommonControls:LableItem Content="Selected Object Properties" FontWeight="ExtraBold" />
+            <CommonControls:LableItem x:Name="uxPropertiesCaption" Content="Selected Object Properties" FontWeight="ExtraBold" />
             <ModelViewer:ModelViewer x:Name="uxProperties" ModelViewItemBrowse="PropertiesObject_Browse" />
-            <CommonControls:LableItem Content="Section Link" FontWeight="ExtraBold" />
-            <local:WhereBuilder x:Name="uxWhereBuilder" />
-            <CommonControls:LableItem Content="Canvas SQL" FontWeight="ExtraBold" />
-            <CommonControls:TextBoxItem IsReadOnly="True" TextWrapping="WrapWithOverflow" x:Name="uxCanvasSql" />
+            <CommonControls:LableItem x:Name="uxWhereBuilderCaption"  Content="Section Where Link" FontWeight="ExtraBold" Visibility="Collapsed" />
+            <local:WhereBuilder x:Name="uxWhereBuilder" Visibility="Collapsed" />
+            <CommonControls:LableItem x:Name="uxCanvasSqlCaption" Content="Canvas SQL" FontWeight="ExtraBold" Visibility="Collapsed" />
+            <CommonControls:TextBoxItem x:Name="uxCanvasSql" IsReadOnly="True" TextWrapping="WrapWithOverflow" Visibility="Collapsed" />
         </StackPanel>
         
     </Grid>

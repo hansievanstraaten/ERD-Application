@@ -1,10 +1,11 @@
 ﻿using REPORT.Data.Models;
+using System.Collections.Generic;
 
 namespace REPORT.Builder.Common.DatabaseOptions
 {
     internal interface IDataToSQL
     {
-        string BuildSelectQuery(ReportColumnModel[] columns);
+        string BuildSelectQuery(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel);
 
     }
 }

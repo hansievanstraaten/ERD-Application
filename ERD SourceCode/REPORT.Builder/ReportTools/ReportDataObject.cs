@@ -11,6 +11,7 @@ namespace REPORT.Builder.ReportTools
     public class ReportDataObject : LabelBase
     {
         private ReportColumnModel columnModel;
+        private bool suppressed;
 
         public ReportDataObject()
         {
@@ -28,6 +29,9 @@ namespace REPORT.Builder.ReportTools
                 XElement result = base.ItemXml;
 
                 result.Add(new XAttribute("ObjectType", "ReportDataObject"));
+                result.Add(new XAttribute("ObjectTable", this.ColumnModel.TableName));
+                result.Add(new XAttribute("ObjectColumn", this.ColumnModel.ColumnName));
+                result.Add(new XAttribute("Suppressed", this.Suppressed));
                 result.Add(new XAttribute("ColumnModel", this.ColumnModel.ZipFile().ConvertBytesToString()));
 
                 return result;
@@ -45,6 +49,29 @@ namespace REPORT.Builder.ReportTools
                     }
 
                     this.SetPropertyValue(item.Name.LocalName, item.Value);
+                }
+            }
+        }
+
+        [FieldInformation("Is Suppressed", Sort = 500)]
+        public bool Suppressed
+        {
+            get
+            {
+                return this.suppressed;
+            }
+
+            set
+            {
+                this.suppressed = value;
+
+                if  (this.IsDesignMode && value)
+                {
+                    this.Foreground = Brushes.Gray;
+                }
+                else if (value)
+                {
+                    this.Visibility = Visibility.Hidden;
                 }
             }
         }

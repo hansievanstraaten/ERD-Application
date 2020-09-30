@@ -1,4 +1,5 @@
 ﻿using ERD.Models;
+using GeneralExtensions;
 using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
@@ -111,6 +112,26 @@ namespace ERD.Common
             {
                 Connections.databaseModel = value;
             }
+        }
+
+        public DatabaseModel GetConnection(string connectionName)
+        {
+            if (this.DefaultConnectionName == connectionName)
+            {
+                return this.DefaultDatabaseModel;
+            }
+
+            DatabaseModel result = null;
+
+            foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in this.AlternativeModels)
+            {
+                if (connectionKey.Key == connectionName)
+                {
+                    result = connectionKey.Value.CopyToObject(new DatabaseModel()) as DatabaseModel;
+                }
+            }
+
+            return result;
         }
 
         public Dictionary<string, UserNameAndPasswordModel> SessionPasswords = new Dictionary<string, UserNameAndPasswordModel>();

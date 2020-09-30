@@ -53,12 +53,6 @@ namespace REPORT.Builder
                     return false;
                 }
 
-                DataSourceRepository repo = new DataSourceRepository();
-
-                repo.UpdateDataSourceMaster(this.MainTable);
-
-                repo.SetIsAvailable(this.MainTable.MasterReport_Id, false);
-
                 foreach(TreeViewItemTool item in this.treeTableItems.Where(ch => ch.IsChecked))
                 {
                     DataSourceTableModel sourceTable = new DataSourceTableModel
@@ -67,8 +61,6 @@ namespace REPORT.Builder
                         TableName = item.Header.ParseToString(),
                         IsAvailable = true
                     };
-
-                    repo.UpdateDataSourceTable(sourceTable);
 
                     this.MainTable.SelectedSourceTables.Add(sourceTable);
                 }

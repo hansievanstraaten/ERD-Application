@@ -191,6 +191,20 @@ namespace ERD.Build
 
                         break;
 
+                    case RepeatTypeEnum.ForeachTableInProject:
+
+                        foreach (ErdCanvasModel canvas in this.AllErdCanvasModels)
+                        {
+                            foreach (TableModel table in canvas.SegmentTables)
+                            {
+                                this.SelectedTable = table;
+
+                                injectionText.Append(this.ReplaceParameters(buildType.Code));
+                            }
+                        }
+
+                        break;
+
                     default:
 
                         this.BuildTypeSwitch(buildType, ref injectionText);
@@ -300,7 +314,7 @@ namespace ERD.Build
 
                     #endregion
 
-                    break;
+                    break;                
 
                 case RepeatTypeEnum.Once:
                 default:

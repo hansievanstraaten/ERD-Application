@@ -6,25 +6,19 @@ namespace REPORT.Data.SQLRepository.Agrigates
 {
     public class ReportConnection : ReportConnectionBase
 	{
-		// NOTE: For PK that is not identity add the 
-		// [Key]
-		// [DatabaseGenerated(DatabaseGeneratedOption.None)]
-		// Attributes
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        new public Int64 MasterReport_Id
+        {
+            get
+            {
+                return base.MasterReport_Id;
+            }
 
-		// Exsample
-		//[Key]
-		//[DatabaseGenerated(DatabaseGeneratedOption.None)]
-		//new public Int64 MasterReport_Id
-		//{
-		//	get
-		//	{
-		//		return base.MasterReport_Id;
-		//	}
-
-		//	set
-		//	{
-		//		base.MasterReport_Id = value;
-		//	}
-		//}
-	}
+            set
+            {
+                base.MasterReport_Id = value;
+            }
+        }
+    }
 }

@@ -92,6 +92,7 @@
     <Compile Include="Exstention\EnumirationExstentions.cs" />
     <Compile Include="Exstention\UIElmentExstentions.cs" />
     <Compile Include="Functions\EventParser.cs" />
+    <Compile Include="Functions\KeyActions.cs" />
     <Compile Include="Functions\Sleep.cs" />
     <Compile Include="Functions\ViSoGlobalization.cs" />
     <Compile Include="GlobalSuppressions.cs" />

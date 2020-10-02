@@ -21,6 +21,7 @@ using ViSo.Dialogs.TextEditor;
 using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Exstention;
+using WPF.Tools.Functions;
 using WPF.Tools.ToolModels;
 
 
@@ -395,14 +396,44 @@ namespace REPORT.Builder
             try
             {
                 ContextMenu menu = new ContextMenu();
+                
+                if (KeyActions.IsCtrlPressed)
+                {
+                    foreach(ReportAlignmentEnum alignment in Enum.GetValues(typeof(ReportAlignmentEnum)))
+                    {
+                        MenuItem alignmentItem = new MenuItem { Header = alignment.GetDescriptionAttribute(), Tag = alignment };
 
-                MenuItem delete = new MenuItem { Name = "uxDelete", Header = "Delete Object" };
+                        alignmentItem.Click += this.Alignment_Click;
 
-                delete.Click += this.SelectedMenuItem_Click;
+                        menu.Items.Add(alignmentItem);
+                    }
+                }
+                else
+                {
+                    MenuItem delete = new MenuItem { Name = "uxDelete", Header = "Delete Object" };
 
-                menu.Items.Add(delete);
+                    delete.Click += this.SelectedMenuItem_Click;
 
+                    menu.Items.Add(delete);
+                }
+                    
                 menu.IsOpen = true;
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void Alignment_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MenuItem menu = (MenuItem)sender;
+
+                SectionCanvas canvas = (SectionCanvas)this.selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
+
+                canvas.AlignmentObjects(menu.Tag.To<ReportAlignmentEnum>());
             }
             catch (Exception err)
             {
@@ -414,9 +445,9 @@ namespace REPORT.Builder
         {
             try
             {
-                SectionCanvas parent = (SectionCanvas)this.selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
+                SectionCanvas canvas = (SectionCanvas)this.selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
 
-                parent.Children.Remove(this.selectedReportObject);
+                canvas.Children.Remove(this.selectedReportObject);
 
                 this.selectedReportObject = null;
             }

@@ -56,6 +56,7 @@
     <Compile Include="PurchaseOrderLineStatusEnum.cs" />
     <Compile Include="PurchaseOrderStatusEnum.cs" />
     <Compile Include="ReportEnums\PageOrientationEnum.cs" />
+    <Compile Include="ReportEnums\ReportAlignmentEnum.cs" />
     <Compile Include="ReportEnums\ReportTypeEnum.cs" />
     <Compile Include="ReportEnums\SectionTypeEnum.cs" />
     <Compile Include="RoleTypeEnum.cs" />

@@ -28,6 +28,8 @@ namespace REPORT.Builder.ReportComponents
 
         private static Dictionary<Guid, UIElement> canvaselements = new Dictionary<Guid, UIElement>();
 
+        public static UIElement SelectedElement { get; set; }
+
         public static Guid GetElementId(this UIElement element)
         {
             return Guid.Parse(element.GetPropertyValue("ElemntId").ParseToString());
@@ -308,7 +310,7 @@ namespace REPORT.Builder.ReportComponents
 
                 thumb.Width = HandleSize;
                 thumb.Height = HandleSize;
-                thumb.Background = Brushes.Orange;
+                thumb.Background = Brushes.LightBlue;
                 thumb.ElemntId = elementId;
                 thumb.ResizeHandleType = item;
 

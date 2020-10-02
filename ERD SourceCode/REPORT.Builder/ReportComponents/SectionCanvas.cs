@@ -5,12 +5,14 @@ using REPORT.Builder.ReportTools;
 using REPORT.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
+using WPF.Tools.Functions;
 
 namespace REPORT.Builder.ReportComponents
 {
@@ -180,12 +182,98 @@ namespace REPORT.Builder.ReportComponents
             this.SqlManager.AddColumn(column);
         }
 
+        public void AlignmentObjects(ReportAlignmentEnum alignmentEnum)
+        {
+            if (this.selectedReportObjects.Count == 0)
+            {
+                return;
+            }
+
+            switch(alignmentEnum)
+            {
+                //case ReportAlignmentEnum.AlignBottom:
+                    
+                //    double bottom = Canvas.GetBottom(this.selectedReportObjects.Values.First());
+
+                //    foreach(KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+                //    {
+                //        Canvas.SetBottom(itemKeyPair.Value, bottom);
+                //    }
+
+                //    break;
+
+                case ReportAlignmentEnum.AlignLeft:
+
+                    double left = Canvas.GetLeft(this.selectedReportObjects.Values.First());
+
+                    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+                    {
+                        Canvas.SetLeft(itemKeyPair.Value, left);
+
+                        itemKeyPair.Value.MoveHandles();
+                    }
+
+                    break;
+
+                //case ReportAlignmentEnum.AlignRight:
+
+                //    double right = Canvas.GetRight(this.selectedReportObjects.Values.First());
+
+                //    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+                //    {
+                //        Canvas.SetRight(itemKeyPair.Value, right);
+                //    }
+
+                //    break;
+
+                case ReportAlignmentEnum.AlignTop:
+
+                    double top = Canvas.GetTop(this.selectedReportObjects.Values.First());
+
+                    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+                    {
+                        Canvas.SetTop(itemKeyPair.Value, top);
+                    }
+
+                    break;
+
+                case ReportAlignmentEnum.SameHeight:
+
+                    double heigh = this.selectedReportObjects.Values.First().GetPropertyValue("ActualHeight").ToDouble();
+
+                    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+                    {
+                        itemKeyPair.Value.SetPropertyValue("Height", heigh);
+                    }
+
+                    break;
+
+                case ReportAlignmentEnum.SameWidth:
+
+                    double width = this.selectedReportObjects.Values.First().GetPropertyValue("ActualWidth").ToDouble();
+
+                    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+                    {
+                        itemKeyPair.Value.SetPropertyValue("Width", width);
+                    }
+
+                    break;
+            }
+
+            foreach (KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+            {
+                itemKeyPair.Value.MoveHandles();
+            }
+        }
+
         public void RemoveElementHandles()
         {
-            if (this.selectedElement != null)
+            foreach(UIElement item in this.selectedReportObjects.Values)
             {
-                this.selectedElement.RemoveHandles(this);
+                item.RemoveHandles(this);
             }
+
+            this.selectedReportObjects.Clear();
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -267,7 +355,7 @@ namespace REPORT.Builder.ReportComponents
                     double elementHeigth = this.selectedElement.GetPropertyValue("ActualHeight").ToDouble();
 
                     double elementLeft = (currentPosition.X - this.startPoint.X) + this.selectedElementOrigins.X;
-                    
+
                     double elementTop = (currentPosition.Y - this.startPoint.Y) + this.selectedElementOrigins.Y;
 
                     if (elementLeft < 0)
@@ -388,7 +476,10 @@ namespace REPORT.Builder.ReportComponents
                 return;
             }
 
-            this.RemoveElementHandles();
+            if (!KeyActions.IsCtrlPressed)
+            {
+                this.RemoveElementHandles();
+            }
 
             this.selectedElement = toolObject;
 
@@ -397,6 +488,13 @@ namespace REPORT.Builder.ReportComponents
             if (!isDragObject)
             {
                 this.AddReportToolItem(toolObject);
+            }
+
+            Guid elementId = toolObject.GetElementId();
+
+            if (!this.selectedReportObjects.ContainsKey(elementId))
+            {
+                this.selectedReportObjects.Add(elementId, toolObject);
             }
 
             this.ReportObjectSelected?.Invoke(toolObject);
@@ -433,8 +531,6 @@ namespace REPORT.Builder.ReportComponents
         {
             Guid elementId = toolObject.GetElementId();
 
-            //this.selectedReportObjects.Add(elementId, toolObject);
-
             toolObject.SetPropertyValue("IsDesignMode", this.IsDesignMode);
 
             this.Children.Add(toolObject as UIElement);
@@ -456,6 +552,6 @@ namespace REPORT.Builder.ReportComponents
             this.ReportColumnAdded?.Invoke(this, column);
 
             return true;
-        }
+        }    
     }
 }

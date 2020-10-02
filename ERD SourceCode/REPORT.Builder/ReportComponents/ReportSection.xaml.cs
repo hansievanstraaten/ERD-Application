@@ -254,6 +254,11 @@ namespace REPORT.Builder.ReportComponents
             this.Title = sectionTitle;
         }
 
+        public void AlignmentObjects(ReportAlignmentEnum alignmentEnum)
+        {
+            this.uxSectionCanvas.AlignmentObjects(alignmentEnum);
+        }
+
         public void AddReportColumn(ReportColumnModel column)
         {
             this.uxSectionCanvas.AddReportColumn(column);

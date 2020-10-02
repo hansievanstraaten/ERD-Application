@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
@@ -29,6 +30,8 @@ namespace REPORT.Builder.ReportComponents
 
         private bool isDragging;
 
+        private bool isHandle;
+
         private Point startPoint;
 
         private Point selectedElementOrigins;
@@ -36,6 +39,8 @@ namespace REPORT.Builder.ReportComponents
         private UIElement selectedElement;
 
         private CanvasSqlManager sqlManager = new CanvasSqlManager();
+
+        private Dictionary<Guid, UIElement> selectedReportObjects = new Dictionary<Guid, UIElement>();
 
         public SectionCanvas()
         {
@@ -165,9 +170,7 @@ namespace REPORT.Builder.ReportComponents
 
             toolObject.SetPropertyValue("ColumnModel", column);
 
-            this.AddReportToolItem(toolObject);
-
-            this.ReportObjectSelected?.Invoke(toolObject);
+            this.SetEditControl(toolObject, false);
 
             if (this.SectionTableName.IsNullEmptyOrWhiteSpace())
             {
@@ -175,6 +178,14 @@ namespace REPORT.Builder.ReportComponents
             }
 
             this.SqlManager.AddColumn(column);
+        }
+
+        public void RemoveElementHandles()
+        {
+            if (this.selectedElement != null)
+            {
+                this.selectedElement.RemoveHandles(this);
+            }
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -187,22 +198,32 @@ namespace REPORT.Builder.ReportComponents
                 {
                     this.startPoint = e.GetPosition(this);
 
+                    UIElement toolObject = null;
+                                        
                     if (e.Source.GetType() == typeof(System.Windows.Shapes.Line))
                     {
-                        this.selectedElement = ((System.Windows.Shapes.Line)e.Source as System.Windows.Shapes.Line).Parent as UIElement;
+                        toolObject = ((System.Windows.Shapes.Line)e.Source as System.Windows.Shapes.Line).Parent as UIElement;
                     }
                     else
                     {
-                        this.selectedElement = e.Source as UIElement;
+                        toolObject = e.Source as UIElement;
                     }
 
-                    this.selectedElementOrigins = new Point(Canvas.GetLeft(this.selectedElement), Canvas.GetTop(this.selectedElement));
+                    this.selectedElementOrigins = new Point(Canvas.GetLeft(toolObject), Canvas.GetTop(toolObject));
 
                     this.isDragging = true;
 
-                    this.CaptureMouse();
+                    //if (e.Source.GetType() != typeof(ResizeHandle))
+                    //{
+                    //}
+                    //else
+                    //{
+                    //    this.selectedElement = toolObject;
+                    //}
+                        
+                    this.SetEditControl(toolObject, true);
 
-                    this.ReportObjectSelected?.Invoke(this.selectedElement);
+                    this.CaptureMouse();
                 }
 
                 e.Handled = true;
@@ -210,6 +231,8 @@ namespace REPORT.Builder.ReportComponents
             else
             {
                 this.isDragging = false;
+
+                this.isHandle = false;
             }
         }
 
@@ -220,6 +243,8 @@ namespace REPORT.Builder.ReportComponents
             if (this.IsMouseCaptured)
             {
                 this.isDragging = false;
+
+                this.isHandle = false;
 
                 this.ReleaseMouseCapture();
 
@@ -247,12 +272,12 @@ namespace REPORT.Builder.ReportComponents
 
                     if (elementLeft < 0)
                     {
-                        elementLeft = 0;
+                        elementLeft = this.isHandle ? ResizeHandles.HandleSize * -1 : 0;
                     }
 
                     if (elementTop < 0)
                     {
-                        elementTop = 0;
+                        elementTop = this.isHandle ? ResizeHandles.HandleSize * -1 : 0;
                     }
 
                     if (base.ActualWidth > (elementLeft + elementWidth))
@@ -263,6 +288,15 @@ namespace REPORT.Builder.ReportComponents
                     if (base.ActualHeight > (elementTop + elementHeigth))
                     {
                         Canvas.SetTop(this.selectedElement, elementTop);
+                    }
+
+                    if (this.isHandle)
+                    {
+                        this.selectedElement.ResizeElement(elementTop, elementLeft);
+                    }
+                    else
+                    {
+                        this.selectedElement.MoveHandles();
                     }
                 }
             }
@@ -334,14 +368,38 @@ namespace REPORT.Builder.ReportComponents
             base.OnDrop(e);
         }
 
-        private void ReportObject_Selected(object sender, MouseButtonEventArgs e)
-        {
-            this.ReportObjectSelected?.Invoke(sender);
-        }
-
         private void SectionCanvas_Seleced(object sender, MouseButtonEventArgs e)
         {
+            this.RemoveElementHandles();
+
+            this.selectedElement = null;
+
             this.ReportObjectSelected?.Invoke(null);
+        }
+
+        private void SetEditControl(UIElement toolObject, bool isDragObject)
+        {
+            if (toolObject.GetType() == typeof(ResizeHandle))
+            {
+                this.isHandle = true;
+
+                this.selectedElement = toolObject;
+
+                return;
+            }
+
+            this.RemoveElementHandles();
+
+            this.selectedElement = toolObject;
+
+            this.selectedElement.ShowHandles(this);
+
+            if (!isDragObject)
+            {
+                this.AddReportToolItem(toolObject);
+            }
+
+            this.ReportObjectSelected?.Invoke(toolObject);
         }
 
         private void AddReportToolItem(ToolsMenuItem toolItem, Point location)
@@ -368,14 +426,14 @@ namespace REPORT.Builder.ReportComponents
 
             toolObject.SetPropertyValue("Left", location.X);
 
-            this.AddReportToolItem(toolObject);
-
-            this.ReportObjectSelected?.Invoke(toolObject);
+            this.SetEditControl(toolObject, false);
         }
 
         private void AddReportToolItem(UIElement toolObject)
         {
-            toolObject.MouseLeftButtonUp += this.ReportObject_Selected;
+            Guid elementId = toolObject.GetElementId();
+
+            //this.selectedReportObjects.Add(elementId, toolObject);
 
             toolObject.SetPropertyValue("IsDesignMode", this.IsDesignMode);
 

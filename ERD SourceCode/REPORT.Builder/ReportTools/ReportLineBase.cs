@@ -20,12 +20,16 @@ namespace REPORT.Builder.ReportTools
 
         public ReportLineBase()
         {
+            this.ElemntId = Guid.NewGuid();
+
             this.DataContext = this;
 
             this.Uid = Guid.NewGuid().ToString();
 
             this.Initialize();
         }
+
+        public Guid ElemntId { get; private set; }
 
         public XElement ItemXml
         {

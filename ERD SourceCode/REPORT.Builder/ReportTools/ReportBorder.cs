@@ -1,5 +1,6 @@
 ﻿
 using GeneralExtensions;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,6 +16,8 @@ namespace REPORT.Builder.ReportTools
 
         public ReportBorder()
         {
+            this.ElemntId = Guid.NewGuid();
+
             this.DataContext = this;
 
             this.BorderThickness = new Thickness(2);
@@ -59,18 +62,7 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
-        //public bool ItemSelected
-        //{
-        //    get
-        //    {
-        //        return this.itemSelected;
-        //    }
-            
-        //    set
-        //    {
-        //        this.itemSelected = value;
-        //    }
-        //}
+        public Guid ElemntId { get; private set; }
 
         public bool IsDesignMode
         {

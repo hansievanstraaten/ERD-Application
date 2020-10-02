@@ -18,8 +18,11 @@ namespace REPORT.Builder.ReportTools
     [ModelName("Label")]
     public class LabelBase : TextBlock
     {
-        //private bool itemSelected;
-        
+        public LabelBase()
+        {
+            this.ElemntId = Guid.NewGuid();
+        }
+
         public XElement ItemXml
         {
             get
@@ -55,18 +58,7 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
-        //public bool ItemSelected
-        //{
-        //    get
-        //    {
-        //        return this.itemSelected;
-        //    }
-            
-        //    set
-        //    {
-        //        this.itemSelected = value;
-        //    }
-        //}
+        public Guid ElemntId { get; private set; }
 
         public bool IsDesignMode
         {

@@ -89,6 +89,7 @@
     <Compile Include="ReportComponents\ReportSection.xaml.cs">
       <DependentUpon>ReportSection.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ReportComponents\ResizeHandles.cs" />
     <Compile Include="ReportComponents\SectionCanvas.cs" />
     <Compile Include="ReportComponents\ToolsMenuItem.xaml.cs">
       <DependentUpon>ToolsMenuItem.xaml</DependentUpon>
@@ -115,6 +116,7 @@
     <Compile Include="ReportTools\ReportLineBase.cs" />
     <Compile Include="ReportTools\ReportPageBreak.cs" />
     <Compile Include="ReportTools\ReportVerticalLine.cs" />
+    <Compile Include="ReportTools\ResizeHandle.cs" />
     <Compile Include="WhereBuilder.xaml.cs">
       <DependentUpon>WhereBuilder.xaml</DependentUpon>
     </Compile>

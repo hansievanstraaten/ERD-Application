@@ -23,6 +23,7 @@ using WPF.Tools.BaseClasses;
 using WPF.Tools.Exstention;
 using WPF.Tools.ToolModels;
 
+
 namespace REPORT.Builder
 {
     /// <summary>
@@ -30,6 +31,8 @@ namespace REPORT.Builder
     /// </summary>
     public partial class ReportDesigner : UserControlBase
     {
+        #region FIELDS
+
         private double markerMargin = 79;
 
         private ReportTypeEnum reportDesignType;
@@ -41,6 +44,10 @@ namespace REPORT.Builder
         private DataSourceMasterModel dataSourceMainTable;
 
         private List<ReportSection> dataReportSections = new List<ReportSection>();
+
+        private List<object> selectedReportObjects = new List<object>();
+
+        #endregion
 
         public ReportDesigner(ReportMasterModel masterModel)
         {
@@ -92,7 +99,7 @@ namespace REPORT.Builder
 
                         section.ReportColumnAdded += this.ReportColumn_Added;
 
-                        section.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
+                        //section.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
                     }
 
                     this.dataReportSections.Add(section);
@@ -107,6 +114,8 @@ namespace REPORT.Builder
 
             this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
         }
+
+        #region PBLIC PROPERTIES
 
         public ReportMasterModel ReportMaster
         {
@@ -133,6 +142,10 @@ namespace REPORT.Builder
                 this.dataSourceMainTable = value;
             }
         }
+
+        #endregion
+
+        #region PUBLIC METHODS
 
         public bool Save()
         {
@@ -223,6 +236,10 @@ namespace REPORT.Builder
             }
         }
 
+        #endregion
+
+        #region EVENT HANDLERS
+
         private void ReportDesigner_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             this.uxHorizontalRuler.Refresh(this.CanvasWidth, 20, this.CanvasHeight);
@@ -234,9 +251,24 @@ namespace REPORT.Builder
             {
                 this.uxProperties.Items.Clear();
 
-                int sectionGroupIndex = sender.GetPropertyValue("SectionGroupIndex").ToInt32();
+                if (Keyboard.IsKeyDown(Key.LeftCtrl)
+                    || Keyboard.IsKeyDown(Key.RightCtrl)
+                    && reportObject != null)
+                {
+                    // Multi object select Option
 
-                if (sectionGroupIndex > 0 && reportObject == null)
+                }
+
+                this.SelectedSectionGroupIndex = sender.GetPropertyValue("SectionGroupIndex").ToInt32();
+
+                int sectionIndex = sender.GetPropertyValue("SectionIndex").ToInt32();
+
+                foreach(ReportSection section in this.dataReportSections.Where(si => si.SectionIndex != sectionIndex))
+                {
+                    this.InvokeMethod(section, "RemoveElementHandles", new object[] { });
+                }
+
+                if (this.SelectedSectionGroupIndex > 0 && reportObject == null)
                 {
                     this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
                     
@@ -256,7 +288,7 @@ namespace REPORT.Builder
 
                     return;
                 }
-                else if (sectionGroupIndex == 0 && reportObject == null)
+                else if (this.SelectedSectionGroupIndex == 0 && reportObject == null)
                 {
                     this.uxPropertiesCaption.Visibility = Visibility.Collapsed;
 
@@ -293,9 +325,6 @@ namespace REPORT.Builder
 
                     this.selectedReportObject.PreviewMouseRightButtonUp += this.SelecteReportObject_RightClick;
                     
-                    // TODO: Heiglight Selected object for resizing
-                    //this.selectedReportObject.SetPropertyValue("ItemSelected", true);
-
                     this.uxProperties.Items.Add(reportObject);
                 }
             }
@@ -317,17 +346,17 @@ namespace REPORT.Builder
             }
         }
 
-        private void ReportSectionWhereClause_Changed(object sender, int sectionGroupIndex)
-        {
-            try
-            {
-                this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
+        //private void ReportSectionWhereClause_Changed(object sender, int sectionGroupIndex)
+        //{
+        //    try
+        //    {
+        //        this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
+        //    }
+        //    catch (Exception err)
+        //    {
+        //        MessageBox.Show(err.InnerExceptionMessage());
+        //    }
+        //}
 
         private void NewDataSection_Requested(object sender, ReportColumnModel column, int sectionGroupIndex)
         {
@@ -553,6 +582,32 @@ namespace REPORT.Builder
             }
         }
 
+        #endregion
+
+        #region PRIVATE PROPERTIES
+
+        private int SelectedSectionGroupIndex { get; set; }
+
+        private double CanvasWidth
+        {
+            get
+            {
+                return ((ReportSection)this.uxReportSections.Children[0]).GetPropertyValue("PageWidth").ToDouble();
+            }
+        }
+
+        private double CanvasHeight
+        {
+            get
+            {
+                return this.uxReportSections.ActualHeight + 25;
+            }
+        }
+
+        #endregion
+
+        #region PRIVATE METHODS
+
         private void InitializeReportSections()
         {
             this.uxReportSections.Children.Clear();
@@ -749,23 +804,7 @@ namespace REPORT.Builder
                 this.uxTableTree.Items.Add(childTreeItem);
             }            
         }
-
-        private double CanvasWidth
-        {
-            get
-            {
-                return ((ReportSection)this.uxReportSections.Children[0]).GetPropertyValue("PageWidth").ToDouble();
-            }
-        }
-
-        private double CanvasHeight
-        {
-            get
-            {
-                return this.uxReportSections.ActualHeight + 25;
-            }
-        }
-
+                
         private XDocument GetReportXml()
         {
             XDocument result = new XDocument();
@@ -799,6 +838,8 @@ namespace REPORT.Builder
 
             return result;
         }
+
+        #endregion
 
         #region NEW DATA SECTION METHODS
 
@@ -858,7 +899,7 @@ namespace REPORT.Builder
 
             data.ReportColumnAdded += this.ReportColumn_Added;
 
-            data.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
+            //data.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
 
             footer.ReportObjectSelected += this.ReportObject_Selected;
 

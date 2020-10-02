@@ -1,5 +1,6 @@
 ﻿using GeneralExtensions;
 using IconSet;
+using System;
 //using System.Drawing;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,8 +16,12 @@ namespace REPORT.Builder.ReportTools
 
         public ReportImage()
         {
+            this.ElemntId = Guid.NewGuid();
+
             this.Source = IconSets.ResourceImageSource("DefaultImage", 25);
         }
+
+        public Guid ElemntId { get; private set; }
 
         public XElement ItemXml
         {

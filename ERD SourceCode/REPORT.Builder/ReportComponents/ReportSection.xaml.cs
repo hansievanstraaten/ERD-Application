@@ -17,7 +17,7 @@ namespace REPORT.Builder.ReportComponents
     /// </summary>
     public partial class ReportSection : UserControlBase
     {
-        public delegate void ReportSectionWhereClauseChangedEvent(object sender, int sectionGroupIndex);
+        //public delegate void ReportSectionWhereClauseChangedEvent(object sender, int sectionGroupIndex);
 
         public delegate void RequestNewDataSectionsEvent(object sender, ReportColumnModel column, int sectionGroupIndex);
 
@@ -25,7 +25,7 @@ namespace REPORT.Builder.ReportComponents
 
         public delegate void ReportObjectSelectedEvent(object sender, object reportObject);
 
-        public event ReportSectionWhereClauseChangedEvent ReportSectionWhereClauseChanged;
+        //public event ReportSectionWhereClauseChangedEvent ReportSectionWhereClauseChanged;
 
         public event RequestNewDataSectionsEvent RequestNewDataSections;
 
@@ -238,22 +238,10 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        //public void AddWhereModels(WhereParameterModel[] whereModels)
-        //{
-        //    this.uxSectionCanvas.SqlManager.AddWhereModels(whereModels);
-
-        //    this.ReportSectionWhereClauseChanged?.Invoke(this, this.SectionGroupIndex);
-        //}
-
-        //public void AddForeignGroupIndex(int index)
-        //{
-        //    this.uxSectionCanvas.SqlManager.AddForeignGroupIndex(index);
-        //}
-
-        //public void RemoveForeignGroupIndex(int index)
-        //{
-        //    this.uxSectionCanvas.SqlManager.RemoveForeignGroupIndex(index);
-        //}
+        public void RemoveElementHandles()
+        {
+            this.uxSectionCanvas.RemoveElementHandles();
+        }
 
         public void RefresSectionTitle()
         {

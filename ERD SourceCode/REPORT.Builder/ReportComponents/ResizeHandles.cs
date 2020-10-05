@@ -42,6 +42,46 @@ namespace REPORT.Builder.ReportComponents
             return Guid.Parse(element.GetPropertyValue("ElemntId").ParseToString());
         }
 
+        public static void NotchLeft(double distance)
+        {
+            foreach (UIElement item in canvaselements.Values)
+            {
+                Canvas.SetLeft(item, (Canvas.GetLeft(item) - distance));
+
+                item.MoveHandles();
+            }
+        }
+
+        public static void NotchUp(double distance)
+        {
+            foreach (UIElement item in canvaselements.Values)
+            {
+                Canvas.SetTop(item, (Canvas.GetTop(item) - distance));
+
+                item.MoveHandles();
+            }
+        }
+
+        public static void NotchRight(double distance)
+        {
+            foreach (UIElement item in canvaselements.Values)
+            {
+                Canvas.SetLeft(item, (Canvas.GetLeft(item) + distance));
+
+                item.MoveHandles();
+            }
+        }
+
+        public static void NotchDown(double distance)
+        {
+            foreach (UIElement item in canvaselements.Values)
+            {
+                Canvas.SetTop(item, (Canvas.GetTop(item) + distance));
+
+                item.MoveHandles();
+            }
+        }
+
         public static void ShowHandles(this UIElement element, SectionCanvas canvas)
         {
             if (element.GetType() == typeof(ResizeHandle))
@@ -212,15 +252,44 @@ namespace REPORT.Builder.ReportComponents
 
             UIElement canvasElement = canvaselements[elementId];
 
+            ResizeHandle handle = (ResizeHandle)element;
+
             double width = canvasElement.GetPropertyValue("Width").ToDouble();
 
             double height = canvasElement.GetPropertyValue("Height").ToDouble();
 
             foreach (UIElement item in canvaselements.Values.Where(c => c.GetElementId() != elementId))
             {
-                item.SetPropertyValue("Width", width);
+                if (handle.ResizeHandleType == ResizeHandlesEnum.RightTop)
+                {
+                    double topOffset = item.GetPropertyValue("ActualHeight").ToDouble() - height;
+
+                    Canvas.SetTop(item, (Canvas.GetTop(item) + topOffset));
+                }
+                else if (handle.ResizeHandleType == ResizeHandlesEnum.LetfTop)
+                {
+                    double topOffset = item.GetPropertyValue("ActualHeight").ToDouble() - height;
+
+                    double leftOffset = item.GetPropertyValue("ActualWidth").ToDouble() - width;
+
+                    Canvas.SetTop(item, (Canvas.GetTop(item) + topOffset));
+
+                    Canvas.SetLeft(item, (Canvas.GetLeft(item) + leftOffset));
+                }
+                else if (handle.ResizeHandleType == ResizeHandlesEnum.LeftBottom)
+                {
+                    double leftOffset = item.GetPropertyValue("ActualWidth").ToDouble() - width;
+
+                    Canvas.SetLeft(item, (Canvas.GetLeft(item) + leftOffset));
+                }
+
+                    item.SetPropertyValue("Width", width);
 
                 item.SetPropertyValue("Height", height);
+
+                //Canvas.SetTop(item, (handleTop - HandleSize));
+
+                //Canvas.SetLeft(item, (handleLeft - HandleSize));
 
                 item.MoveHandles();
             }

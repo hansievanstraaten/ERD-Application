@@ -46,8 +46,6 @@ namespace REPORT.Builder
 
         private List<ReportSection> dataReportSections = new List<ReportSection>();
 
-        //private List<object> selectedReportObjects = new List<object>();
-
         #endregion
 
         public ReportDesigner(ReportMasterModel masterModel)
@@ -239,6 +237,42 @@ namespace REPORT.Builder
 
         #endregion
 
+        #region OVERRIDEs
+
+        protected override void OnPreviewKeyUp(KeyEventArgs e)
+        {
+            base.OnPreviewKeyUp(e);
+
+            switch(e.Key)
+            {
+                case Key.Up:
+
+                    ResizeHandles.NotchUp(1);
+
+                    break;
+
+                case Key.Down:
+
+                    ResizeHandles.NotchDown(1);
+
+                    break;
+
+                case Key.Left:
+
+                    ResizeHandles.NotchLeft(1);
+
+                    break;
+
+                case Key.Right:
+
+                    ResizeHandles.NotchRight(1);
+
+                    break;
+            }
+        }
+
+        #endregion
+
         #region EVENT HANDLERS
 
         private void ReportDesigner_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -338,18 +372,6 @@ namespace REPORT.Builder
                 MessageBox.Show(err.InnerExceptionMessage());
             }
         }
-
-        //private void ReportSectionWhereClause_Changed(object sender, int sectionGroupIndex)
-        //{
-        //    try
-        //    {
-        //        this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
-        //    }
-        //    catch (Exception err)
-        //    {
-        //        MessageBox.Show(err.InnerExceptionMessage());
-        //    }
-        //}
 
         private void NewDataSection_Requested(object sender, ReportColumnModel column, int sectionGroupIndex)
         {

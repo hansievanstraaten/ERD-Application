@@ -3,12 +3,11 @@ using REPORT.Builder.ReportTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Shapes;
+using ViSo.SharedEnums.ReportEnums;
+using WPF.Tools.Exstention;
 
 namespace REPORT.Builder.ReportComponents
 {
@@ -29,6 +28,14 @@ namespace REPORT.Builder.ReportComponents
         private static Dictionary<Guid, UIElement> canvaselements = new Dictionary<Guid, UIElement>();
 
         public static UIElement SelectedElement { get; set; }
+
+        public static int SelectedElementCount 
+        { 
+            get
+            {
+                return canvaselements.Count;
+            }
+        }
 
         public static Guid GetElementId(this UIElement element)
         {
@@ -99,7 +106,79 @@ namespace REPORT.Builder.ReportComponents
             }  
         }
 
-        public static void RemoveHandles(this UIElement element, SectionCanvas canvas)
+        public static void MoveObject(double canvasWidth, double canvasHeight, double elementLeft, double elementWidth, double elementTop, double elementHeigth)
+        {
+            if (canvasWidth > (elementLeft + elementWidth))
+            {
+                Canvas.SetLeft(ResizeHandles.SelectedElement, elementLeft);
+            }
+
+            if (canvasHeight > (elementTop + elementHeigth))
+            {
+                Canvas.SetTop(ResizeHandles.SelectedElement, elementTop);
+            }
+        }
+
+        public static void MoveObjects(double canvasWidth, 
+            double canvasHeight, 
+            double elementLeft, 
+            double elementWidth, 
+            double elementTop, 
+            double elementHeigth,
+            double offsetLeft,
+            double offsetTop
+            )
+        {
+            ResizeHandles.MoveObject(canvasWidth, canvasHeight, elementLeft, elementWidth, elementTop, elementHeigth);
+
+            ResizeHandles.SelectedElement.MoveHandles();
+
+            Guid elementId = SelectedElement.GetElementId();
+
+            foreach (UIElement item in canvaselements.Values)
+            {
+                if (elementId == item.GetElementId())
+                {
+                    continue;
+                }
+
+                SectionCanvas itemCanvas = item.FindParentControlBase(typeof(SectionCanvas)) as SectionCanvas;
+
+                double canvasItemWidth = ResizeHandles.SelectedElement.GetPropertyValue("ActualWidth").ToDouble();
+
+                double canvasItemHeigth = ResizeHandles.SelectedElement.GetPropertyValue("ActualHeight").ToDouble();
+
+                double canvasItemLeft = Canvas.GetLeft(item) + offsetLeft;
+
+                double canvasItemTop = Canvas.GetTop(item) + offsetTop;
+
+                if (canvasItemLeft <= 0 
+                    || canvasItemTop <= 0
+                    || (canvasItemLeft + canvasItemWidth) > itemCanvas.ActualWidth
+                    || (canvasItemTop + canvasItemHeigth) > itemCanvas.ActualHeight)
+                {
+                    continue;
+                }
+
+                Canvas.SetLeft(item, canvasItemLeft);
+
+                Canvas.SetTop(item, canvasItemTop);
+
+                item.MoveHandles();
+            }
+        }
+
+        public static void RemoveHandles()
+        {
+            foreach(UIElement element in canvaselements.Values)
+            {
+                element.RemoveHandles();
+            }
+
+            canvaselements.Clear();
+        }
+
+        public static void RemoveHandles(this UIElement element)
         {
             if (element == null || element.GetType() == typeof(ResizeHandle))
             {
@@ -108,7 +187,7 @@ namespace REPORT.Builder.ReportComponents
 
             Guid elementId = element.GetElementId();
 
-            canvaselements.Remove(elementId);
+            SectionCanvas canvas = element.FindParentControlBase(typeof(SectionCanvas)) as SectionCanvas;
 
             foreach (ResizeHandlesEnum item in Enum.GetValues(typeof(ResizeHandlesEnum)))
             {
@@ -122,6 +201,28 @@ namespace REPORT.Builder.ReportComponents
                 canvas.Children.Remove(elementHandles[key]);
 
                 elementHandles.Remove(key);
+            }
+        }
+
+        public static void ResizeElements(this UIElement element, double handleTop, double handleLeft)
+        {
+            Guid elementId = element.GetElementId();
+
+            element.ResizeElement(handleTop, handleLeft);
+
+            UIElement canvasElement = canvaselements[elementId];
+
+            double width = canvasElement.GetPropertyValue("Width").ToDouble();
+
+            double height = canvasElement.GetPropertyValue("Height").ToDouble();
+
+            foreach (UIElement item in canvaselements.Values.Where(c => c.GetElementId() != elementId))
+            {
+                item.SetPropertyValue("Width", width);
+
+                item.SetPropertyValue("Height", height);
+
+                item.MoveHandles();
             }
         }
 
@@ -228,6 +329,90 @@ namespace REPORT.Builder.ReportComponents
 
                         break;
                 }
+            }
+        }
+
+        public static void AlignmentObjects(ReportAlignmentEnum alignmentEnum)
+        {
+            if (canvaselements.Count == 0)
+            {
+                return;
+            }
+
+            switch (alignmentEnum)
+            {
+                //case ReportAlignmentEnum.AlignBottom:
+
+                //    double bottom = Canvas.GetBottom(this.selectedReportObjects.Values.First());
+
+                //    foreach(KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+                //    {
+                //        Canvas.SetBottom(itemKeyPair.Value, bottom);
+                //    }
+
+                //    break;
+
+                case ReportAlignmentEnum.AlignLeft:
+
+                    double left = Canvas.GetLeft(canvaselements.Values.First());
+
+                    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in canvaselements)
+                    {
+                        Canvas.SetLeft(itemKeyPair.Value, left);
+
+                        itemKeyPair.Value.MoveHandles();
+                    }
+
+                    break;
+
+                //case ReportAlignmentEnum.AlignRight:
+
+                //    double right = Canvas.GetRight(this.selectedReportObjects.Values.First());
+
+                //    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in this.selectedReportObjects)
+                //    {
+                //        Canvas.SetRight(itemKeyPair.Value, right);
+                //    }
+
+                //    break;
+
+                case ReportAlignmentEnum.AlignTop:
+
+                    double top = Canvas.GetTop(canvaselements.Values.First());
+
+                    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in canvaselements)
+                    {
+                        Canvas.SetTop(itemKeyPair.Value, top);
+                    }
+
+                    break;
+
+                case ReportAlignmentEnum.SameHeight:
+
+                    double heigh = canvaselements.Values.First().GetPropertyValue("ActualHeight").ToDouble();
+
+                    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in canvaselements)
+                    {
+                        itemKeyPair.Value.SetPropertyValue("Height", heigh);
+                    }
+
+                    break;
+
+                case ReportAlignmentEnum.SameWidth:
+
+                    double width = canvaselements.Values.First().GetPropertyValue("ActualWidth").ToDouble();
+
+                    foreach (KeyValuePair<Guid, UIElement> itemKeyPair in canvaselements)
+                    {
+                        itemKeyPair.Value.SetPropertyValue("Width", width);
+                    }
+
+                    break;
+            }
+
+            foreach (KeyValuePair<Guid, UIElement> itemKeyPair in canvaselements)
+            {
+                itemKeyPair.Value.MoveHandles();
             }
         }
 

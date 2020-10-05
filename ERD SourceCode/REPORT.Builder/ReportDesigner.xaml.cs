@@ -46,7 +46,7 @@ namespace REPORT.Builder
 
         private List<ReportSection> dataReportSections = new List<ReportSection>();
 
-        private List<object> selectedReportObjects = new List<object>();
+        //private List<object> selectedReportObjects = new List<object>();
 
         #endregion
 
@@ -264,11 +264,6 @@ namespace REPORT.Builder
 
                 int sectionIndex = sender.GetPropertyValue("SectionIndex").ToInt32();
 
-                foreach(ReportSection section in this.dataReportSections.Where(si => si.SectionIndex != sectionIndex))
-                {
-                    this.InvokeMethod(section, "RemoveElementHandles", new object[] { });
-                }
-
                 if (this.SelectedSectionGroupIndex > 0 && reportObject == null)
                 {
                     this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
@@ -317,9 +312,6 @@ namespace REPORT.Builder
 
                     this.uxCanvasSqlCaption.Visibility = Visibility.Collapsed;
                     
-                    // TODO: Remove Selected Heiglight from object
-                    //this.selectedReportObject.SetPropertyValue("ItemSelected", false);
-
                     this.selectedReportObject = null;
                 
                     this.selectedReportObject = reportObject as UIElement;
@@ -396,10 +388,11 @@ namespace REPORT.Builder
             try
             {
                 ContextMenu menu = new ContextMenu();
-                
-                if (KeyActions.IsCtrlPressed)
+
+                //if (KeyActions.IsCtrlPressed)
+                if (ResizeHandles.SelectedElementCount > 1)
                 {
-                    foreach(ReportAlignmentEnum alignment in Enum.GetValues(typeof(ReportAlignmentEnum)))
+                    foreach (ReportAlignmentEnum alignment in Enum.GetValues(typeof(ReportAlignmentEnum)))
                     {
                         MenuItem alignmentItem = new MenuItem { Header = alignment.GetDescriptionAttribute(), Tag = alignment };
 
@@ -408,14 +401,15 @@ namespace REPORT.Builder
                         menu.Items.Add(alignmentItem);
                     }
                 }
-                else
+
+                if (ResizeHandles.SelectedElementCount == 1)
                 {
                     MenuItem delete = new MenuItem { Name = "uxDelete", Header = "Delete Object" };
 
                     delete.Click += this.SelectedMenuItem_Click;
 
                     menu.Items.Add(delete);
-                }
+                }                
                     
                 menu.IsOpen = true;
             }
@@ -431,9 +425,9 @@ namespace REPORT.Builder
             {
                 MenuItem menu = (MenuItem)sender;
 
-                SectionCanvas canvas = (SectionCanvas)this.selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
+                ReportAlignmentEnum alignment = menu.Tag.To<ReportAlignmentEnum>();
 
-                canvas.AlignmentObjects(menu.Tag.To<ReportAlignmentEnum>());
+                ResizeHandles.AlignmentObjects(alignment);
             }
             catch (Exception err)
             {

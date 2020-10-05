@@ -238,11 +238,6 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        public void RemoveElementHandles()
-        {
-            this.uxSectionCanvas.RemoveElementHandles();
-        }
-
         public void RefresSectionTitle()
         {
             string sectionTitle = this.SectionType == SectionTypeEnum.TableData || this.SectionType == SectionTypeEnum.TableFooter || this.SectionType == SectionTypeEnum.TableHeader ?
@@ -252,11 +247,6 @@ namespace REPORT.Builder.ReportComponents
             this.uxSectionCaption.Content = sectionTitle;
 
             this.Title = sectionTitle;
-        }
-
-        public void AlignmentObjects(ReportAlignmentEnum alignmentEnum)
-        {
-            this.uxSectionCanvas.AlignmentObjects(alignmentEnum);
         }
 
         public void AddReportColumn(ReportColumnModel column)

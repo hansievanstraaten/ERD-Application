@@ -14,6 +14,10 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	private Int64? _CoverPage_Id;
 	private Int64? _HeaderAndFooterPage_Id;
 	private Int64? _FinalPage_Id;
+	private int? _PageMarginLeft;
+	private int? _PageMarginRight;
+	private int? _PageMarginTop;
+	private int? _PageMarginBottom;
 
 	/// <summary>
 	/// <para>Master Report ID</para>
@@ -165,6 +169,74 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		set
 		{
 			base.OnPropertyChanged("FinalPage_Id", ref this._FinalPage_Id, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Page Margin Left</para>
+	/// <para></para>
+	/// </summary>
+	public int? PageMarginLeft
+	{ 
+		get
+		{
+			return this._PageMarginLeft;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("PageMarginLeft", ref this._PageMarginLeft, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Page Margin Right</para>
+	/// <para></para>
+	/// </summary>
+	public int? PageMarginRight
+	{ 
+		get
+		{
+			return this._PageMarginRight;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("PageMarginRight", ref this._PageMarginRight, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Page Margin Top</para>
+	/// <para></para>
+	/// </summary>
+	public int? PageMarginTop
+	{ 
+		get
+		{
+			return this._PageMarginTop;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("PageMarginTop", ref this._PageMarginTop, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Page Margin Bottom</para>
+	/// <para></para>
+	/// </summary>
+	public int? PageMarginBottom
+	{ 
+		get
+		{
+			return this._PageMarginBottom;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("PageMarginBottom", ref this._PageMarginBottom, value);
 		}
 	}
 

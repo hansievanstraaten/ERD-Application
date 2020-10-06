@@ -85,7 +85,7 @@ namespace WPF.Tools.CommonControls
 
     public double StringRenderLength(string textValue)
     {
-      var formattedText = new FormattedText(
+      FormattedText formattedText = new FormattedText(
         textValue,
         CultureInfo.CurrentCulture,
         FlowDirection.LeftToRight,

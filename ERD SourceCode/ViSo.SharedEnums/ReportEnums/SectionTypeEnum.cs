@@ -4,6 +4,9 @@ namespace ViSo.SharedEnums.ReportEnums
 {
     public enum SectionTypeEnum
     {
+        [Description("None")]
+        None = 0,
+
         [Description("Header")]
         Header = 1,
 

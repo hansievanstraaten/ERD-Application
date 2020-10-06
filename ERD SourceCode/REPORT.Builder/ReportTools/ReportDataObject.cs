@@ -11,11 +11,12 @@ namespace REPORT.Builder.ReportTools
     public class ReportDataObject : LabelBase
     {
         private ReportColumnModel columnModel;
+
         private bool suppressed;
 
         public ReportDataObject()
         {
-            this.ColumnModel = new ReportColumnModel();
+            //this.ColumnModel = new ReportColumnModel();
 
             this.DataContext = this;
 
@@ -80,7 +81,7 @@ namespace REPORT.Builder.ReportTools
         {
             get
             {
-                return this.columnModel;
+                return this.columnModel == null ? new ReportColumnModel() : this.columnModel;
             }
 
             set

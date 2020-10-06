@@ -76,6 +76,7 @@
     <Compile Include="CommonControls\HorizontalGridSplit.cs" />
     <Compile Include="CommonControls\LableItem.cs" />
     <Compile Include="CommonControls\ScrollViewerPanable.cs" />
+    <Compile Include="CommonControls\TextBlockItem.cs" />
     <Compile Include="CommonControls\TextBoxItem.cs" />
     <Compile Include="CommonControls\TreeViewItemTool.cs" />
     <Compile Include="CommonControls\VerticalGridSplit.cs" />

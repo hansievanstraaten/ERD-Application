@@ -20,6 +20,10 @@ namespace REPORT.Data.SQLRepository.Mappings
 			Property(colCoverPage_Id =>  colCoverPage_Id.CoverPage_Id).HasColumnName("CoverPage_Id");
 			Property(colHeaderAndFooterPage_Id =>  colHeaderAndFooterPage_Id.HeaderAndFooterPage_Id).HasColumnName("HeaderAndFooterPage_Id");
 			Property(colFinalPage_Id =>  colFinalPage_Id.FinalPage_Id).HasColumnName("FinalPage_Id");
+			Property(colPageMarginLeft =>  colPageMarginLeft.PageMarginLeft).HasColumnName("PageMarginLeft");
+			Property(colPageMarginRight =>  colPageMarginRight.PageMarginRight).HasColumnName("PageMarginRight");
+			Property(colPageMarginTop =>  colPageMarginTop.PageMarginTop).HasColumnName("PageMarginTop");
+			Property(colPageMarginBottom =>  colPageMarginBottom.PageMarginBottom).HasColumnName("PageMarginBottom");
 
 		}
 	}

@@ -84,7 +84,11 @@ namespace REPORT.Builder
                 { 
                     ReportTypeEnum = (int)this.selectedreportType,
                     PaperKindEnum = (int)PaperKind.A4,
-                    PageOrientationEnum = (int)PageOrientationEnum.Portrait
+                    PageOrientationEnum = (int)PageOrientationEnum.Portrait,
+                    PageMarginTop = 100,
+                    PageMarginBottom = 100,
+                    PageMarginLeft = 100,
+                    PageMarginRight = 100
                 });
                 
                 if (ControlDialog.ShowDialog($"New {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized).IsFalse())

@@ -6,6 +6,7 @@ using REPORT.Builder.Printing;
 using REPORT.Builder.ReportComponents;
 using REPORT.Builder.ReportTools;
 using REPORT.Data.Models;
+using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace REPORT.Builder
     {
         #region FIELDS
 
-        private double markerMargin = 79;
+        //private double markerMargin = 79;
 
         private ReportTypeEnum reportDesignType;
 
@@ -97,8 +98,11 @@ namespace REPORT.Builder
                         section.RequestNewDataSections += this.NewDataSection_Requested;
 
                         section.ReportColumnAdded += this.ReportColumn_Added;
-
-                        //section.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
+                    }
+                    else if (this.reportDesignType == ReportTypeEnum.CoverPage 
+                        || this.reportDesignType == ReportTypeEnum.FinalPage)
+                    {
+                        section.RefreshPageStaticMarkers();
                     }
 
                     this.dataReportSections.Add(section);
@@ -107,7 +111,7 @@ namespace REPORT.Builder
 
             this.uxReportSections.MinWidth = this.CanvasWidth + 200;
 
-            this.AddMarginMarkers();
+            this.RefreshMarginMarkers();
 
             this.SetupDataReportsOptions();
 
@@ -185,21 +189,24 @@ namespace REPORT.Builder
 
                 DatabaseModel databaseModel = Connections.Instance.GetConnection(this.reportMaster.ProductionConnection);
 
-                ReportConnectionModel connection = new ReportConnectionModel
+                if (databaseModel != null)
                 {
-                    MasterReport_Id = this.ReportMaster.MasterReport_Id,
-                    ReportConnectionName = this.reportMaster.ProductionConnection,
-                    DatabaseTypeEnum = (int)databaseModel.DatabaseType,
-                    ServerName = databaseModel.ServerName,
-                    DatabaseName = databaseModel.DatabaseName,
-                    UserName = databaseModel.UserName,
-                    Password = databaseModel.Password.Encrypt(),
-                    TrustedConnection = databaseModel.TrustedConnection,
-                    IsProductionConnection = true,
-                    IsActive = true
-                };
-
-                repo.UpdateReportConnection(connection);
+                    ReportConnectionModel connection = new ReportConnectionModel
+                    {
+                        MasterReport_Id = this.ReportMaster.MasterReport_Id,
+                        ReportConnectionName = this.reportMaster.ProductionConnection,
+                        DatabaseTypeEnum = (int)databaseModel.DatabaseType,
+                        ServerName = databaseModel.ServerName,
+                        DatabaseName = databaseModel.DatabaseName,
+                        UserName = databaseModel.UserName,
+                        Password = databaseModel.Password.Encrypt(),
+                        TrustedConnection = databaseModel.TrustedConnection,
+                        IsProductionConnection = true,
+                        IsActive = true
+                    };
+                
+                    repo.UpdateReportConnection(connection);
+                }
 
                 #endregion
 
@@ -285,14 +292,6 @@ namespace REPORT.Builder
             try
             {
                 this.uxProperties.Items.Clear();
-
-                if (Keyboard.IsKeyDown(Key.LeftCtrl)
-                    || Keyboard.IsKeyDown(Key.RightCtrl)
-                    && reportObject != null)
-                {
-                    // Multi object select Option
-
-                }
 
                 this.SelectedSectionGroupIndex = sender.GetPropertyValue("SectionGroupIndex").ToInt32();
 
@@ -463,6 +462,8 @@ namespace REPORT.Builder
             {
                 SectionCanvas canvas = (SectionCanvas)this.selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
 
+                ResizeHandles.RemoveHandles();
+
                 canvas.Children.Remove(this.selectedReportObject);
 
                 this.selectedReportObject = null;
@@ -497,9 +498,32 @@ namespace REPORT.Builder
 
                         break;
 
+                    case "PageMarginLeft":
+                    case "PageMarginRight":
+
+                    case "PageMarginTop":
+                    case "PageMarginBottom":
+
+                        if (this.reportDesignType == ReportTypeEnum.ReportContent
+                            || this.reportDesignType == ReportTypeEnum.PageHeaderAndFooter)
+                        {
+                            break;
+                        }
+
+                        foreach(ReportSection section in this.uxReportSections.Children)
+                        {
+                            section.MarkerTopMargin = this.ReportMaster.PageMarginTop.ToInt32();
+
+                            section.MarkerBottomMargin = this.ReportMaster.PageMarginBottom.ToInt32();
+
+                            section.RefreshPageStaticMarkers();
+                        }
+
+                        break;
+
                 }
 
-                this.AddMarginMarkers();
+                this.RefreshMarginMarkers();
             }
             catch (Exception err)
             {
@@ -586,7 +610,7 @@ namespace REPORT.Builder
                     Tag = Connections.Instance.DefaultConnectionName
                 };
 
-                defaultItem.Click += this.ReportConnection_Cliked;
+                defaultItem.Click += this.ReportPrintConnection_Cliked;
 
                 menu.Items.Add(defaultItem);
 
@@ -598,7 +622,7 @@ namespace REPORT.Builder
                         Tag = connectionKey.Key 
                     };
 
-                    alternativeItem.Click += this.ReportConnection_Cliked;
+                    alternativeItem.Click += this.ReportPrintConnection_Cliked;
 
                     menu.Items.Add(alternativeItem);
                 }
@@ -611,17 +635,30 @@ namespace REPORT.Builder
             }
         }
 
-        private void ReportConnection_Cliked(object sender, RoutedEventArgs e)
+        private void ReportPrintConnection_Cliked(object sender, RoutedEventArgs e)
         {
             try
             {
+                if (this.uxReportMasterModel.HasValidationError)
+                {
+                    return;
+                }
+
+                BuildReportPDF reportPrint = new BuildReportPDF();
+
                 MenuItem item = (MenuItem)e.Source;
 
                 DatabaseModel connection = Connections.Instance.GetConnection(item.Tag.ParseToString());
 
                 BuildReportXML xmlBuild = new BuildReportXML();
 
-                XDocument repotXml = xmlBuild.GetReport(this.GetReportXml(), connection);
+                XDocument repotXml = xmlBuild.GetReport(this.GetReportXml(), connection, this.ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster);
+
+                reportPrint.PrintDocument(repotXml);
+
+                PrintPreview preview = new PrintPreview(reportPrint.Pages);
+
+                ControlDialog.ShowDialog("Reports", preview, string.Empty);
             }
             catch (Exception err)
             {
@@ -671,7 +708,9 @@ namespace REPORT.Builder
                         SectionType = SectionTypeEnum.Page,
                         IsDesignMode = true,
                         PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
+                        MarkerBottomMargin = 100,
+                        MarkerTopMargin = 100
                     }); ;
 
                     break;
@@ -691,7 +730,9 @@ namespace REPORT.Builder
                         SectionType = SectionTypeEnum.Header,
                         IsDesignMode = true,
                         PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
+                        MarkerBottomMargin = 100,
+                        MarkerTopMargin = 100
                     });
 
                     this.uxReportSections.Children.Add(new ReportSection 
@@ -701,7 +742,9 @@ namespace REPORT.Builder
                         SectionType = SectionTypeEnum.Footer,
                         IsDesignMode = true,
                         PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                        PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
+                        MarkerBottomMargin = 100,
+                        MarkerTopMargin = 100
                     });
 
                     break;
@@ -737,7 +780,7 @@ namespace REPORT.Builder
             this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Page Break", ToolType = typeof(ReportPageBreak) });
         }
 
-        private void AddMarginMarkers()
+        private void RefreshMarginMarkers()
         {
             double pageWidth = this.CanvasWidth;
 
@@ -745,9 +788,15 @@ namespace REPORT.Builder
 
             this.uxHorizontalRuler.Refresh(pageWidth, 25, this.CanvasHeight);
 
-            this.uxHorizontalRuler.AddMarker(this.markerMargin, true);
+            if (this.ReportMaster.PageMarginLeft.HasValue)
+            {
+                this.uxHorizontalRuler.AddMarker(this.ReportMaster.PageMarginLeft.Value, true);
+            }
 
-            this.uxHorizontalRuler.AddMarker((pageWidth - this.markerMargin), true);
+            if (this.ReportMaster.PageMarginRight.HasValue)
+            {
+                this.uxHorizontalRuler.AddMarker((pageWidth - this.ReportMaster.PageMarginRight.Value), true);
+            }
         }
 
         private void SetupDataReportsOptions()
@@ -903,7 +952,9 @@ namespace REPORT.Builder
                 SectionType = SectionTypeEnum.TableHeader,
                 IsDesignMode = true,
                 PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
+                MarkerBottomMargin = 100,
+                MarkerTopMargin = 100
             };
 
             this.uxReportSections.Children.Insert(sectionIndex[0], header);
@@ -917,7 +968,9 @@ namespace REPORT.Builder
                 SectionType = SectionTypeEnum.TableData,
                 IsDesignMode = true,
                 PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
+                MarkerBottomMargin = 100,
+                MarkerTopMargin = 100
             };
 
             this.uxReportSections.Children.Insert(sectionIndex[1], data);
@@ -931,7 +984,9 @@ namespace REPORT.Builder
                 SectionType = SectionTypeEnum.TableFooter,
                 IsDesignMode = true,
                 PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
-                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum
+                PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
+                MarkerBottomMargin = 100,
+                MarkerTopMargin = 100
             };
 
             this.uxReportSections.Children.Insert(sectionIndex[2], footer);
@@ -1009,8 +1064,6 @@ namespace REPORT.Builder
             return result;
         }
 
-        #endregion
-
-        
+        #endregion        
     }
 }

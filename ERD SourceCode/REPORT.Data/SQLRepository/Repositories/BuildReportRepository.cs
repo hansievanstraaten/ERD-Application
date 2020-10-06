@@ -31,7 +31,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 
             if (report == null)
             {
-                throw new ApplicationException("Report not found.");
+                return null;
             }
 
             string rawXml = report.BinaryXML.UnzipFile().ParseToString();
@@ -39,6 +39,13 @@ namespace REPORT.Data.SQLRepository.Repositories
             return XDocument.Parse(rawXml);
         }    
     
+        public ReportMaster GetReportMaster(long masterReport_Id)
+        {
+            return this.dataContext
+                .ReportsMaster
+                .FirstOrDefault(m => m.MasterReport_Id == masterReport_Id);
+        }
+
         public ReportConnection GetConnection(long masterReportId)
         {
             return this.dataContext

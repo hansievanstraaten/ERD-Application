@@ -17,15 +17,11 @@ namespace REPORT.Builder.ReportComponents
     /// </summary>
     public partial class ReportSection : UserControlBase
     {
-        //public delegate void ReportSectionWhereClauseChangedEvent(object sender, int sectionGroupIndex);
-
         public delegate void RequestNewDataSectionsEvent(object sender, ReportColumnModel column, int sectionGroupIndex);
 
         public delegate void ReportColumnAddedEvent(object sender, ReportColumnModel column, int sectionGroupIndex);
 
         public delegate void ReportObjectSelectedEvent(object sender, object reportObject);
-
-        //public event ReportSectionWhereClauseChangedEvent ReportSectionWhereClauseChanged;
 
         public event RequestNewDataSectionsEvent RequestNewDataSections;
 
@@ -33,7 +29,9 @@ namespace REPORT.Builder.ReportComponents
 
         public event ReportObjectSelectedEvent ReportObjectSelected;
 
-        private double markerMargin = 79;
+        private int markerTopMargin = 100;
+
+        private int markerBottomMargin = 100;
 
         private double canvasHeight;
 
@@ -65,6 +63,8 @@ namespace REPORT.Builder.ReportComponents
                 result.Add(new XAttribute("SectionGroupIndex", this.SectionGroupIndex));
                 result.Add(new XAttribute("CanvasHeight", this.uxMainGrid.RowDefinitions[1].Height.Value));
                 result.Add(new XAttribute("PageOrientation", this.PageOrientation));
+                result.Add(new XAttribute("MarkerTopMargin", this.MarkerTopMargin));
+                result.Add(new XAttribute("MarkerBottomMargin", this.MarkerBottomMargin));
 
                 result.Add(this.uxSectionCanvas.CanvasXml);
 
@@ -87,6 +87,32 @@ namespace REPORT.Builder.ReportComponents
         public int SectionIndex { get; set; }
 
         public int SectionGroupIndex { get; set; }
+
+        public int MarkerTopMargin
+        {
+            get
+            {
+                return this.markerTopMargin;
+            }
+
+            set
+            {
+                this.markerTopMargin = value;
+            }
+        }
+
+        public int MarkerBottomMargin
+        {
+            get
+            {
+                return this.markerBottomMargin;
+            }
+
+            set
+            {
+                this.markerBottomMargin = value;
+            }
+        }
 
         public double CanvasHeight
         {
@@ -238,6 +264,15 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
+        public void RefreshPageStaticMarkers()
+        {
+            this.uxVerticalRuler.ClearMarkers(true);
+
+            this.uxVerticalRuler.AddMarker(this.MarkerTopMargin.ToDouble(), true);
+
+            this.uxVerticalRuler.AddMarker((this.PageHeight - this.MarkerBottomMargin.ToDouble()), true);
+        }
+
         public void RefresSectionTitle()
         {
             string sectionTitle = this.SectionType == SectionTypeEnum.TableData || this.SectionType == SectionTypeEnum.TableFooter || this.SectionType == SectionTypeEnum.TableHeader ?
@@ -321,6 +356,8 @@ namespace REPORT.Builder.ReportComponents
         {
             this.PageSize = PageSetupOptions.GetPageMediaSize(this.PaperKind);
 
+            //var margins = PageSetupOptions.GetPageMargins(this.paperKind);
+
             this.uxSectionCanvas.Width = this.PageWidth;
 
             switch (this.SectionType)
@@ -354,16 +391,7 @@ namespace REPORT.Builder.ReportComponents
         {
             this.uxVerticalRuler.Refresh(25, heigh, traceLength + 25);
         }
-
-        private void RefreshPageStaticMarkers()
-        {
-            this.uxVerticalRuler.ClearMarkers(true);
-
-            this.uxVerticalRuler.AddMarker(this.markerMargin, true);
-
-            this.uxVerticalRuler.AddMarker((this.PageHeight - this.markerMargin), true);
-        }
-
+        
         public double PageHeight
         {
             get

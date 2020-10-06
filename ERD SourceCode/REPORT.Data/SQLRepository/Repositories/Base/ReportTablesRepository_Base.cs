@@ -241,6 +241,78 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
+		public List<ReportMasterModel> GetReportMasterByPageMarginLeft (int? PageMarginLeft)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.PageMarginLeft == PageMarginLeft)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByPageMarginRight (int? PageMarginRight)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.PageMarginRight == PageMarginRight)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByPageMarginTop (int? PageMarginTop)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.PageMarginTop == PageMarginTop)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByPageMarginBottom (int? PageMarginBottom)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.PageMarginBottom == PageMarginBottom)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
 		public List<ReportXMLModel> GetReportXMLByBinaryXML (byte[] BinaryXML)
 		{
 			List<ReportXML> result = this.dataContext

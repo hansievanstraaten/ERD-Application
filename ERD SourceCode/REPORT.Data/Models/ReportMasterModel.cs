@@ -28,12 +28,16 @@ namespace REPORT.Data.Models
 		private Int64? _CoverPage_Id;
 		private Int64? _HeaderAndFooterPage_Id;
 		private Int64? _FinalPage_Id;
+		private int? _PageMarginLeft;
+		private int? _PageMarginRight;
+		private int? _PageMarginTop;
+		private int? _PageMarginBottom;
 
-        /// <summary>
-        /// <para>Master Report ID</para>
-        /// <para>Master Report ID</para>
-        /// </summary>
-        public Int64 MasterReport_Id
+		/// <summary>
+		/// <para>Master Report ID</para>
+		/// <para>Master Report ID</para>
+		/// </summary>
+		public Int64 MasterReport_Id
 		{
 			get
 			{
@@ -260,7 +264,7 @@ namespace REPORT.Data.Models
 			}
 		}
 
-		[FieldInformation("Production Connection", IsVisible = false, IsRequired = true, Sort = 10)]
+		[FieldInformation("Production Connection", IsVisible = false, Sort = 10)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("ProductionConnectionValues")]
 		public string ProductionConnection
@@ -277,6 +281,79 @@ namespace REPORT.Data.Models
 				base.OnPropertyChanged(() => this.ProductionConnection);
             }
         }
+
+		/// <summary>
+		/// <para>Page Margin Left</para>
+		/// <para></para>
+		/// </summary>
+
+		[FieldInformation("Page Left Margin", Sort = 11)]
+		public int? PageMarginLeft
+		{
+			get
+			{
+				return this._PageMarginLeft;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("PageMarginLeft", ref this._PageMarginLeft, value);
+			}
+		}
+
+		[FieldInformation("Page Right Margin", Sort = 12)]
+		/// <summary>
+		/// <para>Page Margin Right</para>
+		/// <para></para>
+		/// </summary>
+		public int? PageMarginRight
+		{
+			get
+			{
+				return this._PageMarginRight;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("PageMarginRight", ref this._PageMarginRight, value);
+			}
+		}
+
+		[FieldInformation("Page Top Margin", Sort = 13)]
+		/// <summary>
+		/// <para>Page Margin Top</para>
+		/// <para></para>
+		/// </summary>
+		public int? PageMarginTop
+		{
+			get
+			{
+				return this._PageMarginTop;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("PageMarginTop", ref this._PageMarginTop, value);
+			}
+		}
+
+		[FieldInformation("Page Bottom Margin", Sort = 14)]
+		/// <summary>
+		/// <para>Page Margin Bottom</para>
+		/// <para></para>
+		/// </summary>
+		public int? PageMarginBottom
+		{
+			get
+			{
+				return this._PageMarginBottom;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("PageMarginBottom", ref this._PageMarginBottom, value);
+			}
+		}
 
 		public DataItemModel[] ProductionConnectionValues
         {

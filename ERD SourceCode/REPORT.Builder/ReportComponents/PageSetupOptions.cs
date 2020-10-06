@@ -25,6 +25,17 @@ namespace REPORT.Builder.ReportComponents
             return result;
         }
 
+        //internal static Margins GetPageMargins(PaperKind paperKind)
+        //{
+        //    PaperSize pageSize = GetPaperSize(paperKind);
+
+        //    PrintDocument document = new PrintDocument();
+
+        //    document.DefaultPageSettings.PaperSize = pageSize;
+
+        //    return document.DefaultPageSettings.Margins;
+        //}
+
         public static double ConvertPaperSizeToCm(int distance)
         {
             // PaperSize is defined in 1/100th inch. To convert to any other unit you must apply a factor.

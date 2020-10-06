@@ -70,7 +70,13 @@
     <Compile Include="DatasourceSelector.xaml.cs">
       <DependentUpon>DatasourceSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Printing\BuildReportPDF.cs" />
+    <Compile Include="Printing\XmlHelper.cs" />
     <Compile Include="Printing\BuildReportXML.cs" />
+    <Compile Include="Printing\PrintCanvas.cs" />
+    <Compile Include="Printing\PrintPreview.xaml.cs">
+      <DependentUpon>PrintPreview.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -136,6 +142,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="DatasourceSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Printing\PrintPreview.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

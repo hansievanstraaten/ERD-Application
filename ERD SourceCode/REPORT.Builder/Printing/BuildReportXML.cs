@@ -39,12 +39,19 @@ namespace REPORT.Builder.Printing
 
         private Dictionary<string, string> executingValues = new Dictionary<string, string>();
 
-        public XDocument GetReport(XDocument xmlReport, DatabaseModel connection)
+        public XDocument GetReport(XDocument xmlReport, DatabaseModel connection, ReportMaster reportMaster)
         {
+            if (this.repo == null)
+            {
+                this.repo = new BuildReportRepository();
+            }
+
             this.dataAccessConnection = connection;
 
             string reportTypeValue = xmlReport.Root.Element("ReportSettings").Attribute("ReportTypeEnum").Value;
 
+            #region BUILD REPORT DATA
+            
             ReportTypeEnum reportType = (ReportTypeEnum)reportTypeValue.ToInt32();
 
             if (reportType == ReportTypeEnum.ReportContent)
@@ -67,6 +74,57 @@ namespace REPORT.Builder.Printing
                 xmlReport.Root.Add(dataNode);
             }
 
+            #endregion
+
+            #region PAGE OPTIONS
+
+            if (reportMaster.FinalPage_Id.HasValue)
+            {
+                XDocument finalPage = this.repo.GetReportXml(reportMaster.FinalPage_Id.Value);
+
+                if (finalPage != null)
+                {
+                    xmlReport.Root.AddFirst(finalPage.Root.Elements());
+                }
+            }
+
+            if (reportMaster.HeaderAndFooterPage_Id.HasValue)
+            {
+                XDocument headerAndFooterPage = this.repo.GetReportXml(reportMaster.HeaderAndFooterPage_Id.Value);
+
+                if (headerAndFooterPage != null)
+                {
+                    xmlReport.Root.AddFirst(headerAndFooterPage.Root.Elements());
+                }
+            }
+
+            if (reportMaster.CoverPage_Id.HasValue)
+            {
+                XDocument coverPage = this.repo.GetReportXml(reportMaster.CoverPage_Id.Value);
+
+                if (coverPage != null)
+                {
+                    xmlReport.Root.AddFirst(coverPage.Root.Elements());
+                }
+            }
+
+            #endregion
+
+            #region PAGE SETUP
+
+            XElement pageSetup = new XElement("PageSetup");
+
+            pageSetup.Add(new XAttribute("PaperKindEnum", reportMaster.PaperKindEnum));
+            pageSetup.Add(new XAttribute("PageOrientationEnum", reportMaster.PageOrientationEnum));
+            pageSetup.Add(new XAttribute("PageMarginBottom", reportMaster.PageMarginBottom));
+            pageSetup.Add(new XAttribute("PageMarginLeft", reportMaster.PageMarginLeft));
+            pageSetup.Add(new XAttribute("PageMarginRight", reportMaster.PageMarginRight));
+            pageSetup.Add(new XAttribute("PageMarginTop", reportMaster.PageMarginTop));
+
+            xmlReport.Root.AddFirst(pageSetup);
+
+            #endregion
+
             return xmlReport;
         }
 
@@ -78,7 +136,9 @@ namespace REPORT.Builder.Printing
 
             XDocument result = this.repo.GetReportXml(this.masterReport_Id);
 
-            return this.GetReport(result, null);
+            ReportMaster reportMaster = this.repo.GetReportMaster(this.masterReport_Id);
+
+            return this.GetReport(result, null, reportMaster);
         }
 
         private void BuildReportData(XElement dataNode)
@@ -89,7 +149,7 @@ namespace REPORT.Builder.Printing
 
             string sectionTableName = this.indexSqlManager[this.sectionIndex].TableName;
 
-            XElement sectionData = new XElement(sectionTableName);
+            //XElement sectionData = new XElement(sectionTableName);
 
             foreach (XElement row in data.Root.Elements())
             {
@@ -104,10 +164,10 @@ namespace REPORT.Builder.Printing
                     this.SetPreviousSextion();
                 }
                 
-                sectionData.Add(row);
+                dataNode.Add(row);
             }
 
-            dataNode.Add(sectionData);
+            //dataNode.Add(sectionData);
         }
 
         public string FormatSQL(string sql)

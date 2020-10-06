@@ -16,7 +16,7 @@ using WPF.Tools.ToolModels;
 namespace REPORT.Builder.ReportTools
 {
     [ModelName("Label")]
-    public class LabelBase : TextBlock
+    public class LabelBase : TextBlockItem
     {
         public LabelBase()
         {

@@ -289,6 +289,8 @@ namespace REPORT.Builder.ReportTools
         {
             this.ReportLine = new System.Windows.Shapes.Line();
 
+            this.ReportLine.VerticalAlignment = VerticalAlignment.Bottom;
+
             this.StrokeThickness = 2;
 
             this.Stroke = Colors.Black;
@@ -320,6 +322,10 @@ namespace REPORT.Builder.ReportTools
             this.X2 = this.LineLength;
 
             this.Y2 = 0;
+
+            //this.VerticalContentAlignment = VerticalAlignment.Center;
+
+            //this.VerticalAlignment = VerticalAlignment.Center;
         }
 
         private void SetVertical()
@@ -327,6 +333,10 @@ namespace REPORT.Builder.ReportTools
             this.X2 = 0;
 
             this.Y2 = this.LineLength;
+
+            //this.HorizontalContentAlignment = HorizontalAlignment.Center;
+
+            //this.HorizontalAlignment = HorizontalAlignment.Center;
         }
     }
 }

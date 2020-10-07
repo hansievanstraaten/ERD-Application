@@ -37,11 +37,7 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        public static Guid GetElementId(this UIElement element)
-        {
-            return Guid.Parse(element.GetPropertyValue("ElemntId").ParseToString());
-        }
-
+        
         public static void NotchLeft(double distance)
         {
             foreach (UIElement item in canvaselements.Values)
@@ -80,70 +76,6 @@ namespace REPORT.Builder.ReportComponents
 
                 item.MoveHandles();
             }
-        }
-
-        public static void ShowHandles(this UIElement element, SectionCanvas canvas)
-        {
-            if (element.GetType() == typeof(ResizeHandle))
-            {
-                return;
-            }
-
-            Guid elementId = element.GetElementId();
-
-            if (HaveHandles(elementId))
-            {
-                return;
-            }
-
-            canvaselements.Add(elementId, element);
-
-            CreateHandles(elementId);
-
-            SetBounds(element);
-                        
-            foreach (KeyValuePair<KeyValuePair<Guid, ResizeHandlesEnum>, ResizeHandle> hanle in elementHandles
-                .Where(k => k.Key.Key == elementId &&
-                            k.Key.Value != ResizeHandlesEnum.None))
-            {
-                switch(hanle.Key.Value)
-                {
-                    case ResizeHandlesEnum.LeftBottom:
-                        
-                        Canvas.SetTop(hanle.Value, bottom);
-
-                        Canvas.SetLeft(hanle.Value, left);
-
-
-                        break;
-
-                    case ResizeHandlesEnum.LetfTop:
-
-                        Canvas.SetTop(hanle.Value, top);
-
-                        Canvas.SetLeft(hanle.Value, left);
-
-                        break;
-
-                    case ResizeHandlesEnum.RightBottom:
-
-                        Canvas.SetTop(hanle.Value, bottom);
-
-                        Canvas.SetLeft(hanle.Value, right);
-
-                        break;
-
-                    case ResizeHandlesEnum.RightTop:
-
-                        Canvas.SetTop(hanle.Value, top);
-
-                        Canvas.SetLeft(hanle.Value, right);
-
-                        break;
-                }
-
-                canvas.Children.Add(hanle.Value);
-            }  
         }
 
         public static void MoveObject(double canvasWidth, double canvasHeight, double elementLeft, double elementWidth, double elementTop, double elementHeigth)
@@ -244,6 +176,117 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
+        public static void ShowHandles(this UIElement element, SectionCanvas canvas)
+        {
+            if (element.GetType() == typeof(ResizeHandle))
+            {
+                return;
+            }
+
+            Guid elementId = element.GetElementId();
+
+            if (HaveHandles(elementId))
+            {
+                return;
+            }
+
+            canvaselements.Add(elementId, element);
+
+            CreateHandles(elementId);
+
+            SetBounds(element);
+                        
+            foreach (KeyValuePair<KeyValuePair<Guid, ResizeHandlesEnum>, ResizeHandle> hanle in elementHandles
+                .Where(k => k.Key.Key == elementId &&
+                            k.Key.Value != ResizeHandlesEnum.None))
+            {
+                switch(hanle.Key.Value)
+                {
+                    case ResizeHandlesEnum.LeftBottom:
+                        
+                        Canvas.SetTop(hanle.Value, bottom);
+
+                        Canvas.SetLeft(hanle.Value, left);
+
+
+                        break;
+
+                    case ResizeHandlesEnum.LetfTop:
+
+                        Canvas.SetTop(hanle.Value, top);
+
+                        Canvas.SetLeft(hanle.Value, left);
+
+                        break;
+
+                    case ResizeHandlesEnum.RightBottom:
+
+                        Canvas.SetTop(hanle.Value, bottom);
+
+                        Canvas.SetLeft(hanle.Value, right);
+
+                        break;
+
+                    case ResizeHandlesEnum.RightTop:
+
+                        Canvas.SetTop(hanle.Value, top);
+
+                        Canvas.SetLeft(hanle.Value, right);
+
+                        break;
+                }
+
+                canvas.Children.Add(hanle.Value);
+            }  
+        }
+
+        public static void MoveHandles(this UIElement element, ResizeHandlesEnum except = ResizeHandlesEnum.None)
+        {
+            SetBounds(element);
+
+            Guid elementId = element.GetElementId();
+
+            foreach (KeyValuePair<KeyValuePair<Guid, ResizeHandlesEnum>, ResizeHandle> hanle in elementHandles
+                .Where(k => k.Key.Key == elementId && k.Key.Value != except))
+            {
+                switch (hanle.Key.Value)
+                {
+                    case ResizeHandlesEnum.LeftBottom:
+
+                        Canvas.SetTop(hanle.Value, bottom);
+
+                        Canvas.SetLeft(hanle.Value, left);
+
+
+                        break;
+
+                    case ResizeHandlesEnum.LetfTop:
+
+                        Canvas.SetTop(hanle.Value, top);
+
+                        Canvas.SetLeft(hanle.Value, left);
+
+                        break;
+
+                    case ResizeHandlesEnum.RightBottom:
+
+                        Canvas.SetTop(hanle.Value, bottom);
+
+                        Canvas.SetLeft(hanle.Value, right);
+
+                        break;
+
+                    case ResizeHandlesEnum.RightTop:
+
+                        Canvas.SetTop(hanle.Value, top);
+
+                        Canvas.SetLeft(hanle.Value, right);
+
+                        break;
+                }
+            }
+        }
+
         public static void ResizeElements(this UIElement element, double handleTop, double handleLeft)
         {
             Guid elementId = element.GetElementId();
@@ -308,97 +351,144 @@ namespace REPORT.Builder.ReportComponents
 
             SetBounds(canvasElement);
 
-            switch (handle.ResizeHandleType)
+            if (canvasElement.GetType().BaseType == typeof(ReportLineBase))
             {
-                case ResizeHandlesEnum.LeftBottom:
+                //double strokeThicknes = canvasElement.GetPropertyValue("StrokeThickness").ToDouble();
 
-                    canvasElement.SetPropertyValue("Height", CalculateBottomHeight(handleTop));
-
-                    canvasElement.SetPropertyValue("Width", CalculateLeftWidth(handleLeft));
-
-                    Canvas.SetLeft(canvasElement, (handleLeft + HandleSize));
-
-                    break;
-
-                case ResizeHandlesEnum.LetfTop:
-
-                    canvasElement.SetPropertyValue("Height", CalculateTopHeight(handleTop));
-
-                    Canvas.SetTop(canvasElement, (handleTop + HandleSize));
-
-                    canvasElement.SetPropertyValue("Width", CalculateLeftWidth(handleLeft));
-
-                    Canvas.SetLeft(canvasElement, (handleLeft + HandleSize));
-
-                    break;
-
-                case ResizeHandlesEnum.RightBottom:
-
-                    canvasElement.SetPropertyValue("Height", CalculateBottomHeight(handleTop));
-
-                    canvasElement.SetPropertyValue("Width", CalculateRightWidth(handleLeft));
-
-                    break;
-
-                case ResizeHandlesEnum.RightTop:
-
-                    canvasElement.SetPropertyValue("Height", CalculateTopHeight(handleTop));
-
-                    Canvas.SetTop(canvasElement, (handleTop + HandleSize));
-
-                    canvasElement.SetPropertyValue("Width", CalculateRightWidth(handleLeft));
-
-                    break;
-            }
-
-            MoveHandles(canvasElement, handle.ResizeHandleType);
-        }
-
-        public static void MoveHandles(this UIElement element, ResizeHandlesEnum except = ResizeHandlesEnum.None)
-        {
-            SetBounds(element);
-
-            Guid elementId = element.GetElementId();
-
-            foreach (KeyValuePair<KeyValuePair<Guid, ResizeHandlesEnum>, ResizeHandle> hanle in elementHandles
-                .Where(k => k.Key.Key == elementId && k.Key.Value != except))
-            {
-                switch (hanle.Key.Value)
+                switch (handle.ResizeHandleType)
                 {
                     case ResizeHandlesEnum.LeftBottom:
 
-                        Canvas.SetTop(hanle.Value, bottom);
+                        canvasElement.SetPropertyValue("StrokeThickness", CalculateBottomHeight(handleTop));
 
-                        Canvas.SetLeft(hanle.Value, left);
+                        canvasElement.SetPropertyValue("Height", CalculateBottomHeight(handleTop));
 
+                        canvasElement.SetPropertyValue("Width", CalculateLeftWidth(handleLeft));
+
+                        canvasElement.SetPropertyValue("LineLength", CalculateLeftWidth(handleLeft));
+
+                        Canvas.SetLeft(canvasElement, (handleLeft + HandleSize));
 
                         break;
 
                     case ResizeHandlesEnum.LetfTop:
 
-                        Canvas.SetTop(hanle.Value, top);
+                        double leftTophicknes = (bottom - handleTop) - HandleSize;
 
-                        Canvas.SetLeft(hanle.Value, left);
+                        if (leftTophicknes < 1)
+                        {
+                            leftTophicknes = 1;
+                        }
+
+                        canvasElement.SetPropertyValue("StrokeThickness", leftTophicknes);
+
+                        Canvas.SetTop(canvasElement, (handleTop + HandleSize));
+
+                        canvasElement.SetPropertyValue("Height", leftTophicknes);
+
+                        canvasElement.SetPropertyValue("Width", CalculateLeftWidth(handleLeft));
+
+                        canvasElement.SetPropertyValue("LineLength", CalculateLeftWidth(handleLeft));
+
+                        Canvas.SetLeft(canvasElement, (handleLeft + HandleSize));
 
                         break;
 
                     case ResizeHandlesEnum.RightBottom:
 
-                        Canvas.SetTop(hanle.Value, bottom);
+                        canvasElement.SetPropertyValue("StrokeThickness", CalculateBottomHeight(handleTop));
 
-                        Canvas.SetLeft(hanle.Value, right);
+                        canvasElement.SetPropertyValue("Height", CalculateBottomHeight(handleTop));
+
+                        canvasElement.SetPropertyValue("Width", CalculateRightWidth(handleLeft));
+
+                        canvasElement.SetPropertyValue("LineLength", CalculateRightWidth(handleLeft));
 
                         break;
 
                     case ResizeHandlesEnum.RightTop:
 
-                        Canvas.SetTop(hanle.Value, top);
+                        double rightTopThicknes = (bottom - handleTop) - HandleSize;
 
-                        Canvas.SetLeft(hanle.Value, right);
+                        if (rightTopThicknes < 1)
+                        {
+                            rightTopThicknes = 1;
+                        }
+
+                        canvasElement.SetPropertyValue("StrokeThickness", rightTopThicknes);
+
+                        Canvas.SetTop(canvasElement, (handleTop + HandleSize));
+
+                        canvasElement.SetPropertyValue("Height", rightTopThicknes);
+
+                        canvasElement.SetPropertyValue("Width", CalculateRightWidth(handleLeft));
+
+                        canvasElement.SetPropertyValue("LineLength", CalculateRightWidth(handleLeft));
 
                         break;
                 }
             }
+            else
+            {
+                switch (handle.ResizeHandleType)
+                {
+                    case ResizeHandlesEnum.LeftBottom:
+
+                        canvasElement.SetPropertyValue("Height", CalculateBottomHeight(handleTop));
+
+                        canvasElement.SetPropertyValue("Width", CalculateLeftWidth(handleLeft));
+
+                        Canvas.SetLeft(canvasElement, (handleLeft + HandleSize));
+
+                        break;
+
+                    case ResizeHandlesEnum.LetfTop:
+
+                        canvasElement.SetPropertyValue("Height", CalculateTopHeight(handleTop));
+
+                        Canvas.SetTop(canvasElement, (handleTop + HandleSize));
+
+                        canvasElement.SetPropertyValue("Width", CalculateLeftWidth(handleLeft));
+
+                        Canvas.SetLeft(canvasElement, (handleLeft + HandleSize));
+
+                        break;
+
+                    case ResizeHandlesEnum.RightBottom:
+
+                        canvasElement.SetPropertyValue("Height", CalculateBottomHeight(handleTop));
+
+                        canvasElement.SetPropertyValue("Width", CalculateRightWidth(handleLeft));
+
+                        break;
+
+                    case ResizeHandlesEnum.RightTop:
+
+                        canvasElement.SetPropertyValue("Height", CalculateTopHeight(handleTop));
+
+                        Canvas.SetTop(canvasElement, (handleTop + HandleSize));
+
+                        canvasElement.SetPropertyValue("Width", CalculateRightWidth(handleLeft));
+
+                        break;
+                }
+            }
+
+            MoveHandles(canvasElement, handle.ResizeHandleType);
+        }
+
+        public static Guid GetElementId(this UIElement element)
+        {
+            return Guid.Parse(element.GetPropertyValue("ElemntId").ParseToString());
+        }
+                
+        public static void RemoveElement(UIElement element)
+        {
+            Guid elementId = element.GetElementId();
+
+            element.RemoveHandles();
+
+            canvaselements.Remove(elementId);
         }
 
         public static void AlignmentObjects(ReportAlignmentEnum alignmentEnum)
@@ -534,7 +624,7 @@ namespace REPORT.Builder.ReportComponents
         }
 
         private static void SetBounds(UIElement element)
-        {
+        {            
             top = Canvas.GetTop(element) - HandleSize;
 
             left = Canvas.GetLeft(element) - HandleSize;

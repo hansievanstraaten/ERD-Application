@@ -408,7 +408,7 @@ namespace GeneralExtensions
             catch
             {
                 // DO NOTHING: This may be because the property was not initialized and is NULL
-                throw;
+                //throw;
             }
         }
 

@@ -12,21 +12,6 @@ namespace REPORT.Builder.ReportTools
             base.IsHorizontal = true;
 
             base.LineLength = 2;
-
-            //this.ActualWidth
-        }
-
-        new public double ActualHeight
-        {
-            get
-            {
-                return base.StrokeThickness;
-            }
-
-            set
-            {
-                base.StrokeThickness = value;
-            }
         }
 
         new public XElement ItemXml

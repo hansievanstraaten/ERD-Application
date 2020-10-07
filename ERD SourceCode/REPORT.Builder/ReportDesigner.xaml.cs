@@ -35,8 +35,6 @@ namespace REPORT.Builder
     {
         #region FIELDS
 
-        //private double markerMargin = 79;
-
         private ReportTypeEnum reportDesignType;
 
         private ReportMasterModel reportMaster;
@@ -462,8 +460,8 @@ namespace REPORT.Builder
             {
                 SectionCanvas canvas = (SectionCanvas)this.selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
 
-                ResizeHandles.RemoveHandles();
-
+                ResizeHandles.RemoveElement(this.selectedReportObject);
+                
                 canvas.Children.Remove(this.selectedReportObject);
 
                 this.selectedReportObject = null;

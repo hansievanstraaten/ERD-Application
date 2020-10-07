@@ -13,7 +13,8 @@ namespace WPF.Tools.ModelViewer
     ComboBox = 3,
     DatePicker = 4,
     EnumBox = 5,
-    SecureString = 6
+    SecureString = 6,
+    ColorBox = 7
   }
 
   public static class ModelItemType

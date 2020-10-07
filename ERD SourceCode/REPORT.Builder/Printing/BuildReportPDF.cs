@@ -7,6 +7,7 @@ using System.Drawing.Printing;
 using System.Linq;
 using System.Printing;
 using System.Windows;
+using System.Windows.Documents;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
 
@@ -98,13 +99,20 @@ namespace REPORT.Builder.Printing
 
                 this.reportData = report.Root.Element("ReportData");
 
-                foreach(XElement row in this.reportData.Elements())
+                this.SetSectionHeader(0);
+
+                foreach (XElement table in this.reportData.Elements())
                 {
-                    this.BuildReportData(row);
+                    foreach (XElement row in table.Elements())
+                    {
+                        this.BuildReportData(row);
+                    }
                 }
+
+                this.SetSectionFooter(0);
             }
 
-            if (this.activeCanvas != null)
+            if (this.activeCanvas != null && this.activeCanvas.HaveElements)
             {
                 this.AddCanvas(this.activeCanvas);
             }
@@ -185,11 +193,7 @@ namespace REPORT.Builder.Printing
             { 
                 Width =  this.PageWidth, 
                 Height = this.PageHeight,
-                Margin = new Thickness(5),
-                //HeaderHeight = this.PageHeaderHeight,
-                //FooterHeight = this.PageFooterHeight,
-                //TopMargin = this.pageMarginTop,
-                //BottomMargin = this.pageMarginBottom
+                Margin = new Thickness(5)
             };
 
             foreach(XElement item in canvasXml.GetReportObjects())
@@ -229,11 +233,14 @@ namespace REPORT.Builder.Printing
 
         private void CompleteDataPageCanvas()
         {
-            XElement footerCanvas = this.pageFooter.GetCanvasXml();
-
-            foreach(XElement item in footerCanvas.GetReportObjects())
+            if (this.pageFooter != null)
             {
-                this.activeCanvas.AddPageFooterObject(item);
+                XElement footerCanvas = this.pageFooter.GetCanvasXml();
+
+                foreach (XElement item in footerCanvas.GetReportObjects())
+                {
+                    this.activeCanvas.AddPageFooterObject(item);
+                }
             }
 
             this.AddCanvas(this.activeCanvas);
@@ -250,40 +257,57 @@ namespace REPORT.Builder.Printing
 
         #region BUILD REPORT DATA SECTION
 
+        private void SetSectionHeader(int groupIndex)
+        {
+            XElement sectionHeader = this.GetReportSection(SectionTypeEnum.TableHeader, groupIndex);
+
+            this.AddObjectModels(sectionHeader, null);
+        }
+
+        private void SetSectionFooter(int groupIndex)
+        {
+            XElement sectionFooter = this.GetReportSection(SectionTypeEnum.TableFooter, groupIndex);
+
+            this.AddObjectModels(sectionFooter, null);
+        }
+
         private void BuildReportData(XElement row)
         {
             int sectionIndex = row.GetRowSectionIndex();
 
             XElement dataSection = this.dataSections[sectionIndex];
 
-            int groupIndex = dataSection.GetSectionGroupIndex();
-
-            XElement sectionHeader = this.GetReportSection(SectionTypeEnum.TableHeader, groupIndex);
-
-            XElement sectionFooter = this.GetReportSection(SectionTypeEnum.TableFooter, groupIndex);
-
-            this.AddObjectModels(sectionHeader, null);
-
             this.AddObjectModels(dataSection, row);
 
             if (row.Elements().Any(e => e.HasElements))
             {
-                foreach(XElement child in row.Elements().Where(ch => ch.HasElements))
-                {
-                    this.BuildReportData(child);
-                }
-            }
+                int groupIndex = dataSection.GetSectionGroupIndex();
 
-            this.AddObjectModels(sectionFooter, null);
+                this.SetSectionHeader((groupIndex + 1));
+
+                foreach (XElement childtable in row.Elements().Where(ch => ch.HasElements))
+                {
+                    foreach (XElement childRow in childtable.Elements())
+                    {
+                        this.BuildReportData(childRow);
+                    }
+                }
+
+                this.SetSectionFooter((groupIndex + 1));
+            }
         }
 
         private void AddObjectModels(XElement sectionElement, XElement row)
         {
+            double minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble() + this.activeCanvas.TopOffset; ;
+
             XElement canvas = sectionElement.GetCanvasXml();
 
             List<XElement> reportObjects = canvas.GetReportObjects();
 
             double lowestBottom = this.activeCanvas.TopOffset;
+
+            bool isReset = false;
 
             foreach (XElement item in reportObjects)
             {
@@ -297,24 +321,44 @@ namespace REPORT.Builder.Printing
 
                     dataItem.Add(new XAttribute("Text", dataValue.Value));
 
-                    lowestBottom = this.AddObectModel(dataItem, lowestBottom);
+                    lowestBottom = this.AddObectModel(dataItem, lowestBottom, out isReset);
                 }
                 else
                 {
-                    lowestBottom = this.AddObectModel(item, lowestBottom);
+                    lowestBottom = this.AddObectModel(item, lowestBottom, out isReset);
                 }
             }
 
-
-
-            this.activeCanvas.TopOffset = lowestBottom;
+            if (isReset)
+            {
+                this.activeCanvas.TopOffset = lowestBottom;
+            }
+            else
+            {
+                this.activeCanvas.TopOffset = minBottom > lowestBottom ? minBottom : lowestBottom;
+            }
         }
 
-        private double AddObectModel(XElement item, double lowestBottom)
+        private double AddObectModel(XElement item, double lowestBottom, out bool reset)
         {
             double result = lowestBottom;
 
+            reset = false;
+
             double elementBottom = 0;
+
+            if (item.IsPageBreak())
+            {
+                result = 0;
+
+                this.CompleteDataPageCanvas();
+
+                this.CreateDataPageCanvas();
+
+                reset = true;
+
+                return result;
+            }
 
             bool canAdd = this.activeCanvas.AddObject(item, SectionTypeEnum.TableData, out elementBottom);
 
@@ -333,7 +377,9 @@ namespace REPORT.Builder.Printing
                 
                 this.CreateDataPageCanvas();
 
-                this.AddObectModel(item, result);
+                result = this.AddObectModel(item, result, out reset);
+
+                reset = true;
             }
 
             return result;

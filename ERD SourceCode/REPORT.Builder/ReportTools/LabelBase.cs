@@ -96,6 +96,8 @@ namespace REPORT.Builder.ReportTools
         }
 
         [FieldInformation("Background", Sort = 103)]
+        [ItemTypeAttribute(ModelItemTypeEnum.ColorBox)]
+        [BrowseButtonAttribute("Background", "Pick Color", "Browse")]
         new public Brush Background
         {
             get
@@ -110,6 +112,8 @@ namespace REPORT.Builder.ReportTools
         }
 
         [FieldInformation("Foreground", Sort = 104)]
+        [ItemTypeAttribute(ModelItemTypeEnum.ColorBox)]
+        [BrowseButtonAttribute("Foreground", "Pick Color", "Browse")]
         new public Brush Foreground
         {
             get

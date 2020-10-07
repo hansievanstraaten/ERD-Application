@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Linq;
 using WPF.Tools.Attributes;
+using WPF.Tools.ModelViewer;
 
 namespace REPORT.Builder.ReportTools
 {
@@ -114,6 +115,8 @@ namespace REPORT.Builder.ReportTools
         }
 
         [FieldInformation("Border Brush", Sort = 4)]
+        [ItemTypeAttribute(ModelItemTypeEnum.ColorBox)]
+        [BrowseButtonAttribute("BorderBrush", "Pick Color", "Browse")]
         new public Brush BorderBrush
         {
             get
@@ -128,6 +131,8 @@ namespace REPORT.Builder.ReportTools
         }
 
         [FieldInformation("Background", Sort = 5)]
+        [ItemTypeAttribute(ModelItemTypeEnum.ColorBox)]
+        [BrowseButtonAttribute("Background", "Pick Color", "Browse")]
         new public Brush Background
         {
             get

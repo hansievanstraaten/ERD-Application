@@ -21,6 +21,7 @@ using ViSo.Dialogs.Controls;
 using ViSo.Dialogs.TextEditor;
 using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.BaseClasses;
+using WPF.Tools.ColoutPicker;
 using WPF.Tools.Exstention;
 using WPF.Tools.Functions;
 using WPF.Tools.ToolModels;
@@ -564,6 +565,19 @@ namespace REPORT.Builder
                         }
 
                         this.selectedReportObject.SetPropertyValue("ImagePath", dlg.FileName);
+
+                        break;
+
+                    default:
+
+                        ColourPicker picker = new ColourPicker();
+
+                        if (picker.ShowDialog().IsFalse())
+                        {
+                            return;
+                        }
+
+                        this.selectedReportObject.SetPropertyValue(buttonKey, picker.SelectedColour);
 
                         break;
                 }

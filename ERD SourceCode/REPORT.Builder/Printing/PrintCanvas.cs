@@ -16,6 +16,8 @@ namespace REPORT.Builder.Printing
             this.Background = System.Windows.Media.Brushes.White;
         }
 
+        public bool HaveElements { get; private set; }
+
         public double HeaderHeight { get; set; }
 
         public double FooterHeight { get; set; }
@@ -73,7 +75,7 @@ namespace REPORT.Builder.Printing
 
             if (sectionType != SectionTypeEnum.Page)
             {
-                if ((itemHeight + this.TopOffset + this.TopMargin) > this.BottomOffset)
+                if ((itemHeight + this.TopOffset) > this.BottomOffset)
                 {
                     elementBottom = 0;
 
@@ -83,11 +85,13 @@ namespace REPORT.Builder.Printing
 
             Canvas.SetLeft(element, element.GetPropertyValue("Left").ToDouble());
 
-            Canvas.SetTop(element, (element.GetPropertyValue("Top").ToDouble() + TopOffset));
+            Canvas.SetTop(element, (element.GetPropertyValue("Top").ToDouble() + this.TopOffset));
 
             this.Children.Add(element);
 
             elementBottom = Canvas.GetTop(element) + itemHeight;
+
+            this.HaveElements = true;
 
             return true;
         }

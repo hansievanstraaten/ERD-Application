@@ -1,5 +1,6 @@
 ﻿using GeneralExtensions;
 using System;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -7,12 +8,13 @@ using System.Windows.Shapes;
 using System.Xml.Linq;
 using WPF.Tools.Attributes;
 using WPF.Tools.Mesurements;
+using WPF.Tools.ModelViewer;
 
 namespace REPORT.Builder.ReportTools
 {
     public class ReportLineBase : ContentControl // Label
     {
-        private Color stroke;
+        private System.Windows.Media.Brush stroke;
 
         private bool isHorizontal = true;
 
@@ -87,7 +89,9 @@ namespace REPORT.Builder.ReportTools
         }
 
         [FieldInformationAttribute("Stroke", Sort = 1)]
-        public Color Stroke
+        [ItemTypeAttribute(ModelItemTypeEnum.ColorBox)]
+        [BrowseButtonAttribute("Stroke", "Pick Color", "Browse")]
+        public System.Windows.Media.Brush Stroke
         {
             get
             {
@@ -98,7 +102,7 @@ namespace REPORT.Builder.ReportTools
             {
                 this.stroke = value;
 
-                this.ReportLine.Stroke = new SolidColorBrush(value);
+                this.ReportLine.Stroke = value;
             }
         }
 
@@ -267,7 +271,7 @@ namespace REPORT.Builder.ReportTools
 
             set
             {
-                Canvas.SetTop(this, value);
+                Canvas.SetTop(this, (value < 0 ? 0 : value));
             }
         }
 
@@ -293,7 +297,7 @@ namespace REPORT.Builder.ReportTools
 
             this.StrokeThickness = 2;
 
-            this.Stroke = Colors.Black;
+            this.Stroke = System.Windows.Media.Brushes.Black; // Colors.Black;
 
             this.X1 = 0;
 
@@ -312,9 +316,9 @@ namespace REPORT.Builder.ReportTools
         {
             ReportLineBase line = (ReportLineBase)d;
 
-            Color col = (Color)e.NewValue;
+            System.Windows.Media.Brush col = (System.Windows.Media.Brush)e.NewValue;
 
-            line.ReportLine.Stroke = new SolidColorBrush(col);
+            line.ReportLine.Stroke = col;
         }
 
         private void SetHorizontal()

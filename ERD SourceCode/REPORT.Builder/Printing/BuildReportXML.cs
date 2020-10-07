@@ -78,7 +78,7 @@ namespace REPORT.Builder.Printing
 
             #region PAGE OPTIONS
 
-            if (reportMaster.FinalPage_Id.HasValue)
+            if (reportMaster.FinalPage_Id.HasValue && reportMaster.FinalPage_Id.Value > 0)
             {
                 XDocument finalPage = this.repo.GetReportXml(reportMaster.FinalPage_Id.Value);
 
@@ -88,7 +88,7 @@ namespace REPORT.Builder.Printing
                 }
             }
 
-            if (reportMaster.HeaderAndFooterPage_Id.HasValue)
+            if (reportMaster.HeaderAndFooterPage_Id.HasValue && reportMaster.HeaderAndFooterPage_Id.Value > 0)
             {
                 XDocument headerAndFooterPage = this.repo.GetReportXml(reportMaster.HeaderAndFooterPage_Id.Value);
 
@@ -98,7 +98,7 @@ namespace REPORT.Builder.Printing
                 }
             }
 
-            if (reportMaster.CoverPage_Id.HasValue)
+            if (reportMaster.CoverPage_Id.HasValue && reportMaster.CoverPage_Id.Value > 0)
             {
                 XDocument coverPage = this.repo.GetReportXml(reportMaster.CoverPage_Id.Value);
 
@@ -125,6 +125,8 @@ namespace REPORT.Builder.Printing
 
             #endregion
 
+            this.repo.UpdateXmlPrinteCount(reportMaster.MasterReport_Id);
+
             return xmlReport;
         }
 
@@ -149,7 +151,8 @@ namespace REPORT.Builder.Printing
 
             string sectionTableName = this.indexSqlManager[this.sectionIndex].TableName;
 
-            //XElement sectionData = new XElement(sectionTableName);
+            XElement sectionData = new XElement(sectionTableName);
+                
 
             foreach (XElement row in data.Root.Elements())
             {
@@ -163,11 +166,11 @@ namespace REPORT.Builder.Printing
                 
                     this.SetPreviousSextion();
                 }
-                
-                dataNode.Add(row);
+
+                sectionData.Add(row);
             }
 
-            //dataNode.Add(sectionData);
+            dataNode.Add(sectionData);
         }
 
         public string FormatSQL(string sql)

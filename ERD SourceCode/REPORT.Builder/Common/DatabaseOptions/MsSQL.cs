@@ -24,13 +24,13 @@ namespace REPORT.Builder.Common.DatabaseOptions
             {
                 ReportColumnModel column = columns[x];
 
-                if (x == 0)
-                {
-                    result.AppendLine($"[{column.ColumnName}], ");
-                }
-                else if (x == columns.Length -1)
+                if (x == columns.Length -1)
                 {
                     result.AppendLine($"             [{column.ColumnName}] ");
+                }
+                else if (x == 0)
+                {
+                    result.AppendLine($"[{column.ColumnName}], ");
                 }
                 else
                 {

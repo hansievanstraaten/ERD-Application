@@ -8,12 +8,15 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.Exstention;
+using WPF.Tools.Mesurements;
 
 namespace REPORT.Builder.ReportComponents
 {
     public static class ResizeHandles
     {
         public static readonly double HandleSize = 10;
+
+        private static double minSizeParameter = 10;
 
         private static double top;
 
@@ -353,7 +356,7 @@ namespace REPORT.Builder.ReportComponents
 
             if (canvasElement.GetType().BaseType == typeof(ReportLineBase))
             {
-                //double strokeThicknes = canvasElement.GetPropertyValue("StrokeThickness").ToDouble();
+                minSizeParameter = 1;
 
                 switch (handle.ResizeHandleType)
                 {
@@ -365,7 +368,7 @@ namespace REPORT.Builder.ReportComponents
 
                         canvasElement.SetPropertyValue("Width", CalculateLeftWidth(handleLeft));
 
-                        canvasElement.SetPropertyValue("LineLength", CalculateLeftWidth(handleLeft));
+                        canvasElement.SetPropertyValue("LineLength", DistanceConverter.ConvertPixelToCm(CalculateLeftWidth(handleLeft)));
 
                         Canvas.SetLeft(canvasElement, (handleLeft + HandleSize));
 
@@ -388,7 +391,7 @@ namespace REPORT.Builder.ReportComponents
 
                         canvasElement.SetPropertyValue("Width", CalculateLeftWidth(handleLeft));
 
-                        canvasElement.SetPropertyValue("LineLength", CalculateLeftWidth(handleLeft));
+                        canvasElement.SetPropertyValue("LineLength", DistanceConverter.ConvertPixelToCm(CalculateLeftWidth(handleLeft)));
 
                         Canvas.SetLeft(canvasElement, (handleLeft + HandleSize));
 
@@ -402,7 +405,7 @@ namespace REPORT.Builder.ReportComponents
 
                         canvasElement.SetPropertyValue("Width", CalculateRightWidth(handleLeft));
 
-                        canvasElement.SetPropertyValue("LineLength", CalculateRightWidth(handleLeft));
+                        canvasElement.SetPropertyValue("LineLength", DistanceConverter.ConvertPixelToCm(CalculateRightWidth(handleLeft)));
 
                         break;
 
@@ -423,13 +426,15 @@ namespace REPORT.Builder.ReportComponents
 
                         canvasElement.SetPropertyValue("Width", CalculateRightWidth(handleLeft));
 
-                        canvasElement.SetPropertyValue("LineLength", CalculateRightWidth(handleLeft));
+                        canvasElement.SetPropertyValue("LineLength", DistanceConverter.ConvertPixelToCm(CalculateRightWidth(handleLeft)));
 
                         break;
                 }
             }
             else
             {
+                minSizeParameter = 10;
+
                 switch (handle.ResizeHandleType)
                 {
                     case ResizeHandlesEnum.LeftBottom:
@@ -579,9 +584,9 @@ namespace REPORT.Builder.ReportComponents
         {
             double width = (right - left) + (handleLeft - right) - HandleSize;
 
-            if (width < 10)
+            if (width < minSizeParameter)
             {
-                return 10;
+                return minSizeParameter;
             }
 
             return width;
@@ -591,9 +596,9 @@ namespace REPORT.Builder.ReportComponents
         {
             double width = (right - handleLeft) - HandleSize;
 
-            if (width < 10)
+            if (width < minSizeParameter)
             {
-                return 10;
+                return minSizeParameter;
             }
 
             return width;
@@ -603,9 +608,9 @@ namespace REPORT.Builder.ReportComponents
         {
             double height = (bottom - handleTop) - HandleSize;
 
-            if (height < 10)
+            if (height < minSizeParameter)
             {
-                return 10;
+                return minSizeParameter;
             }
 
             return height;
@@ -615,9 +620,9 @@ namespace REPORT.Builder.ReportComponents
         {
             double height = (bottom - top) + (handleTop - bottom) - HandleSize;
 
-            if (height < 10)
+            if (height < minSizeParameter)
             {
-                return 10;
+                return minSizeParameter;
             }
 
             return height;

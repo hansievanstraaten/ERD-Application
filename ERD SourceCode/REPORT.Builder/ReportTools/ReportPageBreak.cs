@@ -14,7 +14,7 @@ namespace REPORT.Builder.ReportTools
 
             base.LineLength = 16;
 
-            base.Stroke = Colors.DarkGray;
+            base.Stroke = Brushes.DarkGray;
 
             base.StrokeThickness = 4;
 
@@ -54,7 +54,7 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
-        new public Color Stroke
+        new public Brush Stroke
         {
             get
             {

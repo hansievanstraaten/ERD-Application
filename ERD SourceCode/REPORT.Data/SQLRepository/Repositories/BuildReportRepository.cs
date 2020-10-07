@@ -17,6 +17,32 @@ namespace REPORT.Data.SQLRepository.Repositories
             this.dataContext = new ReportsBuildContext();
         }
 
+        public void UpdateXmlPrinteCount(long masterReport_Id)
+        {
+            ReportXML exists = this.dataContext
+                .ReportsXML
+                .FirstOrDefault(e => e.MasterReport_Id == masterReport_Id);
+
+            if (exists == null)
+            {
+                return;
+            }
+
+            int reportXMLVersion = this.dataContext
+            .ReportsXML
+            .Where(r => r.MasterReport_Id == masterReport_Id)
+            .Max(m => m.ReportXMLVersion);
+
+            ReportXML report = this.dataContext
+                .ReportsXML
+                .FirstOrDefault(xml => xml.MasterReport_Id == masterReport_Id
+                       && xml.ReportXMLVersion == reportXMLVersion);
+
+            ++report.PrintCount;
+
+            this.dataContext.SaveChanges();
+        }
+
         public XDocument GetReportXml(long masterReport_Id)
         {
             int reportXMLVersion = this.dataContext

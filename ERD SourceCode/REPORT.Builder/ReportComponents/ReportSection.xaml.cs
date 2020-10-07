@@ -65,6 +65,7 @@ namespace REPORT.Builder.ReportComponents
                 result.Add(new XAttribute("PageOrientation", this.PageOrientation));
                 result.Add(new XAttribute("MarkerTopMargin", this.MarkerTopMargin));
                 result.Add(new XAttribute("MarkerBottomMargin", this.MarkerBottomMargin));
+                result.Add(new XAttribute("SectionTableName", this.SectionTableName));
 
                 result.Add(this.uxSectionCanvas.CanvasXml);
 

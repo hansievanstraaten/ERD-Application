@@ -15,6 +15,11 @@ namespace REPORT.Builder.Printing
             return reportObject.Attribute("ObjectType").Value == "ReportDataObject";
         }
 
+        internal static bool IsPageBreak(this XElement reportObject)
+        {
+            return reportObject.Attribute("ObjectType").Value == "ReportPageBreak";
+        }
+
         internal static int GetRowSectionIndex(this XElement row)
         {
             return row.Attribute("SectionIndex").Value.ToInt32();

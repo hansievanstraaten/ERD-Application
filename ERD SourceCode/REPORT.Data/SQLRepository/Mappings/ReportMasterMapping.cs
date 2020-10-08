@@ -24,6 +24,7 @@ namespace REPORT.Data.SQLRepository.Mappings
 			Property(colPageMarginRight =>  colPageMarginRight.PageMarginRight).HasColumnName("PageMarginRight");
 			Property(colPageMarginTop =>  colPageMarginTop.PageMarginTop).HasColumnName("PageMarginTop");
 			Property(colPageMarginBottom =>  colPageMarginBottom.PageMarginBottom).HasColumnName("PageMarginBottom");
+			Property(colProjectName =>  colProjectName.ProjectName).HasColumnName("ProjectName");
 
 		}
 	}

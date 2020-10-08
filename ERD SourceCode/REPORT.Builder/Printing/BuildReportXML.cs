@@ -7,6 +7,7 @@ using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure.Interception;
 using System.Linq;
 using System.Security.Policy;
 using System.Windows;
@@ -18,7 +19,7 @@ namespace REPORT.Builder.Printing
     public class BuildReportXML
     {
         private int sectionIndex = 0;
-
+        
         private int maxDataSectionIndex;
 
         private long masterReport_Id;
@@ -39,6 +40,8 @@ namespace REPORT.Builder.Printing
 
         private Dictionary<string, string> executingValues = new Dictionary<string, string>();
 
+        private Dictionary<int, List<int>> foreignGroupIndexes = new Dictionary<int, List<int>>();
+
         public XDocument GetReport(XDocument xmlReport, DatabaseModel connection, ReportMaster reportMaster)
         {
             if (this.repo == null)
@@ -56,7 +59,7 @@ namespace REPORT.Builder.Printing
 
             if (reportType == ReportTypeEnum.ReportContent)
             {
-                this.OpenDataAccess();
+                this.CreateConnectionObject();
 
                 XElement dataNode = new XElement("ReportData");
 
@@ -64,6 +67,13 @@ namespace REPORT.Builder.Printing
                     .Descendants("ReportSection")
                     .Where(st => st.Attribute("SectionType").Value == "5") // SectionTypeEnum.TableData
                     .ToDictionary(d => d.Attribute("SectionIndex").Value.ToInt32());
+
+                foreach(KeyValuePair<int,XElement> keyPair in this.dataSections)
+                {
+                    List<int> keyIndexex = keyPair.Value.GetSectionForeignGroupIndexes();
+
+                    this.foreignGroupIndexes.Add(keyPair.Value.GetSectionGroupIndex(), keyIndexex);
+                }
 
                 this.maxDataSectionIndex = this.dataSections.Max(k => k.Key);
 
@@ -322,7 +332,7 @@ namespace REPORT.Builder.Printing
             this.indexSqlManager.Add(this.sectionIndex, sqlManager);
         }
     
-        private void OpenDataAccess()
+        private void CreateConnectionObject()
         {
             if (this.dataAccessConnection == null)
             {

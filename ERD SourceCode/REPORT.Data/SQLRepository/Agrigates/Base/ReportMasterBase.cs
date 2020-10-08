@@ -9,15 +9,16 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	private string _ReportName;
 	private byte[] _Description;
 	private int _ReportTypeEnum;
-	private int? _PaperKindEnum;
+	private int _PaperKindEnum;
 	private int _PageOrientationEnum;
 	private Int64? _CoverPage_Id;
 	private Int64? _HeaderAndFooterPage_Id;
 	private Int64? _FinalPage_Id;
-	private int? _PageMarginLeft;
-	private int? _PageMarginRight;
-	private int? _PageMarginTop;
-	private int? _PageMarginBottom;
+	private int _PageMarginLeft;
+	private int _PageMarginRight;
+	private int _PageMarginTop;
+	private int _PageMarginBottom;
+	private string _ProjectName;
 
 	/// <summary>
 	/// <para>Master Report ID</para>
@@ -91,7 +92,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	/// <para>PaperKind</para>
 	/// <para></para>
 	/// </summary>
-	public int? PaperKindEnum
+	public int PaperKindEnum
 	{ 
 		get
 		{
@@ -176,7 +177,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	/// <para>Page Margin Left</para>
 	/// <para></para>
 	/// </summary>
-	public int? PageMarginLeft
+	public int PageMarginLeft
 	{ 
 		get
 		{
@@ -193,7 +194,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	/// <para>Page Margin Right</para>
 	/// <para></para>
 	/// </summary>
-	public int? PageMarginRight
+	public int PageMarginRight
 	{ 
 		get
 		{
@@ -210,7 +211,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	/// <para>Page Margin Top</para>
 	/// <para></para>
 	/// </summary>
-	public int? PageMarginTop
+	public int PageMarginTop
 	{ 
 		get
 		{
@@ -227,7 +228,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	/// <para>Page Margin Bottom</para>
 	/// <para></para>
 	/// </summary>
-	public int? PageMarginBottom
+	public int PageMarginBottom
 	{ 
 		get
 		{
@@ -237,6 +238,23 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		set
 		{
 			base.OnPropertyChanged("PageMarginBottom", ref this._PageMarginBottom, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Project Name</para>
+	/// <para></para>
+	/// </summary>
+	public string ProjectName
+	{ 
+		get
+		{
+			return this._ProjectName;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("ProjectName", ref this._ProjectName, value);
 		}
 	}
 

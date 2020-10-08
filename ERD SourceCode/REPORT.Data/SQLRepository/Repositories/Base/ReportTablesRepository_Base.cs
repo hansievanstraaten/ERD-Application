@@ -151,7 +151,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
-		public List<ReportMasterModel> GetReportMasterByPaperKindEnum (int? PaperKindEnum)
+		public List<ReportMasterModel> GetReportMasterByPaperKindEnum (int PaperKindEnum)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
@@ -241,7 +241,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
-		public List<ReportMasterModel> GetReportMasterByPageMarginLeft (int? PageMarginLeft)
+		public List<ReportMasterModel> GetReportMasterByPageMarginLeft (int PageMarginLeft)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
@@ -259,7 +259,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
-		public List<ReportMasterModel> GetReportMasterByPageMarginRight (int? PageMarginRight)
+		public List<ReportMasterModel> GetReportMasterByPageMarginRight (int PageMarginRight)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
@@ -277,7 +277,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
-		public List<ReportMasterModel> GetReportMasterByPageMarginTop (int? PageMarginTop)
+		public List<ReportMasterModel> GetReportMasterByPageMarginTop (int PageMarginTop)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
@@ -295,11 +295,29 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
 		
-		public List<ReportMasterModel> GetReportMasterByPageMarginBottom (int? PageMarginBottom)
+		public List<ReportMasterModel> GetReportMasterByPageMarginBottom (int PageMarginBottom)
 		{
 			List<ReportMaster> result = this.dataContext
 				.ReportsMaster
 				.Where(fk => fk.PageMarginBottom == PageMarginBottom)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
+		
+		public List<ReportMasterModel> GetReportMasterByProjectName (string ProjectName)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.ProjectName == ProjectName)
 				.ToList();
 
 			if (result.Count == 0)

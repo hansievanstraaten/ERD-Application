@@ -72,7 +72,7 @@ namespace REPORT.Builder
             {
                 ReportTablesRepository repo = new ReportTablesRepository();
 
-                this.ReportMaster.ReportXMLVersion = repo.GetReportXMLVersion(masterModel.MasterReport_Id);
+                //this.ReportMaster.ReportXMLVersion = repo.GetReportXMLVersion(masterModel.MasterReport_Id);
 
                 ReportXMLModel reportXML = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, masterModel.MasterReport_Id);
 
@@ -280,6 +280,20 @@ namespace REPORT.Builder
         #endregion
 
         #region EVENT HANDLERS
+
+        private void ReportSave_Cliked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                this.Save();
+
+                MessageBox.Show("Report Saved");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
 
         private void ReportDesigner_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -799,16 +813,10 @@ namespace REPORT.Builder
             this.uxHorizontalRuler.ClearMarkers(true);
 
             this.uxHorizontalRuler.Refresh(pageWidth, 25, this.CanvasHeight);
-
-            if (this.ReportMaster.PageMarginLeft.HasValue)
-            {
-                this.uxHorizontalRuler.AddMarker(this.ReportMaster.PageMarginLeft.Value, true);
-            }
-
-            if (this.ReportMaster.PageMarginRight.HasValue)
-            {
-                this.uxHorizontalRuler.AddMarker((pageWidth - this.ReportMaster.PageMarginRight.Value), true);
-            }
+                
+            this.uxHorizontalRuler.AddMarker(this.ReportMaster.PageMarginLeft, true);
+                
+            this.uxHorizontalRuler.AddMarker((pageWidth - this.ReportMaster.PageMarginRight), true);
         }
 
         private void SetupDataReportsOptions()
@@ -1076,6 +1084,8 @@ namespace REPORT.Builder
             return result;
         }
 
-        #endregion        
+        #endregion
+
+        
     }
 }

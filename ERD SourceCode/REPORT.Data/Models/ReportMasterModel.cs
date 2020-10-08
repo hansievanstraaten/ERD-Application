@@ -18,26 +18,28 @@ namespace REPORT.Data.Models
 	{
 		private Int64 _MasterReport_Id;
 		private string _ReportName;
-		private string _DescriptionText;
-        private string productionConnection;
 		private byte[] _Description;
 		private int _ReportTypeEnum;
-		private int _ReportXMLVersion;
 		private int _PaperKindEnum;
 		private int _PageOrientationEnum;
 		private Int64? _CoverPage_Id;
 		private Int64? _HeaderAndFooterPage_Id;
 		private Int64? _FinalPage_Id;
-		private int? _PageMarginLeft;
-		private int? _PageMarginRight;
-		private int? _PageMarginTop;
-		private int? _PageMarginBottom;
+		private int _PageMarginLeft;
+		private int _PageMarginRight;
+		private int _PageMarginTop;
+		private int _PageMarginBottom;
+		private string _ProjectName;
+        private string productionConnection;
+        private string _DescriptionText;
+        private int _ReportXMLVersion;
 
-		/// <summary>
-		/// <para>Master Report ID</para>
-		/// <para>Master Report ID</para>
-		/// </summary>
-		public Int64 MasterReport_Id
+
+        /// <summary>
+        /// <para>Master Report ID</para>
+        /// <para>Master Report ID</para>
+        /// </summary>
+        public Int64 MasterReport_Id
 		{
 			get
 			{
@@ -288,7 +290,7 @@ namespace REPORT.Data.Models
 		/// </summary>
 
 		[FieldInformation("Page Left Margin", Sort = 11)]
-		public int? PageMarginLeft
+		public int PageMarginLeft
 		{
 			get
 			{
@@ -306,7 +308,7 @@ namespace REPORT.Data.Models
 		/// <para>Page Margin Right</para>
 		/// <para></para>
 		/// </summary>
-		public int? PageMarginRight
+		public int PageMarginRight
 		{
 			get
 			{
@@ -324,7 +326,7 @@ namespace REPORT.Data.Models
 		/// <para>Page Margin Top</para>
 		/// <para></para>
 		/// </summary>
-		public int? PageMarginTop
+		public int PageMarginTop
 		{
 			get
 			{
@@ -342,7 +344,7 @@ namespace REPORT.Data.Models
 		/// <para>Page Margin Bottom</para>
 		/// <para></para>
 		/// </summary>
-		public int? PageMarginBottom
+		public int PageMarginBottom
 		{
 			get
 			{
@@ -352,6 +354,23 @@ namespace REPORT.Data.Models
 			set
 			{
 				base.OnPropertyChanged("PageMarginBottom", ref this._PageMarginBottom, value);
+			}
+		}
+
+		/// <summary>
+		/// <para>Project Name</para>
+		/// <para></para>
+		/// </summary>
+		public string ProjectName
+		{
+			get
+			{
+				return this._ProjectName;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("ProjectName", ref this._ProjectName, value);
 			}
 		}
 

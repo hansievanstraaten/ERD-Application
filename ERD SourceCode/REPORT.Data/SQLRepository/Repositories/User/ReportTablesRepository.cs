@@ -58,5 +58,31 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.CopyToObject(new ReportConnectionModel()) as ReportConnectionModel;
 		}
+
+		new public List<ReportMasterModel> GetReportMasterByReportTypeEnum(int ReportTypeEnum)
+		{
+			List<ReportMaster> agrigates = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.ReportTypeEnum == ReportTypeEnum)
+				.ToList();
+
+			if (agrigates.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+
+			List<object> objectList = agrigates.CopyToObject(typeof(ReportMasterModel));
+
+			List<ReportMasterModel> result = objectList.TryCast<ReportMasterModel>().ToList();
+
+			foreach (ReportMasterModel item in result)
+			{
+				item.ReportXMLVersion = this.GetReportXMLVersion(item.MasterReport_Id);
+
+			}
+
+			return result;
+		}
 	}
 }

@@ -48,7 +48,7 @@
                 <MenuItem x:Name="uxMenuBuildSetup" Header="Script Builder Setup" Click="ScriptBuildSetup_Click" />
                 <MenuItem x:Name="uxMenuBuildRun" Header="Run Script Builder" Click="ScriptBuildRun_Click" />
             </MenuItem>
-            <MenuItem x:Name="uxMenuReport" IsEnabled="False" Header="Report Builder">
+            <MenuItem x:Name="uxMenuReport" IsEnabled="False" Header="Report Builder (Preview)">
                 <MenuItem Header="Setup" Click="ReportSystemSetup_Click" />
                 <MenuItem Header="Select Report" Click="SelectReport_Click" />
             </MenuItem>

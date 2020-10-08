@@ -114,7 +114,7 @@ namespace REPORT.Builder.Printing
 
             if (this.activeCanvas != null && this.activeCanvas.HaveElements)
             {
-                this.AddCanvas(this.activeCanvas);
+                this.CompleteDataPageCanvas();
             }
 
             #endregion
@@ -299,7 +299,7 @@ namespace REPORT.Builder.Printing
 
         private void AddObjectModels(XElement sectionElement, XElement row)
         {
-            double minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble() + this.activeCanvas.TopOffset; ;
+            double minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble() + this.activeCanvas.TopOffset;
 
             XElement canvas = sectionElement.GetCanvasXml();
 
@@ -327,16 +327,24 @@ namespace REPORT.Builder.Printing
                 {
                     lowestBottom = this.AddObectModel(item, lowestBottom, out isReset);
                 }
+                
+                if (isReset)
+                {
+                    minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble() + this.activeCanvas.TopOffset;
+                }
             }
 
-            if (isReset)
-            {
-                this.activeCanvas.TopOffset = lowestBottom;
-            }
-            else
-            {
-                this.activeCanvas.TopOffset = minBottom > lowestBottom ? minBottom : lowestBottom;
-            }
+            //if (isReset)
+            //{
+            //    this.activeCanvas.TopOffset = lowestBottom;
+            //}
+            //else
+            //{
+            //    //double minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble();
+
+            //}
+                
+            this.activeCanvas.TopOffset = minBottom > lowestBottom ? minBottom : lowestBottom;
         }
 
         private double AddObectModel(XElement item, double lowestBottom, out bool reset)

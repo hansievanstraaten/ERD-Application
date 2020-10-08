@@ -1,4 +1,5 @@
-﻿using GeneralExtensions;
+﻿using ERD.Common;
+using GeneralExtensions;
 using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
@@ -29,20 +30,32 @@ namespace REPORT.Builder
 
             this.selectedreportType = reportType;
 
-            ReportTablesRepository repo = new ReportTablesRepository();
+            this.Loaded += this.ReportHeaderFooters_Loaded;
+            
+            this.uxButtonAdd.ToolTip = $"Add new {this.selectedreportType.GetDescriptionAttribute()}";            
+        }
 
-            this.uxButtonAdd.ToolTip = $"Add new {this.selectedreportType.GetDescriptionAttribute()}";
-
-            this.HeadersAndFooters = repo.GetReportMasterByReportTypeEnum((int)this.selectedreportType).ToArray();
-
-            if (reportType == ReportTypeEnum.ReportContent)
+        private void ReportHeaderFooters_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
             {
-                foreach (ReportMasterModel report in this.HeadersAndFooters)
-                {
-                    ReportConnectionModel connection = repo.GetProductionOrConnectionModel(report.MasterReport_Id);
+                ReportTablesRepository repo = new ReportTablesRepository();
 
-                    report.ProductionConnection = connection == null ? string.Empty : connection.ReportConnectionName;
+                this.HeadersAndFooters = repo.GetReportMasterByReportTypeEnum((int)this.selectedreportType).ToArray();
+
+                if (this.selectedreportType == ReportTypeEnum.ReportContent)
+                {
+                    foreach (ReportMasterModel report in this.HeadersAndFooters)
+                    {
+                        ReportConnectionModel connection = repo.GetProductionOrConnectionModel(report.MasterReport_Id);
+
+                        report.ProductionConnection = connection == null ? string.Empty : connection.ReportConnectionName;
+                    }
                 }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
             }
         }
 
@@ -88,7 +101,8 @@ namespace REPORT.Builder
                     PageMarginTop = 100,
                     PageMarginBottom = 100,
                     PageMarginLeft = 100,
-                    PageMarginRight = 100
+                    PageMarginRight = 100,
+                    ProjectName = General.ProjectModel.ModelName
                 });
                 
                 if (ControlDialog.ShowDialog($"New {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized).IsFalse())

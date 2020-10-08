@@ -54,14 +54,28 @@ namespace REPORT.Builder.ReportComponents
         {
             get
             {
+                bool isCollapsed = this.uxCollapse.Direction == WPF.Tools.Specialized.DirectionsEnum.Right;
+
                 XElement result = new XElement("ReportSection");
+
+                if (this.SectionTableName.IsNullEmptyOrWhiteSpace())
+                {
+                    if (this.SectionType == SectionTypeEnum.TableData
+                        || this.SectionType == SectionTypeEnum.TableFooter
+                        || this.SectionType == SectionTypeEnum.TableHeader)
+                    {
+                        throw new ApplicationException("Data source not selected");
+                    }
+
+                    this.SectionTableName = string.Empty;
+                }
 
                 result.Add(new XAttribute("SectionType", (int)this.SectionType));
                 result.Add(new XAttribute("SectionTitle", this.SectionTitle));
                 result.Add(new XAttribute("PaperKind", this.PaperKind));
                 result.Add(new XAttribute("SectionIndex", this.SectionIndex));
                 result.Add(new XAttribute("SectionGroupIndex", this.SectionGroupIndex));
-                result.Add(new XAttribute("CanvasHeight", this.uxMainGrid.RowDefinitions[1].Height.Value));
+                result.Add(new XAttribute("CanvasHeight", (isCollapsed ? this.CanvasHeight : this.uxMainGrid.RowDefinitions[1].Height.Value)));
                 result.Add(new XAttribute("PageOrientation", this.PageOrientation));
                 result.Add(new XAttribute("MarkerTopMargin", this.MarkerTopMargin));
                 result.Add(new XAttribute("MarkerBottomMargin", this.MarkerBottomMargin));

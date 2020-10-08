@@ -35,8 +35,7 @@ namespace REPORT.Builder.ReportTools
                 result.Add(new XAttribute("FontSize", this.FontSize));
                 result.Add(new XAttribute("FontFamily", this.FontFamily));
                 result.Add(new XAttribute("FontWeight", this.FontWeight));
-                result.Add(new XAttribute("HorizontalAlignment", this.HorizontalAlignment));
-                result.Add(new XAttribute("VerticalAlignment", this.VerticalAlignment));
+                result.Add(new XAttribute("TextAlignment", this.TextAlignment));
                 result.Add(new XAttribute("TextWrapping", this.TextWrapping));
                 result.Add(new XAttribute("Width", this.Width));
                 result.Add(new XAttribute("Height", this.Height));
@@ -175,79 +174,40 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
-        public DataItemModel[] FontFamalies
+        [FieldInformation("Text Alignment", Sort = 108)]
+        new public TextAlignment TextAlignment
         {
             get
             {
-                List<DataItemModel> result = new List<DataItemModel>();
-
-                foreach (FontFamily font in Fonts.SystemFontFamilies)
-                {
-                    result.Add(new DataItemModel { DisplayValue = font.ToString(), ItemKey = font });
-                }
-
-                return result.ToArray();
-            }
-        }
-
-        public DataItemModel[] FontWeightsList
-        {
-            get
-            {
-                List<DataItemModel> result = new List<DataItemModel>();
-
-                result.Add(new DataItemModel { DisplayValue = FontWeights.Black.ToString(), ItemKey = FontWeights.Black });
-                result.Add(new DataItemModel { DisplayValue = FontWeights.Bold.ToString(), ItemKey = FontWeights.Bold });
-                result.Add(new DataItemModel { DisplayValue = FontWeights.DemiBold.ToString(), ItemKey = FontWeights.DemiBold});
-                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraBlack.ToString(), ItemKey = FontWeights.ExtraBlack });
-                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraBold.ToString(), ItemKey = FontWeights.ExtraBold });
-                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraLight.ToString(), ItemKey = FontWeights.ExtraLight });
-                result.Add(new DataItemModel { DisplayValue = FontWeights.Heavy.ToString(), ItemKey = FontWeights.Heavy});
-                result.Add(new DataItemModel { DisplayValue = FontWeights.Light.ToString(), ItemKey = FontWeights.Light});
-                result.Add(new DataItemModel { DisplayValue = FontWeights.Medium.ToString(), ItemKey = FontWeights.Medium});
-                result.Add(new DataItemModel { DisplayValue = FontWeights.Normal.ToString(), ItemKey = FontWeights.Normal});
-                result.Add(new DataItemModel { DisplayValue = FontWeights.Regular.ToString(), ItemKey = FontWeights.Regular});
-                result.Add(new DataItemModel { DisplayValue = FontWeights.SemiBold.ToString(), ItemKey = FontWeights.SemiBold});
-                result.Add(new DataItemModel { DisplayValue = FontWeights.Thin.ToString(), ItemKey = FontWeights.Thin });
-
-                return result.ToArray();
-            }
-        }
-
-        [FieldInformation("Horizontal Alignment", Sort = 108)]
-        new public HorizontalAlignment HorizontalAlignment
-        {
-            get
-            {
-                return base.HorizontalAlignment;
+                return base.TextAlignment;
             }
 
             set
             {
-                base.HorizontalAlignment = value;
+                base.TextAlignment = value;
             }
         }
 
-        [FieldInformation("Vertical Alignment", Sort = 109)]
-        new public VerticalAlignment VerticalAlignment
-        {
-            get
-            {
-                return base.VerticalAlignment;
-            }
+        //[FieldInformation("Vertical Alignment", Sort = 109)]
+        //public VerticalAlignment NewVerticalAlignment // NOTE: The "New" is to overcome a bug that prevents the property from being set
+        //{
+        //    get
+        //    {
+        //        return base.VerticalAlignment;
+        //    }
 
-            set
-            {
-                base.VerticalAlignment = value;
-            }
-        }
+        //    set
+        //    {
+        //        base.VerticalAlignment = value;
+        //    }
+        //}
 
         [FieldInformation("Text Wrapping", Sort = 110)]
         new public TextWrapping TextWrapping
-        { 
+        {
             get
             {
-                return base.TextWrapping; 
+                return base.TextWrapping;
             }
 
             set
@@ -283,5 +243,45 @@ namespace REPORT.Builder.ReportTools
                 base.Height = value;
             }
         }
+
+        public DataItemModel[] FontFamalies
+        {
+            get
+            {
+                List<DataItemModel> result = new List<DataItemModel>();
+
+                foreach (FontFamily font in Fonts.SystemFontFamilies)
+                {
+                    result.Add(new DataItemModel { DisplayValue = font.ToString(), ItemKey = font });
+                }
+
+                return result.ToArray();
+            }
+        }
+
+        public DataItemModel[] FontWeightsList
+        {
+            get
+            {
+                List<DataItemModel> result = new List<DataItemModel>();
+
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Black.ToString(), ItemKey = FontWeights.Black });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Bold.ToString(), ItemKey = FontWeights.Bold });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.DemiBold.ToString(), ItemKey = FontWeights.DemiBold });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraBlack.ToString(), ItemKey = FontWeights.ExtraBlack });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraBold.ToString(), ItemKey = FontWeights.ExtraBold });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.ExtraLight.ToString(), ItemKey = FontWeights.ExtraLight });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Heavy.ToString(), ItemKey = FontWeights.Heavy });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Light.ToString(), ItemKey = FontWeights.Light });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Medium.ToString(), ItemKey = FontWeights.Medium });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Normal.ToString(), ItemKey = FontWeights.Normal });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Regular.ToString(), ItemKey = FontWeights.Regular });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.SemiBold.ToString(), ItemKey = FontWeights.SemiBold });
+                result.Add(new DataItemModel { DisplayValue = FontWeights.Thin.ToString(), ItemKey = FontWeights.Thin });
+
+                return result.ToArray();
+            }
+        }
+
     }
 }

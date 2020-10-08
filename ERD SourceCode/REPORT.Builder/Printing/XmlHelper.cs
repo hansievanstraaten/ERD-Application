@@ -95,6 +95,21 @@ namespace REPORT.Builder.Printing
             return element
                 .Descendants("ReportObject")
                 .ToList();
-        }        
+        }
+
+        internal static List<int> GetSectionForeignGroupIndexes(this XElement section)
+        {
+            XElement canvas = section.GetCanvasXml();
+
+            List<int> result = new List<int>();
+
+            foreach(XElement item in canvas.Element("ForeignGroupIndexes").Elements())
+            {
+                result.Add(item.Value.ToInt32());
+            }
+
+            return result;
+        }
+
     }
 }

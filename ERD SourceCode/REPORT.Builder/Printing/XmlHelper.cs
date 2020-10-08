@@ -97,13 +97,13 @@ namespace REPORT.Builder.Printing
                 .ToList();
         }
 
-        internal static List<int> GetSectionForeignGroupIndexes(this XElement section)
+        internal static List<int> GetSectionForeignSectionIndexes(this XElement section)
         {
             XElement canvas = section.GetCanvasXml();
 
             List<int> result = new List<int>();
 
-            foreach(XElement item in canvas.Element("ForeignGroupIndexes").Elements())
+            foreach(XElement item in canvas.Element("ForeignSectionIndexes").Elements())
             {
                 result.Add(item.Value.ToInt32());
             }

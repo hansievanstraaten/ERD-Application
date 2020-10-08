@@ -16,7 +16,7 @@ namespace REPORT.Builder.ReportComponents
 
         private List<WhereParameterModel> whereParameterModel;
 
-        private List<int> foreignGroupIndexes;
+        private List<int> foreignSectionIndex;
 
         internal CanvasSqlManager()
         {
@@ -26,7 +26,7 @@ namespace REPORT.Builder.ReportComponents
 
             this.whereParameterModel = new List<WhereParameterModel>();
 
-            this.foreignGroupIndexes = new List<int>();
+            this.foreignSectionIndex = new List<int>();
         }
 
         internal string SQLQuery
@@ -39,11 +39,11 @@ namespace REPORT.Builder.ReportComponents
 
         internal string TableName { get; private set; }
 
-        internal List<int> ForeignGroupIndexes
+        internal List<int> ForeignSectionIndexes
         {
             get
             {
-                return this.foreignGroupIndexes;
+                return this.foreignSectionIndex;
             }
         }
 
@@ -63,9 +63,9 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        internal bool HaveForeignGroupIndex(int index)
+        internal bool HaveForeignSectionIndex(int index)
         {
-            return this.foreignGroupIndexes.Contains(index);
+            return this.foreignSectionIndex.Contains(index);
         }
 
         internal void Reset()
@@ -76,27 +76,27 @@ namespace REPORT.Builder.ReportComponents
 
             this.whereParameterModel.Clear();
 
-            this.foreignGroupIndexes.Clear();
+            this.foreignSectionIndex.Clear();
         }
 
-        internal void AddForeignGroupIndex(int index)
+        internal void AddForeignSectionIndex(int index)
         {
-            if (this.foreignGroupIndexes.Contains(index))
+            if (this.foreignSectionIndex.Contains(index))
             {
                 return;
             }
 
-            this.foreignGroupIndexes.Add(index);
+            this.foreignSectionIndex.Add(index);
         }
 
-        internal void RemoveForeignGroupIndex(int index)
+        internal void RemoveForeignSectionIndex(int index)
         {
-            if (!this.foreignGroupIndexes.Contains(index))
+            if (!this.foreignSectionIndex.Contains(index))
             {
                 return;
             }
 
-            this.foreignGroupIndexes.Remove(index);
+            this.foreignSectionIndex.Remove(index);
         }
 
         internal void AddColumn(ReportColumnModel column)

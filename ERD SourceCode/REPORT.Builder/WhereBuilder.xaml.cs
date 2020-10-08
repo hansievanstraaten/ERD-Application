@@ -65,7 +65,7 @@ namespace REPORT.Builder
             this.SectionViewModel.PropertyChanged -= this.SectionViewModel_Changed;
 
             this.ForeignSection = this.ReportSections
-                    .FirstOrDefault(gi => gi.SqlManager.HaveForeignGroupIndex(this.SelectedSection.SectionGroupIndex)
+                    .FirstOrDefault(gi => gi.SqlManager.HaveForeignSectionIndex(this.SelectedSection.SectionIndex)
                                         && gi.SectionType == SectionTypeEnum.TableData);
 
             if (this.ForeignSection != null)
@@ -110,7 +110,7 @@ namespace REPORT.Builder
 
                 foreach(ReportSection section in this.ReportSections)
                 {
-                    section.SqlManager.RemoveForeignGroupIndex(this.SelectedSection.SectionGroupIndex);
+                    section.SqlManager.RemoveForeignSectionIndex(this.SelectedSection.SectionIndex);
                 }
 
                 this.ForeignSection = this.ReportSections
@@ -119,7 +119,7 @@ namespace REPORT.Builder
 
                 if (this.ForeignSection != null)
                 {
-                    this.ForeignSection.SqlManager.AddForeignGroupIndex(this.SelectedSection.SectionGroupIndex);
+                    this.ForeignSection.SqlManager.AddForeignSectionIndex(this.SelectedSection.SectionIndex);
                 }
 
                 this.uxSectionLinks.Children.Clear();

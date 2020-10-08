@@ -54,7 +54,7 @@ namespace REPORT.Builder.ReportComponents
 
                 XElement parameterModels = new XElement("ParameterModels");
 
-                XElement foreignGroupIndex = new XElement("ForeignGroupIndexes");
+                XElement foreignGroupIndex = new XElement("ForeignSectionIndexes");
 
                 foreach (UIElement child in this.Children)
                 {
@@ -66,7 +66,7 @@ namespace REPORT.Builder.ReportComponents
                     parameterModels.Add(parameter.ItemXml);
                 }
 
-                foreach(int foreignIndex in this.SqlManager.ForeignGroupIndexes)
+                foreach(int foreignIndex in this.SqlManager.ForeignSectionIndexes)
                 {
                     foreignGroupIndex.Add(new XElement("Index", foreignIndex));
                 }
@@ -103,15 +103,14 @@ namespace REPORT.Builder.ReportComponents
 
                 List<WhereParameterModel> paramatersList = new List<WhereParameterModel>();
 
-                foreach(XElement index in value.Element("ForeignGroupIndexes").Elements())
+                foreach(XElement index in value.Element("ForeignSectionIndexes").Elements())
                 {
-                    this.SqlManager.AddForeignGroupIndex(index.Value.ToInt32());
+                    this.SqlManager.AddForeignSectionIndex(index.Value.ToInt32());
                 }
 
                 foreach (XElement item in value.Element("ParameterModels").Elements())
                 {
                     paramatersList.Add(new WhereParameterModel { ItemXml = item });
-
                 }
                     
                 this.SqlManager.AddWhereModels(paramatersList.ToArray());

@@ -20,8 +20,6 @@ namespace REPORT.Builder.Printing
     {
         private int sectionIndex = 0;
         
-        private int maxDataSectionIndex;
-
         private long masterReport_Id;
 
         private BuildReportRepository repo;
@@ -39,8 +37,6 @@ namespace REPORT.Builder.Printing
         private Dictionary<int, CanvasSqlManager> indexSqlManager = new Dictionary<int, CanvasSqlManager>();
 
         private Dictionary<string, string> executingValues = new Dictionary<string, string>();
-
-        private Dictionary<int, List<int>> foreignGroupIndexes = new Dictionary<int, List<int>>();
 
         public XDocument GetReport(XDocument xmlReport, DatabaseModel connection, ReportMaster reportMaster)
         {
@@ -68,16 +64,9 @@ namespace REPORT.Builder.Printing
                     .Where(st => st.Attribute("SectionType").Value == "5") // SectionTypeEnum.TableData
                     .ToDictionary(d => d.Attribute("SectionIndex").Value.ToInt32());
 
-                foreach(KeyValuePair<int,XElement> keyPair in this.dataSections)
-                {
-                    List<int> keyIndexex = keyPair.Value.GetSectionForeignGroupIndexes();
+                this.sectionIndex = 1;
 
-                    this.foreignGroupIndexes.Add(keyPair.Value.GetSectionGroupIndex(), keyIndexex);
-                }
-
-                this.maxDataSectionIndex = this.dataSections.Max(k => k.Key);
-
-                this.SetNextSextion();
+                this.DoSectionSetup();
 
                 this.BuildReportData(dataNode);
 
@@ -163,19 +152,32 @@ namespace REPORT.Builder.Printing
 
             XElement sectionData = new XElement(sectionTableName);
                 
-
+            sectionData.Add(new XAttribute("SectionGroupIndex", this.SelectedSection.GetSectionGroupIndex()));
+                
             foreach (XElement row in data.Root.Elements())
             {
                 row.Add(new XAttribute("SectionIndex", this.sectionIndex));
 
-                if (this.SetNextSextion())
+                List<int> foreignSections = this.SelectedSection.GetSectionForeignSectionIndexes();
+
+                foreignSections.Sort();
+
+                int holdSectionIndex = this.sectionIndex;
+
+                foreach (int foreignIndex in foreignSections)
                 {
+                    this.sectionIndex = foreignIndex;
+                    
+                    this.DoSectionSetup();
+
                     this.SetExecutingParameters(sectionTableName, row);
 
                     this.BuildReportData(row);
-                
-                    this.SetPreviousSextion();
                 }
+
+                this.sectionIndex = holdSectionIndex;
+
+                this.DoSectionSetup();
 
                 sectionData.Add(row);
             }
@@ -238,55 +240,11 @@ namespace REPORT.Builder.Printing
             }
         }
 
-        private bool SetNextSextion()
+        private void DoSectionSetup()
         {
-            this.SelectedSection = null;
+            this.SelectedSection = this.dataSections[this.sectionIndex];
 
-            bool result = false;
-
-            ++this.sectionIndex;
-
-            while (this.sectionIndex <= this.maxDataSectionIndex)
-            {
-                if (this.dataSections.ContainsKey(this.sectionIndex))
-                {
-                    this.SelectedSection = this.dataSections[this.sectionIndex];
-
-                    this.SQLManagerSetup();
-
-                    result = true;
-
-                    break;
-                }
-
-                ++this.sectionIndex;
-            }
-
-            if (this.sectionIndex > this.maxDataSectionIndex)
-            {
-                this.sectionIndex = this.maxDataSectionIndex;
-            }
-
-            return result;
-        }
-
-        private void SetPreviousSextion()
-        {
-            this.SelectedSection = null;
-
-            --this.sectionIndex;
-
-            while (this.sectionIndex >= 0)
-            {
-                if (this.dataSections.ContainsKey(this.sectionIndex))
-                {
-                    this.SelectedSection = this.dataSections[this.sectionIndex];
-
-                    break;
-                }
-
-                --this.sectionIndex;
-            }
+            this.SQLManagerSetup();
         }
 
         private void SQLManagerSetup()
@@ -317,9 +275,9 @@ namespace REPORT.Builder.Printing
 
             List<WhereParameterModel> paramatersList = new List<WhereParameterModel>();
 
-            foreach (XElement index in canvasXml.Element("ForeignGroupIndexes").Elements())
+            foreach (XElement index in canvasXml.Element("ForeignSectionIndexes").Elements())
             {
-                sqlManager.AddForeignGroupIndex(index.Value.ToInt32());
+                sqlManager.AddForeignSectionIndex(index.Value.ToInt32());
             }
 
             foreach (XElement item in canvasXml.Element("ParameterModels").Elements())

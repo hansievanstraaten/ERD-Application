@@ -99,12 +99,20 @@ namespace REPORT.Builder.Printing
 
                 this.reportData = report.Root.Element("ReportData");
 
-                this.SetSectionHeader(0);
+                if (this.dataSections.Count == 3)
+                {
+                    this.SetSectionHeader(0);
+                }
 
                 foreach (XElement table in this.reportData.Elements())
                 {
                     foreach (XElement row in table.Elements())
                     {
+                        if (this.dataSections.Count > 3)
+                        {
+                            this.SetSectionHeader(0);
+                        }
+
                         this.BuildReportData(row);
                     }
                 }
@@ -283,10 +291,10 @@ namespace REPORT.Builder.Printing
             {
                 int groupIndex = dataSection.GetSectionGroupIndex();
 
-                this.SetSectionHeader((groupIndex + 1));
-
                 foreach (XElement childtable in row.Elements().Where(ch => ch.HasElements))
                 {
+                    this.SetSectionHeader(childtable.GetSectionGroupIndex());
+                    
                     foreach (XElement childRow in childtable.Elements())
                     {
                         this.BuildReportData(childRow);
@@ -319,7 +327,7 @@ namespace REPORT.Builder.Printing
 
                     dataItem.Attribute("ColumnModel").Remove();
 
-                    dataItem.Add(new XAttribute("Text", dataValue.Value));
+                    dataItem.Add(new XAttribute("Text", (dataValue == null ? "OOPS What a mess" : dataValue.Value)));
 
                     lowestBottom = this.AddObectModel(dataItem, lowestBottom, out isReset);
                 }

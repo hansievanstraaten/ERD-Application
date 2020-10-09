@@ -684,7 +684,7 @@ namespace REPORT.Builder
 
                 PrintPreview preview = new PrintPreview(reportPrint.Pages);
 
-                ControlDialog.ShowDialog("Reports", preview, string.Empty);
+                ControlDialog.Show("Reports", preview, string.Empty);
             }
             catch (Exception err)
             {

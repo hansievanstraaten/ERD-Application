@@ -4,6 +4,7 @@ using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
 using System;
+using System.ComponentModel;
 using System.Drawing.Printing;
 using System.IO;
 using System.Windows;
@@ -104,13 +105,26 @@ namespace REPORT.Builder
                     PageMarginRight = 100,
                     ProjectName = General.ProjectModel.ModelName
                 });
-                
-                if (ControlDialog.ShowDialog($"New {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized).IsFalse())
-                {
-                    return;
-                }
 
-                this.HeadersAndFooters = this.HeadersAndFooters.Add(designer.ReportMaster);
+                ControlDialog.WindowsShowIsClosing += this.WindowsShow_IsClosing;
+
+                ControlDialog.Show($"New {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized);                
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void WindowsShow_IsClosing(object sender,UserControlBase control, CancelEventArgs e)
+        {
+            try
+            {
+                ReportDesigner userControl = control.To<ReportDesigner>();
+
+                ControlDialog.WindowsShowIsClosing -= this.WindowsShow_IsClosing;
+
+                this.HeadersAndFooters = this.HeadersAndFooters.Add(userControl.ReportMaster);
             }
             catch (Exception err)
             {
@@ -131,10 +145,7 @@ namespace REPORT.Builder
             {
                 ReportDesigner designer = new ReportDesigner(this.SelectedHeaderAndFooter);
 
-                if (ControlDialog.ShowDialog($"Edit {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized).IsFalse())
-                {
-                    return;
-                }
+                ControlDialog.Show($"Edit {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized);                
             }
             catch (Exception err)
             {

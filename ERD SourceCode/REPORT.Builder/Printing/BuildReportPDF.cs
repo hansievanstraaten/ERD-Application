@@ -289,19 +289,27 @@ namespace REPORT.Builder.Printing
 
             if (row.Elements().Any(e => e.HasElements))
             {
-                int groupIndex = dataSection.GetSectionGroupIndex();
+                //int groupIndex = dataSection.GetSectionGroupIndex();
+                List<int> groupIndexes = new List<int>();
 
                 foreach (XElement childtable in row.Elements().Where(ch => ch.HasElements))
                 {
-                    this.SetSectionHeader(childtable.GetSectionGroupIndex());
-                    
+                    int groupIndex = childtable.GetSectionGroupIndex();
+
+                    groupIndexes.Add(groupIndex);
+
+                    this.SetSectionHeader(groupIndex);
+
                     foreach (XElement childRow in childtable.Elements())
                     {
                         this.BuildReportData(childRow);
                     }
                 }
 
-                this.SetSectionFooter((groupIndex + 1));
+                for(int x = groupIndexes.Count; x > 0; --x)
+                {
+                    this.SetSectionFooter(groupIndexes[x -1]);
+                }
             }
         }
 

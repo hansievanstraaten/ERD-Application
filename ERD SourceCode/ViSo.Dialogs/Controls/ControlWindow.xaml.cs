@@ -30,6 +30,14 @@ namespace ViSo.Dialogs.Controls
             this.Loaded += this.ControlWindow_Loaded;
         }
 
+        public UserControlBase UserControl
+        {
+            get
+            {
+                return this.uxContent.Content.To<UserControlBase>();
+            }
+        }
+
         private void ControlWindow_Loaded(object sender, RoutedEventArgs e)
         {
             this.AutoSize = true;
@@ -49,8 +57,14 @@ namespace ViSo.Dialogs.Controls
                     }
                 }
 
-                this.DialogResult = true;
-
+                if (System.Windows.Interop.ComponentDispatcher.IsThreadModal)
+                {
+                    this.DialogResult = true;
+                }
+                else
+                {
+                    this.Close();
+                }
             }
             catch (Exception err)
             {

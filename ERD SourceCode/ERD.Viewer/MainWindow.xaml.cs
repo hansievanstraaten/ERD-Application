@@ -637,10 +637,7 @@ namespace ERD.Viewer
             {
                 ReportSelector selector = new ReportSelector(General.ProjectModel.FileDirectory);
 
-                if (ControlDialog.ShowDialog("Reports", selector, string.Empty, showOkButton: false).IsFalse())
-                {
-                    return;
-                }
+                ControlDialog.Show("Reports", selector, string.Empty, showOkButton: false);
             }
             catch (Exception err)
             {

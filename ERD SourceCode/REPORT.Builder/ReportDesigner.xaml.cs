@@ -11,6 +11,7 @@ using REPORT.Data.SQLRepository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Windows;
@@ -670,26 +671,85 @@ namespace REPORT.Builder
                     return;
                 }
 
-                BuildReportToCanvas reportPrint = new BuildReportToCanvas();
+                MenuItem item = (MenuItem)e.Source;
+
+                PrintPreview preview = new PrintPreview(this.ReportMaster.ReportName, this.GetPrintCanvases(item));
+
+                ControlDialog.Show("Reports", preview, string.Empty);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void ExportPDF_Cliked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ContextMenu menu = new ContextMenu();
+
+                MenuItem defaultItem = new MenuItem
+                {
+                    Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})",
+                    Tag = Connections.Instance.DefaultConnectionName
+                };
+
+                defaultItem.Click += this.ExportPdfConnection_Cliked;
+
+                menu.Items.Add(defaultItem);
+
+                foreach (KeyValuePair<string, AltDatabaseModel> connectionKey in Connections.Instance.AlternativeModels)
+                {
+                    MenuItem alternativeItem = new MenuItem
+                    {
+                        Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})",
+                        Tag = connectionKey.Key
+                    };
+
+                    alternativeItem.Click += this.ExportPdfConnection_Cliked;
+
+                    menu.Items.Add(alternativeItem);
+                }
+
+                menu.IsOpen = true;
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void ExportPdfConnection_Cliked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (this.uxReportMasterModel.HasValidationError)
+                {
+                    return;
+                }
+
+                SaveFileDialog dlg = new SaveFileDialog();
+
+                dlg.FileName = this.ReportMaster.ReportName;
+
+                dlg.Filter = "PDF Files | *.pdf";
+
+                dlg.OverwritePrompt = false;
+
+                if (dlg.ShowDialog().IsFalse())
+                {
+                    return;
+                }
 
                 MenuItem item = (MenuItem)e.Source;
 
-                DatabaseModel connection = Connections.Instance.GetConnection(item.Tag.ParseToString());
+                CanvasToPDF pdf = new CanvasToPDF();
 
-                BuildReportXML xmlBuild = new BuildReportXML();
+                string result = pdf.ConvertToPdf(dlg.FileName, this.GetPrintCanvases(item));
 
-                XDocument repotXml = xmlBuild.GetReport(this.GetReportXml(), connection, this.ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster);
-
-                reportPrint.PrintDocument(repotXml);
-
-                PrintPreview preview = new PrintPreview(reportPrint.Pages);
-
-                ControlDialog.Show("Reports", preview, string.Empty);
-
-                //TEST CODE
-                //CanvasToPDF pdf = new CanvasToPDF();
-
-                //pdf.ConvertToPdf("C:\\temp\\temp.xps", reportPrint.Pages);
+                Process.Start(result);
+                
             }
             catch (Exception err)
             {
@@ -960,6 +1020,23 @@ namespace REPORT.Builder
             return result;
         }
 
+        private Dictionary<int, PrintCanvas> GetPrintCanvases(MenuItem item)
+        {
+            BuildReportToCanvas reportPrint = new BuildReportToCanvas();
+
+            //MenuItem item = (MenuItem)e.Source;
+
+            DatabaseModel connection = Connections.Instance.GetConnection(item.Tag.ParseToString());
+
+            BuildReportXML xmlBuild = new BuildReportXML();
+
+            XDocument repotXml = xmlBuild.GetReport(this.GetReportXml(), connection, this.ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster);
+
+            reportPrint.PrintDocument(repotXml);
+
+            return reportPrint.Pages;
+        }
+
         #endregion
 
         #region NEW DATA SECTION METHODS
@@ -1090,7 +1167,5 @@ namespace REPORT.Builder
         }
 
         #endregion
-
-        
     }
 }

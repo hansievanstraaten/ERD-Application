@@ -1,0 +1,7 @@
+1. Implement Filters
+2. Implement Categories on reports
+	a. Category Table
+	b. Category Tree
+	c. Categody Add/Edit
+3. Web Api for web printing and download
+4. Create File System DB setup

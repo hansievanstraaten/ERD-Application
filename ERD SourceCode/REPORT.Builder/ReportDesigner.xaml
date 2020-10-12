@@ -28,7 +28,8 @@
             <StackPanel  x:Name="uxMenuStack">
                 <StackPanel Orientation="Horizontal">
                     <CommonControls:ActionButton ResourceImageName="Save" ToolTip="Save Report" Click="ReportSave_Cliked" />
-                    <CommonControls:ActionButton ResourceImageName="Print" ToolTip="Print Report" Click="ReportPrint_Cliked" />
+                    <CommonControls:ActionButton ResourceImageName="PrintPreview" ToolTip="Preview Report" Click="ReportPrint_Cliked" />
+                    <CommonControls:ActionButton ResourceImageName="ExportPDF" ToolTip="Export to PDF" Click="ExportPDF_Cliked" />
                 </StackPanel>
                 <ModelViewer:ModelViewer x:Name="uxReportMasterModel" ModelViewItemBrowse="ReportMasterDescription_Browse" />
                 <CommonControls:LableItem Content="Tools" FontWeight="Bold" />

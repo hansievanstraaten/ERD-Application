@@ -36,30 +36,6 @@ namespace REPORT.Builder
             this.uxButtonAdd.ToolTip = $"Add new {this.selectedreportType.GetDescriptionAttribute()}";            
         }
 
-        private void ReportHeaderFooters_Loaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ReportTablesRepository repo = new ReportTablesRepository();
-
-                this.HeadersAndFooters = repo.GetReportMasterByReportTypeEnum((int)this.selectedreportType).ToArray();
-
-                if (this.selectedreportType == ReportTypeEnum.ReportContent)
-                {
-                    foreach (ReportMasterModel report in this.HeadersAndFooters)
-                    {
-                        ReportConnectionModel connection = repo.GetProductionOrConnectionModel(report.MasterReport_Id);
-
-                        report.ProductionConnection = connection == null ? string.Empty : connection.ReportConnectionName;
-                    }
-                }
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
-
         public ReportMasterModel SelectedHeaderAndFooter
         {
             get
@@ -87,6 +63,30 @@ namespace REPORT.Builder
                 this.headersAndFooters = value;
 
                 base.OnPropertyChanged(() => this.HeadersAndFooters);
+            }
+        }
+
+        private void ReportHeaderFooters_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ReportTablesRepository repo = new ReportTablesRepository();
+
+                this.HeadersAndFooters = repo.GetReportMasterByReportTypeEnum((int)this.selectedreportType, General.ProjectModel.ModelName).ToArray();
+
+                if (this.selectedreportType == ReportTypeEnum.ReportContent)
+                {
+                    foreach (ReportMasterModel report in this.HeadersAndFooters)
+                    {
+                        ReportConnectionModel connection = repo.GetProductionOrConnectionModel(report.MasterReport_Id);
+
+                        report.ProductionConnection = connection == null ? string.Empty : connection.ReportConnectionName;
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
             }
         }
 

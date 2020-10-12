@@ -670,7 +670,7 @@ namespace REPORT.Builder
                     return;
                 }
 
-                BuildReportPDF reportPrint = new BuildReportPDF();
+                BuildReportToCanvas reportPrint = new BuildReportToCanvas();
 
                 MenuItem item = (MenuItem)e.Source;
 
@@ -685,6 +685,11 @@ namespace REPORT.Builder
                 PrintPreview preview = new PrintPreview(reportPrint.Pages);
 
                 ControlDialog.Show("Reports", preview, string.Empty);
+
+                //TEST CODE
+                //CanvasToPDF pdf = new CanvasToPDF();
+
+                //pdf.ConvertToPdf("C:\\temp\\temp.xps", reportPrint.Pages);
             }
             catch (Exception err)
             {

@@ -101,12 +101,19 @@ namespace REPORT.Builder.ReportTools
         {
             get
             {
+                if (this.IsDesignMode && base.Background == Brushes.WhiteSmoke)
+                {
+                    return Brushes.Transparent;
+                }
+
                 return base.Background;
             }
 
             set
             {
                 base.Background = value;
+
+                //var xxx = this.Background;
             }
         }
 

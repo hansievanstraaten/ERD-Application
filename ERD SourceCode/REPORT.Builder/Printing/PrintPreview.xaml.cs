@@ -13,9 +13,11 @@ namespace REPORT.Builder.Printing
         {
             this.InitializeComponent();
 
-            foreach(KeyValuePair<int, PrintCanvas> page in pages)
+            foreach(KeyValuePair<int, PrintCanvas> pageKeyPair in pages)
             {
-                this.uxPageStack.Children.Add(page.Value);
+                pageKeyPair.Value.Margin = new System.Windows.Thickness(5);
+
+                this.uxPageStack.Children.Add(pageKeyPair.Value);
             }
         }
     }

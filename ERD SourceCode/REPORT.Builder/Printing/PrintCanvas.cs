@@ -9,6 +9,7 @@ using ViSo.SharedEnums.ReportEnums;
 
 namespace REPORT.Builder.Printing
 {
+    [Serializable()]
     public class PrintCanvas : Canvas
     {
         public PrintCanvas()

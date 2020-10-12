@@ -13,7 +13,7 @@ using ViSo.SharedEnums.ReportEnums;
 
 namespace REPORT.Builder.Printing
 {
-    public class BuildReportPDF
+    public class BuildReportToCanvas
     {
         private int pageMarginTop;
 
@@ -200,8 +200,7 @@ namespace REPORT.Builder.Printing
             PrintCanvas result = new PrintCanvas 
             { 
                 Width =  this.PageWidth, 
-                Height = this.PageHeight,
-                Margin = new Thickness(5)
+                Height = this.PageHeight
             };
 
             foreach(XElement item in canvasXml.GetReportObjects())

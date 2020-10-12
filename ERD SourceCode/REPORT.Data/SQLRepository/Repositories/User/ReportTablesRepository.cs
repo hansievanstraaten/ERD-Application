@@ -59,11 +59,12 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result.CopyToObject(new ReportConnectionModel()) as ReportConnectionModel;
 		}
 
-		new public List<ReportMasterModel> GetReportMasterByReportTypeEnum(int ReportTypeEnum)
+		public List<ReportMasterModel> GetReportMasterByReportTypeEnum(int ReportTypeEnum, string projectName)
 		{
 			List<ReportMaster> agrigates = this.dataContext
 				.ReportsMaster
-				.Where(fk => fk.ReportTypeEnum == ReportTypeEnum)
+				.Where(fk => fk.ReportTypeEnum == ReportTypeEnum
+									&& fk.ProjectName == projectName)
 				.ToList();
 
 			if (agrigates.Count == 0)

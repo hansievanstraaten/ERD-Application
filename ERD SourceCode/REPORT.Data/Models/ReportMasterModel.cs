@@ -33,13 +33,14 @@ namespace REPORT.Data.Models
         private string productionConnection;
         private string _DescriptionText;
         private int _ReportXMLVersion;
+		private Int64? _CategoryId;
 
 
-        /// <summary>
-        /// <para>Master Report ID</para>
-        /// <para>Master Report ID</para>
-        /// </summary>
-        public Int64 MasterReport_Id
+		/// <summary>
+		/// <para>Master Report ID</para>
+		/// <para>Master Report ID</para>
+		/// </summary>
+		public Int64 MasterReport_Id
 		{
 			get
 			{
@@ -371,6 +372,23 @@ namespace REPORT.Data.Models
 			set
 			{
 				base.OnPropertyChanged("ProjectName", ref this._ProjectName, value);
+			}
+		}
+
+		/// <summary>
+		/// <para>Category ID</para>
+		/// <para></para>
+		/// </summary>
+		public Int64? CategoryId
+		{
+			get
+			{
+				return this._CategoryId;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("CategoryId", ref this._CategoryId, value);
 			}
 		}
 

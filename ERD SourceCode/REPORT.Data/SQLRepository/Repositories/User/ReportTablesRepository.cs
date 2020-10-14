@@ -3,6 +3,7 @@ using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace REPORT.Data.SQLRepository.Repositories
 {
@@ -64,7 +65,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 			List<ReportMaster> agrigates = this.dataContext
 				.ReportsMaster
 				.Where(fk => fk.ReportTypeEnum == ReportTypeEnum
-									&& fk.ProjectName == projectName)
+						  && fk.ProjectName == projectName)
 				.ToList();
 
 			if (agrigates.Count == 0)
@@ -75,15 +76,54 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			List<object> objectList = agrigates.CopyToObject(typeof(ReportMasterModel));
 
-			List<ReportMasterModel> result = objectList.TryCast<ReportMasterModel>().ToList();
+			List<ReportMasterModel> result = objectList.TryCast<ReportMasterModel>().OrderBy(n => n.ReportName).ToList();
 
 			foreach (ReportMasterModel item in result)
 			{
 				item.ReportXMLVersion = this.GetReportXMLVersion(item.MasterReport_Id);
-
 			}
 
 			return result;
+		}
+
+		public List<ReportMasterModel> GetReportMasterByReportTypeEnum(int ReportTypeEnum, string projectName, long categoryId)
+		{
+			List<ReportMaster> agrigates = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.ReportTypeEnum == ReportTypeEnum
+						  && fk.ProjectName == projectName
+						  && fk.CategoryId == categoryId)
+				.ToList();
+
+			if (agrigates.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+
+			List<object> objectList = agrigates.CopyToObject(typeof(ReportMasterModel));
+
+			List<ReportMasterModel> result = objectList.TryCast<ReportMasterModel>().OrderBy(n => n.ReportName).ToList();
+
+			foreach (ReportMasterModel item in result)
+			{
+				item.ReportXMLVersion = this.GetReportXMLVersion(item.MasterReport_Id);
+			}
+
+			return result;
+		}
+
+
+		public List<ReportCategoryModel> GetActiveCategories()
+        {
+			List<ReportCategory> result = base.dataContext
+				.ReportCategories
+				.Where(a => a.IsActive == true)
+				.ToList();
+
+			List<object> objectList = result.CopyToObject(typeof(ReportCategoryModel));
+
+			return objectList.TryCast<ReportCategoryModel>().ToList();
 		}
 	}
 }

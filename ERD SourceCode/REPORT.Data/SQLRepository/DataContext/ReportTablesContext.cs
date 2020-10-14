@@ -10,6 +10,7 @@ namespace REPORT.Data.SQLRepository.DataContext
 		public DbSet<ReportMaster> ReportsMaster { get; set; }
 		public DbSet<ReportXML> ReportsXML { get; set; }
 		public DbSet<ReportConnection> ReportConnections { get; set; }
+		public DbSet<ReportCategory> ReportCategories { get; set; }
 
 		public ReportTablesContext() : base(DatabaseConnection.Instance.ConnectionString)
 		{
@@ -23,6 +24,7 @@ namespace REPORT.Data.SQLRepository.DataContext
 			modelBuilder.Configurations.Add(new ReportMasterMapping());
 			modelBuilder.Configurations.Add(new ReportXMLMapping());
 			modelBuilder.Configurations.Add(new ReportConnectionMapping());
+			modelBuilder.Configurations.Add(new ReportCategoryMapping());
 
 		}
 	}

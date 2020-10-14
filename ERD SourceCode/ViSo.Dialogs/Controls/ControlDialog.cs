@@ -18,6 +18,7 @@ namespace ViSo.Dialogs.Controls
             string boolUpdateMethod,
             bool showOkButton = true,
             bool showCancelButton = true,
+            bool autoSize = false,
             WindowState windowState = WindowState.Normal)
         {
             ControlWindow window = null;
@@ -26,7 +27,19 @@ namespace ViSo.Dialogs.Controls
             {
                 window = new ControlWindow(windowTitle, control, boolUpdateMethod, showOkButton, showCancelButton);
 
-                window.WindowState = windowState;
+                window.AutoSize = autoSize;
+
+                if (windowState != WindowState.Normal)
+                {
+                    window.SourceInitialized += (s, a) =>
+                    {
+                        window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+                        window.WindowState = windowState;
+
+                        window.SizeToContent = SizeToContent.Manual;
+                    };
+                }
 
                 return window.ShowDialog();
             }
@@ -46,13 +59,26 @@ namespace ViSo.Dialogs.Controls
             string boolUpdateMethod,
             bool showOkButton = true,
             bool showCancelButton = true,
+            bool autoSize = false,
             WindowState windowState = WindowState.Normal)
         {
             try
             {
                 ControlWindow window = new ControlWindow(windowTitle, control, boolUpdateMethod, showOkButton, showCancelButton);
 
-                window.WindowState = windowState;
+                window.AutoSize = autoSize;
+
+                if (windowState != WindowState.Normal)
+                {
+                    window.SourceInitialized += (s, a) =>
+                    {
+                        window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                        
+                        window.WindowState = windowState;
+                    };
+                }
+
+                //window.WindowState = windowState;
 
                 window.Closing += WindowShow_Closing;
 

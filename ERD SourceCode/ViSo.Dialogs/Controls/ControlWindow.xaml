@@ -7,7 +7,7 @@
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 xmlns:local="clr-namespace:ViSo.Dialogs.Controls"
                 mc:Ignorable="d"                
-                Title="ControlWindow" Height="450" Width="800">
+                Title="ControlWindow">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

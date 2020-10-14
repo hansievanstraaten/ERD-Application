@@ -19,6 +19,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	private int _PageMarginTop;
 	private int _PageMarginBottom;
 	private string _ProjectName;
+	private Int64? _CategoryId;
 
 	/// <summary>
 	/// <para>Master Report ID</para>
@@ -255,6 +256,23 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		set
 		{
 			base.OnPropertyChanged("ProjectName", ref this._ProjectName, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Category ID</para>
+	/// <para></para>
+	/// </summary>
+	public Int64? CategoryId
+	{ 
+		get
+		{
+			return this._CategoryId;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("CategoryId", ref this._CategoryId, value);
 		}
 	}
 

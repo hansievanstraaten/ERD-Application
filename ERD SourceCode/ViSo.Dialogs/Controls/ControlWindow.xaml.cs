@@ -27,7 +27,7 @@ namespace ViSo.Dialogs.Controls
 
             this.uxButtonCancel.Visibility = showCancelButton ? Visibility.Visible : Visibility.Collapsed;
 
-            this.Loaded += this.ControlWindow_Loaded;
+            //this.Loaded += this.ControlWindow_Loaded;
         }
 
         public UserControlBase UserControl
@@ -38,10 +38,10 @@ namespace ViSo.Dialogs.Controls
             }
         }
 
-        private void ControlWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.AutoSize = true;
-        }
+        //private void ControlWindow_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    //this.AutoSize = true;
+        //}
 
         private void OkButton_Clicked(object sender, RoutedEventArgs e)
         {

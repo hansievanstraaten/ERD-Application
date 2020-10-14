@@ -675,7 +675,7 @@ namespace REPORT.Builder
 
                 PrintPreview preview = new PrintPreview(this.ReportMaster.ReportName, this.GetPrintCanvases(item));
 
-                ControlDialog.Show("Reports", preview, string.Empty);
+                ControlDialog.Show("Reports", preview, string.Empty, showOkButton:false, windowState: WindowState.Maximized);
             }
             catch (Exception err)
             {

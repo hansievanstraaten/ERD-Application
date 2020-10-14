@@ -17,6 +17,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="3" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -30,9 +31,19 @@
                                       ItemsSource="{Binding HeadersAndFooters}"
                                       SelectedItem="{Binding SelectedHeaderAndFooter}">
             <DataGridObjects:ViSoDataGrid.Columns>
+                <DataGridTextColumn Header="Report ID" Binding="{Binding MasterReport_Id}" />
                 <DataGridTextColumn Header="Report Name" Binding="{Binding ReportName}" />
-                <DataGridTextColumn Header="Report Type" Binding="{Binding ReportTypeEnumValue}" />
+                <DataGridTextColumn Header="XML Version" Binding="{Binding ReportXMLVersion}" />
             </DataGridObjects:ViSoDataGrid.Columns>            
-        </DataGridObjects:ViSoDataGrid>     
+        </DataGridObjects:ViSoDataGrid>
+
+        <CommonControls:VerticalGridSplit Grid.Row="0" Grid.Column="2" />
+
+        <StackPanel Grid.Row="0" Grid.Column="3">
+            <CommonControls:LableItem Content="Description" FontWeight="Bold" />
+            <CommonControls:LableItem x:Name="uxDescription" />
+        </StackPanel>
+        
+        
     </Grid>
 </src:UserControlBase>

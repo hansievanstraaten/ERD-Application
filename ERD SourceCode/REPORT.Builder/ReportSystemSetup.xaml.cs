@@ -42,6 +42,10 @@ namespace REPORT.Builder
         {
             try
             {
+                this.ReportSetup.DataBaseSource.Password = this.ReportSetup.DataBaseSource.Password.Encrypt();
+
+                this.ReportSetup.DataBaseSource.IsEncrypted = true;
+
                 string fileObject = JsonConvert.SerializeObject(this.ReportSetup);
 
                 File.WriteAllText(this.ReportFileName, fileObject);
@@ -65,6 +69,13 @@ namespace REPORT.Builder
                     string fileContent = File.ReadAllText(this.ReportFileName);
 
                     this.ReportSetup = JsonConvert.DeserializeObject(fileContent, typeof(ReportSetupModel)) as ReportSetupModel;
+
+                    if (this.ReportSetup.DataBaseSource.IsEncrypted)
+                    {
+                        this.ReportSetup.DataBaseSource.Password = this.ReportSetup.DataBaseSource.Password.Decrypt();
+
+                        this.ReportSetup.DataBaseSource.IsEncrypted = false;
+                    }
                 }
                 else
                 {

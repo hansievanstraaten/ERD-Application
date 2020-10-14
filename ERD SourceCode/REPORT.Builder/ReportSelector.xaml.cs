@@ -22,7 +22,7 @@ namespace REPORT.Builder
 
         private ReportHeaderFooters uxFinalPage;
 
-        private ReportHeaderFooters uxDataPages;
+        private ReportCategories uxDataPages;
 
         public ReportSelector(string projectFileDirectory)
         {
@@ -62,7 +62,7 @@ namespace REPORT.Builder
 
                 #region INITIALIZE TABS
 
-                this.uxDataPages = new ReportHeaderFooters(ReportTypeEnum.ReportContent) { Title = "Data Report" };
+                this.uxDataPages = new ReportCategories() { Title = "Data Report" };
 
                 this.uxCoverPage = new ReportHeaderFooters(ReportTypeEnum.CoverPage) { Title = "Cover Pages" };
 

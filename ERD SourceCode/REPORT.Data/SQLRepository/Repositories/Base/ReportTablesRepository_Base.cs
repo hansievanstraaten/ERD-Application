@@ -58,7 +58,39 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.CopyToObject(new ReportConnectionModel()) as ReportConnectionModel;
 		}
+		
+		public ReportCategoryModel GetReportCategoryByPrimaryKey (Int64 CategoryId  )
+		{
+			ReportCategory result =this.dataContext
+				.ReportCategories
+				.FirstOrDefault(pk => pk.CategoryId == CategoryId  );
 
+			if (result == null)
+			{
+				return null;
+			}
+
+			return result.CopyToObject(new ReportCategoryModel()) as ReportCategoryModel;
+		}
+
+		
+		public List<ReportMasterModel> GetReportMasterByForeignKeyCategoryId (Int64? CategoryId)
+		{
+			List<ReportMaster> result = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.CategoryId == CategoryId)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportMasterModel));
+
+			return objectList.TryCast<ReportMasterModel>().ToList();
+		}
 		
 		public List<ReportXMLModel> GetReportXMLByForeignKeyMasterReport_Id (Int64 MasterReport_Id)
 		{
@@ -510,6 +542,60 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return objectList.TryCast<ReportConnectionModel>().ToList();
 		}
+		
+		public List<ReportCategoryModel> GetReportCategoryByCategoryName (string CategoryName)
+		{
+			List<ReportCategory> result = this.dataContext
+				.ReportCategories
+				.Where(fk => fk.CategoryName == CategoryName)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportCategoryModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportCategoryModel));
+
+			return objectList.TryCast<ReportCategoryModel>().ToList();
+		}
+		
+		public List<ReportCategoryModel> GetReportCategoryByIsActive (bool IsActive)
+		{
+			List<ReportCategory> result = this.dataContext
+				.ReportCategories
+				.Where(fk => fk.IsActive == IsActive)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportCategoryModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportCategoryModel));
+
+			return objectList.TryCast<ReportCategoryModel>().ToList();
+		}
+		
+		public List<ReportCategoryModel> GetReportCategoryByParentCategoryId (Int64? ParentCategoryId)
+		{
+			List<ReportCategory> result = this.dataContext
+				.ReportCategories
+				.Where(fk => fk.ParentCategoryId == ParentCategoryId)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportCategoryModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportCategoryModel));
+
+			return objectList.TryCast<ReportCategoryModel>().ToList();
+		}
 
 		public void UpdateReportMaster(ReportMasterModel model)
 		{
@@ -578,6 +664,29 @@ namespace REPORT.Data.SQLRepository.Repositories
 			this.dataContext.SaveChanges();
 
 			model = existing.CopyToObject(model) as ReportConnectionModel;
+		}
+
+		public void UpdateReportCategory(ReportCategoryModel model)
+		{
+			ReportCategory existing = this.dataContext
+				.ReportCategories
+				.Where(rx => rx.CategoryId == model.CategoryId  )
+				.FirstOrDefault();
+
+			if (existing == null)
+			{
+				existing = model.CopyToObject(new ReportCategory()) as ReportCategory;
+
+				this.dataContext.ReportCategories.Add(existing);
+			}
+			else
+			{
+				existing = model.CopyToObject(existing) as ReportCategory;
+			}
+
+			this.dataContext.SaveChanges();
+
+			model = existing.CopyToObject(model) as ReportCategoryModel;
 		}
 
 

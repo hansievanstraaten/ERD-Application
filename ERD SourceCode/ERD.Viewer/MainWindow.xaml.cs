@@ -265,6 +265,8 @@ namespace ERD.Viewer
 
                 ProjectSetup setup = new ProjectSetup(General.ProjectModel, Connections.Instance.DefaultDatabaseModel);
 
+                setup.AutoSize = true;
+
                 bool? result = setup.ShowDialog();
 
                 if (result.HasValue && !result.Value)
@@ -620,7 +622,7 @@ namespace ERD.Viewer
             {
                 ReportSystemSetup setup = new ReportSystemSetup(General.ProjectModel.FileDirectory);
 
-                if (ControlDialog.ShowDialog("Setup", setup, "Save").IsFalse())
+                if (ControlDialog.ShowDialog("Setup", setup, "Save", autoSize:true).IsFalse())
                 {
                     return;
                 }
@@ -959,6 +961,8 @@ namespace ERD.Viewer
                         if (databaseModel.IsEncrypted)
                         {
                             databaseModel.Password = databaseModel.Password.Decrypt();
+
+                            databaseModel.IsEncrypted = false;
                         }
 
                         Connections.Instance.SetDefaultDatabaseModel(databaseModel, false);
@@ -981,6 +985,8 @@ namespace ERD.Viewer
                                 if (alternativeConnection.IsEncrypted)
                                 {
                                     alternativeConnection.Password = alternativeConnection.Password.Decrypt();
+
+                                    alternativeConnection.IsEncrypted = false;
                                 }
 
                                 Connections.Instance.AlternativeModels.Add(alternativeConnection.ConnectionName, alternativeConnection);

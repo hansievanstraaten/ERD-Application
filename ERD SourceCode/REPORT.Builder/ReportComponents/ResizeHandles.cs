@@ -39,13 +39,19 @@ namespace REPORT.Builder.ReportComponents
                 return canvaselements.Count;
             }
         }
-
-        
+                
         public static void NotchLeft(double distance)
         {
             foreach (UIElement item in canvaselements.Values)
             {
-                Canvas.SetLeft(item, (Canvas.GetLeft(item) - distance));
+                double notchPlacement = Canvas.GetLeft(item) - distance;
+
+                if (notchPlacement < 0)
+                {
+                    notchPlacement = 0;
+                }
+
+                Canvas.SetLeft(item, notchPlacement);
 
                 item.MoveHandles();
             }
@@ -55,7 +61,14 @@ namespace REPORT.Builder.ReportComponents
         {
             foreach (UIElement item in canvaselements.Values)
             {
-                Canvas.SetTop(item, (Canvas.GetTop(item) - distance));
+                double notchPlacement = Canvas.GetTop(item) - distance;
+
+                if (notchPlacement < 0)
+                {
+                    notchPlacement = 0;
+                }
+
+                Canvas.SetTop(item, notchPlacement);
 
                 item.MoveHandles();
             }
@@ -65,7 +78,18 @@ namespace REPORT.Builder.ReportComponents
         {
             foreach (UIElement item in canvaselements.Values)
             {
-                Canvas.SetLeft(item, (Canvas.GetLeft(item) + distance));
+                double notchPlacement = Canvas.GetLeft(item) + distance;
+
+                SectionCanvas parent = item.FindParentControlBase(typeof(SectionCanvas)) as SectionCanvas;
+
+                double itemWidth = item.GetPropertyValue("ActualWidth").ToDouble();
+
+                if ((notchPlacement + itemWidth) > parent.ActualWidth)
+                {
+                    notchPlacement = parent.ActualWidth - itemWidth;
+                }
+
+                Canvas.SetLeft(item, notchPlacement);
 
                 item.MoveHandles();
             }
@@ -75,7 +99,18 @@ namespace REPORT.Builder.ReportComponents
         {
             foreach (UIElement item in canvaselements.Values)
             {
-                Canvas.SetTop(item, (Canvas.GetTop(item) + distance));
+                double notchPlacement = Canvas.GetTop(item) + distance;
+
+                SectionCanvas parent = item.FindParentControlBase(typeof(SectionCanvas)) as SectionCanvas;
+
+                double itemHeight = item.GetPropertyValue("ActualHeight").ToDouble();
+
+                if ((notchPlacement + itemHeight) > parent.ActualHeight)
+                {
+                    notchPlacement = parent.ActualHeight - itemHeight;
+                }
+
+                Canvas.SetTop(item, notchPlacement);
 
                 item.MoveHandles();
             }
@@ -629,7 +664,7 @@ namespace REPORT.Builder.ReportComponents
         }
 
         private static void SetBounds(UIElement element)
-        {            
+        {
             top = Canvas.GetTop(element) - HandleSize;
 
             left = Canvas.GetLeft(element) - HandleSize;

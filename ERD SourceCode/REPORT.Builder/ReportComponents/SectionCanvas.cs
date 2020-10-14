@@ -391,6 +391,10 @@ namespace REPORT.Builder.ReportComponents
             if (!isDragObject)
             {
                 this.AddReportToolItem(toolObject);
+
+                toolObject.UpdateLayout();
+
+                toolObject.MoveHandles();
             }
 
             Guid elementId = toolObject.GetElementId();

@@ -18,9 +18,11 @@ namespace REPORT.Builder
     /// Interaction logic for ReportHeaderFooters.xaml
     /// </summary>
     public partial class ReportHeaderFooters : UserControlBase
-    {
-        private ReportTypeEnum selectedreportType;
+    {        
+        private ReportTypeEnum selectedReportType;
+
         private ReportMasterModel[] headersAndFooters;
+
         private ReportMasterModel selectedHeaderAndFooter;
 
         public ReportHeaderFooters(ReportTypeEnum reportType)
@@ -29,11 +31,25 @@ namespace REPORT.Builder
 
             this.DataContext = this;
 
-            this.selectedreportType = reportType;
+            this.selectedReportType = reportType;
 
             this.Loaded += this.ReportHeaderFooters_Loaded;
             
-            this.uxButtonAdd.ToolTip = $"Add new {this.selectedreportType.GetDescriptionAttribute()}";            
+            this.uxButtonAdd.ToolTip = $"Add new {this.selectedReportType.GetDescriptionAttribute()}";            
+        }
+
+        public void SetReportTypeCategory(long? category)
+        {
+            this.reportCategoryId = category;
+
+            ReportTablesRepository repo = new ReportTablesRepository();
+
+            this.HeadersAndFooters = repo
+                .GetReportMasterByReportTypeEnum(
+                        (int)this.selectedReportType, 
+                        General.ProjectModel.ModelName, 
+                        this.reportCategoryId.HasValue ? this.reportCategoryId.Value : 0)
+                .ToArray();
         }
 
         public ReportMasterModel SelectedHeaderAndFooter
@@ -48,6 +64,15 @@ namespace REPORT.Builder
                 this.selectedHeaderAndFooter = value;
 
                 base.OnPropertyChanged(() => this.SelectedHeaderAndFooter);
+
+                if (value != null && value.Description.Length > 0)
+                {
+                    this.uxDescription.Content = value.Description.UnzipFile();
+                }
+                else
+                {
+                    this.uxDescription.Content = string.Empty;
+                }
             }
         }
 
@@ -72,16 +97,20 @@ namespace REPORT.Builder
             {
                 ReportTablesRepository repo = new ReportTablesRepository();
 
-                this.HeadersAndFooters = repo.GetReportMasterByReportTypeEnum((int)this.selectedreportType, General.ProjectModel.ModelName).ToArray();
-
-                if (this.selectedreportType == ReportTypeEnum.ReportContent)
+                if (this.selectedReportType == ReportTypeEnum.ReportContent)
                 {
+                    this.HeadersAndFooters = new ReportMasterModel[] { };
+
                     foreach (ReportMasterModel report in this.HeadersAndFooters)
                     {
                         ReportConnectionModel connection = repo.GetProductionOrConnectionModel(report.MasterReport_Id);
 
                         report.ProductionConnection = connection == null ? string.Empty : connection.ReportConnectionName;
                     }
+                }
+                else
+                {
+                    this.HeadersAndFooters = repo.GetReportMasterByReportTypeEnum((int)this.selectedReportType, General.ProjectModel.ModelName).ToArray();
                 }
             }
             catch (Exception err)
@@ -94,21 +123,28 @@ namespace REPORT.Builder
         {
             try
             {
+                if (this.selectedReportType == ReportTypeEnum.ReportContent
+                    && !this.reportCategoryId.HasValue)
+                {
+                    throw new ApplicationException("Invalid report category selected");
+                }
+
                 ReportDesigner designer = new ReportDesigner(new ReportMasterModel 
                 { 
-                    ReportTypeEnum = (int)this.selectedreportType,
+                    ReportTypeEnum = (int)this.selectedReportType,
                     PaperKindEnum = (int)PaperKind.A4,
                     PageOrientationEnum = (int)PageOrientationEnum.Portrait,
                     PageMarginTop = 100,
                     PageMarginBottom = 100,
                     PageMarginLeft = 100,
                     PageMarginRight = 100,
-                    ProjectName = General.ProjectModel.ModelName
+                    ProjectName = General.ProjectModel.ModelName,
+                    CategoryId = this.reportCategoryId
                 });
 
                 ControlDialog.WindowsShowIsClosing += this.WindowsShow_IsClosing;
 
-                ControlDialog.Show($"New {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized);                
+                ControlDialog.Show($"New {this.selectedReportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized);                
             }
             catch (Exception err)
             {
@@ -123,6 +159,11 @@ namespace REPORT.Builder
                 ReportDesigner userControl = control.To<ReportDesigner>();
 
                 ControlDialog.WindowsShowIsClosing -= this.WindowsShow_IsClosing;
+
+                if (userControl.ReportMaster.MasterReport_Id <= 0)
+                {   // User did not save the report
+                    return;
+                }
 
                 this.HeadersAndFooters = this.HeadersAndFooters.Add(userControl.ReportMaster);
             }
@@ -145,12 +186,14 @@ namespace REPORT.Builder
             {
                 ReportDesigner designer = new ReportDesigner(this.SelectedHeaderAndFooter);
 
-                ControlDialog.Show($"Edit {this.selectedreportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized);                
+                ControlDialog.Show($"Edit {this.selectedReportType.GetDescriptionAttribute()}", designer, "Save", windowState: WindowState.Maximized);                
             }
             catch (Exception err)
             {
                 MessageBox.Show(err.InnerExceptionMessage());
             }
         }
+
+        private long? reportCategoryId { get; set; }
     }
 }

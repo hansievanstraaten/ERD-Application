@@ -154,10 +154,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\ReportCategoryModel.cs" />
+    <Compile Include="Models\ReportXMLPrintParameterModel.cs" />
     <Compile Include="SQLRepository\Agrigates\Base\ReportCategoryBase.cs" />
+    <Compile Include="SQLRepository\Agrigates\Base\ReportXMLPrintParameterBase.cs" />
     <Compile Include="SQLRepository\Agrigates\User\ReportCategory.cs" />
+    <Compile Include="SQLRepository\Agrigates\User\ReportXMLPrintParameter.cs" />
     <Compile Include="SQLRepository\DbScript.cs" />
     <Compile Include="SQLRepository\Mappings\ReportCategoryMapping.cs" />
+    <Compile Include="SQLRepository\Mappings\ReportXMLPrintParameterMapping.cs" />
     <Compile Include="SQLRepository\Repositories\BuildReportRepository.cs" />
     <Compile Include="DatabaseConnection.cs" />
     <Compile Include="Models\DataSourceMasterModel.cs" />

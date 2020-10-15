@@ -4,12 +4,13 @@ using GeneralExtensions;
 using System.Collections.Generic;
 using System.Linq;
 using ViSo.SharedEnums;
+using System.Windows.Documents;
 
 namespace REPORT.Builder.Common.DatabaseOptions
 {
     internal class MsSQL : IDataToSQL
     {
-        public string BuildSelectQuery(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel)
+        public string BuildSelectQuery(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel, List<ReportXMLPrintParameterModel> reportFilters)
         {
             if (!columns.HasElements())
             {
@@ -40,15 +41,50 @@ namespace REPORT.Builder.Common.DatabaseOptions
 
             result.AppendLine($" FROM [{columns[0].TableName}] WITH(NOLOCK) ");
 
+            bool haveWhereClause = false;
+
             if (whereParameterModel.Count > 0)
             {
                 result.Append("WHERE ");
+
+                haveWhereClause = true;
             }
 
-            // TODO: Add Where Clause
             foreach(WhereParameterModel parameter in  whereParameterModel.OrderBy(so => so.OperatorIndex))
             {
                 result.AppendLine($"{parameter.ColumnName} = @{parameter.ParameterName} {(parameter.AndOrOperator == SqlWhereOperatorsEnum.None ? string.Empty : parameter.AndOrOperator.ParseToString())} ");
+            }
+
+            List<ReportXMLPrintParameterModel> validFilters = reportFilters
+                .Where(rf => !rf.FilterValue.IsNullEmptyOrWhiteSpace())
+                .ToList();
+
+            if (reportFilters.Count > 0 
+                && !haveWhereClause
+                && validFilters.Count > 0)
+			{
+                result.Append(" WHERE ");
+            }
+            else if (haveWhereClause && validFilters.Count > 0)
+            {
+                result.Append(" AND ");
+            }
+
+            for (int x = 0; x < validFilters.Count; ++x)
+			{
+                ReportXMLPrintParameterModel filter = validFilters[x];
+
+                if (filter.FilterValue.IsNullEmptyOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                result.AppendLine($"{filter.TableName}.{filter.ColumnName} = '{filter.FilterValue}'");
+                
+                if (x < validFilters.Count - 1)
+				{
+                    result.Append(" AND ");
+				}
             }
 
             return result.ToString();

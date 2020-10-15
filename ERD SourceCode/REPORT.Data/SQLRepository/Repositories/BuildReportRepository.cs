@@ -1,7 +1,9 @@
 ﻿using GeneralExtensions;
+using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.DataContext;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -16,6 +18,22 @@ namespace REPORT.Data.SQLRepository.Repositories
         {
             this.dataContext = new ReportsBuildContext();
         }
+
+        public int GetReportXMLVersion(long MasterReport_Id)
+        {
+            int result = this.dataContext
+                .ReportsXML
+                .Where(r => r.MasterReport_Id == MasterReport_Id)
+                .Max(m => m.ReportXMLVersion);
+
+            if (result == 0)
+            {
+                return 1;
+            }
+
+            return result;
+        }
+
 
         public void UpdateXmlPrinteCount(long masterReport_Id)
         {
@@ -79,6 +97,19 @@ namespace REPORT.Data.SQLRepository.Repositories
                 .FirstOrDefault(con => con.MasterReport_Id == masterReportId
                                     && con.IsActive
                                     && con.IsProductionConnection);
+        }
+
+        public List<ReportXMLPrintParameterModel> GetPrintparameters(long masterReport_Id, int reportXMLVersion)
+        {
+            List<ReportXMLPrintParameter> result = dataContext
+                .ReportXMLPrintParameters
+                .Where(r => r.MasterReport_Id == masterReport_Id
+                         && r.ReportXMLVersion == reportXMLVersion)
+                .ToList();
+
+            List<object> objectList = result.CopyToObject(typeof(ReportXMLPrintParameterModel));
+
+            return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
         }
     }
 }

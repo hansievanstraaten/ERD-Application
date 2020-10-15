@@ -113,7 +113,6 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result;
 		}
 
-
 		public List<ReportCategoryModel> GetActiveCategories()
         {
 			List<ReportCategory> result = base.dataContext
@@ -124,6 +123,35 @@ namespace REPORT.Data.SQLRepository.Repositories
 			List<object> objectList = result.CopyToObject(typeof(ReportCategoryModel));
 
 			return objectList.TryCast<ReportCategoryModel>().ToList();
+		}	
+	
+		public List<ReportXMLPrintParameterModel> GetPrintparameters(long masterReport_Id, int reportXMLVersion)
+		{
+			List<ReportXMLPrintParameter> result = base.dataContext
+				.ReportXMLPrintParameters
+				.Where(r => r.MasterReport_Id == masterReport_Id
+						 && r.ReportXMLVersion == reportXMLVersion)
+				.ToList();
+
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLPrintParameterModel));
+
+			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
+		}
+
+		public void DisableReportXMLPrintFilters(long masterReportId, int reportXMLVersion)
+		{
+			List<ReportXMLPrintParameter> parametersList = base.dataContext
+				.ReportXMLPrintParameters
+				.Where(p => p.MasterReport_Id == masterReportId
+						 && p.ReportXMLVersion == reportXMLVersion)
+				.ToList();
+
+			foreach(ReportXMLPrintParameter item in parametersList)
+			{
+				item.IsActive = false;
+			}
+
+			base.dataContext.SaveChanges();
 		}
 	}
 }

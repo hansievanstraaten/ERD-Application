@@ -177,9 +177,20 @@ namespace REPORT.Builder
                     };
                 }
 
-                reportXml.BinaryXML = this.GetReportXml().ToString().ZipFile();
+                XDocument reportXmlDocument = this.GetReportXml();
+
+                reportXml.BinaryXML = reportXmlDocument.ToString().ZipFile();
 
                 repo.UpdateReportXML(reportXml);
+
+                repo.DisableReportXMLPrintFilters(this.ReportMaster.MasterReport_Id, this.ReportMaster.ReportXMLVersion);
+
+                List<ReportXMLPrintParameterModel> xxx = this.GetReportparameterFilters(reportXmlDocument);
+
+                foreach(ReportXMLPrintParameterModel filter in this.GetReportparameterFilters(reportXmlDocument))
+				{
+                    repo.UpdateReportXMLPrintParameter(filter);
+				}                
 
                 #endregion
 
@@ -672,7 +683,7 @@ namespace REPORT.Builder
                 }
 
                 MenuItem item = (MenuItem)e.Source;
-
+                                
                 PrintPreview preview = new PrintPreview(this.ReportMaster.ReportName, this.GetPrintCanvases(item));
 
                 ControlDialog.Show("Reports", preview, string.Empty, showOkButton:false, windowState: WindowState.Maximized);
@@ -919,6 +930,8 @@ namespace REPORT.Builder
 
                 this.LoadDataSource();
             }
+
+            this.uxReportMasterModel.AllignAllCaptions();
         }
 
         private void LoadDataSource()
@@ -1022,19 +1035,57 @@ namespace REPORT.Builder
 
         private Dictionary<int, PrintCanvas> GetPrintCanvases(MenuItem item)
         {
-            BuildReportToCanvas reportPrint = new BuildReportToCanvas();
+            XDocument reportXml = this.GetReportXml();
 
-            //MenuItem item = (MenuItem)e.Source;
+            List<ReportXMLPrintParameterModel> parameterFilters = this.GetReportparameterFilters(reportXml);
+
+            if (parameterFilters.Count > 0)
+            {
+                ReportFilterOptions filters = new ReportFilterOptions(parameterFilters);
+
+                if (ControlDialog.ShowDialog("Parameter Filters", filters, "ValidateFilters", autoSize: true).IsFalse())
+                {
+                    throw new ApplicationException("No Filters selected");
+				}
+            }
+
+            BuildReportToCanvas reportPrint = new BuildReportToCanvas();
 
             DatabaseModel connection = Connections.Instance.GetConnection(item.Tag.ParseToString());
 
             BuildReportXML xmlBuild = new BuildReportXML();
 
-            XDocument repotXml = xmlBuild.GetReport(this.GetReportXml(), connection, this.ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster);
+            XDocument repotXml = xmlBuild.GetReport(reportXml, connection, this.ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster, parameterFilters);
 
             reportPrint.PrintDocument(repotXml);
 
             return reportPrint.Pages;
+        }
+
+        private List<ReportXMLPrintParameterModel> GetReportparameterFilters(XDocument reportXml)
+		{
+            List<XElement> filterElements = reportXml
+                    .Root
+                    .Descendants("ReportObject")
+                    .Where(r => r.IsDataObject() && r.Attribute("UseAsPrintParameter").Value == "true")
+                    .ToList();
+
+            List<ReportXMLPrintParameterModel> resut = new List<ReportXMLPrintParameterModel>();
+
+            foreach (XElement item in filterElements)
+            {
+                resut.Add(new ReportXMLPrintParameterModel
+                {
+                    TableName = item.Attribute("ObjectTable").Value,
+                    ColumnName = item.Attribute("ObjectColumn").Value,
+                    ReportXMLVersion = this.ReportMaster.ReportXMLVersion,
+                    MasterReport_Id = this.ReportMaster.MasterReport_Id,
+                    FilterCaption = item.Attribute("PrintParameterCaption").Value,
+                    IsActive = true
+                });
+            }
+
+            return resut;
         }
 
         #endregion

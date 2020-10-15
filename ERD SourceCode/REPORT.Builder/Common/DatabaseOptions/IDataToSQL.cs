@@ -5,7 +5,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
 {
     internal interface IDataToSQL
     {
-        string BuildSelectQuery(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel);
+        string BuildSelectQuery(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel, List<ReportXMLPrintParameterModel> reportFilters);
 
     }
 }

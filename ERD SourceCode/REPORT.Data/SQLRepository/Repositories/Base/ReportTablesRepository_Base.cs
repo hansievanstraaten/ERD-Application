@@ -72,6 +72,20 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.CopyToObject(new ReportCategoryModel()) as ReportCategoryModel;
 		}
+		
+		public ReportXMLPrintParameterModel GetReportXMLPrintParameterByPrimaryKey (string TableName, string ColumnName, int ReportXMLVersion, Int64 MasterReport_Id  )
+		{
+			ReportXMLPrintParameter result =this.dataContext
+				.ReportXMLPrintParameters
+				.FirstOrDefault(pk => pk.TableName == TableName && pk.ColumnName == ColumnName && pk.ReportXMLVersion == ReportXMLVersion && pk.MasterReport_Id == MasterReport_Id  );
+
+			if (result == null)
+			{
+				return null;
+			}
+
+			return result.CopyToObject(new ReportXMLPrintParameterModel()) as ReportXMLPrintParameterModel;
+		}
 
 		
 		public List<ReportMasterModel> GetReportMasterByForeignKeyCategoryId (Int64? CategoryId)
@@ -126,6 +140,42 @@ namespace REPORT.Data.SQLRepository.Repositories
 			List<object> objectList = result.CopyToObject(typeof(ReportConnectionModel));
 
 			return objectList.TryCast<ReportConnectionModel>().ToList();
+		}
+		
+		public List<ReportXMLPrintParameterModel> GetReportXMLPrintParameterByForeignKeyReportXMLVersion (int ReportXMLVersion)
+		{
+			List<ReportXMLPrintParameter> result = this.dataContext
+				.ReportXMLPrintParameters
+				.Where(fk => fk.ReportXMLVersion == ReportXMLVersion)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportXMLPrintParameterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLPrintParameterModel));
+
+			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
+		}
+		
+		public List<ReportXMLPrintParameterModel> GetReportXMLPrintParameterByForeignKeyMasterReport_Id (Int64 MasterReport_Id)
+		{
+			List<ReportXMLPrintParameter> result = this.dataContext
+				.ReportXMLPrintParameters
+				.Where(fk => fk.MasterReport_Id == MasterReport_Id)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportXMLPrintParameterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLPrintParameterModel));
+
+			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
 		}
 
 		
@@ -596,6 +646,42 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return objectList.TryCast<ReportCategoryModel>().ToList();
 		}
+		
+		public List<ReportXMLPrintParameterModel> GetReportXMLPrintParameterByIsActive (bool IsActive)
+		{
+			List<ReportXMLPrintParameter> result = this.dataContext
+				.ReportXMLPrintParameters
+				.Where(fk => fk.IsActive == IsActive)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportXMLPrintParameterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLPrintParameterModel));
+
+			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
+		}
+		
+		public List<ReportXMLPrintParameterModel> GetReportXMLPrintParameterByFilterCaption (string FilterCaption)
+		{
+			List<ReportXMLPrintParameter> result = this.dataContext
+				.ReportXMLPrintParameters
+				.Where(fk => fk.FilterCaption == FilterCaption)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportXMLPrintParameterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLPrintParameterModel));
+
+			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
+		}
 
 		public void UpdateReportMaster(ReportMasterModel model)
 		{
@@ -687,6 +773,29 @@ namespace REPORT.Data.SQLRepository.Repositories
 			this.dataContext.SaveChanges();
 
 			model = existing.CopyToObject(model) as ReportCategoryModel;
+		}
+
+		public void UpdateReportXMLPrintParameter(ReportXMLPrintParameterModel model)
+		{
+			ReportXMLPrintParameter existing = this.dataContext
+				.ReportXMLPrintParameters
+				.Where(rx => rx.TableName == model.TableName && rx.ColumnName == model.ColumnName && rx.ReportXMLVersion == model.ReportXMLVersion && rx.MasterReport_Id == model.MasterReport_Id  )
+				.FirstOrDefault();
+
+			if (existing == null)
+			{
+				existing = model.CopyToObject(new ReportXMLPrintParameter()) as ReportXMLPrintParameter;
+
+				this.dataContext.ReportXMLPrintParameters.Add(existing);
+			}
+			else
+			{
+				existing = model.CopyToObject(existing) as ReportXMLPrintParameter;
+			}
+
+			this.dataContext.SaveChanges();
+
+			model = existing.CopyToObject(model) as ReportXMLPrintParameterModel;
 		}
 
 

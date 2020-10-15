@@ -7,14 +7,16 @@ using WPF.Tools.Attributes;
 
 namespace REPORT.Builder.ReportTools
 {
-    [ModelName("Data Object")]
+	[ModelName("Data Object")]
     public class ReportDataObject : LabelBase
     {
         private ReportColumnModel columnModel;
 
         private bool suppressed;
+		private bool useAsPrintParameter;
+		private string printParameterCaption;
 
-        public ReportDataObject()
+		public ReportDataObject()
         {
             //this.ColumnModel = new ReportColumnModel();
 
@@ -32,6 +34,8 @@ namespace REPORT.Builder.ReportTools
                 result.Add(new XAttribute("ObjectType", "ReportDataObject"));
                 result.Add(new XAttribute("ObjectTable", this.ColumnModel.TableName));
                 result.Add(new XAttribute("ObjectColumn", this.ColumnModel.ColumnName));
+                result.Add(new XAttribute("UseAsPrintParameter", this.UseAsPrintParameter));
+                result.Add(new XAttribute("PrintParameterCaption", this.PrintParameterCaption));
                 result.Add(new XAttribute("Suppressed", this.Suppressed));
                 result.Add(new XAttribute("ColumnModel", this.ColumnModel.ZipFile().ConvertBytesToString()));
 
@@ -54,7 +58,35 @@ namespace REPORT.Builder.ReportTools
             }
         }
 
-        [FieldInformation("Is Suppressed", Sort = 500)]
+        [FieldInformation("Use as Print Parameter", Sort = 500)]
+        public bool UseAsPrintParameter
+        {
+            get
+			{
+                return this.useAsPrintParameter;
+			}
+
+            set
+			{
+                this.useAsPrintParameter = value;
+			}
+		}
+
+        [FieldInformation("Print Parameter Caption", Sort = 501)]
+        public string PrintParameterCaption
+		{
+            get
+			{
+                return this.printParameterCaption == null ? string.Empty : this.printParameterCaption;
+			}
+
+            set
+			{
+                this.printParameterCaption = value;
+			}
+		}
+
+        [FieldInformation("Is Suppressed", Sort = 502)]
         public bool Suppressed
         {
             get

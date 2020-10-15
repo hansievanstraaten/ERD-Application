@@ -116,6 +116,9 @@
     <Compile Include="ReportDesigner.xaml.cs">
       <DependentUpon>ReportDesigner.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ReportFilterOptions.xaml.cs">
+      <DependentUpon>ReportFilterOptions.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ReportHeaderFooters.xaml.cs">
       <DependentUpon>ReportHeaderFooters.xaml</DependentUpon>
     </Compile>
@@ -175,6 +178,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ReportDesigner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ReportFilterOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

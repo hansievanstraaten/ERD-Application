@@ -16,6 +16,8 @@ namespace REPORT.Builder.ReportComponents
 
         private List<WhereParameterModel> whereParameterModel;
 
+        private List<ReportXMLPrintParameterModel> reportFilters = new List<ReportXMLPrintParameterModel>();
+
         private List<int> foreignSectionIndex;
 
         internal CanvasSqlManager()
@@ -33,7 +35,7 @@ namespace REPORT.Builder.ReportComponents
         {
             get
             {
-                return ObjectCreator.GetCanvasSQL(this.columnsDictionary.Values.ToArray(), this.whereParameterModel);
+                return ObjectCreator.GetCanvasSQL(this.columnsDictionary.Values.ToArray(), this.whereParameterModel, this.reportFilters);
             }
         }
 
@@ -62,6 +64,11 @@ namespace REPORT.Builder.ReportComponents
                 return this.whereParameterModel;
             }
         }
+
+        internal void AddFilterParameters(List<ReportXMLPrintParameterModel> filters)
+		{
+            this.reportFilters.AddRange(filters);
+		}
 
         internal bool HaveForeignSectionIndex(int index)
         {

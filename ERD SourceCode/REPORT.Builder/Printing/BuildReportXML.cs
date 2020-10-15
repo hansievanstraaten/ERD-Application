@@ -7,16 +7,14 @@ using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure.Interception;
 using System.Linq;
-using System.Security.Policy;
 using System.Windows;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
 
 namespace REPORT.Builder.Printing
 {
-    public class BuildReportXML
+	public class BuildReportXML
     {
         private int sectionIndex = 0;
         
@@ -37,13 +35,26 @@ namespace REPORT.Builder.Printing
         private Dictionary<int, CanvasSqlManager> indexSqlManager = new Dictionary<int, CanvasSqlManager>();
 
         private Dictionary<string, string> executingValues = new Dictionary<string, string>();
+                
+        private Dictionary<string, List<ReportXMLPrintParameterModel>> tableFilters;
 
-        public XDocument GetReport(XDocument xmlReport, DatabaseModel connection, ReportMaster reportMaster)
+        public XDocument GetReport(XDocument xmlReport, DatabaseModel connection, ReportMaster reportMaster, List<ReportXMLPrintParameterModel> filtes)
         {
             if (this.repo == null)
             {
                 this.repo = new BuildReportRepository();
             }
+
+            if (filtes.Count == 0)
+			{
+                this.tableFilters = new Dictionary<string, List<ReportXMLPrintParameterModel>>();
+			}
+            else
+			{
+                this.tableFilters = filtes
+                    .GroupBy(g => g.TableName)
+                    .ToDictionary(t => t.Key, c => c.ToList());
+			}
 
             this.dataAccessConnection = connection;
 
@@ -139,16 +150,23 @@ namespace REPORT.Builder.Printing
 
             ReportMaster reportMaster = this.repo.GetReportMaster(this.masterReport_Id);
 
-            return this.GetReport(result, null, reportMaster);
+            List<ReportXMLPrintParameterModel> filtes = this.repo.GetPrintparameters(this.masterReport_Id, this.repo.GetReportXMLVersion(this.masterReport_Id));
+
+            return this.GetReport(result, null, reportMaster, filtes);
         }
 
         private void BuildReportData(XElement dataNode)
         {
             this.ExtractRequiredParameters();
 
-            XDocument data = this.data.ExecuteQuery(this.FormatSQL(this.indexSqlManager[this.sectionIndex].SQLQuery));
-
             string sectionTableName = this.indexSqlManager[this.sectionIndex].TableName;
+
+            this.indexSqlManager[this.sectionIndex]
+                .AddFilterParameters((this.tableFilters.ContainsKey(sectionTableName) ? 
+                    this.tableFilters[sectionTableName] : 
+                    new List<ReportXMLPrintParameterModel>()));
+
+            XDocument data = this.data.ExecuteQuery(this.FormatSQL(this.indexSqlManager[this.sectionIndex].SQLQuery));
 
             XElement sectionData = new XElement(sectionTableName);
                 

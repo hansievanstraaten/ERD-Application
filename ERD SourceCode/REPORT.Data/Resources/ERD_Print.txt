@@ -291,6 +291,8 @@ BEGIN
     ADD [CategoryId] [BigInt]  NULL
 END
 
+
+
 IF NOT EXISTS(SELECT 1
                 FROM SYS.INDEXES
                WHERE IS_PRIMARY_KEY = 1
@@ -591,6 +593,103 @@ SET QUOTED_IDENTIFIER ON
 
 IF NOT EXISTS (SELECT 1
                  FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME = 'ReportXMLPrintParameter')
+BEGIN
+    CREATE TABLE [ReportXMLPrintParameter]
+         ( 
+           [TableName] [VarChar] (255) NOT NULL,
+           [ColumnName] [VarChar] (255) NOT NULL,
+           [ReportXMLVersion] [Int]  NOT NULL,
+           [MasterReport_Id] [BigInt]  NOT NULL,
+           [IsActive] [Bit]  NOT NULL,
+           [FilterCaption] [VarChar] (255) NOT NULL,
+    CONSTRAINT [PK_ReportXMLPrintParameter] PRIMARY KEY CLUSTERED
+    (
+        [TableName] ASC,
+        [ColumnName] ASC,
+        [ReportXMLVersion] ASC,
+        [MasterReport_Id] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
+                  AND COLUMN_NAME = 'TableName')
+BEGIN
+    ALTER TABLE [ReportXMLPrintParameter]
+    ADD [TableName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
+                  AND COLUMN_NAME = 'ColumnName')
+BEGIN
+    ALTER TABLE [ReportXMLPrintParameter]
+    ADD [ColumnName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
+                  AND COLUMN_NAME = 'ReportXMLVersion')
+BEGIN
+    ALTER TABLE [ReportXMLPrintParameter]
+    ADD [ReportXMLVersion] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
+                  AND COLUMN_NAME = 'MasterReport_Id')
+BEGIN
+    ALTER TABLE [ReportXMLPrintParameter]
+    ADD [MasterReport_Id] [BigInt]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
+                  AND COLUMN_NAME = 'IsActive')
+BEGIN
+    ALTER TABLE [ReportXMLPrintParameter]
+    ADD [IsActive] [Bit]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
+                  AND COLUMN_NAME = 'FilterCaption')
+BEGIN
+    ALTER TABLE [ReportXMLPrintParameter]
+    ADD [FilterCaption] [VarChar] (255) NOT NULL
+END
+
+
+
+IF NOT EXISTS(SELECT 1
+                FROM SYS.INDEXES
+               WHERE IS_PRIMARY_KEY = 1
+               AND[NAME] = 'PK_ReportXMLPrintParameter')
+BEGIN
+    ALTER TABLE[ReportXMLPrintParameter]
+    ADD CONSTRAINT PK_ReportXMLPrintParameter PRIMARY KEY CLUSTERED([TableName],[ColumnName],[ReportXMLVersion],[MasterReport_Id]);
+END
+
+
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+IF NOT EXISTS (SELECT 1
+                 FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_NAME = 'Lookup')
 BEGIN
     CREATE TABLE [Lookup]
@@ -694,6 +793,16 @@ BEGIN
     REFERENCES [dbo].[ReportMaster] ([MasterReport_Id])
 
 ALTER TABLE [dbo].[ReportConnection] CHECK CONSTRAINT [FK__ReportMaster__ReportConnection]
+END
+
+
+
+IF (OBJECT_ID('dbo.FK__ReportXML__ReportXMLPrintParameter', 'F') IS NULL)
+BEGIN
+    ALTER TABLE [dbo].[ReportXMLPrintParameter]  WITH CHECK ADD  CONSTRAINT [FK__ReportXML__ReportXMLPrintParameter] FOREIGN KEY([ReportXMLVersion], [MasterReport_Id])
+    REFERENCES [dbo].[ReportXML] ([ReportXMLVersion], [MasterReport_Id])
+
+ALTER TABLE [dbo].[ReportXMLPrintParameter] CHECK CONSTRAINT [FK__ReportXML__ReportXMLPrintParameter]
 END
 
 

@@ -14,6 +14,7 @@ namespace REPORT.Data.SQLRepository.DataContext
 		public DbSet<ReportXML> ReportsXML { get; set; }
 		public DbSet<ReportConnection> ReportConnections { get; set; }
 		public DbSet<ReportCategory> ReportCategories { get; set; }
+		public DbSet<ReportXMLPrintParameter> ReportXMLPrintParameters { get; set; }
 		public DbSet<Lookup> Lookups { get; set; }
 
 		public ReportsBuildContext() : base(DatabaseConnection.Instance.ConnectionString)
@@ -31,6 +32,7 @@ namespace REPORT.Data.SQLRepository.DataContext
 			modelBuilder.Configurations.Add(new ReportXMLMapping());
 			modelBuilder.Configurations.Add(new ReportConnectionMapping());
 			modelBuilder.Configurations.Add(new ReportCategoryMapping());
+			modelBuilder.Configurations.Add(new ReportXMLPrintParameterMapping());
 			modelBuilder.Configurations.Add(new LookupMapping());
 
 		}

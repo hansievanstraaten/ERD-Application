@@ -28,7 +28,7 @@ namespace WPF.Tools.ModelViewer
         {
             this.InitializeComponent();
 
-            this.Loaded += this.ModelViewObject_Loaded;
+            //this.Loaded += this.ModelViewObject_Loaded;
 
             this.LoadOnlyAttributedFields = loadOnlyAttributedFlag;
 
@@ -52,6 +52,8 @@ namespace WPF.Tools.ModelViewer
             }
 
             this.LoadPropertyObjects();
+
+            this.AllignCaptions();
         }
 
         public ModelViewObject(object classObject) : this(classObject, true)
@@ -181,30 +183,30 @@ namespace WPF.Tools.ModelViewer
             }
         }
 
-        private void ModelViewObject_Loaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                double maxCaptionWidth = 100;
+        //private void ModelViewObject_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    //try
+        //    //{
+        //    //    double maxCaptionWidth = 100;
 
-                foreach (ModelViewItem viewerItem in this.Items)
-                {
-                    if (viewerItem.CaptionTextWidth > maxCaptionWidth)
-                    {
-                        maxCaptionWidth = viewerItem.CaptionTextWidth;
-                    }
-                }
+        //    //    foreach (ModelViewItem viewerItem in this.Items)
+        //    //    {
+        //    //        if (viewerItem.CaptionTextWidth > maxCaptionWidth)
+        //    //        {
+        //    //            maxCaptionWidth = viewerItem.CaptionTextWidth;
+        //    //        }
+        //    //    }
 
-                foreach (ModelViewItem viewerItem in this.Items)
-                {
-                    viewerItem.CaptionWidth = maxCaptionWidth;
-                }
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(TranslationDictionary.Translate(err.InnerExceptionMessage()));
-            }
-        }
+        //    //    foreach (ModelViewItem viewerItem in this.Items)
+        //    //    {
+        //    //        viewerItem.CaptionWidth = maxCaptionWidth;
+        //    //    }
+        //    //}
+        //    //catch (Exception err)
+        //    //{
+        //    //    MessageBox.Show(TranslationDictionary.Translate(err.InnerExceptionMessage()));
+        //    //}
+        //}
 
         private void ModelItem_Focus(ModelViewItem sender, object focusedbject)
         {
@@ -232,6 +234,31 @@ namespace WPF.Tools.ModelViewer
             catch (Exception err)
             {
                 MessageBox.Show(err.Message);
+            }
+        }
+
+        private void AllignCaptions()
+        {
+            try
+            {
+                double maxCaptionWidth = 100;
+
+                foreach (ModelViewItem viewerItem in this.Items)
+                {
+                    if (viewerItem.CaptionTextWidth > maxCaptionWidth)
+                    {
+                        maxCaptionWidth = viewerItem.CaptionTextWidth;
+                    }
+                }
+
+                foreach (ModelViewItem viewerItem in this.Items)
+                {
+                    viewerItem.CaptionWidth = maxCaptionWidth;
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(TranslationDictionary.Translate(err.InnerExceptionMessage()));
             }
         }
 

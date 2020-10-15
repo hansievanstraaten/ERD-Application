@@ -59,6 +59,7 @@
     <Compile Include="ObjectExstentions.cs" />
     <Compile Include="SecureStringFunctions.cs" />
     <Compile Include="SqlDbTypeExstentions.cs" />
+    <Compile Include="StringBuilderExstentions.cs" />
     <Compile Include="TypeExstentions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringExtensions.cs" />

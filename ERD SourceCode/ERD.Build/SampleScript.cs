@@ -53,7 +53,7 @@ namespace ERD.Build
 
             result.Append(body.Code);
 
-            //this.BuildTypeIteration(ref result, classOption.BuildTypes);
+            this.ExecuteIfStatment(ref result, 0);
 
             return this.RemoveTrailingCharacters(result);
         }
@@ -78,6 +78,8 @@ namespace ERD.Build
             result.Append(this.ReplaceParameters(body.Code));
 
             this.BuildTypeIteration(ref result, classOption.BuildTypes);
+
+            this.ExecuteIfStatment(ref result, 0);
 
             return this.RemoveTrailingCharacters(result);
         }
@@ -105,7 +107,45 @@ namespace ERD.Build
 
             this.BuildTypeIteration(ref result, classOption.BuildTypes);
 
+            this.ExecuteIfStatment(ref result, 0);
+
             return this.RemoveTrailingCharacters(result);
+        }
+
+        public void ExecuteIfStatment(ref StringBuilder result, int passedIndex)
+        {
+            string startIfString = "[[IF{{"; //0}}]]";
+
+            string endIfString = "}}]]";
+
+            int startIfIndex = result.IndexOf(startIfString, passedIndex);
+
+            if (startIfIndex <= 0)
+            {
+                return;
+            }
+
+            int endIfIndex = result.IndexOf(endIfString, startIfIndex) + endIfString.Length;
+
+            int indexLength = endIfIndex - startIfIndex;
+
+            string checkValue = result.Substring(startIfIndex, indexLength);
+
+            string[] checkValues = checkValue
+                .Replace(startIfString, string.Empty)
+                .Replace(endIfString, string.Empty)
+                .Split(new string[] { "==", "then" }, System.StringSplitOptions.RemoveEmptyEntries);
+
+            if (checkValues[0].Trim() == checkValues[1].Trim())
+            {
+                result.Replace(checkValue, checkValues[2], startIfIndex, indexLength);
+            }
+            else
+            {
+                result.Replace(checkValue, string.Empty, startIfIndex, indexLength);
+            }
+
+            this.ExecuteIfStatment(ref result, startIfIndex);
         }
 
         public string RemoveTrailingCharacters(StringBuilder value)
@@ -193,6 +233,17 @@ namespace ERD.Build
 
                     case RepeatTypeEnum.ForeachTableInProject:
 
+                        List<BuildTypeModel> nextTypesListB = new List<BuildTypeModel>();
+
+                        int xIndexB = x;
+
+                        while (xIndexB < buildTypesArray.Length)
+                        {
+                            nextTypesListB.Add(buildTypesArray[xIndexB]);
+
+                            ++xIndexB;
+                        }
+
                         foreach (ErdCanvasModel canvas in this.AllErdCanvasModels)
                         {
                             foreach (TableModel table in canvas.SegmentTables)
@@ -200,6 +251,8 @@ namespace ERD.Build
                                 this.SelectedTable = table;
 
                                 injectionText.Append(this.ReplaceParameters(buildType.Code));
+
+                                this.BuildTypeIteration(ref injectionText, nextTypesListB.ToArray());
                             }
                         }
 
@@ -355,7 +408,8 @@ namespace ERD.Build
                 .Replace("[[DataType]]", this.ColumnDataType)
                 .Replace("[[DatabaseColumnType]]", this.SqlDataType)
                 .Replace("[[DatabaseColumnLength]]", this.FieldLength)
-                .Replace("[[DatabaseNullableType]]", this.SqlNullableDataType)                ;
+                .Replace("[[DatabaseNullableType]]", this.SqlNullableDataType) 
+                .Replace("[[DatabaseColumnTypeIDENTITY]]", this.SqlColumnIDENTITY);
 
             return rawText;
         }
@@ -446,7 +500,6 @@ namespace ERD.Build
           }
         }
 
-
         private string ForeignTablePluralName
         {
             get
@@ -460,7 +513,6 @@ namespace ERD.Build
             }
         }
 
-
         private string ForeignTableDescription
         {
             get
@@ -473,8 +525,6 @@ namespace ERD.Build
                 return this.SelectedReferencedTable.Description;
             }
         }
-
-
 
         private string PrimaryKeyColumnName
         {
@@ -600,6 +650,24 @@ namespace ERD.Build
                 }
 
                 return "NOT NULL";
+            }
+        }
+
+        private string SqlColumnIDENTITY
+        {
+            get
+            {
+                if (this.SelectedColumn == null)
+                {
+                    return "false";
+                }
+
+                if (this.SelectedColumn.DataType.EndsWith(" IDENTITY"))
+                {
+                    return "true";
+                }
+
+                return "false";
             }
         }
     }

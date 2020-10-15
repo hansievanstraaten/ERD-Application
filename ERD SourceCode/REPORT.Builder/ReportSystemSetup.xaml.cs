@@ -1,6 +1,8 @@
 ﻿using ERD.Models.ReportModels;
 using GeneralExtensions;
 using Newtonsoft.Json;
+using REPORT.Data;
+using REPORT.Data.SQLRepository;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -49,6 +51,19 @@ namespace REPORT.Builder
                 string fileObject = JsonConvert.SerializeObject(this.ReportSetup);
 
                 File.WriteAllText(this.ReportFileName, fileObject);
+
+                this.ReportSetup.DataBaseSource.Password = this.ReportSetup.DataBaseSource.Password.Decrypt();
+
+                this.ReportSetup.DataBaseSource.IsEncrypted = false;
+
+                if (this.ReportSetup.StorageType == StorageTypeEnum.DatabaseSystem)
+				{
+                    DatabaseConnection.Instance.InitializeConnectionString(this.ReportSetup);
+
+                    DbScript script = new DbScript();
+
+                    script.InitializeReportsDB();
+                }
 
                 return true;
             }

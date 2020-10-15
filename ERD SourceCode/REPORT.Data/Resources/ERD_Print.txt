@@ -1,0 +1,699 @@
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+IF NOT EXISTS (SELECT 1
+                 FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME = 'DataSourceMaster')
+BEGIN
+    CREATE TABLE [DataSourceMaster]
+         ( 
+           [MasterReport_Id] [BigInt]  NOT NULL,
+           [MainTableName] [VarChar] (255) NOT NULL,
+    CONSTRAINT [PK_DataSourceMaster] PRIMARY KEY CLUSTERED
+    (
+        [MasterReport_Id] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'DataSourceMaster' 
+                  AND COLUMN_NAME = 'MasterReport_Id')
+BEGIN
+    ALTER TABLE [DataSourceMaster]
+    ADD [MasterReport_Id] [BigInt]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'DataSourceMaster' 
+                  AND COLUMN_NAME = 'MainTableName')
+BEGIN
+    ALTER TABLE [DataSourceMaster]
+    ADD [MainTableName] [VarChar] (255) NOT NULL
+END
+
+
+
+IF NOT EXISTS(SELECT 1
+                FROM SYS.INDEXES
+               WHERE IS_PRIMARY_KEY = 1
+               AND[NAME] = 'PK_DataSourceMaster')
+BEGIN
+    ALTER TABLE[DataSourceMaster]
+    ADD CONSTRAINT PK_DataSourceMaster PRIMARY KEY CLUSTERED([MasterReport_Id]);
+END
+
+
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+IF NOT EXISTS (SELECT 1
+                 FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME = 'DataSourceTable')
+BEGIN
+    CREATE TABLE [DataSourceTable]
+         ( 
+           [MasterReport_Id] [BigInt]  NOT NULL,
+           [TableName] [VarChar] (255) NOT NULL,
+           [IsAvailable] [Bit]  NOT NULL,
+    CONSTRAINT [PK_DataSourceTable] PRIMARY KEY CLUSTERED
+    (
+        [MasterReport_Id] ASC,
+        [TableName] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'DataSourceTable' 
+                  AND COLUMN_NAME = 'MasterReport_Id')
+BEGIN
+    ALTER TABLE [DataSourceTable]
+    ADD [MasterReport_Id] [BigInt]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'DataSourceTable' 
+                  AND COLUMN_NAME = 'TableName')
+BEGIN
+    ALTER TABLE [DataSourceTable]
+    ADD [TableName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'DataSourceTable' 
+                  AND COLUMN_NAME = 'IsAvailable')
+BEGIN
+    ALTER TABLE [DataSourceTable]
+    ADD [IsAvailable] [Bit]  NOT NULL
+END
+
+
+
+IF NOT EXISTS(SELECT 1
+                FROM SYS.INDEXES
+               WHERE IS_PRIMARY_KEY = 1
+               AND[NAME] = 'PK_DataSourceTable')
+BEGIN
+    ALTER TABLE[DataSourceTable]
+    ADD CONSTRAINT PK_DataSourceTable PRIMARY KEY CLUSTERED([MasterReport_Id],[TableName]);
+END
+
+
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+IF NOT EXISTS (SELECT 1
+                 FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME = 'ReportMaster')
+BEGIN
+    CREATE TABLE [ReportMaster]
+         ( 
+           [MasterReport_Id] [BigInt]  IDENTITY(1,1) NOT NULL,
+           [ReportName] [VarChar] (255) NOT NULL,
+           [Description] [VarBinary] (MAX) NULL,
+           [ReportTypeEnum] [Int]  NOT NULL,
+           [PaperKindEnum] [Int]  NOT NULL,
+           [PageOrientationEnum] [Int]  NOT NULL,
+           [CoverPage_Id] [BigInt]  NULL,
+           [HeaderAndFooterPage_Id] [BigInt]  NULL,
+           [FinalPage_Id] [BigInt]  NULL,
+           [PageMarginLeft] [Int]  NOT NULL,
+           [PageMarginRight] [Int]  NOT NULL,
+           [PageMarginTop] [Int]  NOT NULL,
+           [PageMarginBottom] [Int]  NOT NULL,
+           [ProjectName] [VarChar] (255) NOT NULL,
+           [CategoryId] [BigInt]  NULL,
+    CONSTRAINT [PK_ReportMaster] PRIMARY KEY CLUSTERED
+    (
+        [MasterReport_Id] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'MasterReport_Id')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [MasterReport_Id] [BigInt]  IDENTITY(1,1) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'ReportName')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [ReportName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'Description')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [Description] [VarBinary] (MAX) NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'ReportTypeEnum')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [ReportTypeEnum] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'PaperKindEnum')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [PaperKindEnum] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'PageOrientationEnum')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [PageOrientationEnum] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'CoverPage_Id')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [CoverPage_Id] [BigInt]  NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'HeaderAndFooterPage_Id')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [HeaderAndFooterPage_Id] [BigInt]  NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'FinalPage_Id')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [FinalPage_Id] [BigInt]  NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'PageMarginLeft')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [PageMarginLeft] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'PageMarginRight')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [PageMarginRight] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'PageMarginTop')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [PageMarginTop] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'PageMarginBottom')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [PageMarginBottom] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'ProjectName')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [ProjectName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportMaster' 
+                  AND COLUMN_NAME = 'CategoryId')
+BEGIN
+    ALTER TABLE [ReportMaster]
+    ADD [CategoryId] [BigInt]  NULL
+END
+
+IF NOT EXISTS(SELECT 1
+                FROM SYS.INDEXES
+               WHERE IS_PRIMARY_KEY = 1
+               AND[NAME] = 'PK_ReportMaster')
+BEGIN
+    ALTER TABLE[ReportMaster]
+    ADD CONSTRAINT PK_ReportMaster PRIMARY KEY CLUSTERED([MasterReport_Id]);
+END
+
+
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+IF NOT EXISTS (SELECT 1
+                 FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME = 'ReportXML')
+BEGIN
+    CREATE TABLE [ReportXML]
+         ( 
+           [ReportXMLVersion] [Int]  NOT NULL,
+           [MasterReport_Id] [BigInt]  NOT NULL,
+           [BinaryXML] [VarBinary] (MAX) NOT NULL,
+           [PrintCount] [BigInt]  NOT NULL,
+    CONSTRAINT [PK_ReportXML] PRIMARY KEY CLUSTERED
+    (
+        [ReportXMLVersion] ASC,
+        [MasterReport_Id] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXML' 
+                  AND COLUMN_NAME = 'ReportXMLVersion')
+BEGIN
+    ALTER TABLE [ReportXML]
+    ADD [ReportXMLVersion] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXML' 
+                  AND COLUMN_NAME = 'MasterReport_Id')
+BEGIN
+    ALTER TABLE [ReportXML]
+    ADD [MasterReport_Id] [BigInt]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXML' 
+                  AND COLUMN_NAME = 'BinaryXML')
+BEGIN
+    ALTER TABLE [ReportXML]
+    ADD [BinaryXML] [VarBinary] (MAX) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXML' 
+                  AND COLUMN_NAME = 'PrintCount')
+BEGIN
+    ALTER TABLE [ReportXML]
+    ADD [PrintCount] [BigInt]  NOT NULL
+END
+
+
+
+IF NOT EXISTS(SELECT 1
+                FROM SYS.INDEXES
+               WHERE IS_PRIMARY_KEY = 1
+               AND[NAME] = 'PK_ReportXML')
+BEGIN
+    ALTER TABLE[ReportXML]
+    ADD CONSTRAINT PK_ReportXML PRIMARY KEY CLUSTERED([ReportXMLVersion],[MasterReport_Id]);
+END
+
+
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+IF NOT EXISTS (SELECT 1
+                 FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME = 'ReportConnection')
+BEGIN
+    CREATE TABLE [ReportConnection]
+         ( 
+           [MasterReport_Id] [BigInt]  NOT NULL,
+           [ReportConnectionName] [VarChar] (255) NOT NULL,
+           [DatabaseTypeEnum] [Int]  NOT NULL,
+           [ServerName] [VarChar] (255) NOT NULL,
+           [DatabaseName] [VarChar] (255) NOT NULL,
+           [UserName] [VarChar] (255) NOT NULL,
+           [Password] [VarChar] (MAX) NOT NULL,
+           [TrustedConnection] [Bit]  NOT NULL,
+           [IsProductionConnection] [Bit]  NOT NULL,
+           [IsActive] [Bit]  NOT NULL,
+    CONSTRAINT [PK_ReportConnection] PRIMARY KEY CLUSTERED
+    (
+        [MasterReport_Id] ASC,
+        [ReportConnectionName] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'MasterReport_Id')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [MasterReport_Id] [BigInt]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'ReportConnectionName')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [ReportConnectionName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'DatabaseTypeEnum')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [DatabaseTypeEnum] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'ServerName')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [ServerName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'DatabaseName')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [DatabaseName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'UserName')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [UserName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'Password')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [Password] [VarChar] (MAX) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'TrustedConnection')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [TrustedConnection] [Bit]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'IsProductionConnection')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [IsProductionConnection] [Bit]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportConnection' 
+                  AND COLUMN_NAME = 'IsActive')
+BEGIN
+    ALTER TABLE [ReportConnection]
+    ADD [IsActive] [Bit]  NOT NULL
+END
+
+
+
+IF NOT EXISTS(SELECT 1
+                FROM SYS.INDEXES
+               WHERE IS_PRIMARY_KEY = 1
+               AND[NAME] = 'PK_ReportConnection')
+BEGIN
+    ALTER TABLE[ReportConnection]
+    ADD CONSTRAINT PK_ReportConnection PRIMARY KEY CLUSTERED([MasterReport_Id],[ReportConnectionName]);
+END
+
+
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+IF NOT EXISTS (SELECT 1
+                 FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME = 'ReportCategory')
+BEGIN
+    CREATE TABLE [ReportCategory]
+         ( 
+           [CategoryId] [BigInt]  IDENTITY(1,1) NOT NULL,
+           [CategoryName] [VarChar] (255) NOT NULL,
+           [IsActive] [Bit]  NOT NULL,
+           [ParentCategoryId] [BigInt]  NULL,
+    CONSTRAINT [PK_ReportCategory] PRIMARY KEY CLUSTERED
+    (
+        [CategoryId] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportCategory' 
+                  AND COLUMN_NAME = 'CategoryId')
+BEGIN
+    ALTER TABLE [ReportCategory]
+    ADD [CategoryId] [BigInt]  IDENTITY(1,1) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportCategory' 
+                  AND COLUMN_NAME = 'CategoryName')
+BEGIN
+    ALTER TABLE [ReportCategory]
+    ADD [CategoryName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportCategory' 
+                  AND COLUMN_NAME = 'IsActive')
+BEGIN
+    ALTER TABLE [ReportCategory]
+    ADD [IsActive] [Bit]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportCategory' 
+                  AND COLUMN_NAME = 'ParentCategoryId')
+BEGIN
+    ALTER TABLE [ReportCategory]
+    ADD [ParentCategoryId] [BigInt]  NULL
+END
+
+
+
+IF NOT EXISTS(SELECT 1
+                FROM SYS.INDEXES
+               WHERE IS_PRIMARY_KEY = 1
+               AND[NAME] = 'PK_ReportCategory')
+BEGIN
+    ALTER TABLE[ReportCategory]
+    ADD CONSTRAINT PK_ReportCategory PRIMARY KEY CLUSTERED([CategoryId]);
+END
+
+
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+IF NOT EXISTS (SELECT 1
+                 FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME = 'Lookup')
+BEGIN
+    CREATE TABLE [Lookup]
+         ( 
+           [LookupGroup] [VarChar] (255) NOT NULL,
+           [GroupKey] [Int]  NOT NULL,
+           [GroupDescription] [VarChar] (255) NOT NULL,
+    CONSTRAINT [PK_Lookup] PRIMARY KEY CLUSTERED
+    (
+        [LookupGroup] ASC,
+        [GroupKey] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+END
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'Lookup' 
+                  AND COLUMN_NAME = 'LookupGroup')
+BEGIN
+    ALTER TABLE [Lookup]
+    ADD [LookupGroup] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'Lookup' 
+                  AND COLUMN_NAME = 'GroupKey')
+BEGIN
+    ALTER TABLE [Lookup]
+    ADD [GroupKey] [Int]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'Lookup' 
+                  AND COLUMN_NAME = 'GroupDescription')
+BEGIN
+    ALTER TABLE [Lookup]
+    ADD [GroupDescription] [VarChar] (255) NOT NULL
+END
+
+
+
+IF NOT EXISTS(SELECT 1
+                FROM SYS.INDEXES
+               WHERE IS_PRIMARY_KEY = 1
+               AND[NAME] = 'PK_Lookup')
+BEGIN
+    ALTER TABLE[Lookup]
+    ADD CONSTRAINT PK_Lookup PRIMARY KEY CLUSTERED([LookupGroup],[GroupKey]);
+END
+
+
+
+IF (OBJECT_ID('dbo.FK__ReportMaster__DataSourceMaster', 'F') IS NULL)
+BEGIN
+    ALTER TABLE [dbo].[DataSourceMaster]  WITH CHECK ADD  CONSTRAINT [FK__ReportMaster__DataSourceMaster] FOREIGN KEY([MasterReport_Id])
+    REFERENCES [dbo].[ReportMaster] ([MasterReport_Id])
+
+ALTER TABLE [dbo].[DataSourceMaster] CHECK CONSTRAINT [FK__ReportMaster__DataSourceMaster]
+END
+
+
+
+IF (OBJECT_ID('dbo.FK__DataSourceMaster__DataSourceTable', 'F') IS NULL)
+BEGIN
+    ALTER TABLE [dbo].[DataSourceTable]  WITH CHECK ADD  CONSTRAINT [FK__DataSourceMaster__DataSourceTable] FOREIGN KEY([MasterReport_Id])
+    REFERENCES [dbo].[DataSourceMaster] ([MasterReport_Id])
+
+ALTER TABLE [dbo].[DataSourceTable] CHECK CONSTRAINT [FK__DataSourceMaster__DataSourceTable]
+END
+
+
+
+IF (OBJECT_ID('dbo.FK__ReportCategory__ReportMaster', 'F') IS NULL)
+BEGIN
+    ALTER TABLE [dbo].[ReportMaster]  WITH CHECK ADD  CONSTRAINT [FK__ReportCategory__ReportMaster] FOREIGN KEY([CategoryId])
+    REFERENCES [dbo].[ReportCategory] ([CategoryId])
+
+ALTER TABLE [dbo].[ReportMaster] CHECK CONSTRAINT [FK__ReportCategory__ReportMaster]
+END
+
+
+
+IF (OBJECT_ID('dbo.FK__ReportMaster__ReportXML', 'F') IS NULL)
+BEGIN
+    ALTER TABLE [dbo].[ReportXML]  WITH CHECK ADD  CONSTRAINT [FK__ReportMaster__ReportXML] FOREIGN KEY([MasterReport_Id])
+    REFERENCES [dbo].[ReportMaster] ([MasterReport_Id])
+
+ALTER TABLE [dbo].[ReportXML] CHECK CONSTRAINT [FK__ReportMaster__ReportXML]
+END
+
+
+
+IF (OBJECT_ID('dbo.FK__ReportMaster__ReportConnection', 'F') IS NULL)
+BEGIN
+    ALTER TABLE [dbo].[ReportConnection]  WITH CHECK ADD  CONSTRAINT [FK__ReportMaster__ReportConnection] FOREIGN KEY([MasterReport_Id])
+    REFERENCES [dbo].[ReportMaster] ([MasterReport_Id])
+
+ALTER TABLE [dbo].[ReportConnection] CHECK CONSTRAINT [FK__ReportMaster__ReportConnection]
+END
+
+

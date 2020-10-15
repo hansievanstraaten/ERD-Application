@@ -2,6 +2,7 @@
 using GeneralExtensions;
 using Newtonsoft.Json;
 using REPORT.Data;
+using REPORT.Data.SQLRepository;
 using System;
 using System.IO;
 using System.Windows;
@@ -56,7 +57,18 @@ namespace REPORT.Builder
 
                 this.ReportSetup = JsonConvert.DeserializeObject(fileContent, typeof(ReportSetupModel)) as ReportSetupModel;
 
+                if (this.ReportSetup.DataBaseSource.IsEncrypted)
+				{
+                    this.ReportSetup.DataBaseSource.Password = this.ReportSetup.DataBaseSource.Password.Decrypt();
+
+                    this.ReportSetup.DataBaseSource.IsEncrypted = false;
+                }
+
                 DatabaseConnection.Instance.InitializeConnectionString(this.ReportSetup);
+
+                DbScript script = new DbScript();
+
+                script.InitializeReportsDB();
 
                 #endregion
 

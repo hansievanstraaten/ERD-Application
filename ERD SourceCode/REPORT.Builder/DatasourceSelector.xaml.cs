@@ -1,12 +1,9 @@
 ﻿using ERD.Common;
-using ERD.Models;
 using GeneralExtensions;
 using REPORT.Data.Models;
-using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using WPF.Tools.BaseClasses;

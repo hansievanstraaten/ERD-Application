@@ -23,5 +23,7 @@
 [[DatabaseColumnType]]=Replaces with the database datatype used,
 [[DatabaseColumnLength]]=Replaces with the  column length,
 [[DatabaseNullableType]]=Replaces with the Database Nullable type. E.g. 'NULL' or 'NOT NULL',
+[[DatabaseColumnTypeIDENTITY]]= Returns true or false,
 
-[[?*]]=Removes the last occurrence of the specified parameter and replaces the pre-ceding instances with the character specified as the '*'.
+[[?*]]=Removes the last occurrence of the specified parameter and replaces the pre-ceding instances with the character specified as the '*'.,
+[[IF{{0}}]]= Executes only if the contition is met. This start with the parameter value e.g. [[DataType]] followed by == and the string value that must be true.

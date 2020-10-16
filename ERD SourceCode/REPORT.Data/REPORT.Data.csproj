@@ -218,9 +218,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ERD.Base\ERD.Base.csproj">
+      <Project>{2A61A104-CB60-4D3E-B4B4-38D4C822BABB}</Project>
+      <Name>ERD.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ERD.Common\ERD.Common.csproj">
       <Project>{719be630-883f-4009-abfe-3d0965018d4b}</Project>
       <Name>ERD.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj">
+      <Project>{42D76052-8D0D-4571-8D65-861B7BB5CB6D}</Project>
+      <Name>ERD.DatabaseScripts</Name>
     </ProjectReference>
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj">
       <Project>{A3A6B6F4-1959-4A99-A5CA-472BC1B605EA}</Project>

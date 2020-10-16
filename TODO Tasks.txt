@@ -1,6 +1,9 @@
 - Implement Data Sort
 - Change report Category
 - Delete Report
+- Implement Column Replace value
+- Data objects Suppress IF NO DATTA
+- Filter options default value
 
 - Web Api for web printing and download
 - Create File System DB setup

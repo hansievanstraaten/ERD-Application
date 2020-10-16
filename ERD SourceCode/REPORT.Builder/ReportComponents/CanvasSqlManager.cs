@@ -35,7 +35,11 @@ namespace REPORT.Builder.ReportComponents
         {
             get
             {
-                return ObjectCreator.GetCanvasSQL(this.columnsDictionary.Values.ToArray(), this.whereParameterModel, this.reportFilters);
+                return ObjectCreator.GetCanvasSQL(
+                    this.columnsDictionary.Values.ToArray(), 
+                    this.whereParameterModel, 
+                    this.reportFilters, 
+                    this.orderByString);
             }
         }
 
@@ -68,6 +72,11 @@ namespace REPORT.Builder.ReportComponents
         internal void AddFilterParameters(List<ReportXMLPrintParameterModel> filters)
 		{
             this.reportFilters.AddRange(filters);
+		}
+
+        internal void AddOrderByString(string orderBy)
+		{
+            this.orderByString = orderBy;
 		}
 
         internal bool HaveForeignSectionIndex(int index)
@@ -156,6 +165,8 @@ namespace REPORT.Builder.ReportComponents
 
             this.whereParameterModel.AddRange(whereModels);
         }
+
+        private string orderByString { get; set; }
 
         private void AddColumnCount(string columnName)
         {

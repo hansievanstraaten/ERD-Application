@@ -46,11 +46,7 @@ namespace REPORT.Builder
 
                 if (!File.Exists(this.ReportFileName))
                 {
-                    MessageBox.Show("Setup not Found");
-
-                    this.CloseIfNotMainWindow(false);
-
-                    return;
+                    throw new ApplicationException("Setup not Found");
                 }
 
                 string fileContent = File.ReadAllText(this.ReportFileName);
@@ -64,11 +60,11 @@ namespace REPORT.Builder
                     this.ReportSetup.DataBaseSource.IsEncrypted = false;
                 }
 
-                DatabaseConnection.Instance.InitializeConnectionString(this.ReportSetup);
-
                 DbScript script = new DbScript();
 
-                script.InitializeReportsDB();
+                script.InitializeReportsDB(this.ReportSetup);
+
+                DatabaseConnection.Instance.InitializeConnectionString(this.ReportSetup);
 
                 #endregion
 

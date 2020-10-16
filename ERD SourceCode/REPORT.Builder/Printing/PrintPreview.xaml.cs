@@ -24,12 +24,23 @@ namespace REPORT.Builder.Printing
 
             this.printPages = pages;
 
+            int printedPages = 0;
+
             foreach (KeyValuePair<int, PrintCanvas> pageKeyPair in this.printPages)
             {
                 pageKeyPair.Value.Margin = new System.Windows.Thickness(5);
 
                 this.uxPageStack.Children.Add(pageKeyPair.Value);
+
+                ++printedPages;
+
+                if (printedPages >= 15)
+				{   // Do this to prevent over poading of report. This is to heavy
+                    break;
+				}
             }
+
+            this.uxPageCount.Content = printedPages >= 15 ? $"Max of Pages {printedPages} Reached for Print Preview." : $"{printedPages} Pages";
         }
 
         private void ReportPrint_Cliked(object sender, System.Windows.RoutedEventArgs e)

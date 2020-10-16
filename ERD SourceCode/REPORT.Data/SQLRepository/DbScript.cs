@@ -1,5 +1,11 @@
+using ERD.Base;
+using ERD.Common;
+using ERD.Models.ReportModels;
+using ERD.Viewer.Database;
 using GeneralExtensions;
 using REPORT.Data.SQLRepository.DataContext;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -9,9 +15,17 @@ namespace REPORT.Data.SQLRepository
 	{
 		private ReportTablesContext contex;
 
-		public void InitializeReportsDB()
+		public void InitializeReportsDB(ReportSetupModel reportSetup)
 		{
-			this.contex = new ReportTablesContext();
+			Dictionary<string, string> connectionValues = new Dictionary<string, string>();
+
+			connectionValues.Add("ServerName", reportSetup.DataBaseSource.ServerName);
+			connectionValues.Add("DatabaseName", reportSetup.DataBaseSource.DatabaseName);
+			connectionValues.Add("UserName", reportSetup.DataBaseSource.UserName);
+			connectionValues.Add("Password", reportSetup.DataBaseSource.Password);
+			connectionValues.Add("TrustedConnection", reportSetup.DataBaseSource.TrustedConnection.ParseToString());
+
+			DataAccess dataAccess = new DataAccess(DatabaseTypeEnum.SQL, connectionValues);
 
 			var script = typeof(Properties.Resources)
 			  .GetProperties(BindingFlags.Static | BindingFlags.NonPublic |
@@ -19,8 +33,22 @@ namespace REPORT.Data.SQLRepository
 			  .Where(p => p.PropertyType == typeof(string) && p.Name == "ERD_Print")
 			  .Select(x => new { SqlScript = x.GetValue(null, null) })
 			  .FirstOrDefault();
-				
-			this.contex.Database.ExecuteSqlCommand(script.SqlScript.ParseToString(), new object[] { });
+
+			dataAccess.ExecuteNonQuery(script.SqlScript.ParseToString());
+
+			//string[] queryies = script.SqlScript.ParseToString().Split(new string[] { "[[GO]]" }, StringSplitOptions.RemoveEmptyEntries);
+
+			//foreach (string query in queryies)
+			//{				
+			//	try
+			//	{
+			//		dataAccess.ExecuteNonQuery(query);
+			//	}
+			//	catch (Exception err)
+			//	{
+			//		throw;
+			//	}
+			//}
 		}
 	}
 }

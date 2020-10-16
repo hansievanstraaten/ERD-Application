@@ -4,14 +4,16 @@ using System.Xml.Linq;
 
 namespace ERD.DatabaseScripts
 {
-  internal interface IDataAccess
-  {
-    void Construct(DatabaseModel databaseModel);
+    internal interface IDataAccess
+    {
+        void Construct(DatabaseModel databaseModel);
 
-    XDocument ExecuteQuery(string sqlQuery);
+        void Construct(Dictionary<string, string> setupValues);
 
-    List<dynamic> ExecuteQueryDynamic(string sqlQuery);
+        XDocument ExecuteQuery(string sqlQuery);
 
-    int ExecuteNonQuery(string sqlQuery);
-  }
+        List<dynamic> ExecuteQueryDynamic(string sqlQuery);
+
+        int ExecuteNonQuery(string sqlQuery);
+    }
 }

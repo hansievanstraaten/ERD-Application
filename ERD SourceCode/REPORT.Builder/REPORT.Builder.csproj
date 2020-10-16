@@ -72,6 +72,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CategorySelector.xaml.cs">
+      <DependentUpon>CategorySelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Common\DatabaseOptions\IDataToSQL.cs" />
     <Compile Include="Common\DatabaseOptions\MsSQL.cs" />
     <Compile Include="Common\ObjectCreator.cs" />
@@ -157,6 +160,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="CategorySelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DatasourceSelector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

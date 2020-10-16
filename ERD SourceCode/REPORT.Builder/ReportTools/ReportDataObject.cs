@@ -15,6 +15,7 @@ namespace REPORT.Builder.ReportTools
         private bool suppressed;
 		private bool useAsPrintParameter;
 		private string printParameterCaption;
+		private bool useInOrderBy;
 
 		public ReportDataObject()
         {
@@ -36,6 +37,7 @@ namespace REPORT.Builder.ReportTools
                 result.Add(new XAttribute("ObjectColumn", this.ColumnModel.ColumnName));
                 result.Add(new XAttribute("UseAsPrintParameter", this.UseAsPrintParameter));
                 result.Add(new XAttribute("PrintParameterCaption", this.PrintParameterCaption));
+                result.Add(new XAttribute("UseInOrderBy", this.UseInOrderBy));
                 result.Add(new XAttribute("Suppressed", this.Suppressed));
                 result.Add(new XAttribute("ColumnModel", this.ColumnModel.ZipFile().ConvertBytesToString()));
 
@@ -86,7 +88,21 @@ namespace REPORT.Builder.ReportTools
 			}
 		}
 
-        [FieldInformation("Is Suppressed", Sort = 502)]
+        [FieldInformation("Use In Order By", Sort = 502)]
+        public bool UseInOrderBy
+		{
+            get
+			{
+                return this.useInOrderBy;
+			}
+
+            set
+			{
+                this.useInOrderBy = value;
+			}
+		}
+
+        [FieldInformation("Is Suppressed", Sort = 503)]
         public bool Suppressed
         {
             get

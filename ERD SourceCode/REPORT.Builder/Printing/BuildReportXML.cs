@@ -14,10 +14,10 @@ using ViSo.SharedEnums.ReportEnums;
 
 namespace REPORT.Builder.Printing
 {
-	public class BuildReportXML
+    public class BuildReportXML
     {
         private int sectionIndex = 0;
-        
+
         private long masterReport_Id;
 
         private BuildReportRepository repo;
@@ -35,7 +35,9 @@ namespace REPORT.Builder.Printing
         private Dictionary<int, CanvasSqlManager> indexSqlManager = new Dictionary<int, CanvasSqlManager>();
 
         private Dictionary<string, string> executingValues = new Dictionary<string, string>();
-                
+
+        private Dictionary<string, string> orderByDictionary = new Dictionary<string, string>();
+
         private Dictionary<string, List<ReportXMLPrintParameterModel>> tableFilters;
 
         public XDocument GetReport(XDocument xmlReport, DatabaseModel connection, ReportMaster reportMaster, List<ReportXMLPrintParameterModel> filtes)
@@ -46,22 +48,42 @@ namespace REPORT.Builder.Printing
             }
 
             if (filtes.Count == 0)
-			{
+            {
                 this.tableFilters = new Dictionary<string, List<ReportXMLPrintParameterModel>>();
-			}
+            }
             else
-			{
+            {
                 this.tableFilters = filtes
                     .GroupBy(g => g.TableName)
                     .ToDictionary(t => t.Key, c => c.ToList());
-			}
+            }
 
             this.dataAccessConnection = connection;
+
+            Dictionary<string, XElement[]> sqlOrderBy = xmlReport
+                .Root
+                .Descendants("ReportObject")
+                .Where(ro => ro.IsDataObject() && ro.Attribute("UseInOrderBy").Value == "true")
+                .GroupBy(tn => tn.Attribute("ObjectTable").Value)
+                .ToDictionary(td => td.Key, td => td.ToArray());
+
+            //.FirstOrDefault(ro => ro.IsDataObject() && ro.Attribute("UseInOrderBy").Value == "true");
+
+            Dictionary<string, string> orderByDictionary = new Dictionary<string, string>();
+
+            foreach(KeyValuePair<string, XElement[]> orderKey in sqlOrderBy)
+			{
+                string[] orderString = orderKey.Value
+                    .Select(x => x.Attribute("ObjectColumn").Value)
+                    .ToArray();
+
+                this.orderByDictionary.Add(orderKey.Key, orderString.Concatenate(","));
+            }
 
             string reportTypeValue = xmlReport.Root.Element("ReportSettings").Attribute("ReportTypeEnum").Value;
 
             #region BUILD REPORT DATA
-            
+
             ReportTypeEnum reportType = (ReportTypeEnum)reportTypeValue.ToInt32();
 
             if (reportType == ReportTypeEnum.ReportContent)
@@ -161,17 +183,23 @@ namespace REPORT.Builder.Printing
 
             string sectionTableName = this.indexSqlManager[this.sectionIndex].TableName;
 
-            this.indexSqlManager[this.sectionIndex]
-                .AddFilterParameters((this.tableFilters.ContainsKey(sectionTableName) ? 
-                    this.tableFilters[sectionTableName] : 
-                    new List<ReportXMLPrintParameterModel>()));
+			this.indexSqlManager[this.sectionIndex]
+				.AddFilterParameters((this.tableFilters.ContainsKey(sectionTableName) ?
+					this.tableFilters[sectionTableName] :
+					new List<ReportXMLPrintParameterModel>()));
 
-            XDocument data = this.data.ExecuteQuery(this.FormatSQL(this.indexSqlManager[this.sectionIndex].SQLQuery));
+            if (this.orderByDictionary.ContainsKey(sectionTableName))
+			{
+                this.indexSqlManager[this.sectionIndex]
+                    .AddOrderByString(this.orderByDictionary[sectionTableName]);
+			}
+
+			XDocument data = this.data.ExecuteQuery(this.FormatSQL(this.indexSqlManager[this.sectionIndex].SQLQuery));
 
             XElement sectionData = new XElement(sectionTableName);
-                
+
             sectionData.Add(new XAttribute("SectionGroupIndex", this.SelectedSection.GetSectionGroupIndex()));
-                
+
             foreach (XElement row in data.Root.Elements())
             {
                 row.Add(new XAttribute("SectionIndex", this.sectionIndex));
@@ -185,7 +213,7 @@ namespace REPORT.Builder.Printing
                 foreach (int foreignIndex in foreignSections)
                 {
                     this.sectionIndex = foreignIndex;
-                    
+
                     this.DoSectionSetup();
 
                     this.SetExecutingParameters(sectionTableName, row);
@@ -205,7 +233,7 @@ namespace REPORT.Builder.Printing
 
         public string FormatSQL(string sql)
         {
-            foreach(KeyValuePair<string, string> value in this.executingValues)
+            foreach (KeyValuePair<string, string> value in this.executingValues)
             {
                 sql = sql.Replace(value.Key, $"'{value.Value}'");
             }
@@ -215,13 +243,13 @@ namespace REPORT.Builder.Printing
 
         private void SetExecutingParameters(string tableName, XElement row)
         {
-            foreach(XElement column in row.Elements())
+            foreach (XElement column in row.Elements())
             {
                 string parameterKey = $"{tableName}.{column.Name.LocalName}";
 
                 List<KeyValuePair<string, string>> parameter = this.whereParameters.Where(v => v.Value == parameterKey).ToList();
 
-                foreach(KeyValuePair<string, string> parameterkeyPair in parameter)
+                foreach (KeyValuePair<string, string> parameterkeyPair in parameter)
                 {
                     string columnSeek = parameterkeyPair.Value.Remove(0, (tableName.Length + 1));
 
@@ -245,7 +273,7 @@ namespace REPORT.Builder.Printing
                 .Where(d => d.Attribute("ParameterName").Value.StartsWith(this.indexSqlManager[this.sectionIndex].TableName))
                     .ToList();
 
-            foreach(XElement item in expectedWheres)
+            foreach (XElement item in expectedWheres)
             {
                 string columnName = item.Attribute("ColumnName").Value;
 
@@ -286,7 +314,7 @@ namespace REPORT.Builder.Printing
                 if (item.Name.LocalName == "ReportObject" && item.Attribute("ObjectType").Value == "ReportDataObject")
                 {
                     UIElement child = ObjectCreator.CreateReportObject(item, false);
-                        
+
                     sqlManager.AddColumn(child.GetPropertyValue("ColumnModel") as ReportColumnModel);
                 }
             }
@@ -307,7 +335,7 @@ namespace REPORT.Builder.Printing
 
             this.indexSqlManager.Add(this.sectionIndex, sqlManager);
         }
-    
+
         private void CreateConnectionObject()
         {
             if (this.dataAccessConnection == null)

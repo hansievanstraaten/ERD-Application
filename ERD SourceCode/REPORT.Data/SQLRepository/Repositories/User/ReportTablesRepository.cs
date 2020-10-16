@@ -1,6 +1,7 @@
 using GeneralExtensions;
 using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -136,6 +137,60 @@ namespace REPORT.Data.SQLRepository.Repositories
 			List<object> objectList = result.CopyToObject(typeof(ReportXMLPrintParameterModel));
 
 			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
+		}
+
+		public bool CategoryHaveReports(long categoryId)
+		{
+			List<ReportCategory> categories = base.dataContext.ReportCategories.ToList();
+
+			return this.CheckCategoryHaveReports(categories, categoryId);			
+		}
+
+		private bool CheckCategoryHaveReports(List<ReportCategory> categories, long categoryId)
+		{
+			if (this.CategoryReportCount(categoryId) > 0)
+			{
+				return true;
+			}
+
+			foreach (ReportCategory category in categories.Where(pc => pc.ParentCategoryId == categoryId))
+			{
+				if (this.CheckCategoryHaveReports(categories, category.CategoryId))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public int CategoryReportCount(long categoryId)
+		{
+			return base.dataContext
+				.ReportsMaster
+				.Where(ci => ci.CategoryId == categoryId)
+				.Count();
+		}
+
+		public void DeleteCategory(long categoryId)
+		{
+			int reportCount = base.dataContext
+				.ReportsMaster
+				.Where(ci => ci.CategoryId == categoryId)
+				.Count();
+
+			if (reportCount > 0)
+			{
+				throw new ApplicationException("Cannot delete Category while reports are attached.");
+			}
+
+			ReportCategory category = base.dataContext
+				.ReportCategories
+				.First(rc => rc.CategoryId == categoryId);
+
+			category.IsActive = false;
+
+			base.dataContext.SaveChanges();
 		}
 
 		public void DisableReportXMLPrintFilters(long masterReportId, int reportXMLVersion)

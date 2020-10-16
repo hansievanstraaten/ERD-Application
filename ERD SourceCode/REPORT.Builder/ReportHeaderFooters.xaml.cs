@@ -33,6 +33,8 @@ namespace REPORT.Builder
 
             this.selectedReportType = reportType;
 
+            this.uxChangeCategory.Visibility = this.selectedReportType == ReportTypeEnum.ReportContent ? Visibility.Visible : Visibility.Collapsed; 
+
             this.Loaded += this.ReportHeaderFooters_Loaded;
             
             this.uxButtonAdd.ToolTip = $"Add new {this.selectedReportType.GetDescriptionAttribute()}";            
@@ -156,6 +158,11 @@ namespace REPORT.Builder
         {
             try
             {
+                if (control.GetType() != typeof(ReportDesigner))
+				{
+                    return;
+				}
+
                 ReportDesigner userControl = control.To<ReportDesigner>();
 
                 ControlDialog.WindowsShowIsClosing -= this.WindowsShow_IsClosing;
@@ -194,6 +201,43 @@ namespace REPORT.Builder
             }
         }
 
+		private void ChangeCategory_Click(object sender, RoutedEventArgs e)
+		{
+            try
+			{
+                if (this.SelectedHeaderAndFooter == null)
+				{
+                    MessageBox.Show("Please select a Report.");
+
+                    return;
+				}
+
+                CategorySelector selector = new CategorySelector();
+
+                if (ControlDialog.ShowDialog("Report Categories", selector, string.Empty).IsFalse())
+				{
+                    return;
+				}
+
+                if (this.SelectedHeaderAndFooter.CategoryId == selector.SelectedCategoryId)
+				{
+                    return;
+				}
+
+                this.SelectedHeaderAndFooter.CategoryId = selector.SelectedCategoryId;
+
+                ReportTablesRepository repo = new ReportTablesRepository();
+
+                repo.UpdateReportMaster(this.SelectedHeaderAndFooter);
+
+                this.HeadersAndFooters = this.HeadersAndFooters.Remove(this.SelectedHeaderAndFooter);
+            }
+            catch (Exception err)
+			{
+                MessageBox.Show(err.Message);
+			}
+		}
+
         private long? reportCategoryId { get; set; }
-    }
+	}
 }

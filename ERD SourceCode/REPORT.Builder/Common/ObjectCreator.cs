@@ -99,7 +99,11 @@ namespace REPORT.Builder.Common
             }
         }
     
-        internal static string GetCanvasSQL(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel, List<ReportXMLPrintParameterModel> reportFilters)
+        internal static string GetCanvasSQL(
+            ReportColumnModel[] columns, 
+            List<WhereParameterModel> whereParameterModel, 
+            List<ReportXMLPrintParameterModel> reportFilters,
+            string orderByString)
         {
             DatabaseTypeEnum buildType = Connections.Instance.DatabaseModel.DatabaseType;
 
@@ -112,7 +116,7 @@ namespace REPORT.Builder.Common
 
                     sql = new MsSQL();
 
-                    return sql.BuildSelectQuery(columns, whereParameterModel, reportFilters);
+                    return sql.BuildSelectQuery(columns, whereParameterModel, reportFilters, orderByString);
             }
         }
     }

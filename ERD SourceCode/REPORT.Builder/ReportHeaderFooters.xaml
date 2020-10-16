@@ -22,8 +22,9 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="0" Grid.Column="0">
-            <CommonControls:ActionButton x:Name="uxButtonAdd" ResourceImageName="Add" Click="OnAdd_Click" />
-            <CommonControls:ActionButton x:Name="uxButtonEdit" ResourceImageName="Edit" Click="OnEdit_Click" />
+            <CommonControls:ActionButton x:Name="uxButtonAdd" ToolTip="Add new Report" ResourceImageName="Add" Click="OnAdd_Click" />
+            <CommonControls:ActionButton x:Name="uxButtonEdit" ToolTip="Edit Report" ResourceImageName="Edit" Click="OnEdit_Click" />
+            <CommonControls:ActionButton x:Name="uxChangeCategory" ToolTip="Change Report Category" ResourceImageName="TagItem" Click="ChangeCategory_Click" Visibility="Collapsed" />
         </StackPanel>
         
         <DataGridObjects:ViSoDataGrid Grid.Row="0" Grid.Column="1"

@@ -162,6 +162,8 @@
     <None Include="Resources\DefaultImage.png" />
     <None Include="Resources\PrintPreview.png" />
     <None Include="Resources\ExportPDF.png" />
+    <None Include="Resources\Tag.png" />
+    <None Include="Resources\TagItem.png" />
     <Content Include="ViSo_nice.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

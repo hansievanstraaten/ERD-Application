@@ -10,7 +10,11 @@ namespace REPORT.Builder.Common.DatabaseOptions
 {
     internal class MsSQL : IDataToSQL
     {
-        public string BuildSelectQuery(ReportColumnModel[] columns, List<WhereParameterModel> whereParameterModel, List<ReportXMLPrintParameterModel> reportFilters)
+        public string BuildSelectQuery(
+            ReportColumnModel[] columns, 
+            List<WhereParameterModel> whereParameterModel, 
+            List<ReportXMLPrintParameterModel> reportFilters,
+            string orderByString)
         {
             if (!columns.HasElements())
             {
@@ -86,6 +90,11 @@ namespace REPORT.Builder.Common.DatabaseOptions
                     result.Append(" AND ");
 				}
             }
+
+            if (!orderByString.IsNullEmptyOrWhiteSpace())
+			{
+                result.Append($" ORDER BY {orderByString} ASC");
+			}
 
             return result.ToString();
         }

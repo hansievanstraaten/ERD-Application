@@ -11,6 +11,7 @@
                      d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -19,12 +20,9 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!--<StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Background="White">
-            <CommonControls:ActionButton ResourceImageName="Print" ToolTip="Print Report" Click="ReportPrint_Cliked" />
-            <CommonControls:ActionButton ResourceImageName="ExportPDF" ToolTip="Export to PDF" Click="ExportPDF_Cliked" />
-        </StackPanel>-->
+        <CommonControls:LableItem Grid.Row="0" Grid.Column="1" x:Name="uxPageCount" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="White" />
         
-        <ScrollViewer Grid.Row="0" Grid.Column="1">
+        <ScrollViewer Grid.Row="1" Grid.Column="1">
             <StackPanel x:Name="uxPageStack" HorizontalAlignment="Center" />
         </ScrollViewer>
             

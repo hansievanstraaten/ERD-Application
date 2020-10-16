@@ -58,11 +58,9 @@ namespace REPORT.Builder
 
                 if (this.ReportSetup.StorageType == StorageTypeEnum.DatabaseSystem)
 				{
-                    DatabaseConnection.Instance.InitializeConnectionString(this.ReportSetup);
-
                     DbScript script = new DbScript();
 
-                    script.InitializeReportsDB();
+                    script.InitializeReportsDB(this.ReportSetup);
                 }
 
                 return true;

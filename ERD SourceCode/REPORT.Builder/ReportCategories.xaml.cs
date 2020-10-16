@@ -77,8 +77,45 @@ namespace REPORT.Builder
 
         private void DeleteCategory_Cliked(object sender, System.Windows.RoutedEventArgs e)
         {
+            if (this.SelectedCategory == null)
+			{
+                MessageBox.Show("Please Select a Category.");
+
+                return;
+			}
+
             try
             {
+                long categoryId = this.SelectedCategory.Tag.ToInt64();
+
+                ReportTablesRepository repo = new ReportTablesRepository();
+
+                if (repo.CategoryHaveReports(categoryId))
+                {
+                    throw new ApplicationException("Cannot delete Category while reports are attached.");
+                }
+
+                string message = $"Are you sure that you want to delete '{this.SelectedCategory.Header}'?";
+
+                MessageBoxResult boxResult = MessageBox.Show(message, "Delete", MessageBoxButton.YesNo);
+
+                if (boxResult != MessageBoxResult.Yes)
+				{
+                    return;
+				}
+
+                repo.DeleteCategory(categoryId);
+
+                if (this.SelectedCategory.Parent.GetType() == typeof(TreeViewItemTool))
+                {
+                    TreeViewItemTool parent = this.SelectedCategory.Parent as TreeViewItemTool;
+
+                    parent.Items.Remove(this.SelectedCategory);
+                }
+                else
+				{
+                    this.uxCategoryTree.Items.Remove(this.SelectedCategory);
+				}
 
             }
             catch (Exception err)

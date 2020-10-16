@@ -15,7 +15,7 @@ BEGIN
         [MasterReport_Id] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-END
+END                            
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -24,7 +24,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [DataSourceMaster]
     ADD [MasterReport_Id] [BigInt]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -34,18 +34,9 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [DataSourceMaster]
     ADD [MainTableName] [VarChar] (255) NOT NULL
-END
+END                            
 
-
-
-IF NOT EXISTS(SELECT 1
-                FROM SYS.INDEXES
-               WHERE IS_PRIMARY_KEY = 1
-               AND[NAME] = 'PK_DataSourceMaster')
-BEGIN
-    ALTER TABLE[DataSourceMaster]
-    ADD CONSTRAINT PK_DataSourceMaster PRIMARY KEY CLUSTERED([MasterReport_Id]);
-END
+               
 
 
 SET ANSI_NULLS ON
@@ -67,7 +58,7 @@ BEGIN
         [TableName] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-END
+END                            
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -76,7 +67,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [DataSourceTable]
     ADD [MasterReport_Id] [BigInt]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -86,7 +77,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [DataSourceTable]
     ADD [TableName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -96,18 +87,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [DataSourceTable]
     ADD [IsAvailable] [Bit]  NOT NULL
-END
-
-
-
-IF NOT EXISTS(SELECT 1
-                FROM SYS.INDEXES
-               WHERE IS_PRIMARY_KEY = 1
-               AND[NAME] = 'PK_DataSourceTable')
-BEGIN
-    ALTER TABLE[DataSourceTable]
-    ADD CONSTRAINT PK_DataSourceTable PRIMARY KEY CLUSTERED([MasterReport_Id],[TableName]);
-END
+END                            
 
 
 SET ANSI_NULLS ON
@@ -140,7 +120,7 @@ BEGIN
         [MasterReport_Id] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-END
+END                            
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -149,7 +129,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [MasterReport_Id] [BigInt]  IDENTITY(1,1) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -159,7 +139,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [ReportName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -169,7 +149,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [Description] [VarBinary] (MAX) NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -179,7 +159,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [ReportTypeEnum] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -189,7 +169,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [PaperKindEnum] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -199,7 +179,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [PageOrientationEnum] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -209,7 +189,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [CoverPage_Id] [BigInt]  NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -219,7 +199,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [HeaderAndFooterPage_Id] [BigInt]  NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -229,7 +209,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [FinalPage_Id] [BigInt]  NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -239,7 +219,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [PageMarginLeft] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -249,7 +229,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [PageMarginRight] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -259,7 +239,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [PageMarginTop] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -269,7 +249,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [PageMarginBottom] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -279,7 +259,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [ProjectName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -289,18 +269,9 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportMaster]
     ADD [CategoryId] [BigInt]  NULL
-END
+END                            
 
 
-
-IF NOT EXISTS(SELECT 1
-                FROM SYS.INDEXES
-               WHERE IS_PRIMARY_KEY = 1
-               AND[NAME] = 'PK_ReportMaster')
-BEGIN
-    ALTER TABLE[ReportMaster]
-    ADD CONSTRAINT PK_ReportMaster PRIMARY KEY CLUSTERED([MasterReport_Id]);
-END
 
 
 SET ANSI_NULLS ON
@@ -323,7 +294,7 @@ BEGIN
         [MasterReport_Id] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-END
+END                            
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -332,7 +303,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXML]
     ADD [ReportXMLVersion] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -342,7 +313,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXML]
     ADD [MasterReport_Id] [BigInt]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -352,7 +323,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXML]
     ADD [BinaryXML] [VarBinary] (MAX) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -362,18 +333,8 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXML]
     ADD [PrintCount] [BigInt]  NOT NULL
-END
+END                            
 
-
-
-IF NOT EXISTS(SELECT 1
-                FROM SYS.INDEXES
-               WHERE IS_PRIMARY_KEY = 1
-               AND[NAME] = 'PK_ReportXML')
-BEGIN
-    ALTER TABLE[ReportXML]
-    ADD CONSTRAINT PK_ReportXML PRIMARY KEY CLUSTERED([ReportXMLVersion],[MasterReport_Id]);
-END
 
 
 SET ANSI_NULLS ON
@@ -402,7 +363,7 @@ BEGIN
         [ReportConnectionName] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-END
+END                            
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -411,7 +372,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [MasterReport_Id] [BigInt]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -421,7 +382,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [ReportConnectionName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -431,7 +392,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [DatabaseTypeEnum] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -441,7 +402,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [ServerName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -451,7 +412,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [DatabaseName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -461,7 +422,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [UserName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -471,7 +432,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [Password] [VarChar] (MAX) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -481,7 +442,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [TrustedConnection] [Bit]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -491,7 +452,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [IsProductionConnection] [Bit]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -501,18 +462,8 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportConnection]
     ADD [IsActive] [Bit]  NOT NULL
-END
-
-
-
-IF NOT EXISTS(SELECT 1
-                FROM SYS.INDEXES
-               WHERE IS_PRIMARY_KEY = 1
-               AND[NAME] = 'PK_ReportConnection')
-BEGIN
-    ALTER TABLE[ReportConnection]
-    ADD CONSTRAINT PK_ReportConnection PRIMARY KEY CLUSTERED([MasterReport_Id],[ReportConnectionName]);
-END
+END                            
+             
 
 
 SET ANSI_NULLS ON
@@ -534,7 +485,7 @@ BEGIN
         [CategoryId] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-END
+END                            
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -543,7 +494,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportCategory]
     ADD [CategoryId] [BigInt]  IDENTITY(1,1) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -553,7 +504,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportCategory]
     ADD [CategoryName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -563,7 +514,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportCategory]
     ADD [IsActive] [Bit]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -573,18 +524,8 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportCategory]
     ADD [ParentCategoryId] [BigInt]  NULL
-END
+END                            
 
-
-
-IF NOT EXISTS(SELECT 1
-                FROM SYS.INDEXES
-               WHERE IS_PRIMARY_KEY = 1
-               AND[NAME] = 'PK_ReportCategory')
-BEGIN
-    ALTER TABLE[ReportCategory]
-    ADD CONSTRAINT PK_ReportCategory PRIMARY KEY CLUSTERED([CategoryId]);
-END
 
 
 SET ANSI_NULLS ON
@@ -611,7 +552,7 @@ BEGIN
         [MasterReport_Id] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-END
+END                            
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -620,7 +561,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXMLPrintParameter]
     ADD [TableName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -630,7 +571,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXMLPrintParameter]
     ADD [ColumnName] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -640,7 +581,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXMLPrintParameter]
     ADD [ReportXMLVersion] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -650,7 +591,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXMLPrintParameter]
     ADD [MasterReport_Id] [BigInt]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -660,7 +601,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXMLPrintParameter]
     ADD [IsActive] [Bit]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -670,18 +611,9 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXMLPrintParameter]
     ADD [FilterCaption] [VarChar] (255) NOT NULL
-END
+END                            
 
 
-
-IF NOT EXISTS(SELECT 1
-                FROM SYS.INDEXES
-               WHERE IS_PRIMARY_KEY = 1
-               AND[NAME] = 'PK_ReportXMLPrintParameter')
-BEGIN
-    ALTER TABLE[ReportXMLPrintParameter]
-    ADD CONSTRAINT PK_ReportXMLPrintParameter PRIMARY KEY CLUSTERED([TableName],[ColumnName],[ReportXMLVersion],[MasterReport_Id]);
-END
 
 
 SET ANSI_NULLS ON
@@ -703,7 +635,7 @@ BEGIN
         [GroupKey] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-END
+END                            
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -712,7 +644,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [Lookup]
     ADD [LookupGroup] [VarChar] (255) NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -722,7 +654,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [Lookup]
     ADD [GroupKey] [Int]  NOT NULL
-END
+END                            
 
 
 IF NOT EXISTS (SELECT 1 
@@ -732,18 +664,7 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [Lookup]
     ADD [GroupDescription] [VarChar] (255) NOT NULL
-END
-
-
-
-IF NOT EXISTS(SELECT 1
-                FROM SYS.INDEXES
-               WHERE IS_PRIMARY_KEY = 1
-               AND[NAME] = 'PK_Lookup')
-BEGIN
-    ALTER TABLE[Lookup]
-    ADD CONSTRAINT PK_Lookup PRIMARY KEY CLUSTERED([LookupGroup],[GroupKey]);
-END
+END                            
 
 
 
@@ -753,7 +674,7 @@ BEGIN
     REFERENCES [dbo].[ReportMaster] ([MasterReport_Id])
 
 ALTER TABLE [dbo].[DataSourceMaster] CHECK CONSTRAINT [FK__ReportMaster__DataSourceMaster]
-END
+END                            
 
 
 
@@ -763,7 +684,7 @@ BEGIN
     REFERENCES [dbo].[DataSourceMaster] ([MasterReport_Id])
 
 ALTER TABLE [dbo].[DataSourceTable] CHECK CONSTRAINT [FK__DataSourceMaster__DataSourceTable]
-END
+END                            
 
 
 
@@ -773,7 +694,7 @@ BEGIN
     REFERENCES [dbo].[ReportCategory] ([CategoryId])
 
 ALTER TABLE [dbo].[ReportMaster] CHECK CONSTRAINT [FK__ReportCategory__ReportMaster]
-END
+END                            
 
 
 
@@ -783,7 +704,7 @@ BEGIN
     REFERENCES [dbo].[ReportMaster] ([MasterReport_Id])
 
 ALTER TABLE [dbo].[ReportXML] CHECK CONSTRAINT [FK__ReportMaster__ReportXML]
-END
+END                            
 
 
 
@@ -793,7 +714,7 @@ BEGIN
     REFERENCES [dbo].[ReportMaster] ([MasterReport_Id])
 
 ALTER TABLE [dbo].[ReportConnection] CHECK CONSTRAINT [FK__ReportMaster__ReportConnection]
-END
+END                            
 
 
 
@@ -803,6 +724,6 @@ BEGIN
     REFERENCES [dbo].[ReportXML] ([ReportXMLVersion], [MasterReport_Id])
 
 ALTER TABLE [dbo].[ReportXMLPrintParameter] CHECK CONSTRAINT [FK__ReportXML__ReportXMLPrintParameter]
-END
+END                            
 
 

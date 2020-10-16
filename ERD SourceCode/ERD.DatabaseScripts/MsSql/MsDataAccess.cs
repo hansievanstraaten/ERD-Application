@@ -12,349 +12,360 @@ using WPF.Tools.BaseClasses;
 
 namespace ERD.DatabaseScripts.MsSql
 {
-  internal class MsDataAccess : IDataAccess
-  {
-    private readonly string connectionString = "Server={0};Database={1};User ID={2};Password={3};Trusted_Connection={4}";
-
-    private SqlConnection connection;
-    private DataConverters converter = new DataConverters();
-
-    private bool _trustedConnection;
-    private string _server;
-    private string _database;
-    private string _username;
-    private string _password;
-
-    public void Construct(DatabaseModel databaseModel)
+    internal class MsDataAccess : IDataAccess
     {
-      this._server = databaseModel.ServerName;
+        private readonly string connectionString = "Server={0};Database={1};User ID={2};Password={3};Trusted_Connection={4}";
 
-      this._database = databaseModel.DatabaseName;
+        private SqlConnection connection;
+        private DataConverters converter = new DataConverters();
 
-      this._trustedConnection = databaseModel.TrustedConnection;
+        private bool _trustedConnection;
+        private string _server;
+        private string _database;
+        private string _username;
+        private string _password;
 
-      if (databaseModel.UserName.IsNullEmptyOrWhiteSpace() || databaseModel.Password.IsNullEmptyOrWhiteSpace())
-      {
-        this.GetPasswordOptions(databaseModel);
-      }
-      else
-      {
-        this._username = databaseModel.UserName;
-
-        this._password = databaseModel.Password;
-      }
-    }
-
-    public XDocument ExecuteQuery(string sqlQuery)
-    {
-      StringBuilder resultString = new StringBuilder();
-
-      resultString.Append("<QueryResults>");
-
-      try
-      {
-        IDataReader reader = this.ExecuteCommand(sqlQuery);
-
-        Dictionary<int, string> columns = new Dictionary<int, string>();
-
-        int fieldCount = reader.FieldCount;
-
-        for (int x = 0; x < reader.FieldCount; x++)
+        public void Construct(DatabaseModel databaseModel)
         {
-          columns.Add(x, reader.GetName(x));
+            this._server = databaseModel.ServerName;
+
+            this._database = databaseModel.DatabaseName;
+
+            this._trustedConnection = databaseModel.TrustedConnection;
+
+            if (databaseModel.UserName.IsNullEmptyOrWhiteSpace() || databaseModel.Password.IsNullEmptyOrWhiteSpace())
+            {
+                this.GetPasswordOptions(databaseModel);
+            }
+            else
+            {
+                this._username = databaseModel.UserName;
+
+                this._password = databaseModel.Password;
+            }
         }
 
-        int readIndex = 0;
-
-        while (reader.Read())
+        public void Construct(Dictionary<string, string> setupValues)
         {
-          StringBuilder line = new StringBuilder();
+            this._server = setupValues["ServerName"]; 
 
-          resultString.Append($"<Row_{readIndex}>");
+            this._database = setupValues["DatabaseName"];
 
-          for (int x = 0; x < fieldCount; x++)
-          {
-            object value = reader.GetValue(x);
+            this._username = setupValues["UserName"];
 
-            string dataTypeName = reader.GetDataTypeName(x);
+            this._password = setupValues["Password"];
 
-            if (value is DBNull)
+            this._trustedConnection = setupValues["TrustedConnection"].ToBool();                
+        }
+
+
+        public XDocument ExecuteQuery(string sqlQuery)
+        {
+            StringBuilder resultString = new StringBuilder();
+
+            resultString.Append("<QueryResults>");
+
+            try
             {
-              line.AppendLine($"<{columns[x]}></{columns[x]}>");
+                IDataReader reader = this.ExecuteCommand(sqlQuery);
 
-              continue;
+                Dictionary<int, string> columns = new Dictionary<int, string>();
+
+                int fieldCount = reader.FieldCount;
+
+                for (int x = 0; x < reader.FieldCount; x++)
+                {
+                    columns.Add(x, reader.GetName(x));
+                }
+
+                int readIndex = 0;
+
+                while (reader.Read())
+                {
+                    StringBuilder line = new StringBuilder();
+
+                    resultString.Append($"<Row_{readIndex}>");
+
+                    for (int x = 0; x < fieldCount; x++)
+                    {
+                        object value = reader.GetValue(x);
+
+                        string dataTypeName = reader.GetDataTypeName(x);
+
+                        if (value is DBNull)
+                        {
+                            line.AppendLine($"<{columns[x]}></{columns[x]}>");
+
+                            continue;
+                        }
+
+                        line.AppendLine($"<{columns[x]}>{this.GetDataByType(value, dataTypeName)}</{columns[x]}>");
+                    }
+
+                    resultString.Append(line);
+
+                    resultString.Append($"</Row_{readIndex}>");
+
+                    readIndex++;
+                }
+
+                resultString.Append("</QueryResults>");
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                this.CloseConnection();
             }
 
-            line.AppendLine($"<{columns[x]}>{this.GetDataByType(value, dataTypeName)}</{columns[x]}>");
-          }
-
-          resultString.Append(line);
-
-          resultString.Append($"</Row_{readIndex}>");
-
-          readIndex++;
+            return XDocument.Parse(resultString.ToString());
         }
 
-        resultString.Append("</QueryResults>");
-      }
-      catch
-      {
-        throw;
-      }
-      finally
-      {
-        this.CloseConnection();
-      }
-
-      return XDocument.Parse(resultString.ToString());
-    }
-
-    public List<dynamic> ExecuteQueryDynamic(string sqlQuery)
-    {
-      List<dynamic> result = new List<dynamic>();
-
-      try
-      {
-        IDataReader reader = this.ExecuteCommand(sqlQuery);
-
-        Dictionary<int, string> columns = new Dictionary<int, string>();
-
-        int fieldCount = reader.FieldCount;
-
-        for (int x = 0; x < reader.FieldCount; x++)
+        public List<dynamic> ExecuteQueryDynamic(string sqlQuery)
         {
-          string originalName = reader.GetName(x);
+            List<dynamic> result = new List<dynamic>();
 
-          columns.Add(x, originalName);
-        }
-
-        while (reader.Read())
-        {
-          dynamic readItem = new ExpandoObject();
-
-          var readItemDic = readItem as IDictionary<string, object>;
-
-          foreach (KeyValuePair<int, string> column in columns)
-          {
-            object value = reader.GetValue(column.Key);
-
-            string dataTypeName = reader.GetDataTypeName(column.Key);
-
-            if (value is DBNull)
+            try
             {
-              readItemDic.Add(column.Value, null);
+                IDataReader reader = this.ExecuteCommand(sqlQuery);
 
-              continue;
+                Dictionary<int, string> columns = new Dictionary<int, string>();
+
+                int fieldCount = reader.FieldCount;
+
+                for (int x = 0; x < reader.FieldCount; x++)
+                {
+                    string originalName = reader.GetName(x);
+
+                    columns.Add(x, originalName);
+                }
+
+                while (reader.Read())
+                {
+                    dynamic readItem = new ExpandoObject();
+
+                    var readItemDic = readItem as IDictionary<string, object>;
+
+                    foreach (KeyValuePair<int, string> column in columns)
+                    {
+                        object value = reader.GetValue(column.Key);
+
+                        string dataTypeName = reader.GetDataTypeName(column.Key);
+
+                        if (value is DBNull)
+                        {
+                            readItemDic.Add(column.Value, null);
+
+                            continue;
+                        }
+
+                        string columnName = column.Value;
+
+                        if (readItemDic.ContainsKey(columnName))
+                        {
+                            columnName = $"{column.Value}_{column.Key}";
+                        }
+
+                        readItemDic.Add(columnName, this.GetDataByTypeDynamic(value, dataTypeName));
+                    }
+
+                    result.Add(readItem);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                this.CloseConnection();
             }
 
-            string columnName = column.Value;
+            return result;
+        }
 
-            if (readItemDic.ContainsKey(columnName))
+        public int ExecuteNonQuery(string sqlQuery)
+        {
+            try
             {
-              columnName = $"{column.Value}_{column.Key}";
+                this.connection = new SqlConnection(string.Format(this.connectionString, this._server, this._database, this._username, this._password, this._trustedConnection));
+
+                this.connection.Open();
+
+                SqlCommand cmd = this.connection.CreateCommand();
+
+                cmd.CommandText = sqlQuery;
+
+                return cmd.ExecuteNonQuery();
+            }
+            catch
+            {
+                if (this.connection != null)
+                {
+                    if (this.connection.State == System.Data.ConnectionState.Open)
+                    {
+                        this.connection.Close();
+                    }
+
+                    this.connection = null;
+                }
+
+                throw;
+            }
+        }
+
+        private void GetPasswordOptions(DatabaseModel databaseModel)
+        {
+            string sessionKey = $"{databaseModel.ServerName}||{databaseModel.DatabaseName}";
+
+            if (Connections.Instance.SessionPasswords.ContainsKey(sessionKey))
+            {
+                this._username = Connections.Instance.SessionPasswords[sessionKey].UserName;
+
+                this._password = Connections.Instance.SessionPasswords[sessionKey].Password;
+
+                return;
             }
 
-            readItemDic.Add(columnName, this.GetDataByTypeDynamic(value, dataTypeName));
-          }
+            UserNameAndPasswordModel model = new UserNameAndPasswordModel
+            {
+                UserName = databaseModel.UserName,
+                Password = databaseModel.Password
+            };
 
-          result.Add(readItem);
+            Type controlType = Type.GetType("ERD.Viewer.Database.UserNameAndPassword,ERD.Viewer");
+
+            WindowBase userPassword = Activator.CreateInstance(controlType, new object[] { model }) as WindowBase;
+
+            bool? result = this.InvokeMethod(userPassword, "ShowDialog", null).To<bool?>();
+
+            if (!result.HasValue || !result.Value)
+            {
+                throw new ApplicationException("Operation canceled");
+            }
+
+            this._username = model.UserName;
+
+            this._password = model.Password;
+
+            Connections.Instance.SessionPasswords.Add(sessionKey, model);
         }
-      }
-      catch
-      {
-        throw;
-      }
-      finally
-      {
-        this.CloseConnection();
-      }
 
-      return result;
-    }
-
-    public int ExecuteNonQuery(string sqlQuery)
-    {
-      try
-      {
-        this.connection = new SqlConnection(string.Format(this.connectionString, this._server, this._database, this._username, this._password, this._trustedConnection));
-
-        this.connection.Open();
-
-        SqlCommand cmd = this.connection.CreateCommand();
-
-        cmd.CommandText = sqlQuery;
-
-        return cmd.ExecuteNonQuery();
-      }
-      catch
-      {
-        if (this.connection != null)
+        private IDataReader ExecuteCommand(string sqlQuery)
         {
-          if (this.connection.State == System.Data.ConnectionState.Open)
-          {
-            this.connection.Close();
-          }
+            try
+            {
+                this.connection = new SqlConnection(string.Format(this.connectionString, this._server, this._database, this._username, this._password, this._trustedConnection));
 
-          this.connection = null;
+                this.connection.Open();
+
+                SqlCommand cmd = this.connection.CreateCommand();
+
+                cmd.CommandText = sqlQuery;
+
+                return cmd.ExecuteReader();
+            }
+            catch
+            {
+                if (this.connection != null)
+                {
+                    if (this.connection.State == System.Data.ConnectionState.Open)
+                    {
+                        this.connection.Close();
+                    }
+
+                    this.connection = null;
+                }
+
+                throw;
+            }
         }
 
-        throw;
-      }
-    }
-
-    private void GetPasswordOptions(DatabaseModel databaseModel)
-    {
-      string sessionKey = $"{databaseModel.ServerName}||{databaseModel.DatabaseName}";
-
-      if (Connections.Instance.SessionPasswords.ContainsKey(sessionKey))
-      {
-        this._username = Connections.Instance.SessionPasswords[sessionKey].UserName;
-
-        this._password = Connections.Instance.SessionPasswords[sessionKey].Password;
-
-        return;
-      }
-
-      UserNameAndPasswordModel model = new UserNameAndPasswordModel
-      {
-        UserName = databaseModel.UserName,
-        Password = databaseModel.Password
-      };
-
-      //ERD.Viewer.Database.UserNameAndPassword
-      Type controlType = Type.GetType("ERD.Viewer.Database.UserNameAndPassword,ERD.Viewer");
-
-      WindowBase userPassword = Activator.CreateInstance(controlType, new object[] {model}) as WindowBase;
-
-      //UserNameAndPassword userPassword = new UserNameAndPassword(model);
-
-      bool? result = this.InvokeMethod(userPassword, "ShowDialog", null).To<bool?>();
-
-      if (!result.HasValue || !result.Value)
-      {
-        throw new ApplicationException("Operation canceled");
-      }
-
-      this._username = model.UserName;
-
-      this._password = model.Password;
-
-      Connections.Instance.SessionPasswords.Add(sessionKey, model);
-    }
-
-    private IDataReader ExecuteCommand(string sqlQuery)
-    {
-      try
-      {
-        this.connection = new SqlConnection(string.Format(this.connectionString, this._server, this._database, this._username, this._password, this._trustedConnection));
-
-        this.connection.Open();
-
-        SqlCommand cmd = this.connection.CreateCommand();
-
-        cmd.CommandText = sqlQuery;
-
-        return cmd.ExecuteReader();
-      }
-      catch
-      {
-        if (this.connection != null)
+        private object GetDataByType(object data, string type)
         {
-          if (this.connection.State == System.Data.ConnectionState.Open)
-          {
-            this.connection.Close();
-          }
+            switch (type)
+            {
+                case "timestamp":
 
-          this.connection = null;
+                    byte[] bytes = (byte[])data;
+
+                    return new XCData(Convert.ToString(converter.ConvertTimeStamp(bytes)));
+
+                case "bit":
+                    return Convert.ToBoolean(data);
+
+                case "uniqueidentifier":
+
+                    return new XCData(Convert.ToString(data));
+
+                case "varbinary":
+                    if (string.IsNullOrEmpty(data.ToString()))
+                    {
+                        return data;
+                    }
+
+                    return new XCData(((byte[])data).ConvertBytesToString());
+
+                case "datetime":
+                    DateTime date = DateTime.Now;
+
+                    DateTime.TryParse(Convert.ToString(data), out date);
+
+                    //return date;
+                    return new XCData(date.ToStringCulture(true));
+
+                default: return new XCData(data.ParseToString());
+                    //return data;
+            }
         }
 
-        throw;
-      }
-    }
-
-    private object GetDataByType(object data, string type)
-    {
-      switch (type)
-      {
-        case "timestamp":
-
-          byte[] bytes = (byte[])data;
-
-          return new XCData(Convert.ToString(converter.ConvertTimeStamp(bytes)));
-
-        case "bit":
-          return Convert.ToBoolean(data);
-
-        case "uniqueidentifier":
-
-          return new XCData(Convert.ToString(data));
-
-        case "varbinary":
-          if (string.IsNullOrEmpty(data.ToString()))
-          {
-            return data;
-          }
-
-          return new XCData(((byte[])data).ConvertBytesToString());
-
-        case "datetime":
-          DateTime date = DateTime.Now;
-
-          DateTime.TryParse(Convert.ToString(data), out date);
-
-          //return date;
-          return new XCData(date.ToStringCulture(true));
-
-        default: return new XCData(data.ParseToString());
-          //return data;
-      }
-    }
-
-    private object GetDataByTypeDynamic(object data, string type)
-    {
-      switch (type)
-      {
-        case "timestamp":
-
-          byte[] bytes = (byte[])data;
-
-          return converter.ConvertTimeStamp(bytes);
-
-        case "bit":
-          return Convert.ToBoolean(data);
-
-        case "uniqueidentifier":
-
-          return Convert.ToString(data);
-
-        case "varbinary":
-
-          return ((byte[])data).ConvertBytesToString();
-
-        case "datetime":
-          DateTime date = DateTime.Now;
-
-          DateTime.TryParse(Convert.ToString(data), out date);
-
-          //return date;
-          return date;
-
-        default: return data.ParseToString();
-          //return data;
-      }
-    }
-
-    private void CloseConnection()
-    {
-      if (this.connection != null)
-      {
-        if (this.connection.State == System.Data.ConnectionState.Open)
+        private object GetDataByTypeDynamic(object data, string type)
         {
-          this.connection.Close();
+            switch (type)
+            {
+                case "timestamp":
+
+                    byte[] bytes = (byte[])data;
+
+                    return converter.ConvertTimeStamp(bytes);
+
+                case "bit":
+                    return Convert.ToBoolean(data);
+
+                case "uniqueidentifier":
+
+                    return Convert.ToString(data);
+
+                case "varbinary":
+
+                    return ((byte[])data).ConvertBytesToString();
+
+                case "datetime":
+                    DateTime date = DateTime.Now;
+
+                    DateTime.TryParse(Convert.ToString(data), out date);
+
+                    //return date;
+                    return date;
+
+                default: return data.ParseToString();
+                    //return data;
+            }
         }
 
-        this.connection = null;
-      }
+        private void CloseConnection()
+        {
+            if (this.connection != null)
+            {
+                if (this.connection.State == System.Data.ConnectionState.Open)
+                {
+                    this.connection.Close();
+                }
+
+                this.connection = null;
+            }
+        }
     }
-  }
 }

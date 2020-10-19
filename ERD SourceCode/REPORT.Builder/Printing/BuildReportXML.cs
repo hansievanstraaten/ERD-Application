@@ -40,7 +40,11 @@ namespace REPORT.Builder.Printing
 
         private Dictionary<string, List<ReportXMLPrintParameterModel>> tableFilters;
 
-        public XDocument GetReport(XDocument xmlReport, DatabaseModel connection, ReportMaster reportMaster, List<ReportXMLPrintParameterModel> filtes)
+        public XDocument GetReport(
+          XDocument xmlReport, 
+          DatabaseModel connection, 
+          ReportMaster reportMaster, 
+          List<ReportXMLPrintParameterModel> filtes)
         {
             if (this.repo == null)
             {

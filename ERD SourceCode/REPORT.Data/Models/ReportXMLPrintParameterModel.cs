@@ -14,6 +14,7 @@ namespace REPORT.Data.Models
 		private string _ColumnName;
 		private bool _IsActive;
 		private string _FilterCaption;
+		private string _DefaultValue;
 		private string filterValue;
 
 		/// <summary>
@@ -121,12 +122,16 @@ namespace REPORT.Data.Models
 			}
 		}
 
-
 		[FieldInformationAttribute("Filter Value", Sort = 1)]
 		public string FilterValue
 		{
 			get
 			{
+				if (!this.DefaultValue.IsNullEmptyOrWhiteSpace())
+				{
+					return this.DefaultValue;
+				}
+
 				return this.filterValue;
 			}
 
@@ -137,6 +142,24 @@ namespace REPORT.Data.Models
 				base.OnPropertyChanged(() => this.FilterValue);
 			}
 		}
+
+		/// <summary>
+		/// <para>Default Value</para>
+		/// <para></para>
+		/// </summary>
+		public string DefaultValue
+		{
+			get
+			{
+				return this._DefaultValue;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("DefaultValue", ref this._DefaultValue, value);
+			}
+		}
+
 
 	}
 }

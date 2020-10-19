@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Media;
 using WPF.Tools.BaseClasses;
 
 namespace REPORT.Builder.Printing
@@ -40,7 +41,20 @@ namespace REPORT.Builder.Printing
 				}
             }
 
-            this.uxPageCount.Content = printedPages >= 15 ? $"Max of Pages {printedPages} Reached for Print Preview." : $"{printedPages} Pages";
+            if (printedPages >= 15)
+            {
+                this.uxPageCount.Content = $"Max of Pages {printedPages} Reached for Print Preview. Select Print to PDF for the full report.";
+
+                this.uxPageCount.FontSize = 15;
+
+                this.uxPageCount.Foreground = Brushes.Red;
+
+                this.uxPageCount.FontWeight = FontWeights.Bold;
+            }
+            else
+			{
+                this.uxPageCount.Content = $"{printedPages} Pages";
+            }
         }
 
         private void ReportPrint_Cliked(object sender, System.Windows.RoutedEventArgs e)

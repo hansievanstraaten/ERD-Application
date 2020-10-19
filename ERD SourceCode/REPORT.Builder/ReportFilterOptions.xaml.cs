@@ -79,6 +79,11 @@ namespace REPORT.Builder
 			{
 				ReportXMLPrintParameterModel item = this.ReportParameters[x];
 
+				if (!item.DefaultValue.IsNullEmptyOrWhiteSpace())
+				{
+					continue;
+				}
+
 				this.uxParameters.Items.Add(item);
 
 				this.uxParameters[x].HideHeader(true);

@@ -17,6 +17,7 @@ namespace REPORT.Data.SQLRepository.Mappings
 			Property(colMasterReport_Id =>  colMasterReport_Id.MasterReport_Id).HasColumnName("MasterReport_Id");
 			Property(colIsActive =>  colIsActive.IsActive).HasColumnName("IsActive");
 			Property(colFilterCaption =>  colFilterCaption.FilterCaption).HasColumnName("FilterCaption");
+			Property(colDefaultValue =>  colDefaultValue.DefaultValue).HasColumnName("DefaultValue");
 
 		}
 	}

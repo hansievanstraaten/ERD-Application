@@ -16,6 +16,8 @@ namespace REPORT.Builder.ReportTools
 		private bool useAsPrintParameter;
 		private string printParameterCaption;
 		private bool useInOrderBy;
+		private string printParameterDefaultValue;
+		private bool suppressIfNoData;
 
 		public ReportDataObject()
         {
@@ -37,8 +39,10 @@ namespace REPORT.Builder.ReportTools
                 result.Add(new XAttribute("ObjectColumn", this.ColumnModel.ColumnName));
                 result.Add(new XAttribute("UseAsPrintParameter", this.UseAsPrintParameter));
                 result.Add(new XAttribute("PrintParameterCaption", this.PrintParameterCaption));
+                result.Add(new XAttribute("PrintParameterDefaultValue", this.PrintParameterDefaultValue));
                 result.Add(new XAttribute("UseInOrderBy", this.UseInOrderBy));
                 result.Add(new XAttribute("Suppressed", this.Suppressed));
+                result.Add(new XAttribute("SuppressIfNoData", this.SuppressIfNoData));
                 result.Add(new XAttribute("ColumnModel", this.ColumnModel.ZipFile().ConvertBytesToString()));
 
                 return result;
@@ -88,7 +92,21 @@ namespace REPORT.Builder.ReportTools
 			}
 		}
 
-        [FieldInformation("Use In Order By", Sort = 502)]
+        [FieldInformation("Print Parameter Default", Sort = 502)]
+        public string PrintParameterDefaultValue
+		{
+            get
+			{      
+                return this.printParameterDefaultValue.ParseToString();
+            }
+
+            set
+			{
+                this.printParameterDefaultValue = value;
+			}
+		}
+
+        [FieldInformation("Use In Order By", Sort = 503)]
         public bool UseInOrderBy
 		{
             get
@@ -102,7 +120,7 @@ namespace REPORT.Builder.ReportTools
 			}
 		}
 
-        [FieldInformation("Is Suppressed", Sort = 503)]
+        [FieldInformation("Is Suppressed", Sort = 504)]
         public bool Suppressed
         {
             get
@@ -124,6 +142,21 @@ namespace REPORT.Builder.ReportTools
                 }
             }
         }
+
+        [FieldInformation("Suppress if No Data", Sort = 505)]
+        public bool SuppressIfNoData
+        {
+            get
+            {
+                return this.suppressIfNoData;
+            }
+
+            set
+            {
+                this.suppressIfNoData = value;
+            }
+        }
+
 
         public ReportColumnModel ColumnModel
         {

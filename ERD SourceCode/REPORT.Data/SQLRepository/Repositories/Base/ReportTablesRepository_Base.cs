@@ -682,6 +682,24 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
 		}
+		
+		public List<ReportXMLPrintParameterModel> GetReportXMLPrintParameterByDefaultValue (string DefaultValue)
+		{
+			List<ReportXMLPrintParameter> result = this.dataContext
+				.ReportXMLPrintParameters
+				.Where(fk => fk.DefaultValue == DefaultValue)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportXMLPrintParameterModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLPrintParameterModel));
+
+			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
+		}
 
 		public void UpdateReportMaster(ReportMasterModel model)
 		{

@@ -347,9 +347,16 @@ namespace REPORT.Builder.Printing
                 {
                     XElement dataValue = row.Element(item.GetObjectColumn());
 
+                    if (item.IsEmptyDataSuppressed() && (dataValue == null || dataValue.Value.IsNullEmptyOrWhiteSpace()))
+					{
+                        continue;
+					}
+
                     XElement dataItem = new XElement(item); // Do this tp preserve the original xml
 
                     dataItem.Attribute("ColumnModel").Remove();
+
+                    //SuppressIfNoData
 
                     dataItem.Add(new XAttribute("Text", (dataValue == null ? "OOPS What a mess" : dataValue.Value)));
 

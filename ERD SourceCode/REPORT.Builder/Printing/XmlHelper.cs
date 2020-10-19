@@ -15,6 +15,11 @@ namespace REPORT.Builder.Printing
             return reportObject.Attribute("ObjectType").Value == "ReportDataObject";
         }
 
+        internal static bool IsEmptyDataSuppressed(this XElement reportObject)
+		{
+            return reportObject.Attribute("SuppressIfNoData").Value.ToBool();
+        }
+
         internal static bool IsPageBreak(this XElement reportObject)
         {
             return reportObject.Attribute("ObjectType").Value == "ReportPageBreak";

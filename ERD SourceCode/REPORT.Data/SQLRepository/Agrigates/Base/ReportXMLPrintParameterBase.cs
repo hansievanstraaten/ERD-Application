@@ -11,6 +11,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 	private Int64 _MasterReport_Id;
 	private bool _IsActive;
 	private string _FilterCaption;
+	private string _DefaultValue;
 
 	/// <summary>
 	/// <para>Table Name</para>
@@ -111,6 +112,23 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		set
 		{
 			base.OnPropertyChanged("FilterCaption", ref this._FilterCaption, value);
+		}
+	}
+
+	/// <summary>
+	/// <para>Default Value</para>
+	/// <para></para>
+	/// </summary>
+	public string DefaultValue
+	{ 
+		get
+		{
+			return this._DefaultValue;
+		}
+
+		set
+		{
+			base.OnPropertyChanged("DefaultValue", ref this._DefaultValue, value);
 		}
 	}
 

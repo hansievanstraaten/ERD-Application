@@ -4,6 +4,7 @@ using REPORT.Builder.ReportTools;
 using REPORT.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -56,6 +57,8 @@ namespace REPORT.Builder.ReportComponents
 
                 XElement foreignGroupIndex = new XElement("ForeignSectionIndexes");
 
+                XElement replacementColumns = new XElement("ReplacementColumns");
+
                 foreach (UIElement child in this.Children)
                 {
                     objectModels.Add(child.GetPropertyValue("ItemXml") as XElement);
@@ -66,7 +69,12 @@ namespace REPORT.Builder.ReportComponents
                     parameterModels.Add(parameter.ItemXml);
                 }
 
-                foreach(int foreignIndex in this.SqlManager.ForeignSectionIndexes)
+                foreach (ReportWhereHeaderModel replacementColumn in this.SqlManager.ReplacementColumnModels)
+                {
+                    replacementColumns.Add(replacementColumn.ItemXml);
+                }
+
+                foreach (int foreignIndex in this.SqlManager.ForeignSectionIndexes)
                 {
                     foreignGroupIndex.Add(new XElement("Index", foreignIndex));
                 }
@@ -74,6 +82,8 @@ namespace REPORT.Builder.ReportComponents
                 result.Add(objectModels);
 
                 result.Add(parameterModels);
+
+                result.Add(replacementColumns);
 
                 result.Add(foreignGroupIndex);
 
@@ -112,7 +122,12 @@ namespace REPORT.Builder.ReportComponents
                 {
                     paramatersList.Add(new WhereParameterModel { ItemXml = item });
                 }
-                    
+
+                foreach (XElement item in value.Element("ReplacementColumns").Elements())
+                {
+                    this.SqlManager.UpdateReplacementColumn(new ReportWhereHeaderModel { ItemXml = item });
+                }
+
                 this.SqlManager.AddWhereModels(paramatersList.ToArray());
 
                 this.SectionTableName = this.SqlManager.TableName;
@@ -154,15 +169,15 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        //public void RemoveElementHandles()
-        //{
-        //    foreach (UIElement item in this.selectedReportObjects.Values)
-        //    {
-        //        item.RemoveHandles();
-        //    }
+        public ReportWhereHeaderModel GetReplacementColumn(string tableName,string columnName)
+		{
+            return this.SqlManager.GetReplacementColumn(tableName, columnName);
+		}
 
-        //    this.selectedReportObjects.Clear();
-        //}
+        public void UpdateReplacementColumn(ReportWhereHeaderModel replacementValues)
+		{
+            this.SqlManager.UpdateReplacementColumn(replacementValues);
+		}
 
         public void AddReportColumn(ReportColumnModel column)
         {

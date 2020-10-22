@@ -14,6 +14,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
             ReportColumnModel[] columns, 
             List<WhereParameterModel> whereParameterModel, 
             List<ReportXMLPrintParameterModel> reportFilters,
+            Dictionary<string, ReportWhereHeaderModel> replacementColumns,
             string orderByString)
         {
             if (!columns.HasElements())
@@ -31,17 +32,23 @@ namespace REPORT.Builder.Common.DatabaseOptions
 
                 if (x == columns.Length -1)
                 {
-                    result.AppendLine($"             [{column.ColumnName}] ");
+                    result.AppendLine($"             [{columns[0].TableName}].[{column.ColumnName}] ");
                 }
                 else if (x == 0)
                 {
-                    result.AppendLine($"[{column.ColumnName}], ");
+                    result.AppendLine($"[{columns[0].TableName}].[{column.ColumnName}], ");
                 }
                 else
                 {
-                    result.AppendLine($"             [{column.ColumnName}], ");
+                    result.AppendLine($"             [{columns[0].TableName}].[{column.ColumnName}], ");
                 }
             }
+
+            // Add replacement SQL here
+            foreach(KeyValuePair<string, ReportWhereHeaderModel> replacekey in replacementColumns)
+			{
+                result.Replace(replacekey.Key, this.BuildReplacementSQL(replacekey));
+			}
 
             result.AppendLine($" FROM [{columns[0].TableName}] WITH(NOLOCK) ");
 
@@ -98,5 +105,49 @@ namespace REPORT.Builder.Common.DatabaseOptions
 
             return result.ToString();
         }
+
+        private string BuildReplacementSQL(KeyValuePair<string, ReportWhereHeaderModel> replacementKey)
+		{
+            ReportWhereHeaderModel value = replacementKey.Value;
+
+            StringBuilder result = new StringBuilder();
+
+            result.Append($"(SELECT {value.UseColumn} FROM {value.UseTable} WHERE ");
+
+            for(int x = 0; x < value.WhereDetails.Count; ++x)
+			{
+                ReportWhereDetailModel detail = value.WhereDetails[x];
+
+                if (detail.IsColumn)
+                {
+                    if (x == (value.WhereDetails.Count - 1))
+                    {
+                        result.Append($"{detail.WhereOption} = {detail.WhereValue} ");
+                    }
+                    else
+                    {
+                        result.Append($"{detail.WhereOption} = {detail.WhereValue} AND ");
+                    }
+                }
+                else
+                {
+                    if (x == (value.WhereDetails.Count - 1))
+                    {
+                        result.Append($"{detail.WhereOption} = '{detail.WhereValue}' ");
+                    }
+                    else
+                    {
+                        result.Append($"{detail.WhereOption} = '{detail.WhereValue}' AND ");
+                    }
+                }
+
+            }
+
+            result.Append(")");
+
+            result.Append($" AS {value.ReplaceColumn}");
+
+            return result.ToString();
+		}
     }
 }

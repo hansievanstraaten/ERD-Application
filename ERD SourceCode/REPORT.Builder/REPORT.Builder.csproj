@@ -78,7 +78,7 @@
     <Compile Include="Common\DatabaseOptions\IDataToSQL.cs" />
     <Compile Include="Common\DatabaseOptions\MsSQL.cs" />
     <Compile Include="Common\ObjectCreator.cs" />
-    <Compile Include="Constants\Constants.cs" />
+    <Compile Include="Constants\ReportConstants.cs" />
     <Compile Include="DatasourceSelector.xaml.cs">
       <DependentUpon>DatasourceSelector.xaml</DependentUpon>
     </Compile>
@@ -102,6 +102,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ReplaceBuilder.xaml.cs">
+      <DependentUpon>ReplaceBuilder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ReplaceWhere.xaml.cs">
+      <DependentUpon>ReplaceWhere.xaml</DependentUpon>
     </Compile>
     <Compile Include="ReportCategories.xaml.cs">
       <DependentUpon>ReportCategories.xaml</DependentUpon>
@@ -169,6 +175,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Printing\PrintPreview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ReplaceBuilder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ReplaceWhere.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

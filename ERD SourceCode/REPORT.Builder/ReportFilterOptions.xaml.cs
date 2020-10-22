@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using WPF.Tools.BaseClasses;
+using WPF.Tools.Exstention;
 
 namespace REPORT.Builder
 {
@@ -20,7 +21,7 @@ namespace REPORT.Builder
 
 			this.Loaded += this.ReportFilterOptions_Loaded;
 		}
-				
+
 		public ReportFilterOptions(long masterReport_Id) : this()
 		{
 			this.MasterReport_Id = masterReport_Id;
@@ -34,7 +35,7 @@ namespace REPORT.Builder
 			this.LoadFIlters();
 		}
 
-    public ReportFilterOptions(List<ReportXMLPrintParameterModel> parameterFilters) : this()
+		public ReportFilterOptions(List<ReportXMLPrintParameterModel> parameterFilters) : this()
 		{
 			this.ReportParameters = parameterFilters;
 
@@ -65,6 +66,11 @@ namespace REPORT.Builder
 		{
 			try
 			{
+				if (!this.HaveFilters)
+				{
+					this.CloseIfNotMainWindow(true);
+				}
+
 				this.uxParameters.AllignAllCaptions();
 			}
 			catch (Exception err)
@@ -84,15 +90,16 @@ namespace REPORT.Builder
 					continue;
 				}
 
+				this.HaveFilters = true;
+
 				this.uxParameters.Items.Add(item);
 
 				this.uxParameters[x].HideHeader(true);
 
 				this.uxParameters[x, 0].Caption = item.FilterCaption;
 			}
-
-			//this.uxParameters.AllignAllCaptions();
 		}
 
+		private bool HaveFilters { get; set; }
 	}
 }

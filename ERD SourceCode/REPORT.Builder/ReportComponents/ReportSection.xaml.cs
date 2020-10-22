@@ -263,6 +263,14 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
+        public CanvasSqlManager SqlManager
+        {
+            get
+            {
+                return this.uxSectionCanvas.SqlManager;
+            }
+        }
+
         public List<ReportColumnModel> ReportColumns
         {
             get
@@ -271,12 +279,14 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        public CanvasSqlManager SqlManager
+        public ReportWhereHeaderModel GetReplacementColumn(string tableName, string columnName)
         {
-            get
-            {
-                return this.uxSectionCanvas.SqlManager;
-            }
+            return this.uxSectionCanvas.GetReplacementColumn(tableName, columnName);
+        }
+
+        public void UpdateReplacementColumn(ReportWhereHeaderModel replacementValues)
+        {
+            this.uxSectionCanvas.UpdateReplacementColumn(replacementValues);
         }
 
         public void RefreshPageStaticMarkers()

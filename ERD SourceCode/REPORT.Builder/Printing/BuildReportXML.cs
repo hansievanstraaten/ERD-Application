@@ -337,6 +337,11 @@ namespace REPORT.Builder.Printing
 
             sqlManager.AddWhereModels(paramatersList.ToArray());
 
+            foreach (XElement item in canvasXml.Element("ReplacementColumns").Elements())
+            {
+                sqlManager.UpdateReplacementColumn(new ReportWhereHeaderModel { ItemXml = item });
+            }
+
             this.indexSqlManager.Add(this.sectionIndex, sqlManager);
         }
 

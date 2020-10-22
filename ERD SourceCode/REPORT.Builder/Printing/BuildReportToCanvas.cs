@@ -372,17 +372,7 @@ namespace REPORT.Builder.Printing
                     minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble() + this.activeCanvas.TopOffset;
                 }
             }
-
-            //if (isReset)
-            //{
-            //    this.activeCanvas.TopOffset = lowestBottom;
-            //}
-            //else
-            //{
-            //    //double minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble();
-
-            //}
-                
+                            
             this.activeCanvas.TopOffset = minBottom > lowestBottom ? minBottom : lowestBottom;
         }
 

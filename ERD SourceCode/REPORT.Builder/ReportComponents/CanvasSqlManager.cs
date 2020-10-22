@@ -14,11 +14,13 @@ namespace REPORT.Builder.ReportComponents
 
         private Dictionary<string, ReportColumnModel> columnsDictionary;
 
+        private List<int> foreignSectionIndex;
+
         private List<WhereParameterModel> whereParameterModel;
 
         private List<ReportXMLPrintParameterModel> reportFilters = new List<ReportXMLPrintParameterModel>();
 
-        private List<int> foreignSectionIndex;
+        private Dictionary<string, ReportWhereHeaderModel> replacementColumns = new Dictionary<string, ReportWhereHeaderModel>();
 
         internal CanvasSqlManager()
         {
@@ -38,7 +40,8 @@ namespace REPORT.Builder.ReportComponents
                 return ObjectCreator.GetCanvasSQL(
                     this.columnsDictionary.Values.ToArray(), 
                     this.whereParameterModel, 
-                    this.reportFilters, 
+                    this.reportFilters,
+                    this.replacementColumns,
                     this.orderByString);
             }
         }
@@ -67,6 +70,47 @@ namespace REPORT.Builder.ReportComponents
             {
                 return this.whereParameterModel;
             }
+        }
+
+        internal List<ReportWhereHeaderModel> ReplacementColumnModels
+		{
+            get
+			{
+                return this.replacementColumns.Values.ToList();
+            }
+		}
+
+        internal ReportWhereHeaderModel GetReplacementColumn(string tableName, string columnName)
+		{
+            string itemKey = $"[{tableName}].[{columnName}]";
+
+            if (this.replacementColumns.ContainsKey(itemKey))
+			{
+                return this.replacementColumns[itemKey];
+			}
+
+            return new ReportWhereHeaderModel
+            {
+                ReplaceTable = tableName,
+                ReplaceColumn = columnName
+            };
+		}
+
+        internal void UpdateReplacementColumn(ReportWhereHeaderModel replacementValues)
+        {
+            string itemKey = $"[{replacementValues.ReplaceTable}].[{replacementValues.ReplaceColumn}]";
+
+            if (this.replacementColumns.ContainsKey(itemKey))
+			{
+                this.replacementColumns.Remove(itemKey);
+			}
+
+            if (replacementValues.WhereDetails.Count == 0)
+			{
+                return;
+			}
+
+            this.replacementColumns.Add(itemKey, replacementValues);
         }
 
         internal void AddFilterParameters(List<ReportXMLPrintParameterModel> filters)

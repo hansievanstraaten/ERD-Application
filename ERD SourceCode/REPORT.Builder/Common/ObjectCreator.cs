@@ -103,6 +103,7 @@ namespace REPORT.Builder.Common
             ReportColumnModel[] columns, 
             List<WhereParameterModel> whereParameterModel, 
             List<ReportXMLPrintParameterModel> reportFilters,
+            Dictionary<string, ReportWhereHeaderModel> replacementColumns,
             string orderByString)
         {
             DatabaseTypeEnum buildType = Connections.Instance.DatabaseModel.DatabaseType;
@@ -116,7 +117,7 @@ namespace REPORT.Builder.Common
 
                     sql = new MsSQL();
 
-                    return sql.BuildSelectQuery(columns, whereParameterModel, reportFilters, orderByString);
+                    return sql.BuildSelectQuery(columns, whereParameterModel, reportFilters, replacementColumns, orderByString);
             }
         }
     }

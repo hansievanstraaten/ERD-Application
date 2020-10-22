@@ -49,23 +49,23 @@ namespace REPORT.Builder
 
 		public ReportDesigner(ReportMasterModel masterModel)
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 
-			InitializeToolsStack();
+			this.InitializeToolsStack();
 
-			SizeChanged += ReportDesigner_SizeChanged;
+			SizeChanged += this.ReportDesigner_SizeChanged;
 
-			reportDesignType = (ReportTypeEnum)masterModel.ReportTypeEnum;
+			this.reportDesignType = (ReportTypeEnum)masterModel.ReportTypeEnum;
 
-			ReportMaster = masterModel;
+			this.ReportMaster = masterModel;
 
-			uxReportMasterModel.Items.Add(ReportMaster);
+			this.uxReportMasterModel.Items.Add(this.ReportMaster);
 
-			if (ReportMaster.MasterReport_Id == 0)
+			if (this.ReportMaster.MasterReport_Id == 0)
 			{   // New Report
-				ReportMaster.ReportXMLVersion = 1;
+				this.ReportMaster.ReportXMLVersion = 1;
 
-				InitializeReportSections();
+				this.InitializeReportSections();
 			}
 			else
 			{
@@ -73,13 +73,13 @@ namespace REPORT.Builder
 
 				//this.ReportMaster.ReportXMLVersion = repo.GetReportXMLVersion(masterModel.MasterReport_Id);
 
-				ReportXMLModel reportXML = repo.GetReportXMLByPrimaryKey(ReportMaster.ReportXMLVersion, masterModel.MasterReport_Id);
+				ReportXMLModel reportXML = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, masterModel.MasterReport_Id);
 
 				string reportXml = reportXML.BinaryXML.UnzipFile().ParseToString();
 
 				XDocument report = XDocument.Parse(reportXml);
 
-				reportDesignType = (ReportTypeEnum)report.Root.Element("ReportSettings").Attribute("ReportTypeEnum").Value.ToInt32();
+				this.reportDesignType = (ReportTypeEnum)report.Root.Element("ReportSettings").Attribute("ReportTypeEnum").Value.ToInt32();
 
 				foreach (XElement sectionElement in report.Root.Element("ReportSettings").Elements("ReportSection").OrderBy(si => si.Attribute("SectionIndex").Value.ToInt32()))
 				{
@@ -87,33 +87,33 @@ namespace REPORT.Builder
 
 					section.SectionXml = sectionElement;
 
-					uxReportSections.Children.Add(section);
+					this.uxReportSections.Children.Add(section);
 
-					section.ReportObjectSelected += ReportObject_Selected;
+					section.ReportObjectSelected += this.ReportObject_Selected;
 
 					if (section.SectionType == SectionTypeEnum.TableData)
 					{
-						section.RequestNewDataSections += NewDataSection_Requested;
+						section.RequestNewDataSections += this.NewDataSection_Requested;
 
-						section.ReportColumnAdded += ReportColumn_Added;
+						section.ReportColumnAdded += this.ReportColumn_Added;
 					}
-					else if (reportDesignType == ReportTypeEnum.CoverPage
-						|| reportDesignType == ReportTypeEnum.FinalPage)
+					else if (this.reportDesignType == ReportTypeEnum.CoverPage
+						|| this.reportDesignType == ReportTypeEnum.FinalPage)
 					{
 						section.RefreshPageStaticMarkers();
 					}
 
-					dataReportSections.Add(section);
+					this.dataReportSections.Add(section);
 				}
 			}
 
-			uxReportSections.MinWidth = CanvasWidth + 200;
+			this.uxReportSections.MinWidth = this.CanvasWidth + 200;
 
-			RefreshMarginMarkers();
+			this.RefreshMarginMarkers();
 
-			SetupDataReportsOptions();
+			this.SetupDataReportsOptions();
 
-			ReportMaster.PropertyChanged += ReportMaster_PropertyChanged;
+			this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
 		}
 
 		#region PBLIC PROPERTIES
@@ -122,12 +122,12 @@ namespace REPORT.Builder
 		{
 			get
 			{
-				return reportMaster;
+				return this.reportMaster;
 			}
 
 			set
 			{
-				reportMaster = value;
+				this.reportMaster = value;
 			}
 		}
 
@@ -135,12 +135,12 @@ namespace REPORT.Builder
 		{
 			get
 			{
-				return dataSourceMainTable;
+				return this.dataSourceMainTable;
 			}
 
 			set
 			{
-				dataSourceMainTable = value;
+				this.dataSourceMainTable = value;
 			}
 		}
 
@@ -152,40 +152,40 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				if (uxReportMasterModel.HasValidationError)
+				if (this.uxReportMasterModel.HasValidationError)
 				{
 					return false;
 				}
 
 				ReportTablesRepository repo = new ReportTablesRepository();
 
-				repo.UpdateReportMaster(ReportMaster);
+				repo.UpdateReportMaster(this.ReportMaster);
 
 				#region REPORT XML
 
-				ReportXMLModel reportXml = repo.GetReportXMLByPrimaryKey(ReportMaster.ReportXMLVersion, ReportMaster.MasterReport_Id);
+				ReportXMLModel reportXml = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, this.ReportMaster.MasterReport_Id);
 
 				if (reportXml == null)
 				{
 					reportXml = new ReportXMLModel
 					{
-						MasterReport_Id = ReportMaster.MasterReport_Id,
-						ReportXMLVersion = ReportMaster.ReportXMLVersion,
+						MasterReport_Id = this.ReportMaster.MasterReport_Id,
+						ReportXMLVersion = this.ReportMaster.ReportXMLVersion,
 						PrintCount = 0
 					};
 				}
 
-				XDocument reportXmlDocument = GetReportXml();
+				XDocument reportXmlDocument = this.GetReportXml();
 
 				reportXml.BinaryXML = reportXmlDocument.ToString().ZipFile();
 
 				repo.UpdateReportXML(reportXml);
 
-				repo.DisableReportXMLPrintFilters(ReportMaster.MasterReport_Id, ReportMaster.ReportXMLVersion);
+				repo.DisableReportXMLPrintFilters(this.ReportMaster.MasterReport_Id, this.ReportMaster.ReportXMLVersion);
 
-				List<ReportXMLPrintParameterModel> xxx = GetReportparameterFilters(reportXmlDocument);
+				List<ReportXMLPrintParameterModel> xxx = this.GetReportparameterFilters(reportXmlDocument);
 
-				foreach (ReportXMLPrintParameterModel filter in GetReportparameterFilters(reportXmlDocument))
+				foreach (ReportXMLPrintParameterModel filter in this.GetReportparameterFilters(reportXmlDocument))
 				{
 					repo.UpdateReportXMLPrintParameter(filter);
 				}
@@ -194,16 +194,16 @@ namespace REPORT.Builder
 
 				#region REPORT CONNECTIONS
 
-				repo.SetReportConnectionsSttus(ReportMaster.MasterReport_Id, false, false);
+				repo.SetReportConnectionsSttus(this.ReportMaster.MasterReport_Id, false, false);
 
-				DatabaseModel databaseModel = Connections.Instance.GetConnection(reportMaster.ProductionConnection);
+				DatabaseModel databaseModel = Connections.Instance.GetConnection(this.reportMaster.ProductionConnection);
 
 				if (databaseModel != null)
 				{
 					ReportConnectionModel connection = new ReportConnectionModel
 					{
-						MasterReport_Id = ReportMaster.MasterReport_Id,
-						ReportConnectionName = reportMaster.ProductionConnection,
+						MasterReport_Id = this.ReportMaster.MasterReport_Id,
+						ReportConnectionName = this.reportMaster.ProductionConnection,
 						DatabaseTypeEnum = (int)databaseModel.DatabaseType,
 						ServerName = databaseModel.ServerName,
 						DatabaseName = databaseModel.DatabaseName,
@@ -221,19 +221,19 @@ namespace REPORT.Builder
 
 				#region SAVE DATASOURCE SELECTION
 
-				if (DataSourceMainTable != null)
+				if (this.DataSourceMainTable != null)
 				{
 					DataSourceRepository sourceRepo = new DataSourceRepository();
 
-					DataSourceMainTable.MasterReport_Id = ReportMaster.MasterReport_Id;
+					this.DataSourceMainTable.MasterReport_Id = this.ReportMaster.MasterReport_Id;
 
-					sourceRepo.UpdateDataSourceMaster(DataSourceMainTable);
+					sourceRepo.UpdateDataSourceMaster(this.DataSourceMainTable);
 
-					sourceRepo.SetIsAvailable(ReportMaster.MasterReport_Id, false);
+					sourceRepo.SetIsAvailable(this.ReportMaster.MasterReport_Id, false);
 
-					foreach (DataSourceTableModel sourceModel in DataSourceMainTable.SelectedSourceTables)
+					foreach (DataSourceTableModel sourceModel in this.DataSourceMainTable.SelectedSourceTables)
 					{
-						sourceModel.MasterReport_Id = ReportMaster.MasterReport_Id;
+						sourceModel.MasterReport_Id = this.ReportMaster.MasterReport_Id;
 
 						sourceRepo.UpdateDataSourceTable(sourceModel);
 					}
@@ -295,7 +295,7 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				Save();
+				this.Save();
 
 				MessageBox.Show("Report Saved");
 			}
@@ -307,74 +307,106 @@ namespace REPORT.Builder
 
 		private void ReportDesigner_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			uxHorizontalRuler.Refresh(CanvasWidth, 20, CanvasHeight);
+			this.uxHorizontalRuler.Refresh(this.CanvasWidth, 20, this.CanvasHeight);
 		}
 
 		private void ReportObject_Selected(object sender, object reportObject)
 		{
 			try
 			{
-				uxProperties.Items.Clear();
+				this.uxProperties.Items.Clear();
 
-				SelectedSectionGroupIndex = sender.GetPropertyValue("SectionGroupIndex").ToInt32();
+				this.SelectedSectionGroupIndex = sender.GetPropertyValue("SectionGroupIndex").ToInt32();
 
 				int sectionIndex = sender.GetPropertyValue("SectionIndex").ToInt32();
 
-				if (SelectedSectionGroupIndex > 0 && reportObject == null)
+				if (this.selectedReportObject != null)
 				{
-					uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
+					ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == sectionIndex);
 
-					uxWhereBuilder.AddSectionOptions(dataReportSections.ToArray(), sender.GetPropertyValue("SectionGroupIndex").ToInt32());
+					canvas.UpdateReplacementColumn(this.uxReplacceColumn.WhereHeader);
+				}
 
-					uxPropertiesCaption.Visibility = Visibility.Collapsed;
+				if (this.SelectedSectionGroupIndex > 0 && reportObject == null)
+				{
+					this.uxCanvasSql.Text = sender == null ? string.Empty : sender.GetPropertyValue("SQLQuery").ParseToString();
 
-					uxProperties.Visibility = Visibility.Collapsed;
+					this.uxWhereBuilder.AddSectionOptions(this.dataReportSections.ToArray(), sender.GetPropertyValue("SectionGroupIndex").ToInt32());
 
-					uxWhereBuilder.Visibility = Visibility.Visible;
+					this.uxPropertiesCaption.Visibility = Visibility.Collapsed;
 
-					uxWhereBuilderCaption.Visibility = Visibility.Visible;
+					this.uxProperties.Visibility = Visibility.Collapsed;
 
-					uxCanvasSql.Visibility = Visibility.Visible;
+					this.uxReplacceColumnCaption.Visibility = Visibility.Collapsed;
 
-					uxCanvasSqlCaption.Visibility = Visibility.Visible;
+					this.uxReplacceColumn.Visibility = Visibility.Collapsed;
+
+					this.uxWhereBuilder.Visibility = Visibility.Visible;
+
+					this.uxWhereBuilderCaption.Visibility = Visibility.Visible;
+
+					this.uxCanvasSql.Visibility = Visibility.Visible;
+
+					this.uxCanvasSqlCaption.Visibility = Visibility.Visible;
 
 					return;
 				}
-				else if (SelectedSectionGroupIndex == 0 && reportObject == null)
+				else if (this.SelectedSectionGroupIndex == 0 && reportObject == null)
 				{
-					uxPropertiesCaption.Visibility = Visibility.Collapsed;
+					this.uxPropertiesCaption.Visibility = Visibility.Collapsed;
 
-					uxProperties.Visibility = Visibility.Collapsed;
+					this.uxProperties.Visibility = Visibility.Collapsed;
 
-					uxWhereBuilder.Visibility = Visibility.Collapsed;
+					this.uxReplacceColumnCaption.Visibility = Visibility.Collapsed;
 
-					uxWhereBuilderCaption.Visibility = Visibility.Collapsed;
+					this.uxReplacceColumn.Visibility = Visibility.Collapsed;
 
-					uxCanvasSql.Visibility = Visibility.Collapsed;
+					this.uxWhereBuilder.Visibility = Visibility.Collapsed;
 
-					uxCanvasSqlCaption.Visibility = Visibility.Collapsed;
+					this.uxWhereBuilderCaption.Visibility = Visibility.Collapsed;
+
+					this.uxCanvasSql.Visibility = Visibility.Collapsed;
+
+					this.uxCanvasSqlCaption.Visibility = Visibility.Collapsed;
 				}
 				else if (reportObject != null)
 				{
-					uxPropertiesCaption.Visibility = Visibility.Visible;
+					if (reportObject.GetType() == typeof(ReportDataObject))
+					{
+						ReportDataObject dataObject = reportObject.To<ReportDataObject>();
 
-					uxProperties.Visibility = Visibility.Visible;
+						this.uxReplacceColumnCaption.Visibility = Visibility.Visible;
 
-					uxWhereBuilder.Visibility = Visibility.Collapsed;
+						this.uxReplacceColumn.Visibility = Visibility.Visible;
 
-					uxWhereBuilderCaption.Visibility = Visibility.Collapsed;
+						this.uxReplacceColumn.Clear();
 
-					uxCanvasSql.Visibility = Visibility.Collapsed;
+						ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == sectionIndex);
 
-					uxCanvasSqlCaption.Visibility = Visibility.Collapsed;
+						this.uxReplacceColumn.SetValueColumns(canvas.ReportColumns);
 
-					selectedReportObject = null;
+						this.uxReplacceColumn.WhereHeader = canvas.GetReplacementColumn(dataObject.ColumnModel.TableName, dataObject.ColumnModel.ColumnName);
+					}
 
-					selectedReportObject = reportObject as UIElement;
+					this.uxPropertiesCaption.Visibility = Visibility.Visible;
 
-					selectedReportObject.PreviewMouseRightButtonUp += SelecteReportObject_RightClick;
+					this.uxProperties.Visibility = Visibility.Visible;
 
-					uxProperties.Items.Add(reportObject);
+					this.uxWhereBuilder.Visibility = Visibility.Collapsed;
+
+					this.uxWhereBuilderCaption.Visibility = Visibility.Collapsed;
+
+					this.uxCanvasSql.Visibility = Visibility.Collapsed;
+
+					this.uxCanvasSqlCaption.Visibility = Visibility.Collapsed;
+
+					this.selectedReportObject = null;
+
+					this.selectedReportObject = reportObject as UIElement;
+
+					this.selectedReportObject.PreviewMouseRightButtonUp += this.SelecteReportObject_RightClick;
+
+					this.uxProperties.Items.Add(reportObject);
 				}
 			}
 			catch (Exception err)
@@ -387,7 +419,7 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				RefreshSectionTitles();
+				this.RefreshSectionTitles();
 			}
 			catch (Exception err)
 			{
@@ -399,27 +431,27 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				ReportSection dataSection = dataReportSections
+				ReportSection dataSection = this.dataReportSections
 					.FirstOrDefault(rp => rp.SectionTableName == column.TableName
 										&& rp.SectionType == SectionTypeEnum.TableData);
 
 				if (dataSection == null)
 				{
-					int newGroupIndex = CreateDatareportSections();
+					int newGroupIndex = this.CreateDatareportSections();
 
-					foreach (ReportSection section in dataReportSections.Where(si => si.SectionGroupIndex == newGroupIndex))
+					foreach (ReportSection section in this.dataReportSections.Where(si => si.SectionGroupIndex == newGroupIndex))
 					{
 						section.SectionTableName = column.TableName;
 					}
 
-					dataSection = dataReportSections
+					dataSection = this.dataReportSections
 					.FirstOrDefault(rp => rp.SectionGroupIndex == newGroupIndex
 										&& rp.SectionType == SectionTypeEnum.TableData);
 				}
 
 				dataSection.AddReportColumn(column);
 
-				RefreshSectionTitles();
+				this.RefreshSectionTitles();
 			}
 			catch (Exception err)
 			{
@@ -440,7 +472,7 @@ namespace REPORT.Builder
 					{
 						MenuItem alignmentItem = new MenuItem { Header = alignment.GetDescriptionAttribute(), Tag = alignment };
 
-						alignmentItem.Click += Alignment_Click;
+						alignmentItem.Click += this.Alignment_Click;
 
 						menu.Items.Add(alignmentItem);
 					}
@@ -450,7 +482,7 @@ namespace REPORT.Builder
 				{
 					MenuItem delete = new MenuItem { Name = "uxDelete", Header = "Delete Object" };
 
-					delete.Click += SelectedMenuItem_Click;
+					delete.Click += this.SelectedMenuItem_Click;
 
 					menu.Items.Add(delete);
 				}
@@ -483,13 +515,13 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				SectionCanvas canvas = (SectionCanvas)selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
+				SectionCanvas canvas = (SectionCanvas)this.selectedReportObject.FindParentControlBase(typeof(SectionCanvas));
 
-				ResizeHandles.RemoveElement(selectedReportObject);
+				ResizeHandles.RemoveElement(this.selectedReportObject);
 
-				canvas.Children.Remove(selectedReportObject);
+				canvas.Children.Remove(this.selectedReportObject);
 
-				selectedReportObject = null;
+				this.selectedReportObject = null;
 			}
 			catch (Exception err)
 			{
@@ -505,18 +537,18 @@ namespace REPORT.Builder
 				{
 					case "PaperKindEnum":
 
-						foreach (ReportSection section in uxReportSections.Children)
+						foreach (ReportSection section in this.uxReportSections.Children)
 						{
-							section.PaperKind = (PaperKind)ReportMaster.PaperKindEnum;
+							section.PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum;
 						}
 
 						break;
 
 					case "PageOrientationEnum":
 
-						foreach (ReportSection section in uxReportSections.Children)
+						foreach (ReportSection section in this.uxReportSections.Children)
 						{
-							section.PageOrientation = (PageOrientationEnum)ReportMaster.PageOrientationEnum;
+							section.PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum;
 						}
 
 						break;
@@ -527,17 +559,17 @@ namespace REPORT.Builder
 					case "PageMarginTop":
 					case "PageMarginBottom":
 
-						if (reportDesignType == ReportTypeEnum.ReportContent
-							|| reportDesignType == ReportTypeEnum.PageHeaderAndFooter)
+						if (this.reportDesignType == ReportTypeEnum.ReportContent
+							|| this.reportDesignType == ReportTypeEnum.PageHeaderAndFooter)
 						{
 							break;
 						}
 
-						foreach (ReportSection section in uxReportSections.Children)
+						foreach (ReportSection section in this.uxReportSections.Children)
 						{
-							section.MarkerTopMargin = ReportMaster.PageMarginTop.ToInt32();
+							section.MarkerTopMargin = this.ReportMaster.PageMarginTop.ToInt32();
 
-							section.MarkerBottomMargin = ReportMaster.PageMarginBottom.ToInt32();
+							section.MarkerBottomMargin = this.ReportMaster.PageMarginBottom.ToInt32();
 
 							section.RefreshPageStaticMarkers();
 						}
@@ -546,7 +578,7 @@ namespace REPORT.Builder
 
 				}
 
-				RefreshMarginMarkers();
+				this.RefreshMarginMarkers();
 			}
 			catch (Exception err)
 			{
@@ -558,12 +590,12 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				if (TextEditing.ShowDialog("Description", ReportMaster.DescriptionText).IsFalse())
+				if (TextEditing.ShowDialog("Description", this.ReportMaster.DescriptionText).IsFalse())
 				{
 					return;
 				}
 
-				ReportMaster.DescriptionText = TextEditing.Text;
+				this.ReportMaster.DescriptionText = TextEditing.Text;
 			}
 			catch (Exception err)
 			{
@@ -588,7 +620,7 @@ namespace REPORT.Builder
 							return;
 						}
 
-						selectedReportObject.SetPropertyValue("ImagePath", dlg.FileName);
+						this.selectedReportObject.SetPropertyValue("ImagePath", dlg.FileName);
 
 						break;
 
@@ -601,7 +633,7 @@ namespace REPORT.Builder
 							return;
 						}
 
-						selectedReportObject.SetPropertyValue(buttonKey, picker.SelectedColour);
+						this.selectedReportObject.SetPropertyValue(buttonKey, picker.SelectedColour);
 
 						break;
 				}
@@ -616,16 +648,16 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				DatasourceSelector selector = new DatasourceSelector(ReportMaster.MasterReport_Id);
+				DatasourceSelector selector = new DatasourceSelector(this.ReportMaster.MasterReport_Id);
 
 				if (ControlDialog.ShowDialog("Data Source", selector, "Accept").IsFalse())
 				{
 					return;
 				}
 
-				DataSourceMainTable = selector.MainTable;
+				this.DataSourceMainTable = selector.MainTable;
 
-				LoadDataSource();
+				this.LoadDataSource();
 			}
 			catch (Exception err)
 			{
@@ -646,7 +678,7 @@ namespace REPORT.Builder
 					Tag = Connections.Instance.DefaultConnectionName
 				};
 
-				defaultItem.Click += ReportPrintConnection_Cliked;
+				defaultItem.Click += this.ReportPrintConnection_Cliked;
 
 				menu.Items.Add(defaultItem);
 
@@ -658,7 +690,7 @@ namespace REPORT.Builder
 						Tag = connectionKey.Key
 					};
 
-					alternativeItem.Click += ReportPrintConnection_Cliked;
+					alternativeItem.Click += this.ReportPrintConnection_Cliked;
 
 					menu.Items.Add(alternativeItem);
 				}
@@ -675,14 +707,14 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				if (uxReportMasterModel.HasValidationError)
+				if (this.uxReportMasterModel.HasValidationError)
 				{
 					return;
 				}
 
 				MenuItem item = (MenuItem)e.Source;
 
-				PrintPreview preview = new PrintPreview(ReportMaster.ReportName, GetPrintCanvases(item));
+				PrintPreview preview = new PrintPreview(this.ReportMaster.ReportName, this.GetPrintCanvases(item));
 
 				ControlDialog.Show("Reports", preview, string.Empty, showOkButton: false, windowState: WindowState.Maximized);
 			}
@@ -704,7 +736,7 @@ namespace REPORT.Builder
 					Tag = Connections.Instance.DefaultConnectionName
 				};
 
-				defaultItem.Click += ExportPdfConnection_Cliked;
+				defaultItem.Click += this.ExportPdfConnection_Cliked;
 
 				menu.Items.Add(defaultItem);
 
@@ -716,7 +748,7 @@ namespace REPORT.Builder
 						Tag = connectionKey.Key
 					};
 
-					alternativeItem.Click += ExportPdfConnection_Cliked;
+					alternativeItem.Click += this.ExportPdfConnection_Cliked;
 
 					menu.Items.Add(alternativeItem);
 				}
@@ -733,14 +765,14 @@ namespace REPORT.Builder
 		{
 			try
 			{
-				if (uxReportMasterModel.HasValidationError)
+				if (this.uxReportMasterModel.HasValidationError)
 				{
 					return;
 				}
 
 				SaveFileDialog dlg = new SaveFileDialog();
 
-				dlg.FileName = ReportMaster.ReportName;
+				dlg.FileName = this.ReportMaster.ReportName;
 
 				dlg.Filter = "PDF Files | *.pdf";
 
@@ -755,7 +787,7 @@ namespace REPORT.Builder
 
 				CanvasToPDF pdf = new CanvasToPDF();
 
-				string result = pdf.ConvertToPdf(dlg.FileName, GetPrintCanvases(item));
+				string result = pdf.ConvertToPdf(dlg.FileName, this.GetPrintCanvases(item));
 
 				Process.Start(result);
 
@@ -776,7 +808,7 @@ namespace REPORT.Builder
 		{
 			get
 			{
-				return ((ReportSection)uxReportSections.Children[0]).GetPropertyValue("PageWidth").ToDouble();
+				return ((ReportSection)this.uxReportSections.Children[0]).GetPropertyValue("PageWidth").ToDouble();
 			}
 		}
 
@@ -784,7 +816,7 @@ namespace REPORT.Builder
 		{
 			get
 			{
-				return uxReportSections.ActualHeight + 25;
+				return this.uxReportSections.ActualHeight + 25;
 			}
 		}
 
@@ -794,21 +826,21 @@ namespace REPORT.Builder
 
 		private void InitializeReportSections()
 		{
-			uxReportSections.Children.Clear();
+			this.uxReportSections.Children.Clear();
 
-			switch (reportDesignType)
+			switch (this.reportDesignType)
 			{
 				case ReportTypeEnum.CoverPage:
 				case ReportTypeEnum.FinalPage:
 
-					uxReportSections.Children.Add(new ReportSection
+					this.uxReportSections.Children.Add(new ReportSection
 					{
 						SectionIndex = 0,
 						SectionGroupIndex = 0,
 						SectionType = SectionTypeEnum.Page,
 						IsDesignMode = true,
-						PaperKind = (PaperKind)ReportMaster.PaperKindEnum,
-						PageOrientation = (PageOrientationEnum)ReportMaster.PageOrientationEnum,
+						PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+						PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
 						MarkerBottomMargin = 100,
 						MarkerTopMargin = 100
 					}); ;
@@ -817,32 +849,32 @@ namespace REPORT.Builder
 
 				case ReportTypeEnum.ReportContent:
 
-					CreateDatareportSections();
+					this.CreateDatareportSections();
 
 					break;
 
 				case ReportTypeEnum.PageHeaderAndFooter:
 
-					uxReportSections.Children.Add(new ReportSection
+					this.uxReportSections.Children.Add(new ReportSection
 					{
 						SectionIndex = 0,
 						SectionGroupIndex = 0,
 						SectionType = SectionTypeEnum.Header,
 						IsDesignMode = true,
-						PaperKind = (PaperKind)ReportMaster.PaperKindEnum,
-						PageOrientation = (PageOrientationEnum)ReportMaster.PageOrientationEnum,
+						PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+						PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
 						MarkerBottomMargin = 100,
 						MarkerTopMargin = 100
 					});
 
-					uxReportSections.Children.Add(new ReportSection
+					this.uxReportSections.Children.Add(new ReportSection
 					{
 						SectionIndex = 1,
 						SectionGroupIndex = 0,
 						SectionType = SectionTypeEnum.Footer,
 						IsDesignMode = true,
-						PaperKind = (PaperKind)ReportMaster.PaperKindEnum,
-						PageOrientation = (PageOrientationEnum)ReportMaster.PageOrientationEnum,
+						PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+						PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
 						MarkerBottomMargin = 100,
 						MarkerTopMargin = 100
 					});
@@ -850,111 +882,111 @@ namespace REPORT.Builder
 					break;
 			}
 
-			foreach (ReportSection section in uxReportSections.Children)
+			foreach (ReportSection section in this.uxReportSections.Children)
 			{
-				section.ReportObjectSelected += ReportObject_Selected;
+				section.ReportObjectSelected += this.ReportObject_Selected;
 
 				if (section.SectionType == SectionTypeEnum.TableData)
 				{
-					section.RequestNewDataSections += NewDataSection_Requested;
+					section.RequestNewDataSections += this.NewDataSection_Requested;
 
-					section.ReportColumnAdded += ReportColumn_Added;
+					section.ReportColumnAdded += this.ReportColumn_Added;
 				}
 			}
 		}
 
 		private void InitializeToolsStack()
 		{
-			uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Label", ToolType = typeof(ReportLabel) });
+			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Label", ToolType = typeof(ReportLabel) });
 
-			uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Border", ToolType = typeof(ReportBorder) });
+			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Border", ToolType = typeof(ReportBorder) });
 
-			uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Current Date", ToolType = typeof(CurrentDate) });
+			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Current Date", ToolType = typeof(CurrentDate) });
 
-			uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Image", ToolType = typeof(ReportImage) });
+			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Image", ToolType = typeof(ReportImage) });
 
-			uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Horizontal Line", ToolType = typeof(ReportHorizontalLine) });
+			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Horizontal Line", ToolType = typeof(ReportHorizontalLine) });
 
-			uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Vertical Line", ToolType = typeof(ReportVerticalLine) });
+			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Vertical Line", ToolType = typeof(ReportVerticalLine) });
 
-			uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Page Break", ToolType = typeof(ReportPageBreak) });
+			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Page Break", ToolType = typeof(ReportPageBreak) });
 		}
 
 		private void RefreshMarginMarkers()
 		{
-			double pageWidth = CanvasWidth;
+			double pageWidth = this.CanvasWidth;
 
-			uxHorizontalRuler.ClearMarkers(true);
+			this.uxHorizontalRuler.ClearMarkers(true);
 
-			uxHorizontalRuler.Refresh(pageWidth, 25, CanvasHeight);
+			this.uxHorizontalRuler.Refresh(pageWidth, 25, this.CanvasHeight);
 
-			uxHorizontalRuler.AddMarker(ReportMaster.PageMarginLeft, true);
+			this.uxHorizontalRuler.AddMarker(this.ReportMaster.PageMarginLeft, true);
 
-			uxHorizontalRuler.AddMarker((pageWidth - ReportMaster.PageMarginRight), true);
+			this.uxHorizontalRuler.AddMarker((pageWidth - this.ReportMaster.PageMarginRight), true);
 		}
 
 		private void SetupDataReportsOptions()
 		{
-			if (reportDesignType != ReportTypeEnum.ReportContent)
+			if (this.reportDesignType != ReportTypeEnum.ReportContent)
 			{
 				return;
 			}
 
-			uxReportMasterModel["Cover Page"].Visibility = Visibility.Visible;
+			this.uxReportMasterModel["Cover Page"].Visibility = Visibility.Visible;
 
-			uxReportMasterModel["Page Headers and Footers"].Visibility = Visibility.Visible;
+			this.uxReportMasterModel["Page Headers and Footers"].Visibility = Visibility.Visible;
 
-			uxReportMasterModel["Final Page"].Visibility = Visibility.Visible;
+			this.uxReportMasterModel["Final Page"].Visibility = Visibility.Visible;
 
-			uxReportMasterModel["Production Connection"].Visibility = Visibility.Visible;
+			this.uxReportMasterModel["Production Connection"].Visibility = Visibility.Visible;
 
-			uxReportMasterModel["Production Connection"].IsRequired = true;
+			this.uxReportMasterModel["Production Connection"].IsRequired = true;
 
-			uxDataMenueBorder.Visibility = Visibility.Visible;
+			this.uxDataMenueBorder.Visibility = Visibility.Visible;
 
-			uxDataMenue.Visibility = Visibility.Visible;
+			this.uxDataMenue.Visibility = Visibility.Visible;
 
-			uxTableTree.Visibility = Visibility.Visible;
+			this.uxTableTree.Visibility = Visibility.Visible;
 
 			DataSourceRepository repo = new DataSourceRepository();
 
-			DataSourceMasterModel sourceMaster = repo.GetDataSourceMasterByPrimaryKey(ReportMaster.MasterReport_Id);
+			DataSourceMasterModel sourceMaster = repo.GetDataSourceMasterByPrimaryKey(this.ReportMaster.MasterReport_Id);
 
 			if (sourceMaster != null)
 			{
-				sourceMaster.SelectedSourceTables.AddRange(repo.GetDataSourceTableByForeignKeyMasterReport_Id(ReportMaster.MasterReport_Id));
+				sourceMaster.SelectedSourceTables.AddRange(repo.GetDataSourceTableByForeignKeyMasterReport_Id(this.ReportMaster.MasterReport_Id));
 
-				DataSourceMainTable = sourceMaster;
+				this.DataSourceMainTable = sourceMaster;
 
-				LoadDataSource();
+				this.LoadDataSource();
 			}
 
-			uxReportMasterModel.AllignAllCaptions();
+			this.uxReportMasterModel.AllignAllCaptions();
 		}
 
 		private void LoadDataSource()
 		{
-			uxTableTree.Items.Clear();
+			this.uxTableTree.Items.Clear();
 
-			foreach (ReportSection section in uxReportSections.Children)
+			foreach (ReportSection section in this.uxReportSections.Children)
 			{
 				if (section.SectionGroupIndex != 0)
 				{
 					continue;
 				}
 
-				section.SectionTableName = DataSourceMainTable.MainTableName; // Do this to reserve the first section for the main data source
+				section.SectionTableName = this.DataSourceMainTable.MainTableName; // Do this to reserve the first section for the main data source
 
 				section.RefresSectionTitle();
 			}
 
-			TreeViewItem mainTreeItem = new TreeViewItem { Header = DataSourceMainTable.MainTableName };
+			TreeViewItem mainTreeItem = new TreeViewItem { Header = this.DataSourceMainTable.MainTableName };
 
-			foreach (DataItemModel column in Integrity.GetColumnsForTable(DataSourceMainTable.MainTableName))
+			foreach (DataItemModel column in Integrity.GetColumnsForTable(this.DataSourceMainTable.MainTableName))
 			{
-				ColumnObjectModel tableColumn = Integrity.GetObjectModel(DataSourceMainTable.MainTableName, column.DisplayValue);
+				ColumnObjectModel tableColumn = Integrity.GetObjectModel(this.DataSourceMainTable.MainTableName, column.DisplayValue);
 
-				ReportColumnModel reportColumn = tableColumn.CopyToObject(new ReportColumnModel { TableName = DataSourceMainTable.MainTableName }) as ReportColumnModel;
+				ReportColumnModel reportColumn = tableColumn.CopyToObject(new ReportColumnModel { TableName = this.DataSourceMainTable.MainTableName }) as ReportColumnModel;
 
 				ToolsMenuItem treeMainColumn = new ToolsMenuItem
 				{
@@ -966,11 +998,11 @@ namespace REPORT.Builder
 				mainTreeItem.Items.Add(treeMainColumn);
 			}
 
-			uxTableTree.Items.Add(mainTreeItem);
+			this.uxTableTree.Items.Add(mainTreeItem);
 
-			foreach (DataSourceTableModel sourceTable in DataSourceMainTable.SelectedSourceTables)
+			foreach (DataSourceTableModel sourceTable in this.DataSourceMainTable.SelectedSourceTables)
 			{
-				if (sourceTable.TableName == DataSourceMainTable.MainTableName)
+				if (sourceTable.TableName == this.DataSourceMainTable.MainTableName)
 				{
 					continue;
 				}
@@ -993,7 +1025,7 @@ namespace REPORT.Builder
 					childTreeItem.Items.Add(treeChildColumn);
 				}
 
-				uxTableTree.Items.Add(childTreeItem);
+				this.uxTableTree.Items.Add(childTreeItem);
 			}
 		}
 
@@ -1005,9 +1037,9 @@ namespace REPORT.Builder
 
 			XElement report = new XElement("ReportSettings");
 
-			report.Add(new XAttribute("ReportTypeEnum", (int)reportDesignType));
+			report.Add(new XAttribute("ReportTypeEnum", (int)this.reportDesignType));
 
-			foreach (ReportSection section in uxReportSections.Children)
+			foreach (ReportSection section in this.uxReportSections.Children)
 			{
 				report.Add(section.SectionXml);
 			}
@@ -1033,9 +1065,9 @@ namespace REPORT.Builder
 
 		private Dictionary<int, PrintCanvas> GetPrintCanvases(MenuItem item)
 		{
-			XDocument reportXml = GetReportXml();
+			XDocument reportXml = this.GetReportXml();
 
-			List<ReportXMLPrintParameterModel> parameterFilters = GetReportparameterFilters(reportXml);
+			List<ReportXMLPrintParameterModel> parameterFilters = this.GetReportparameterFilters(reportXml);
 
 			if (parameterFilters.Count > 0)
 			{
@@ -1053,7 +1085,7 @@ namespace REPORT.Builder
 
 			BuildReportXML xmlBuild = new BuildReportXML();
 
-			XDocument repotXml = xmlBuild.GetReport(reportXml, connection, ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster, parameterFilters);
+			XDocument repotXml = xmlBuild.GetReport(reportXml, connection, this.ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster, parameterFilters);
 
 			reportPrint.PrintDocument(repotXml);
 
@@ -1076,8 +1108,8 @@ namespace REPORT.Builder
 				{
 					TableName = item.Attribute("ObjectTable").Value,
 					ColumnName = item.Attribute("ObjectColumn").Value,
-					ReportXMLVersion = ReportMaster.ReportXMLVersion,
-					MasterReport_Id = ReportMaster.MasterReport_Id,
+					ReportXMLVersion = this.ReportMaster.ReportXMLVersion,
+					MasterReport_Id = this.ReportMaster.MasterReport_Id,
 					FilterCaption = item.Attribute("PrintParameterCaption").Value,
 					DefaultValue = item.Attribute("PrintParameterDefaultValue").Value,
 					IsActive = true
@@ -1093,9 +1125,9 @@ namespace REPORT.Builder
 
 		private int CreateDatareportSections()
 		{
-			int groupSectionId = NextGroupIndex();
+			int groupSectionId = this.NextGroupIndex();
 
-			int[] sectionIndex = CalculateSectionIndexes();
+			int[] sectionIndex = this.CalculateSectionIndexes();
 
 			ReportSection header = new ReportSection
 			{
@@ -1103,15 +1135,15 @@ namespace REPORT.Builder
 				SectionGroupIndex = groupSectionId,
 				SectionType = SectionTypeEnum.TableHeader,
 				IsDesignMode = true,
-				PaperKind = (PaperKind)ReportMaster.PaperKindEnum,
-				PageOrientation = (PageOrientationEnum)ReportMaster.PageOrientationEnum,
+				PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+				PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
 				MarkerBottomMargin = 100,
 				MarkerTopMargin = 100
 			};
 
-			uxReportSections.Children.Insert(sectionIndex[0], header);
+			this.uxReportSections.Children.Insert(sectionIndex[0], header);
 
-			dataReportSections.Add(header);
+			this.dataReportSections.Add(header);
 
 			ReportSection data = new ReportSection
 			{
@@ -1119,15 +1151,15 @@ namespace REPORT.Builder
 				SectionGroupIndex = groupSectionId,
 				SectionType = SectionTypeEnum.TableData,
 				IsDesignMode = true,
-				PaperKind = (PaperKind)ReportMaster.PaperKindEnum,
-				PageOrientation = (PageOrientationEnum)ReportMaster.PageOrientationEnum,
+				PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+				PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
 				MarkerBottomMargin = 100,
 				MarkerTopMargin = 100
 			};
 
-			uxReportSections.Children.Insert(sectionIndex[1], data);
+			this.uxReportSections.Children.Insert(sectionIndex[1], data);
 
-			dataReportSections.Add(data);
+			this.dataReportSections.Add(data);
 
 			ReportSection footer = new ReportSection
 			{
@@ -1135,34 +1167,34 @@ namespace REPORT.Builder
 				SectionGroupIndex = groupSectionId,
 				SectionType = SectionTypeEnum.TableFooter,
 				IsDesignMode = true,
-				PaperKind = (PaperKind)ReportMaster.PaperKindEnum,
-				PageOrientation = (PageOrientationEnum)ReportMaster.PageOrientationEnum,
+				PaperKind = (PaperKind)this.ReportMaster.PaperKindEnum,
+				PageOrientation = (PageOrientationEnum)this.ReportMaster.PageOrientationEnum,
 				MarkerBottomMargin = 100,
 				MarkerTopMargin = 100
 			};
 
-			uxReportSections.Children.Insert(sectionIndex[2], footer);
+			this.uxReportSections.Children.Insert(sectionIndex[2], footer);
 
-			dataReportSections.Add(footer);
+			this.dataReportSections.Add(footer);
 
-			header.ReportObjectSelected += ReportObject_Selected;
+			header.ReportObjectSelected += this.ReportObject_Selected;
 
-			data.ReportObjectSelected += ReportObject_Selected;
+			data.ReportObjectSelected += this.ReportObject_Selected;
 
-			data.RequestNewDataSections += NewDataSection_Requested;
+			data.RequestNewDataSections += this.NewDataSection_Requested;
 
-			data.ReportColumnAdded += ReportColumn_Added;
+			data.ReportColumnAdded += this.ReportColumn_Added;
 
 			//data.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
 
-			footer.ReportObjectSelected += ReportObject_Selected;
+			footer.ReportObjectSelected += this.ReportObject_Selected;
 
 			return groupSectionId;
 		}
 
 		private void RefreshSectionTitles()
 		{
-			foreach (ReportSection section in dataReportSections)
+			foreach (ReportSection section in this.dataReportSections)
 			{
 				section.RefresSectionTitle();
 			}
@@ -1170,26 +1202,26 @@ namespace REPORT.Builder
 
 		private int NextGroupIndex()
 		{
-			return dataReportSections.Count == 0 ? 0 :
-				(dataReportSections.Select(gr => gr.SectionGroupIndex).Max() + 1);
+			return this.dataReportSections.Count == 0 ? 0 :
+				(this.dataReportSections.Select(gr => gr.SectionGroupIndex).Max() + 1);
 		}
 
 		private int GetMaxSectionIndex()
 		{   // Zero based index
-			return dataReportSections.Count == 0 ? 2 :
-				(dataReportSections.Select(gr => gr.SectionIndex).Max());
+			return this.dataReportSections.Count == 0 ? 2 :
+				(this.dataReportSections.Select(gr => gr.SectionIndex).Max());
 		}
 
 		private int[] CalculateSectionIndexes()
 		{
-			int nextGroupIndex = NextGroupIndex();
+			int nextGroupIndex = this.NextGroupIndex();
 
 			if (nextGroupIndex == 0)
 			{
 				return new int[] { 0, 1, 2 };
 			}
 
-			int maxSectionIndex = GetMaxSectionIndex();
+			int maxSectionIndex = this.GetMaxSectionIndex();
 
 			int insertIndexStart = ((maxSectionIndex + 1) / 3) + ((maxSectionIndex + 1) / 3);
 
@@ -1201,7 +1233,7 @@ namespace REPORT.Builder
 
 			int shiftIndex = result[2] + 1;
 
-			ReportSection[] changeSections = dataReportSections
+			ReportSection[] changeSections = this.dataReportSections
 				.Where(si => si.SectionIndex >= insertIndexStart)
 				.OrderBy(oi => oi.SectionIndex)
 				.ToArray();

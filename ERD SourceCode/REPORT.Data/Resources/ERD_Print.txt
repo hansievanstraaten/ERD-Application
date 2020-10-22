@@ -1,3 +1,19 @@
+IF EXISTS(SELECT 1
+          FROM SYS.FOREIGN_KEYS
+         WHERE OBJECT_ID = OBJECT_ID(N'dbo.FK__ReportWhereHeader__ReportWhereDetail')
+         AND PARENT_OBJECT_ID = OBJECT_ID(N'dbo.ReportWhereDetail'))
+BEGIN
+ ALTER TABLE[ReportWhereDetail] DROP CONSTRAINT[FK__ReportWhereHeader__ReportWhereDetail]
+END
+
+IF EXISTS(SELECT 1
+          FROM SYS.FOREIGN_KEYS
+         WHERE OBJECT_ID = OBJECT_ID(N'dbo.FK__ReportMaster__ReportWhereHeader')
+         AND PARENT_OBJECT_ID = OBJECT_ID(N'dbo.ReportWhereHeader'))
+BEGIN
+ ALTER TABLE[ReportWhereHeader] DROP CONSTRAINT[FK__ReportMaster__ReportWhereHeader]
+END
+
 SET ANSI_NULLS ON
 
 SET QUOTED_IDENTIFIER ON
@@ -597,42 +613,22 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     CREATE TABLE [ReportXMLPrintParameter]
          ( 
-           [TableName] [VarChar] (255) NOT NULL,
-           [ColumnName] [VarChar] (255) NOT NULL,
            [ReportXMLVersion] [Int]  NOT NULL,
            [MasterReport_Id] [BigInt]  NOT NULL,
+           [TableName] [VarChar] (255) NOT NULL,
+           [ColumnName] [VarChar] (255) NOT NULL,
            [IsActive] [Bit]  NOT NULL,
            [FilterCaption] [VarChar] (255) NOT NULL,
            [DefaultValue] [VarChar] (255) NULL,
     CONSTRAINT [PK_ReportXMLPrintParameter] PRIMARY KEY CLUSTERED
     (
-        [TableName] ASC,
-        [ColumnName] ASC,
         [ReportXMLVersion] ASC,
-        [MasterReport_Id] ASC
+        [MasterReport_Id] ASC,
+        [TableName] ASC,
+        [ColumnName] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
 END
-
-IF NOT EXISTS (SELECT 1 
-                 FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
-                  AND COLUMN_NAME = 'TableName')
-BEGIN
-    ALTER TABLE [ReportXMLPrintParameter]
-    ADD [TableName] [VarChar] (255) NOT NULL
-END
-
-
-IF NOT EXISTS (SELECT 1 
-                 FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
-                  AND COLUMN_NAME = 'ColumnName')
-BEGIN
-    ALTER TABLE [ReportXMLPrintParameter]
-    ADD [ColumnName] [VarChar] (255) NOT NULL
-END
-
 
 IF NOT EXISTS (SELECT 1 
                  FROM INFORMATION_SCHEMA.COLUMNS
@@ -651,6 +647,26 @@ IF NOT EXISTS (SELECT 1
 BEGIN
     ALTER TABLE [ReportXMLPrintParameter]
     ADD [MasterReport_Id] [BigInt]  NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
+                  AND COLUMN_NAME = 'TableName')
+BEGIN
+    ALTER TABLE [ReportXMLPrintParameter]
+    ADD [TableName] [VarChar] (255) NOT NULL
+END
+
+
+IF NOT EXISTS (SELECT 1 
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME  = 'ReportXMLPrintParameter' 
+                  AND COLUMN_NAME = 'ColumnName')
+BEGIN
+    ALTER TABLE [ReportXMLPrintParameter]
+    ADD [ColumnName] [VarChar] (255) NOT NULL
 END
 
 
@@ -691,7 +707,7 @@ IF NOT EXISTS(SELECT 1
                AND[NAME] = 'PK_ReportXMLPrintParameter')
 BEGIN
     ALTER TABLE[ReportXMLPrintParameter]
-    ADD CONSTRAINT PK_ReportXMLPrintParameter PRIMARY KEY CLUSTERED([TableName],[ColumnName],[ReportXMLVersion],[MasterReport_Id]);
+    ADD CONSTRAINT PK_ReportXMLPrintParameter PRIMARY KEY CLUSTERED([ReportXMLVersion],[MasterReport_Id],[TableName],[ColumnName]);
 END
 
 

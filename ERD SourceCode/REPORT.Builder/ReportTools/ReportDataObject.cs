@@ -8,11 +8,11 @@ using WPF.Tools.Attributes;
 namespace REPORT.Builder.ReportTools
 {
 	[ModelName("Data Object")]
-    public class ReportDataObject : LabelBase
-    {
-        private ReportColumnModel columnModel;
+	public class ReportDataObject : LabelBase
+	{
+		private ReportColumnModel columnModel;
 
-        private bool suppressed;
+		private bool suppressed;
 		private bool useAsPrintParameter;
 		private string printParameterCaption;
 		private bool useInOrderBy;
@@ -20,169 +20,168 @@ namespace REPORT.Builder.ReportTools
 		private bool suppressIfNoData;
 
 		public ReportDataObject()
-        {
-            //this.ColumnModel = new ReportColumnModel();
-
-            this.DataContext = this;
-
-            base.Loaded += this.ReportLabel_Loaded;
-        }
-
-        new public XElement ItemXml
-        {
-            get
-            {
-                XElement result = base.ItemXml;
-
-                result.Add(new XAttribute("ObjectType", "ReportDataObject"));
-                result.Add(new XAttribute("ObjectTable", this.ColumnModel.TableName));
-                result.Add(new XAttribute("ObjectColumn", this.ColumnModel.ColumnName));
-                result.Add(new XAttribute("UseAsPrintParameter", this.UseAsPrintParameter));
-                result.Add(new XAttribute("PrintParameterCaption", this.PrintParameterCaption));
-                result.Add(new XAttribute("PrintParameterDefaultValue", this.PrintParameterDefaultValue));
-                result.Add(new XAttribute("UseInOrderBy", this.UseInOrderBy));
-                result.Add(new XAttribute("Suppressed", this.Suppressed));
-                result.Add(new XAttribute("SuppressIfNoData", this.SuppressIfNoData));
-                result.Add(new XAttribute("ColumnModel", this.ColumnModel.ZipFile().ConvertBytesToString()));
-
-                return result;
-            }
-
-            set
-            {
-                foreach (XAttribute item in value.Attributes())
-                {
-                    if (item.Name.LocalName == "ColumnModel")
-                    {
-                        this.ColumnModel = item.Value.ConvertStringToBytes().UnzipFile() as ReportColumnModel;
-
-                        continue;
-                    }
-
-                    this.SetPropertyValue(item.Name.LocalName, item.Value);
-                }
-            }
-        }
-
-        [FieldInformation("Use as Print Parameter", Sort = 500)]
-        public bool UseAsPrintParameter
-        {
-            get
-			{
-                return this.useAsPrintParameter;
-			}
-
-            set
-			{
-                this.useAsPrintParameter = value;
-			}
-		}
-
-        [FieldInformation("Print Parameter Caption", Sort = 501)]
-        public string PrintParameterCaption
 		{
-            get
-			{
-                return this.printParameterCaption == null ? string.Empty : this.printParameterCaption;
-			}
+			//this.ColumnModel = new ReportColumnModel();
 
-            set
-			{
-                this.printParameterCaption = value;
-			}
+			this.DataContext = this;
+
+			base.Loaded += this.ReportLabel_Loaded;
 		}
 
-        [FieldInformation("Print Parameter Default", Sort = 502)]
-        public string PrintParameterDefaultValue
+		public new XElement ItemXml
 		{
-            get
-			{      
-                return this.printParameterDefaultValue.ParseToString();
-            }
-
-            set
+			get
 			{
-                this.printParameterDefaultValue = value;
+				XElement result = base.ItemXml;
+
+				result.Add(new XAttribute("ObjectType", "ReportDataObject"));
+				result.Add(new XAttribute("ObjectTable", this.ColumnModel.TableName));
+				result.Add(new XAttribute("ObjectColumn", this.ColumnModel.ColumnName));
+				result.Add(new XAttribute("UseAsPrintParameter", this.UseAsPrintParameter));
+				result.Add(new XAttribute("PrintParameterCaption", this.PrintParameterCaption));
+				result.Add(new XAttribute("PrintParameterDefaultValue", this.PrintParameterDefaultValue));
+				result.Add(new XAttribute("UseInOrderBy", this.UseInOrderBy));
+				result.Add(new XAttribute("Suppressed", this.Suppressed));
+				result.Add(new XAttribute("SuppressIfNoData", this.SuppressIfNoData));
+				result.Add(new XAttribute("ColumnModel", this.ColumnModel.ZipFile().ConvertBytesToString()));
+
+				return result;
+			}
+
+			set
+			{
+				foreach (XAttribute item in value.Attributes())
+				{
+					if (item.Name.LocalName == "ColumnModel")
+					{
+						this.ColumnModel = item.Value.ConvertStringToBytes().UnzipFile() as ReportColumnModel;
+
+						continue;
+					}
+
+					this.SetPropertyValue(item.Name.LocalName, item.Value);
+				}
 			}
 		}
 
-        [FieldInformation("Use In Order By", Sort = 503)]
-        public bool UseInOrderBy
+		[FieldInformation("Use as Print Parameter", Sort = 500)]
+		public bool UseAsPrintParameter
 		{
-            get
+			get
 			{
-                return this.useInOrderBy;
+				return this.useAsPrintParameter;
 			}
 
-            set
+			set
 			{
-                this.useInOrderBy = value;
+				this.useAsPrintParameter = value;
 			}
 		}
 
-        [FieldInformation("Is Suppressed", Sort = 504)]
-        public bool Suppressed
-        {
-            get
-            {
-                return this.suppressed;
-            }
+		[FieldInformation("Print Parameter Caption", Sort = 501)]
+		public string PrintParameterCaption
+		{
+			get
+			{
+				return this.printParameterCaption == null ? string.Empty : this.printParameterCaption;
+			}
 
-            set
-            {
-                this.suppressed = value;
+			set
+			{
+				this.printParameterCaption = value;
+			}
+		}
 
-                if  (this.IsDesignMode && value)
-                {
-                    this.Foreground = Brushes.Gray;
-                }
-                else if (value)
-                {
-                    this.Visibility = Visibility.Hidden;
-                }
-            }
-        }
+		[FieldInformation("Print Parameter Default", Sort = 502)]
+		public string PrintParameterDefaultValue
+		{
+			get
+			{
+				return this.printParameterDefaultValue.ParseToString();
+			}
 
-        [FieldInformation("Suppress if No Data", Sort = 505)]
-        public bool SuppressIfNoData
-        {
-            get
-            {
-                return this.suppressIfNoData;
-            }
+			set
+			{
+				this.printParameterDefaultValue = value;
+			}
+		}
 
-            set
-            {
-                this.suppressIfNoData = value;
-            }
-        }
+		[FieldInformation("Use In Order By", Sort = 503)]
+		public bool UseInOrderBy
+		{
+			get
+			{
+				return this.useInOrderBy;
+			}
 
+			set
+			{
+				this.useInOrderBy = value;
+			}
+		}
 
-        public ReportColumnModel ColumnModel
-        {
-            get
-            {
-                return this.columnModel == null ? new ReportColumnModel() : this.columnModel;
-            }
+		[FieldInformation("Is Suppressed", Sort = 504)]
+		public bool Suppressed
+		{
+			get
+			{
+				return this.suppressed;
+			}
 
-            set
-            {
-                this.columnModel = value;
+			set
+			{
+				this.suppressed = value;
 
-                base.Text = value.ColumnName;
-            }
-        }
+				if (this.IsDesignMode && value)
+				{
+					this.Foreground = Brushes.Gray;
+				}
+				else if (value)
+				{
+					this.Visibility = Visibility.Hidden;
+				}
+			}
+		}
 
-        private void ReportLabel_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (this.IsDesignMode)
-            {
-                this.Background = Brushes.WhiteSmoke;
-            }
-            else
-            {
-                this.Background = Brushes.Transparent;
-            }
-        }    
-    }
+		[FieldInformation("Suppress if No Data", Sort = 505)]
+		public bool SuppressIfNoData
+		{
+			get
+			{
+				return this.suppressIfNoData;
+			}
+
+			set
+			{
+				this.suppressIfNoData = value;
+			}
+		}
+
+		public ReportColumnModel ColumnModel
+		{
+			get
+			{
+				return this.columnModel == null ? new ReportColumnModel() : this.columnModel;
+			}
+
+			set
+			{
+				this.columnModel = value;
+
+				base.Text = value.ColumnName;
+			}
+		}
+
+		private void ReportLabel_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (this.IsDesignMode)
+			{
+				this.Background = Brushes.WhiteSmoke;
+			}
+			else
+			{
+				this.Background = Brushes.Transparent;
+			}
+		}
+	}
 }

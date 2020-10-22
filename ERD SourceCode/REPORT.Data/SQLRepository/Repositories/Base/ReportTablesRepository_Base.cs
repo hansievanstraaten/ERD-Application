@@ -73,11 +73,11 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result.CopyToObject(new ReportCategoryModel()) as ReportCategoryModel;
 		}
 		
-		public ReportXMLPrintParameterModel GetReportXMLPrintParameterByPrimaryKey (string TableName, string ColumnName, int ReportXMLVersion, Int64 MasterReport_Id  )
+		public ReportXMLPrintParameterModel GetReportXMLPrintParameterByPrimaryKey (int ReportXMLVersion, Int64 MasterReport_Id, string TableName, string ColumnName  )
 		{
 			ReportXMLPrintParameter result =this.dataContext
 				.ReportXMLPrintParameters
-				.FirstOrDefault(pk => pk.TableName == TableName && pk.ColumnName == ColumnName && pk.ReportXMLVersion == ReportXMLVersion && pk.MasterReport_Id == MasterReport_Id  );
+				.FirstOrDefault(pk => pk.ReportXMLVersion == ReportXMLVersion && pk.MasterReport_Id == MasterReport_Id && pk.TableName == TableName && pk.ColumnName == ColumnName  );
 
 			if (result == null)
 			{
@@ -797,7 +797,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 		{
 			ReportXMLPrintParameter existing = this.dataContext
 				.ReportXMLPrintParameters
-				.Where(rx => rx.TableName == model.TableName && rx.ColumnName == model.ColumnName && rx.ReportXMLVersion == model.ReportXMLVersion && rx.MasterReport_Id == model.MasterReport_Id  )
+				.Where(rx => rx.ReportXMLVersion == model.ReportXMLVersion && rx.MasterReport_Id == model.MasterReport_Id && rx.TableName == model.TableName && rx.ColumnName == model.ColumnName  )
 				.FirstOrDefault();
 
 			if (existing == null)

@@ -71,6 +71,10 @@
         <StackPanel Grid.Row="0" Grid.Column="4">
             <CommonControls:LableItem x:Name="uxPropertiesCaption" Content="Selected Object Properties" FontWeight="ExtraBold" />
             <ModelViewer:ModelViewer x:Name="uxProperties" ModelViewItemBrowse="PropertiesObject_Browse" />
+            
+            <CommonControls:LableItem x:Name="uxReplacceColumnCaption"  Content="Replace Column Value With" FontWeight="ExtraBold" Visibility="Collapsed" />
+            <local:ReplaceBuilder x:Name="uxReplacceColumn" Visibility="Collapsed" />
+            
             <CommonControls:LableItem x:Name="uxWhereBuilderCaption"  Content="Section Where Link" FontWeight="ExtraBold" Visibility="Collapsed" />
             <local:WhereBuilder x:Name="uxWhereBuilder" Visibility="Collapsed" />
             <CommonControls:LableItem x:Name="uxCanvasSqlCaption" Content="Canvas SQL" FontWeight="ExtraBold" Visibility="Collapsed" />

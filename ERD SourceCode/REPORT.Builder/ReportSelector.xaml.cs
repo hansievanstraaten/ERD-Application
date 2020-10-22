@@ -29,7 +29,7 @@ namespace REPORT.Builder
         {
             this.InitializeComponent();
 
-            this.ReportFileName = Path.Combine(projectFileDirectory, Constants.Constants.ReportSetupFileName);
+            this.ReportFileName = Path.Combine(projectFileDirectory, Constants.ReportConstants.ReportSetupFileName);
 
             this.InitializeTabs();
         }

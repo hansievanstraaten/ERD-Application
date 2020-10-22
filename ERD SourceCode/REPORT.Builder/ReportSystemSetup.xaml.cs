@@ -31,7 +31,7 @@ namespace REPORT.Builder
                 return;
             }
 
-            this.ReportFileName = Path.Combine(projectFileDirectory, Constants.Constants.ReportSetupFileName);
+            this.ReportFileName = Path.Combine(projectFileDirectory, Constants.ReportConstants.ReportSetupFileName);
 
             this.Loaded += this.ReportSystemSetup_Loaded;
         }

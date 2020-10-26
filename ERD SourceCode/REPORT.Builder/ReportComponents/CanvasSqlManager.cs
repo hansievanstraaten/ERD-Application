@@ -5,6 +5,7 @@ using REPORT.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace REPORT.Builder.ReportComponents
 {
@@ -20,7 +21,9 @@ namespace REPORT.Builder.ReportComponents
 
         private List<ReportXMLPrintParameterModel> reportFilters = new List<ReportXMLPrintParameterModel>();
 
-        private Dictionary<string, ReportWhereHeaderModel> replacementColumns = new Dictionary<string, ReportWhereHeaderModel>();
+        private Dictionary<string, ReportSQLReplaceHeaderModel> replacementColumns = new Dictionary<string, ReportSQLReplaceHeaderModel>();
+
+        private Dictionary<string, ReportsInvokeReplaceModel> invokeMethods = new Dictionary<string, ReportsInvokeReplaceModel>();
 
         internal CanvasSqlManager()
         {
@@ -72,7 +75,7 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        internal List<ReportWhereHeaderModel> ReplacementColumnModels
+        internal List<ReportSQLReplaceHeaderModel> ReplacementColumnModels
 		{
             get
 			{
@@ -80,7 +83,15 @@ namespace REPORT.Builder.ReportComponents
             }
 		}
 
-        internal ReportWhereHeaderModel GetReplacementColumn(string tableName, string columnName)
+        internal Dictionary<string, ReportsInvokeReplaceModel> InvokeReplacementColumnModels
+		{
+            get
+			{
+                return this.invokeMethods;
+			}
+		}
+
+        internal ReportSQLReplaceHeaderModel GetReplacementColumn(string tableName, string columnName)
 		{
             string itemKey = $"[{tableName}].[{columnName}]";
 
@@ -89,14 +100,14 @@ namespace REPORT.Builder.ReportComponents
                 return this.replacementColumns[itemKey];
 			}
 
-            return new ReportWhereHeaderModel
+            return new ReportSQLReplaceHeaderModel
             {
                 ReplaceTable = tableName,
                 ReplaceColumn = columnName
             };
 		}
 
-        internal void UpdateReplacementColumn(ReportWhereHeaderModel replacementValues)
+        internal void UpdateReplacementColumn(ReportSQLReplaceHeaderModel replacementValues)
         {
             string itemKey = $"[{replacementValues.ReplaceTable}].[{replacementValues.ReplaceColumn}]";
 
@@ -111,6 +122,44 @@ namespace REPORT.Builder.ReportComponents
 			}
 
             this.replacementColumns.Add(itemKey, replacementValues);
+        }
+
+        internal ReportsInvokeReplaceModel GetInvokeMethod(string tableName, string columnName)
+		{
+            string itemKey = $"[{tableName}].[{columnName}]";
+
+            if (this.invokeMethods.ContainsKey(itemKey))
+			{
+                return this.invokeMethods[itemKey];
+			}
+
+            return new ReportsInvokeReplaceModel
+            {
+                TableName = tableName,
+                ColumnName = columnName
+            };
+        }
+
+        internal void UpdateInvokeReplaceModel(ReportsInvokeReplaceModel invokeModel)
+		{
+            if (invokeModel == null)
+			{
+                return;
+			}
+
+            string itemKey = $"[{invokeModel.TableName}].[{invokeModel.ColumnName}]";
+
+            if (this.invokeMethods.ContainsKey(itemKey))
+			{
+                this.invokeMethods.Remove(itemKey);
+			}
+
+            if (invokeModel.SelectDll.IsNullEmptyOrWhiteSpace())
+			{
+                return;
+			}
+
+            this.invokeMethods.Add(itemKey, invokeModel);
         }
 
         internal void AddFilterParameters(List<ReportXMLPrintParameterModel> filters)

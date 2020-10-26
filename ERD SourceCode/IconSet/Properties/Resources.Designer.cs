@@ -403,6 +403,16 @@ namespace IconSet.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Execute {
+            get {
+                object obj = ResourceManager.GetObject("Execute", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ExportPDF {
             get {
                 object obj = ResourceManager.GetObject("ExportPDF", resourceCulture);

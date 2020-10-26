@@ -99,6 +99,8 @@ namespace REPORT.Builder.Printing
         {
             return element
                 .Descendants("ReportObject")
+                .OrderBy(l => l.Attribute("Top").Value.ToDouble())
+                .ThenBy(t => t.Attribute("Left").Value.ToDouble())
                 .ToList();
         }
 

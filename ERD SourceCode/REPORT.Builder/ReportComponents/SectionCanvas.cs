@@ -53,30 +53,37 @@ namespace REPORT.Builder.ReportComponents
 
                 XElement objectModels = new XElement("ObjectModels");
 
-                XElement parameterModels = new XElement("ParameterModels");
-
-                XElement foreignGroupIndex = new XElement("ForeignSectionIndexes");
-
-                XElement replacementColumns = new XElement("ReplacementColumns");
-
                 foreach (UIElement child in this.Children)
                 {
                     objectModels.Add(child.GetPropertyValue("ItemXml") as XElement);
                 }
+                
+                XElement parameterModels = new XElement("ParameterModels");
 
                 foreach(WhereParameterModel parameter in this.SqlManager.WhereParameterModel)
                 {
                     parameterModels.Add(parameter.ItemXml);
                 }
+                
+                XElement replacementColumns = new XElement("ReplacementColumns");
 
-                foreach (ReportWhereHeaderModel replacementColumn in this.SqlManager.ReplacementColumnModels)
+                foreach (ReportSQLReplaceHeaderModel replacementColumn in this.SqlManager.ReplacementColumnModels)
                 {
                     replacementColumns.Add(replacementColumn.ItemXml);
                 }
+                
+                XElement foreignGroupIndex = new XElement("ForeignSectionIndexes");
 
                 foreach (int foreignIndex in this.SqlManager.ForeignSectionIndexes)
                 {
                     foreignGroupIndex.Add(new XElement("Index", foreignIndex));
+                }
+
+                XElement invokeMehods = new XElement("InvokeMethods");
+
+                foreach(ReportsInvokeReplaceModel method in this.SqlManager.InvokeReplacementColumnModels.Values)
+				{
+                    invokeMehods.Add(method.ItemXml);
                 }
 
                 result.Add(objectModels);
@@ -86,6 +93,8 @@ namespace REPORT.Builder.ReportComponents
                 result.Add(replacementColumns);
 
                 result.Add(foreignGroupIndex);
+
+                result.Add(invokeMehods);
 
                 return result;
             }
@@ -125,7 +134,12 @@ namespace REPORT.Builder.ReportComponents
 
                 foreach (XElement item in value.Element("ReplacementColumns").Elements())
                 {
-                    this.SqlManager.UpdateReplacementColumn(new ReportWhereHeaderModel { ItemXml = item });
+                    this.SqlManager.UpdateReplacementColumn(new ReportSQLReplaceHeaderModel { ItemXml = item });
+                }
+
+                foreach (XElement item in value.Element("InvokeMethods").Elements())
+                {
+                    this.SqlManager.UpdateInvokeReplaceModel(new ReportsInvokeReplaceModel { ItemXml = item });
                 }
 
                 this.SqlManager.AddWhereModels(paramatersList.ToArray());
@@ -168,16 +182,6 @@ namespace REPORT.Builder.ReportComponents
                 this.sqlManager = value;
             }
         }
-
-        public ReportWhereHeaderModel GetReplacementColumn(string tableName,string columnName)
-		{
-            return this.SqlManager.GetReplacementColumn(tableName, columnName);
-		}
-
-        public void UpdateReplacementColumn(ReportWhereHeaderModel replacementValues)
-		{
-            this.SqlManager.UpdateReplacementColumn(replacementValues);
-		}
 
         public void AddReportColumn(ReportColumnModel column)
         {

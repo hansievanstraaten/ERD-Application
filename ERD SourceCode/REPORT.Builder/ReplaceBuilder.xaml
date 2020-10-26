@@ -1,4 +1,5 @@
-﻿<src:UserControlBase xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
+﻿<src:UserControlBase xmlns:ModelViewer="clr-namespace:WPF.Tools.ModelViewer;assembly=WPF.Tools"  
+                     xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
                      x:Class="REPORT.Builder.ReplaceBuilder"
                      xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -8,11 +9,11 @@
                      xmlns:local="clr-namespace:REPORT.Builder"
                      mc:Ignorable="d" 
                      d:DesignHeight="450" d:DesignWidth="800">
-    <Grid x:Name="uxMainGrid">
+    <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -20,23 +21,40 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <CommonControls:LableItem Grid.Row="0" Grid.Column="0" Content="Select from Table" />
+        <CommonControls:LableItem Grid.Row="0" Grid.Column="0" Content="Option Type" />
 
-        <CommonControls:ComboBoxTool Grid.Row="0" Grid.Column="1" x:Name="uxFromTable" SelectionChanged="FromTable_Changed" />
+        <CommonControls:ComboBoxTool Grid.Row="0" Grid.Column="1" x:Name="uxOptionType" SelectionChanged="OptionType_Changed" />
 
-        <CommonControls:LableItem Grid.Row="1" Grid.Column="0" Content="Replace With Value From" />
+        <ContentControl Grid.Row="1" Grid.ColumnSpan="2" x:Name="uxSqlReplace" Visibility="Collapsed">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-        <CommonControls:ComboBoxTool Grid.Row="1" Grid.Column="1" x:Name="uxValueFromTable" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-        <CommonControls:LableItem Grid.Row="2" Grid.Column="0" Content="Where" />
+                <CommonControls:LableItem Grid.Row="0" Grid.Column="0" Content="Select from Table" />
 
-        <StackPanel Grid.Row="2" Grid.Column="1" x:Name="uxWhereOptions">
-            
-        </StackPanel>
+                <CommonControls:ComboBoxTool Grid.Row="0" Grid.Column="1" x:Name="uxFromTable" SelectionChanged="FromTable_Changed" />
 
-        <!--<CommonControls:ComboBoxTool Grid.Row="2" Grid.Column="1" x:Name="uxSelectedColumn"/>
+                <CommonControls:LableItem Grid.Row="1" Grid.Column="0" Content="Replace With Value From" />
 
-        <CommonControls:ComboBoxTool Grid.Row="2" Grid.Column="2" x:Name="uxSelectedValue" IsEditable="True"/>-->
+                <CommonControls:ComboBoxTool Grid.Row="1" Grid.Column="1" x:Name="uxValueFromTable" />
+
+                <CommonControls:LableItem Grid.Row="2" Grid.Column="0" Content="Where" />
+
+                <StackPanel Grid.Row="2" Grid.Column="1" x:Name="uxWhereOptions" />
+            </Grid>
+        </ContentControl>
+
+        <ContentControl Grid.Row="1" Grid.ColumnSpan="2" x:Name="uxInvokeReplace" Visibility="Collapsed">
+            <ModelViewer:ModelViewer x:Name="uxInvoke" ModelViewItemBrowse="InvokeModel_Browse" />
+        </ContentControl>
 
     </Grid>
 </src:UserControlBase>

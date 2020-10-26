@@ -1,7 +1,7 @@
 ﻿using GeneralExtensions;
 using REPORT.Builder.Common;
+using REPORT.Builder.ReportTools;
 using System;
-using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
@@ -9,7 +9,7 @@ using ViSo.SharedEnums.ReportEnums;
 
 namespace REPORT.Builder.Printing
 {
-    [Serializable()]
+	[Serializable()]
     public class PrintCanvas : Canvas
     {
         public PrintCanvas()
@@ -72,8 +72,13 @@ namespace REPORT.Builder.Printing
         {
             UIElement element = ObjectCreator.CreateReportObject(item, false);
 
-            double itemHeight = element.GetPropertyValue("TextHeight").ToDouble();
+            double itemHeight = 0;
 
+            if (item.IsDataObject())
+            {
+                this.MeasureDataElement(element, out itemHeight);
+            }
+            
             if (sectionType != SectionTypeEnum.Page)
             {
                 if ((itemHeight + this.TopOffset) > this.BottomOffset)
@@ -92,9 +97,35 @@ namespace REPORT.Builder.Printing
 
             elementBottom = Canvas.GetTop(element) + itemHeight;
 
-            this.HaveElements = true;
+			this.HaveElements = true;
 
             return true;
         }
-    }
+
+		public void MeasureDataElement(UIElement element, out double itemHeight)
+		{
+            ReportDataObject dataObj = element.To<ReportDataObject>();
+
+            if (dataObj.TextWrapping == TextWrapping.NoWrap && dataObj.Width != double.NaN)
+			{
+                itemHeight = dataObj.Height;
+
+                return;
+			}
+
+            dataObj.MaxWidth = dataObj.Width;
+
+            Size size = new Size(dataObj.Width, double.PositiveInfinity);
+
+            dataObj.Measure(size);
+
+            dataObj.Height = dataObj.DesiredSize.Height;
+
+            dataObj.Arrange(new Rect(dataObj.DesiredSize));
+
+            dataObj.Height = dataObj.ActualHeight;
+
+            itemHeight = dataObj.Height;
+		}
+	}
 }

@@ -279,14 +279,24 @@ namespace REPORT.Builder.ReportComponents
             }
         }
 
-        public ReportWhereHeaderModel GetReplacementColumn(string tableName, string columnName)
+        public ReportSQLReplaceHeaderModel GetReplacementColumn(string tableName, string columnName)
         {
-            return this.uxSectionCanvas.GetReplacementColumn(tableName, columnName);
+            return this.SqlManager.GetReplacementColumn(tableName, columnName);
         }
 
-        public void UpdateReplacementColumn(ReportWhereHeaderModel replacementValues)
+        public void UpdateReplacementColumn(ReportSQLReplaceHeaderModel replacementValues)
         {
-            this.uxSectionCanvas.UpdateReplacementColumn(replacementValues);
+            this.SqlManager.UpdateReplacementColumn(replacementValues);
+        }
+
+        public ReportsInvokeReplaceModel GetInvokeMethod(string tableName, string columnName)
+        {
+            return this.SqlManager.GetInvokeMethod(tableName, columnName);
+        }
+
+        public void UpdateInvokeReplaceModel(ReportsInvokeReplaceModel invokeModel)
+        {
+            this.SqlManager.UpdateInvokeReplaceModel(invokeModel);
         }
 
         public void RefreshPageStaticMarkers()

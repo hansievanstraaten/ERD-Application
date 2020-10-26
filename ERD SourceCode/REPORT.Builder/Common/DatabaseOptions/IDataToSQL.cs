@@ -9,7 +9,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
             ReportColumnModel[] columns, 
             List<WhereParameterModel> whereParameterModel, 
             List<ReportXMLPrintParameterModel> reportFilters,
-            Dictionary<string, ReportWhereHeaderModel> replacementColumns,
+            Dictionary<string, ReportSQLReplaceHeaderModel> replacementColumns,
             string orderByString);
 
     }

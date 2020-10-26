@@ -5,7 +5,7 @@ using WPF.Tools.BaseClasses;
 
 namespace REPORT.Data.Models
 {
-	public class ReportWhereDetailModel : ModelsBase
+	public class ReportSQLReplaceDetailModel : ModelsBase
 	{
 		private string _WhereOption;
 		private string _WhereValue;

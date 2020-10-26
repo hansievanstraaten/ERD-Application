@@ -61,8 +61,6 @@ namespace REPORT.Builder.Common
 
                     ReportImage image = new ReportImage();
 
-                    //image.IsDesignMode = isDesignMode;
-
                     image.ItemXml = xmlObject;
 
                     return image as UIElement;
@@ -70,8 +68,6 @@ namespace REPORT.Builder.Common
                 case "ReportHorizontalLine":
 
                     ReportHorizontalLine horizontalLine = new ReportHorizontalLine();
-
-                    //horizontalLine.IsDesignMode = isDesignMode;
 
                     horizontalLine.ItemXml = xmlObject;
 
@@ -103,7 +99,7 @@ namespace REPORT.Builder.Common
             ReportColumnModel[] columns, 
             List<WhereParameterModel> whereParameterModel, 
             List<ReportXMLPrintParameterModel> reportFilters,
-            Dictionary<string, ReportWhereHeaderModel> replacementColumns,
+            Dictionary<string, ReportSQLReplaceHeaderModel> replacementColumns,
             string orderByString)
         {
             DatabaseTypeEnum buildType = Connections.Instance.DatabaseModel.DatabaseType;

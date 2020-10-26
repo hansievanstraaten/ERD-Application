@@ -397,12 +397,6 @@ namespace GeneralExtensions
 
             try
             {
-                //Type propertyType = info.PropertyType;
-
-                //Type target = propertyType.IsNullableType() ? Nullable.GetUnderlyingType(info.PropertyType) : info.PropertyType;
-
-                //value = Convert.ChangeType(value, target);
-
                 info.SetValue(source, value, null);
             }
             catch

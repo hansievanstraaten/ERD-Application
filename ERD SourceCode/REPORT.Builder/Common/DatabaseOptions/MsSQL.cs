@@ -1,20 +1,19 @@
-﻿using REPORT.Data.Models;
-using System.Text;
-using GeneralExtensions;
+﻿using GeneralExtensions;
+using REPORT.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using ViSo.SharedEnums;
-using System.Windows.Documents;
 
 namespace REPORT.Builder.Common.DatabaseOptions
 {
-    internal class MsSQL : IDataToSQL
+	internal class MsSQL : IDataToSQL
     {
         public string BuildSelectQuery(
             ReportColumnModel[] columns, 
             List<WhereParameterModel> whereParameterModel, 
             List<ReportXMLPrintParameterModel> reportFilters,
-            Dictionary<string, ReportWhereHeaderModel> replacementColumns,
+            Dictionary<string, ReportSQLReplaceHeaderModel> replacementColumns,
             string orderByString)
         {
             if (!columns.HasElements())
@@ -45,7 +44,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
             }
 
             // Add replacement SQL here
-            foreach(KeyValuePair<string, ReportWhereHeaderModel> replacekey in replacementColumns)
+            foreach(KeyValuePair<string, ReportSQLReplaceHeaderModel> replacekey in replacementColumns)
 			{
                 result.Replace(replacekey.Key, this.BuildReplacementSQL(replacekey));
 			}
@@ -106,9 +105,9 @@ namespace REPORT.Builder.Common.DatabaseOptions
             return result.ToString();
         }
 
-        private string BuildReplacementSQL(KeyValuePair<string, ReportWhereHeaderModel> replacementKey)
+        private string BuildReplacementSQL(KeyValuePair<string, ReportSQLReplaceHeaderModel> replacementKey)
 		{
-            ReportWhereHeaderModel value = replacementKey.Value;
+            ReportSQLReplaceHeaderModel value = replacementKey.Value;
 
             StringBuilder result = new StringBuilder();
 
@@ -116,7 +115,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
 
             for(int x = 0; x < value.WhereDetails.Count; ++x)
 			{
-                ReportWhereDetailModel detail = value.WhereDetails[x];
+                ReportSQLReplaceDetailModel detail = value.WhereDetails[x];
 
                 if (detail.IsColumn)
                 {

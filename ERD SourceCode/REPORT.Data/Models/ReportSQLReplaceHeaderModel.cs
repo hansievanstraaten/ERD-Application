@@ -7,16 +7,16 @@ using WPF.Tools.BaseClasses;
 
 namespace REPORT.Data.Models
 {
-	public class ReportWhereHeaderModel : ModelsBase
+	public class ReportSQLReplaceHeaderModel : ModelsBase
 	{
 		private string _ReplaceColumn;
 		private string _ReplaceTable;
 		private string _UseColumn;
 		private string _UseTable;
 
-		public ReportWhereHeaderModel()
+		public ReportSQLReplaceHeaderModel()
 		{
-			this.WhereDetails = new List<ReportWhereDetailModel>();
+			this.WhereDetails = new List<ReportSQLReplaceDetailModel>();
 		}
 
 		public XElement ItemXml
@@ -33,7 +33,7 @@ namespace REPORT.Data.Models
 
 				XElement whereDetails = new XElement("WhereDetails");
 
-				foreach(ReportWhereDetailModel detail in this.WhereDetails)
+				foreach(ReportSQLReplaceDetailModel detail in this.WhereDetails)
 				{
 					whereDetails.Add(detail.ItemXml);
 				}
@@ -52,11 +52,10 @@ namespace REPORT.Data.Models
 
 				foreach(XElement column in value.Descendants("ReportWhereDetail"))
 				{
-					this.WhereDetails.Add(new ReportWhereDetailModel { ItemXml = column });
+					this.WhereDetails.Add(new ReportSQLReplaceDetailModel { ItemXml = column });
 				}
 			}
 		}
-
 
 		///// <summary>
 		///// <para>Master Report ID</para>
@@ -143,7 +142,7 @@ namespace REPORT.Data.Models
 			}
 		}
 
-		public List<ReportWhereDetailModel> WhereDetails;
+		public List<ReportSQLReplaceDetailModel> WhereDetails;
 
 	}
 }

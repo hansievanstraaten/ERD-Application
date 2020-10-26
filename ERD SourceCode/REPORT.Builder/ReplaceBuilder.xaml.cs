@@ -8,6 +8,12 @@ using System.Linq;
 using System.Windows;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.ToolModels;
+using WPF.Tools.Exstention;
+using WPF.Tools.CommonControls;
+using System.ComponentModel;
+using Microsoft.Win32;
+using System.Reflection;
+using ViSo.Dialogs.Input;
 
 namespace REPORT.Builder
 {
@@ -16,11 +22,27 @@ namespace REPORT.Builder
 	/// </summary>
 	public partial class ReplaceBuilder : UserControlBase
 	{
+		private readonly string fromTable = "From Table";
+
+		private readonly string fromDll = "From dll";
+
+		#region FROM SQL FIELDS
+
 		private List<DataItemModel> whereOptions = new List<DataItemModel>();
 
 		private List<DataItemModel> valueColumns = new List<DataItemModel>();
 
 		private List<ReplaceWhere> replaceWheres = new List<ReplaceWhere>();
+
+		#endregion
+
+		#region INVOKE METHOD SECTION FIELDS
+
+		private ReportsInvokeReplaceModel invokeMethodSetup;
+
+		private Dictionary<string, Type> tyesDictionary;
+
+		#endregion
 
 		public ReplaceBuilder()
 		{
@@ -28,17 +50,74 @@ namespace REPORT.Builder
 
 			this.uxFromTable.Items.Add(new DataItemModel { DisplayValue = ReportConstants.None, ItemKey = ReportConstants.None });
 
+			this.uxOptionType.Items.Add(new DataItemModel { DisplayValue = this.fromTable, ItemKey = this.fromTable });
+
+			this.uxOptionType.Items.Add(new DataItemModel { DisplayValue = this.fromDll, ItemKey = this.fromDll });
+
 			foreach (DataItemModel systemTable in Integrity.GetSystemTables().OrderBy(t => t.DisplayValue))
 			{
 				this.uxFromTable.Items.Add(systemTable);
 			}
+
+			this.uxOptionType.SelectedValue = this.fromTable;
 		}
 
-		public ReportWhereHeaderModel WhereHeader
+		public void RefreshCaptionWidth()
+		{
+			try
+			{
+				if (this.Visibility != Visibility.Visible)
+				{
+					return;
+				}
+
+				this.InvalidateVisual();
+
+				this.UpdateLayout();
+
+				UIElement[] lables = this.FindVisualControls(typeof(LableItem));
+
+				if (lables.Length == 0)
+				{
+					return;
+				}
+
+				double maxWidth = lables
+					.Where(s => !s.GetPropertyValue("Content").ParseToString().StartsWith("Method Setup ("))
+					.Max<UIElement>(m => m.GetPropertyValue("TextLenght").ToDouble()) + 10;
+
+				foreach (UIElement element in lables)
+				{
+					if (element.GetPropertyValue("Content").ParseToString().StartsWith("Method Setup ("))
+					{
+						continue;
+					}
+
+					element.SetPropertyValue("Width", maxWidth);
+				}
+
+			}
+			catch (Exception err)
+			{
+				MessageBox.Show(err.InnerExceptionMessage());
+			}
+		}
+
+		public void Clear()
+		{
+			this.uxFromTable.SelectedValue = ReportConstants.None;
+
+			if (this.InvokeMethodSetup != null)
+			{
+				this.InvokeMethodSetup.SelectDll.IsNullEmptyOrWhiteSpace();
+			}
+		}
+
+		public ReportSQLReplaceHeaderModel WhereHeader
 		{
 			get
 			{
-				ReportWhereHeaderModel result = new ReportWhereHeaderModel
+				ReportSQLReplaceHeaderModel result = new ReportSQLReplaceHeaderModel
 				{
 					ReplaceColumn = this.ReplaceColumn,
 					ReplaceTable = this.ReplaceTable,
@@ -46,14 +125,14 @@ namespace REPORT.Builder
 					UseColumn = this.uxValueFromTable.SelectedValue.ParseToString()
 				};
 
-				foreach(ReplaceWhere item in this.replaceWheres)
+				foreach (ReplaceWhere item in this.replaceWheres)
 				{
 					if (item.WhereOption == ReportConstants.None)
 					{
 						continue;
 					}
 
-					result.WhereDetails.Add(new ReportWhereDetailModel 
+					result.WhereDetails.Add(new ReportSQLReplaceDetailModel
 					{
 						WhereOption = item.WhereOption,
 						WhereValue = item.WhereValue,
@@ -67,7 +146,7 @@ namespace REPORT.Builder
 			set
 			{
 				this.ReplaceTable = value.ReplaceTable;
-				
+
 				this.ReplaceColumn = value.ReplaceColumn;
 
 				if (value.UseTable.IsNullEmptyOrWhiteSpace() || value.UseTable == ReportConstants.None)
@@ -79,9 +158,9 @@ namespace REPORT.Builder
 
 				this.uxValueFromTable.SelectedValue = value.UseColumn;
 
-				for(int x = 0; x < value.WhereDetails.Count; ++x)
+				for (int x = 0; x < value.WhereDetails.Count; ++x)
 				{
-					ReportWhereDetailModel item = value.WhereDetails[x];
+					ReportSQLReplaceDetailModel item = value.WhereDetails[x];
 
 					ReplaceWhere replaceOption = this.replaceWheres.FirstOrDefault(i => i.Index == x);
 
@@ -91,6 +170,55 @@ namespace REPORT.Builder
 				}
 			}
 		}
+
+		public ReportsInvokeReplaceModel InvokeMethodSetup
+		{
+			get
+			{
+				return this.invokeMethodSetup;
+			}
+
+			set
+			{
+				if (this.tyesDictionary != null)
+				{
+					this.tyesDictionary.Clear();
+				}
+
+				if (this.invokeMethodSetup != null)
+				{
+					this.invokeMethodSetup.PropertyChanged -= this.InvokeMethodSetup_Changed;
+				}
+
+				this.invokeMethodSetup = value;
+
+				this.uxInvoke.Items.Clear();
+
+				this.uxInvoke.Items.Add(this.invokeMethodSetup);
+
+				if (value != null)
+				{
+					this.uxInvoke[0, 1].SetComboBoxItems(
+						new DataItemModel[] { new DataItemModel { DisplayValue = value.NamespaceValue, ItemKey = value.NamespaceValue } });
+
+					this.uxInvoke[0, 2].SetComboBoxItems(
+						new DataItemModel[] { new DataItemModel { DisplayValue = value.SelectedMethod, ItemKey = value.SelectedMethod } });
+
+					this.uxInvoke[0, 1].SetValue(value.NamespaceValue);
+
+					this.uxInvoke[0, 2].SetValue(value.SelectedMethod);
+				}
+
+				this.invokeMethodSetup.PropertyChanged += this.InvokeMethodSetup_Changed;
+
+				this.uxOptionType.SelectedValue = value == null || value.SelectDll.IsNullEmptyOrWhiteSpace() ?
+					this.fromTable
+					:
+					this.fromDll;
+			}
+		}
+		
+		#region FROM SQL METHODS
 
 		public void SetValueColumns(List<ReportColumnModel> reportColumns)
 		{
@@ -103,10 +231,25 @@ namespace REPORT.Builder
 			this.valueColumns.AddRange(columns);
 		}
 
-		public void Clear()
+		#endregion
+
+		private void OptionType_Changed(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
 		{
-			this.uxFromTable.SelectedValue = ReportConstants.None;
+			try
+			{
+				this.uxSqlReplace.Visibility = this.uxOptionType.SelectedValue.ParseToString() == this.fromDll ? Visibility.Collapsed : Visibility.Visible;
+
+				this.uxInvokeReplace.Visibility = this.uxOptionType.SelectedValue.ParseToString() == this.fromDll ? Visibility.Visible : Visibility.Collapsed;
+
+				this.RefreshCaptionWidth();
+			}
+			catch (Exception err)
+			{
+				MessageBox.Show(err.InnerExceptionMessage());
+			}
 		}
+
+		#region FROM SQL SECTION EVENTS
 
 		private void FromTable_Changed(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
 		{
@@ -181,14 +324,72 @@ namespace REPORT.Builder
 			}
 		}
 
+		#endregion
+
+		#region INVOKE METHOD SECTION EVENTS
+
+		private void InvokeModel_Browse(object sender, string buttonKey)
+		{
+			try
+			{
+				switch(buttonKey)
+				{
+					case "SelectDllKey":
+
+						this.ShowDllSelect();
+
+						break;
+
+					case "InvokeDllKey":
+
+						this.TestMethodInvoke();
+
+						break;
+				}
+			}
+			catch (Exception err)
+			{
+				MessageBox.Show(err.InnerExceptionMessage());
+			}
+		}
+
+		private void InvokeMethodSetup_Changed(object sender, PropertyChangedEventArgs e)
+		{
+			try
+			{
+				switch(e.PropertyName)
+				{
+					case "SelectDll":
+
+						this.LoadNamespaceClasses();
+
+						break;
+
+					case "NamespaceValue":
+
+						this.LoadTypeMethods();
+
+						break;
+				}
+			}
+			catch (Exception err)
+			{
+				MessageBox.Show(err.InnerExceptionMessage());
+			}
+		}
+
+		#endregion
+
+		#region FROM SQL METHODS
+
 		private void AddReplaceWhere()
 		{
-			ReplaceWhere replaceOption = new ReplaceWhere { Index = this.uxWhereOptions.Children.Count};
+			ReplaceWhere replaceOption = new ReplaceWhere { Index = this.uxWhereOptions.Children.Count };
 
 			replaceOption.SetSelectableColumns(this.whereOptions);
 
 			replaceOption.SetValueColumns(this.valueColumns);
-				
+
 			replaceOption.WhereValue = this.WhereHeaderKey;
 
 			replaceOption.ColumnSelectionChanged += this.WhereOptionsColumn_Changed;
@@ -198,16 +399,127 @@ namespace REPORT.Builder
 			this.replaceWheres.Add(replaceOption);
 		}
 
+		#endregion
+
+		#region INVOKE METHODS
+
+		private void ShowDllSelect()
+		{
+			OpenFileDialog dlg = new OpenFileDialog();
+
+			dlg.Filter = "DLL Files | *.dll";
+
+			if (dlg.ShowDialog().IsFalse())
+			{
+				return;
+			}
+
+			this.InvokeMethodSetup.SelectDll = dlg.FileName;
+		}
+
+		private void LoadNamespaceClasses()
+		{
+			if (this.InvokeMethodSetup.SelectDll.IsNullEmptyOrWhiteSpace())
+			{
+				this.uxInvoke[0, 1].SetComboBoxItems(new DataItemModel[] { });
+
+				this.uxInvoke[0, 2].SetComboBoxItems(new DataItemModel[] { });
+
+				this.InvokeMethodSetup.NamespaceValue = string.Empty;
+
+				this.InvokeMethodSetup.SelectedMethod = string.Empty;
+
+				return;
+			}
+
+			Assembly asm = Assembly.LoadFile(this.InvokeMethodSetup.SelectDll);
+
+			this.InvokeMethodSetup.AssemblyName = asm.FullName;
+
+			this.tyesDictionary = asm
+				.GetTypes()
+				.ToDictionary(t => t.FullName, t => t);
+
+			this.uxInvoke[0, 1].SetComboBoxItems(tyesDictionary
+				.Values
+				.Select(a => new DataItemModel { DisplayValue = a.FullName, ItemKey = a.FullName })
+				.ToArray());
+		}
+
+		private void LoadTypeMethods()
+		{
+			if (this.InvokeMethodSetup.NamespaceValue.IsNullEmptyOrWhiteSpace())
+			{
+				return;
+			}
+
+			Type classType = classType = this.tyesDictionary[this.InvokeMethodSetup.NamespaceValue];
+
+			List<DataItemModel> methodList = new List<DataItemModel>();
+
+			foreach(MethodInfo method in classType.GetMethods())
+			{
+				methodList.Add(new DataItemModel { DisplayValue = method.Name, ItemKey = method.Name });
+			}
+
+			this.uxInvoke[0, 2].SetComboBoxItems(methodList.ToArray());
+		}
+
+		private void TestMethodInvoke()
+		{
+			if (this.InvokeMethodSetup.SelectedMethod.IsNullEmptyOrWhiteSpace())
+			{
+				MessageBox.Show("Please select a method to execute");
+
+				return;
+			}
+
+			if (InputBox.ShowDialog("Invoke Parameter", "Parameter Value").IsFalse())
+			{
+				return;
+			}
+
+			Type executingType = null;
+
+			if (this.tyesDictionary.ContainsKey(this.InvokeMethodSetup.NamespaceValue))
+			{
+				executingType = this.tyesDictionary[this.InvokeMethodSetup.NamespaceValue];
+			}
+			else
+			{
+				Assembly asm = Assembly.LoadFile(this.InvokeMethodSetup.SelectDll);
+
+				executingType = asm.GetType(this.InvokeMethodSetup.NamespaceValue);
+			}
+
+			object instance = Activator.CreateInstance(executingType);
+
+			string output = instance.InvokeMethod(
+				instance, 
+				this.InvokeMethodSetup.SelectedMethod, 
+				new object[] { InputBox.Result }).ParseToString();
+
+			MessageBox.Show($"Your method returned: {output}");
+		}
+
+		#endregion
+
+		#region FROM SQL PROPERTIES
+
 		private string ReplaceTable { get; set; }
 
 		private string ReplaceColumn { get; set; }
 
-		private string WhereHeaderKey 
-		{ 
+		private string WhereHeaderKey
+		{
 			get
 			{
 				return $"{this.ReplaceTable}.{this.ReplaceColumn}";
 			}
 		}
+
+		#endregion
+
+		
 	}
 }

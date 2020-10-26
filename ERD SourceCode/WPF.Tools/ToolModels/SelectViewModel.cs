@@ -4,34 +4,34 @@ using WPF.Tools.ModelViewer;
 
 namespace WPF.Tools.ToolModels
 {
-  [ModelNameAttribute("Select")]
-  public class SelectViewModel : ModelsBase
-  {
-    private object selectedItem;
-
-    [FieldInformationAttribute("Options")]
-    [ItemTypeAttribute(ModelItemTypeEnum.ComboBox, IsComboboxEditable = false)]
-    [ValuesSourceAttribute("LookupValues")]
-    public object SelectedItem
+    [ModelNameAttribute("Select")]
+    public class SelectViewModel : ModelsBase
     {
-      get
-      {
-        return this.selectedItem;
-      }
+        private object selectedItem;
 
-      set
-      {
-        this.selectedItem = value;
+        [FieldInformationAttribute("Options")]
+        [ItemTypeAttribute(ModelItemTypeEnum.ComboBox, IsComboboxEditable = false)]
+        [ValuesSourceAttribute("LookupValues")]
+        public object SelectedItem
+        {
+            get
+            {
+                return this.selectedItem;
+            }
 
-        base.OnPropertyChanged(() => this.SelectedItem);
-      }
+            set
+            {
+                this.selectedItem = value;
+
+                base.OnPropertyChanged(() => this.SelectedItem);
+            }
+        }
+
+        public DataItemModel[] LookupValues
+        {
+            get;
+
+            set;
+        }
     }
-
-    public DataItemModel[] LookupValues
-    {
-      get;
-
-      set;
-    }
-  }
 }

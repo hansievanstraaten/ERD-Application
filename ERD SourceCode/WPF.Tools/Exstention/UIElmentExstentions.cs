@@ -74,7 +74,7 @@ namespace WPF.Tools.Exstention
 
             return itemList.ToArray();
         }
-
+        
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject obj, Type objType) where T : DependencyObject
         {
             if (obj != null)
@@ -116,6 +116,7 @@ namespace WPF.Tools.Exstention
                 }
             }
         }
+
 
         public static void CloseIfNotMainWindow(this FrameworkElement element, bool dialogResult)
         {

@@ -320,11 +320,15 @@ namespace REPORT.Builder
 
 				int sectionIndex = sender.GetPropertyValue("SectionIndex").ToInt32();
 
-				if (this.selectedReportObject != null)
+				bool isDataObject = (reportObject != null && reportObject.GetType() == typeof(ReportDataObject));
+
+				if (this.selectedReportObject != null && isDataObject)
 				{
 					ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == sectionIndex);
 
 					canvas.UpdateReplacementColumn(this.uxReplacceColumn.WhereHeader);
+
+					canvas.UpdateInvokeReplaceModel(this.uxReplacceColumn.InvokeMethodSetup);
 				}
 
 				if (this.SelectedSectionGroupIndex > 0 && reportObject == null)
@@ -371,7 +375,7 @@ namespace REPORT.Builder
 				}
 				else if (reportObject != null)
 				{
-					if (reportObject.GetType() == typeof(ReportDataObject))
+					if (isDataObject)
 					{
 						ReportDataObject dataObject = reportObject.To<ReportDataObject>();
 
@@ -386,6 +390,16 @@ namespace REPORT.Builder
 						this.uxReplacceColumn.SetValueColumns(canvas.ReportColumns);
 
 						this.uxReplacceColumn.WhereHeader = canvas.GetReplacementColumn(dataObject.ColumnModel.TableName, dataObject.ColumnModel.ColumnName);
+
+						this.uxReplacceColumn.InvokeMethodSetup = canvas.GetInvokeMethod(dataObject.ColumnModel.TableName, dataObject.ColumnModel.ColumnName);
+
+						this.uxReplacceColumn.RefreshCaptionWidth();
+					}
+					else
+					{
+						this.uxReplacceColumnCaption.Visibility = Visibility.Collapsed;
+
+						this.uxReplacceColumn.Visibility = Visibility.Collapsed;
 					}
 
 					this.uxPropertiesCaption.Visibility = Visibility.Visible;
@@ -892,6 +906,8 @@ namespace REPORT.Builder
 
 					section.ReportColumnAdded += this.ReportColumn_Added;
 				}
+
+				section.RefresSectionTitle();
 			}
 		}
 

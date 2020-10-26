@@ -6,8 +6,10 @@ using REPORT.Builder.ReportComponents;
 using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
@@ -39,6 +41,8 @@ namespace REPORT.Builder.Printing
         private Dictionary<string, string> orderByDictionary = new Dictionary<string, string>();
 
         private Dictionary<string, List<ReportXMLPrintParameterModel>> tableFilters;
+
+        private Dictionary<string, object> invokeInstances = new Dictionary<string, object>();
 
         public XDocument GetReport(
           XDocument xmlReport, 
@@ -229,6 +233,8 @@ namespace REPORT.Builder.Printing
 
                 this.DoSectionSetup();
 
+                this.SetInvokedValues(sectionTableName, row);
+
                 sectionData.Add(row);
             }
 
@@ -339,7 +345,12 @@ namespace REPORT.Builder.Printing
 
             foreach (XElement item in canvasXml.Element("ReplacementColumns").Elements())
             {
-                sqlManager.UpdateReplacementColumn(new ReportWhereHeaderModel { ItemXml = item });
+                sqlManager.UpdateReplacementColumn(new ReportSQLReplaceHeaderModel { ItemXml = item });
+            }
+
+            foreach (XElement item in canvasXml.Element("InvokeMethods").Elements())
+            {
+                sqlManager.UpdateInvokeReplaceModel(new ReportsInvokeReplaceModel { ItemXml = item });
             }
 
             this.indexSqlManager.Add(this.sectionIndex, sqlManager);
@@ -356,5 +367,50 @@ namespace REPORT.Builder.Printing
 
             this.data = new DataAccess(this.dataAccessConnection);
         }
+    
+        private void SetInvokedValues(string tableName, XElement row)
+		{
+            foreach(XElement column in row.Elements())
+			{
+                string columnKey = $"[{tableName}].[{column.Name.LocalName}]";
+
+                if (!this.indexSqlManager[this.sectionIndex].InvokeReplacementColumnModels.ContainsKey(columnKey))
+				{
+                    continue;
+				}
+
+                column.Value = InvokeReplacement(columnKey, column.Value);
+
+            }
+		}
+
+        private string InvokeReplacement(string columnKey, string columnValue)
+		{
+			object instance = null;
+                
+            ReportsInvokeReplaceModel invokeModel = this.indexSqlManager[this.sectionIndex].InvokeReplacementColumnModels[columnKey];
+
+			if (!this.invokeInstances.ContainsKey(columnKey))
+			{
+                Assembly asm = Assembly.LoadFile(invokeModel.SelectDll);
+
+				Type executingType = asm.GetType(invokeModel.NamespaceValue);
+
+				instance = Activator.CreateInstance(executingType);
+
+				this.invokeInstances.Add(columnKey, instance);
+			}
+			else
+			{
+				instance = this.invokeInstances[columnKey];
+			}
+
+			string output = instance.InvokeMethod(
+				instance,
+                invokeModel.SelectedMethod,
+				new object[] { columnValue }).ParseToString();
+
+			return output;
+		}
     }
 }

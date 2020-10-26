@@ -15,6 +15,8 @@ namespace REPORT.Builder.Printing
 {
     public class BuildReportToCanvas
     {
+        private bool isSingleTable = false;
+
         private int pageMarginTop;
 
         private int pageMarginBottom;
@@ -95,20 +97,17 @@ namespace REPORT.Builder.Printing
 
             if (this.dataSections.Count > 0)
             {
+                this.isSingleTable = this.dataSections.Count == 3;
+
                 this.CreateDataPageCanvas();
 
                 this.reportData = report.Root.Element("ReportData");
-
-                if (this.dataSections.Count == 3)
-                {
-                    this.SetSectionHeader(0);
-                }
 
                 foreach (XElement table in this.reportData.Elements())
                 {
                     foreach (XElement row in table.Elements())
                     {
-                        if (this.dataSections.Count > 3)
+                        if (!isSingleTable)
                         {
                             this.SetSectionHeader(0);
                         }
@@ -121,7 +120,7 @@ namespace REPORT.Builder.Printing
                         }
                     }
 
-                    if (this.dataSections.Count == 3)
+                    if (this.isSingleTable)
                     {
                         this.SetSectionFooter(0);
                     }
@@ -244,6 +243,11 @@ namespace REPORT.Builder.Printing
                     this.activeCanvas.AddPageHeaderObject(item);
                 }
             }
+
+            if (this.isSingleTable)
+            {
+                this.SetSectionHeader(0);
+            }
         }
 
         private void CompleteDataPageCanvas()
@@ -342,6 +346,8 @@ namespace REPORT.Builder.Printing
             bool isReset = false;
 
             foreach (XElement item in reportObjects)
+                //.OrderBy(l => l.Attribute("Top").Value.ToDouble())
+                //.ThenBy(t => t.Attribute("Left").Value.ToDouble()))
             {
                 if (item.IsDataObject())
                 {
@@ -355,8 +361,6 @@ namespace REPORT.Builder.Printing
                     XElement dataItem = new XElement(item); // Do this tp preserve the original xml
 
                     dataItem.Attribute("ColumnModel").Remove();
-
-                    //SuppressIfNoData
 
                     dataItem.Add(new XAttribute("Text", (dataValue == null ? "OOPS What a mess" : dataValue.Value)));
 

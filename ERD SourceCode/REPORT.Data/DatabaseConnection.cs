@@ -1,16 +1,20 @@
 ﻿using ERD.Models.ReportModels;
+using GeneralExtensions;
 using System;
+using System.IO;
 using ViSo.SharedEnums.ReportEnums;
 
 namespace REPORT.Data
 {
-    public sealed class DatabaseConnection : IDisposable
+	public sealed class DatabaseConnection : IDisposable
     {
         private static DatabaseConnection databaseConnection_Instance = null;
 
         private static readonly object lockObject = new object();
 
-        private readonly string rawConnectionString = "Server={0};Database={1};User ID={2};Password={3};Trusted_Connection={4}";
+        private readonly string msSqlConnectionString = "Server={0};Database={1};User ID={2};Password={3};Trusted_Connection={4}";
+
+        private string connectionString;
 
         public static DatabaseConnection Instance
         {
@@ -36,32 +40,57 @@ namespace REPORT.Data
             this.Dispose();
         }
 
-        public bool IsDatabaseSetup { get; private set; }
+        public string ConnectionString 
+        {
+            get
+            {
+                return this.connectionString.IsNullEmptyOrWhiteSpace() ? "OopsConnectionStrnigNotSet" : this.connectionString;
+            }
 
-        public string FilesDirectory { get; private set; }
-
-        public string ConnectionString { get; private set; }
+            private set
+			{
+                this.connectionString = value;
+			}
+        }
 
         public void InitializeConnectionString(ReportSetupModel setupModel)
         {
-            this.IsDatabaseSetup = setupModel.StorageType == StorageTypeEnum.DatabaseSystem;
-
-            if (this.IsDatabaseSetup)
+            switch (setupModel.StorageType)
             {
-                object[] args = new object[]
-                {
-                  setupModel.DataBaseSource.ServerName,
-                  setupModel.DataBaseSource.DatabaseName,
-                  setupModel.DataBaseSource.UserName,
-                  setupModel.DataBaseSource.Password,
-                  setupModel.DataBaseSource.TrustedConnection
-                };
+                case StorageTypeEnum.MsSql:
 
-                this.ConnectionString = String.Format(rawConnectionString, args);
-            }
-            else
-            {
-                this.FilesDirectory = setupModel.FileDirectory;
+                    object[] args = new object[]
+                    {
+                      setupModel.DataBaseSource.ServerName,
+                      setupModel.DataBaseSource.DatabaseName,
+                      setupModel.DataBaseSource.UserName,
+                      setupModel.DataBaseSource.Password,
+                      setupModel.DataBaseSource.TrustedConnection
+                    };
+
+                    this.ConnectionString = String.Format(msSqlConnectionString, args);
+
+                    break;
+
+                case StorageTypeEnum.SQLite:
+
+                    //"Data Source=MyDatabase.sqlite;Version=3;");
+
+     //               string sqLitePath = $"{setupModel.FileDirectory}\\ERD_Reports.sqlite";
+
+     //               SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder
+     //               {
+     //                   DataSource = $"{sqLitePath};Version=3;"
+     //               };
+
+     //               this.ConnectionString = builder.ConnectionString;
+
+     //               if (!File.Exists(sqLitePath))
+					//{
+     //                   SQLiteConnection.CreateFile(sqLitePath);
+     //               }
+
+                    break;
             }
         }
 

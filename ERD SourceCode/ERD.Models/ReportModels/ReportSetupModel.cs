@@ -16,7 +16,7 @@ namespace ERD.Models.ReportModels
             this.DataBaseSource = new DatabaseModel();
         }
 
-        [FieldInformation("Save Report In", IsRequired = true)]
+        [FieldInformation("Database Type", IsRequired = true)]
         public StorageTypeEnum StorageType
         {
             get
@@ -32,7 +32,7 @@ namespace ERD.Models.ReportModels
             }
         }
 
-        [FieldInformation("Save Report Setup In")]
+        [FieldInformation("DB File Location")]
         [BrowseButton("SaveDirectory", "Open Folder", "Search")]
         public string FileDirectory
         {

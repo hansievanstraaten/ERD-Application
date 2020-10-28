@@ -35,20 +35,6 @@ namespace REPORT.Data.SQLRepository
 			  .FirstOrDefault();
 
 			dataAccess.ExecuteNonQuery(script.SqlScript.ParseToString());
-
-			//string[] queryies = script.SqlScript.ParseToString().Split(new string[] { "[[GO]]" }, StringSplitOptions.RemoveEmptyEntries);
-
-			//foreach (string query in queryies)
-			//{				
-			//	try
-			//	{
-			//		dataAccess.ExecuteNonQuery(query);
-			//	}
-			//	catch (Exception err)
-			//	{
-			//		throw;
-			//	}
-			//}
 		}
 	}
 }

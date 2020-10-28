@@ -1,21 +1,17 @@
-﻿using ERD.Models.ReportModels;
-using GeneralExtensions;
-using Newtonsoft.Json;
+﻿using GeneralExtensions;
 using REPORT.Data;
-using REPORT.Data.SQLRepository;
 using System;
 using System.IO;
 using System.Windows;
 using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.BaseClasses;
-using WPF.Tools.Exstention;
 
 namespace REPORT.Builder
 {
-    /// <summary>
-    /// Interaction logic for ReportSelector.xaml
-    /// </summary>
-    public partial class ReportSelector : UserControlBase
+	/// <summary>
+	/// Interaction logic for ReportSelector.xaml
+	/// </summary>
+	public partial class ReportSelector : UserControlBase
     {
         private ReportHeaderFooters uxCoverPage;
 
@@ -36,7 +32,7 @@ namespace REPORT.Builder
 
         public string ReportFileName { get; private set; }
 
-        public ReportSetupModel ReportSetup { get; private set; }
+        //public ReportSetupModel ReportSetup { get; private set; }
 
         private void InitializeTabs()
         {
@@ -49,22 +45,9 @@ namespace REPORT.Builder
                     throw new ApplicationException("Setup not Found");
                 }
 
-                string fileContent = File.ReadAllText(this.ReportFileName);
+                DbConfiguration.Instance.Initialize(this.ReportFileName);
 
-                this.ReportSetup = JsonConvert.DeserializeObject(fileContent, typeof(ReportSetupModel)) as ReportSetupModel;
-
-                if (this.ReportSetup.DataBaseSource.IsEncrypted)
-				{
-                    this.ReportSetup.DataBaseSource.Password = this.ReportSetup.DataBaseSource.Password.Decrypt();
-
-                    this.ReportSetup.DataBaseSource.IsEncrypted = false;
-                }
-
-                DbScript script = new DbScript();
-
-                script.InitializeReportsDB(this.ReportSetup);
-
-                DatabaseConnection.Instance.InitializeConnectionString(this.ReportSetup);
+                DatabaseConnection.Instance.InitializeConnectionString(DbConfiguration.Instance.ReportSetup);
 
                 #endregion
 

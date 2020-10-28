@@ -4,10 +4,10 @@ namespace ViSo.SharedEnums.ReportEnums
 {
     public enum StorageTypeEnum
     {
-        [Description("File System")]
-        FileSystem = 1,
+        [Description("SQLite")]
+        SQLite = 1,
 
-        [Description("Database (Recommended)")]
-        DatabaseSystem = 2
+        [Description("MS SQL")]
+        MsSql = 2
     }
 }

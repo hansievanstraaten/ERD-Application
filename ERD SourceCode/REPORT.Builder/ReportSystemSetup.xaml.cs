@@ -1,8 +1,5 @@
-﻿using ERD.Models.ReportModels;
-using GeneralExtensions;
-using Newtonsoft.Json;
+﻿using GeneralExtensions;
 using REPORT.Data;
-using REPORT.Data.SQLRepository;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -13,10 +10,10 @@ using WPF.Tools.Exstention;
 
 namespace REPORT.Builder
 {
-    /// <summary>
-    /// Interaction logic for ReportSystemSetup.xaml
-    /// </summary>
-    public partial class ReportSystemSetup : UserControlBase
+	/// <summary>
+	/// Interaction logic for ReportSystemSetup.xaml
+	/// </summary>
+	public partial class ReportSystemSetup : UserControlBase
     {
         public ReportSystemSetup(string projectFileDirectory)
         {
@@ -33,37 +30,20 @@ namespace REPORT.Builder
 
             this.ReportFileName = Path.Combine(projectFileDirectory, Constants.ReportConstants.ReportSetupFileName);
 
+            DbConfiguration.Instance.Initialize(this.ReportFileName);
+
             this.Loaded += this.ReportSystemSetup_Loaded;
+
+            this.Unloaded += this.ReportSystemSetup_Unloaded;
         }
 
-        public string ReportFileName { get; private set; }
-
-        public ReportSetupModel ReportSetup { get; private set; }
+		public string ReportFileName { get; private set; }
 
         public bool Save()
         {
             try
             {
-                this.ReportSetup.DataBaseSource.Password = this.ReportSetup.DataBaseSource.Password.Encrypt();
-
-                this.ReportSetup.DataBaseSource.IsEncrypted = true;
-
-                string fileObject = JsonConvert.SerializeObject(this.ReportSetup);
-
-                File.WriteAllText(this.ReportFileName, fileObject);
-
-                this.ReportSetup.DataBaseSource.Password = this.ReportSetup.DataBaseSource.Password.Decrypt();
-
-                this.ReportSetup.DataBaseSource.IsEncrypted = false;
-
-                if (this.ReportSetup.StorageType == StorageTypeEnum.DatabaseSystem)
-				{
-                    DbScript script = new DbScript();
-
-                    script.InitializeReportsDB(this.ReportSetup);
-                }
-
-                return true;
+                return DbConfiguration.Instance.Save();
             }
             catch (Exception err)
             {
@@ -77,31 +57,15 @@ namespace REPORT.Builder
         {
             try
             {
-                if (File.Exists(this.ReportFileName))
+                this.uxReportSetup.Items.Add(DbConfiguration.Instance.ReportSetup);
+
+                this.uxReportSetup["Database Type"].IsEnabled = false;
+
+                DbConfiguration.Instance.ReportSetup.PropertyChanged += this.ReportSetup_Changed;
+
+                if (this.uxReportSetup["Database Type"].GetValue() == null)
                 {
-                    string fileContent = File.ReadAllText(this.ReportFileName);
-
-                    this.ReportSetup = JsonConvert.DeserializeObject(fileContent, typeof(ReportSetupModel)) as ReportSetupModel;
-
-                    if (this.ReportSetup.DataBaseSource.IsEncrypted)
-                    {
-                        this.ReportSetup.DataBaseSource.Password = this.ReportSetup.DataBaseSource.Password.Decrypt();
-
-                        this.ReportSetup.DataBaseSource.IsEncrypted = false;
-                    }
-                }
-                else
-                {
-                    this.ReportSetup = new ReportSetupModel();
-                }
-
-                this.uxReportSetup.Items.Add(this.ReportSetup);
-
-                this.ReportSetup.PropertyChanged += this.ReportSetup_Changed;
-
-                if (this.uxReportSetup["Save Report In"].GetValue() == null)
-                {
-                    this.ReportSetup.StorageType = StorageTypeEnum.DatabaseSystem;
+                    DbConfiguration.Instance.ReportSetup.StorageType = StorageTypeEnum.MsSql;
                 }
                 else
                 {
@@ -112,6 +76,18 @@ namespace REPORT.Builder
             {
                 MessageBox.Show(err.InnerExceptionMessage());
             }
+        }
+
+        private void ReportSystemSetup_Unloaded(object sender, RoutedEventArgs e)
+        {
+            try
+			{
+                DbConfiguration.Instance.ReportSetup.PropertyChanged -= this.ReportSetup_Changed;
+            }
+            catch (Exception err)
+			{
+                MessageBox.Show(err.InnerExceptionMessage());
+			}
         }
 
         private void OnModelViewer_Browse(object sender, string buttonKey)
@@ -127,7 +103,7 @@ namespace REPORT.Builder
                         return;
                     }
 
-                    this.ReportSetup.FileDirectory = folder.SelectedPath;
+                    DbConfiguration.Instance.ReportSetup.FileDirectory = folder.SelectedPath;
 
                     break;
             }
@@ -152,18 +128,18 @@ namespace REPORT.Builder
                 this.uxReportSetup[1].Visibility = Visibility.Collapsed;
             }
 
-            switch (this.ReportSetup.StorageType)
+            switch (DbConfiguration.Instance.ReportSetup.StorageType)
             {
-                case StorageTypeEnum.FileSystem:
+                case StorageTypeEnum.SQLite:
 
-                    this.uxReportSetup["Save Report Setup In"].Visibility = Visibility.Visible;
+                    this.uxReportSetup["DB File Location"].Visibility = Visibility.Visible;
 
                     break;
 
-                case StorageTypeEnum.DatabaseSystem:
+                case StorageTypeEnum.MsSql:
                 default:
 
-                    this.uxReportSetup["Save Report Setup In"].Visibility = Visibility.Collapsed;
+                    this.uxReportSetup["DB File Location"].Visibility = Visibility.Collapsed;
 
                     if (this.uxReportSetup.Items.Count > 1)
                     {
@@ -171,7 +147,7 @@ namespace REPORT.Builder
                     }
                     else
                     {
-                        this.uxReportSetup.Items.Add(this.ReportSetup.DataBaseSource);
+                        this.uxReportSetup.Items.Add(DbConfiguration.Instance.ReportSetup.DataBaseSource);
                     }
 
                     break;

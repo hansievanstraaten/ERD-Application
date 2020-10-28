@@ -1,0 +1,4 @@
+﻿Enable-Migrations -ProjectName REPORT.Data -ContextTypeName REPORT.Data.SQLRepository.DataContext.DataSourceContext -StartUpProjectName ERD.Viewer -Verbose
+Enable-Migrations -ProjectName REPORT.Data -ContextTypeName REPORT.Data.SQLRepository.DataContext.ReportsBuildContext -StartUpProjectName ERD.Viewer -Verbose
+Enable-Migrations -ProjectName REPORT.Data -ContextTypeName REPORT.Data.SQLRepository.DataContext.ReportTablesContext -StartUpProjectName ERD.Viewer -Verbose
+Enable-Migrations -ProjectName REPORT.Data -ContextTypeName REPORT.Data.SQLRepository.DataContext.SystemTablesContext -StartUpProjectName ERD.Viewer -Verbose

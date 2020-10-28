@@ -1,8 +1,11 @@
 - Delete Report
 
+Apply Text to Filter if Replace option is available	
+
 - Web Api for web printing and download
-- Create File System DB setup
+- Implement SQLite DB
 - Correct Password Incription (TEST SYSTEM WIDE)
+
 
 
 

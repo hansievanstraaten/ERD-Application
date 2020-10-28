@@ -45,42 +45,6 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result.CopyToObject(new DataSourceTableModel()) as DataSourceTableModel;
 		}
 
-		
-		public List<DataSourceMasterModel> GetDataSourceMasterByForeignKeyMasterReport_Id (Int64 MasterReport_Id)
-		{
-			List<DataSourceMaster> result = this.dataContext
-				.DataSourcesMaster
-				.Where(fk => fk.MasterReport_Id == MasterReport_Id)
-				.ToList();
-
-			if (result.Count == 0)
-			{
-				return new List<DataSourceMasterModel>();
-			}
-
-			
-			List<object> objectList = result.CopyToObject(typeof(DataSourceMasterModel));
-
-			return objectList.TryCast<DataSourceMasterModel>().ToList();
-		}
-		
-		public List<DataSourceTableModel> GetDataSourceTableByForeignKeyMasterReport_Id (Int64 MasterReport_Id)
-		{
-			List<DataSourceTable> result = this.dataContext
-				.DataSourceTables
-				.Where(fk => fk.MasterReport_Id == MasterReport_Id)
-				.ToList();
-
-			if (result.Count == 0)
-			{
-				return new List<DataSourceTableModel>();
-			}
-
-			
-			List<object> objectList = result.CopyToObject(typeof(DataSourceTableModel));
-
-			return objectList.TryCast<DataSourceTableModel>().ToList();
-		}
 
 		
 		public List<DataSourceMasterModel> GetDataSourceMasterByMainTableName (string MainTableName)

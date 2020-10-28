@@ -26,4 +26,4 @@
 [[DatabaseColumnTypeIDENTITY]]= Returns true or false,
 
 [[?*]]=Removes the last occurrence of the specified parameter and replaces the pre-ceding instances with the character specified as the '*'.,
-[[IF{{0}}]]= Executes only if the contition is met. This start with the parameter value e.g. [[DataType]] followed by == and the string value that must be true.
+[[IF{{0}}]]=Executes only if the contition is met. This start with the parameter value e.g. [[IF{{[[DataType]] == string then 'This is a string'}}]].

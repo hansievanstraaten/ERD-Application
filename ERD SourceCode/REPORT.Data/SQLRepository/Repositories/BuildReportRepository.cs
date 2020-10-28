@@ -12,11 +12,11 @@ namespace REPORT.Data.SQLRepository.Repositories
 
     public class BuildReportRepository
     {
-        private ReportsBuildContext dataContext;
+        private ReportTablesContext dataContext;
 
         public BuildReportRepository()
         {
-            this.dataContext = new ReportsBuildContext();
+            this.dataContext = new ReportTablesContext();
         }
 
         public int GetReportXMLVersion(long MasterReport_Id)

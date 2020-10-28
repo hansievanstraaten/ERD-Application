@@ -1,65 +1,65 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using WPF.Tools.BaseClasses;
 
 namespace REPORT.Data.SQLRepository.Agrigates
 {
-    public abstract class LookupBase : ModelsBase
-    {
-	private string _LookupGroup;
-	private int _GroupKey;
-	private string _GroupDescription;
+	public abstract class LookupBase : ModelsBase
+	{
+		private string _LookupGroup;
+		private int _GroupKey;
+		private string _GroupDescription;
 
-	/// <summary>
-	/// <para>Lookup Group</para>
-	/// <para></para>
-	/// </summary>
-	public string LookupGroup
-	{ 
-		get
+
+		// Primary Keys
+		[Key]
+		 	
+		public string LookupGroup
 		{
-			return this._LookupGroup;
+			get
+			{
+				return this._LookupGroup;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("LookupGroup", ref this._LookupGroup, value);
+			}
+		}
+		[Key]
+		 	
+		public int GroupKey
+		{
+			get
+			{
+				return this._GroupKey;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("GroupKey", ref this._GroupKey, value);
+			}
 		}
 
-		set
+
+		// Foreign Keys
+
+
+		// Columns
+		public string GroupDescription
 		{
-			base.OnPropertyChanged("LookupGroup", ref this._LookupGroup, value);
+			get
+			{
+				return this._GroupDescription;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("GroupDescription", ref this._GroupDescription, value);
+			}
 		}
+
+
 	}
-
-	/// <summary>
-	/// <para>Group Key</para>
-	/// <para></para>
-	/// </summary>
-	public int GroupKey
-	{ 
-		get
-		{
-			return this._GroupKey;
-		}
-
-		set
-		{
-			base.OnPropertyChanged("GroupKey", ref this._GroupKey, value);
-		}
-	}
-
-	/// <summary>
-	/// <para>Group Description</para>
-	/// <para></para>
-	/// </summary>
-	public string GroupDescription
-	{ 
-		get
-		{
-			return this._GroupDescription;
-		}
-
-		set
-		{
-			base.OnPropertyChanged("GroupDescription", ref this._GroupDescription, value);
-		}
-	}
-
-
-    }
 }

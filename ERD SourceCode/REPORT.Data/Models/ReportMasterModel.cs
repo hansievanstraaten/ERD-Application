@@ -419,7 +419,7 @@ namespace REPORT.Data.Models
 
 				ReportTablesRepository repo = new ReportTablesRepository();
 
-				foreach (ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.CoverPage))
+				foreach (ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.CoverPage, General.ProjectModel.ModelName))
 				{
 					result.Add(new DataItemModel { DisplayValue = item.ReportName, ItemKey = item.MasterReport_Id });
 				}
@@ -438,7 +438,7 @@ namespace REPORT.Data.Models
 
 				ReportTablesRepository repo = new ReportTablesRepository();
 
-				foreach (ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.PageHeaderAndFooter))
+				foreach (ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.PageHeaderAndFooter, General.ProjectModel.ModelName))
 				{
 					result.Add(new DataItemModel { DisplayValue = item.ReportName, ItemKey = item.MasterReport_Id });
 				}
@@ -457,7 +457,7 @@ namespace REPORT.Data.Models
 
 				ReportTablesRepository repo = new ReportTablesRepository();
 
-				foreach (ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.FinalPage))
+				foreach (ReportMasterModel item in repo.GetReportMasterByReportTypeEnum((int)ViSo.SharedEnums.ReportEnums.ReportTypeEnum.FinalPage, General.ProjectModel.ModelName))
 				{
 					result.Add(new DataItemModel { DisplayValue = item.ReportName, ItemKey = item.MasterReport_Id });
 				}

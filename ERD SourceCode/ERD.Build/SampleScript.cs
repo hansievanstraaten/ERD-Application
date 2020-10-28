@@ -120,7 +120,7 @@ namespace ERD.Build
 
             int startIfIndex = result.IndexOf(startIfString, passedIndex);
 
-            if (startIfIndex <= 0)
+            if (startIfIndex < 0)
             {
                 return;
             }
@@ -294,7 +294,9 @@ namespace ERD.Build
 
                     #region FOREACH FOREIGN KEY IN TABLE  
 
-                    ColumnObjectModel[] foreignKeyColumnsArray = this.SelectedTable.Columns.Where(pk => pk.IsForeignkey).ToArray();
+                    ColumnObjectModel[] foreignKeyColumnsArray = this.SelectedTable.Columns
+                        .Where(pk => pk.IsForeignkey
+                                && !pk.InPrimaryKey).ToArray();
 
                     for (int keyCol = 0; keyCol < foreignKeyColumnsArray.Length; ++keyCol)
                     {

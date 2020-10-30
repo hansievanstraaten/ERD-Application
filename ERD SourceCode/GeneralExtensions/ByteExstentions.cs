@@ -14,7 +14,7 @@ namespace GeneralExtensions
         return string.Empty;
       }
 
-      return Convert.ToBase64String(value);
+      return System.Convert.ToBase64String(value);
     }
 
     public static object UnzipFile(this byte[] source)

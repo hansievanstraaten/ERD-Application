@@ -2,6 +2,7 @@ using ERD.DatabaseScripts.Engineering;
 using GeneralExtensions;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Xml.Linq;
 using WPF.Tools.BaseClasses;
 
@@ -11,11 +12,13 @@ namespace REPORT.Data.Models
 	{
 		private string _ReplaceColumn;
 		private string _ReplaceTable;
-		private string _UseColumn;
+		private List<string> _UseColumn;
 		private string _UseTable;
 
 		public ReportSQLReplaceHeaderModel()
 		{
+			this.UseColumns = new List<string>(0);
+
 			this.WhereDetails = new List<ReportSQLReplaceDetailModel>();
 		}
 
@@ -28,10 +31,20 @@ namespace REPORT.Data.Models
 				result.Add(new XAttribute("ObjectType", "ReportWhereHeaderModel"));
 				result.Add(new XAttribute("ReplaceColumn", this.ReplaceColumn));
 				result.Add(new XAttribute("ReplaceTable", this.ReplaceTable));
-				result.Add(new XAttribute("UseColumn", this.UseColumn));
 				result.Add(new XAttribute("UseTable", this.UseTable));
 
+				XElement selectColumns = new XElement("SelectColumns");
 				XElement whereDetails = new XElement("WhereDetails");
+
+				foreach(string column in this.UseColumns)
+				{
+					if (column == "<None>")
+					{
+						continue;
+					}
+
+					selectColumns.Add(new XElement("ColumnName", column));
+				}
 
 				foreach(ReportSQLReplaceDetailModel detail in this.WhereDetails)
 				{
@@ -39,6 +52,8 @@ namespace REPORT.Data.Models
 				}
 
 				result.Add(whereDetails);
+
+				result.Add(selectColumns);
 
 				return result;
 			}
@@ -50,7 +65,12 @@ namespace REPORT.Data.Models
 					this.SetPropertyValue(element.Name.LocalName, element.Value);
 				}
 
-				foreach(XElement column in value.Descendants("ReportWhereDetail"))
+				foreach (XElement column in value.Descendants("ColumnName"))
+				{
+					this.UseColumns.Add(column.Value);
+				}
+
+				foreach (XElement column in value.Descendants("ReportWhereDetail"))
 				{
 					this.WhereDetails.Add(new ReportSQLReplaceDetailModel { ItemXml = column });
 				}
@@ -112,7 +132,7 @@ namespace REPORT.Data.Models
 		/// <para>Use Column</para>
 		/// <para></para>
 		/// </summary>
-		public string UseColumn
+		public List<string> UseColumns
 		{
 			get
 			{
@@ -121,7 +141,7 @@ namespace REPORT.Data.Models
 
 			set
 			{
-				base.OnPropertyChanged("UseColumn", ref this._UseColumn, value);
+				this._UseColumn = value;
 			}
 		}
 

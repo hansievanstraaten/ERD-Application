@@ -50,7 +50,7 @@
             </MenuItem>
             <MenuItem x:Name="uxMenuReport" IsEnabled="False" Header="Report Builder (Preview)">
                 <MenuItem Header="Setup" Click="ReportSystemSetup_Click" />
-                <MenuItem Header="Select Report" Click="SelectReport_Click" />
+                <MenuItem Header="Reports" Click="SelectReport_Click" />
             </MenuItem>
             <Specialized:FlashableLabel Content="Install Updates" x:Name="uxInstallUpdates" Visibility="Collapsed" OnMouseClicked="InstallUpdates_Cliked" />
         </Menu>

@@ -14,6 +14,7 @@ using System.ComponentModel;
 using Microsoft.Win32;
 using System.Reflection;
 using ViSo.Dialogs.Input;
+using System.Windows.Controls;
 
 namespace REPORT.Builder
 {
@@ -121,9 +122,13 @@ namespace REPORT.Builder
 				{
 					ReplaceColumn = this.ReplaceColumn,
 					ReplaceTable = this.ReplaceTable,
-					UseTable = this.uxFromTable.SelectedValue.ParseToString(),
-					UseColumn = this.uxValueFromTable.SelectedValue.ParseToString()
+					UseTable = this.uxFromTable.SelectedValue.ParseToString()
 				};
+
+				foreach(ComboBoxTool boxTool in this.uxSelectColumnsStack.Children)
+				{
+					result.UseColumns.Add(boxTool.SelectedValue.ParseToString());
+				}
 
 				foreach (ReplaceWhere item in this.replaceWheres)
 				{
@@ -156,7 +161,10 @@ namespace REPORT.Builder
 
 				this.uxFromTable.SelectedValue = value.UseTable;
 
-				this.uxValueFromTable.SelectedValue = value.UseColumn;
+				for (int x = 0; x < value.UseColumns.Count; ++x)
+				{
+					this.AddSelectFromColumnOption(value.UseColumns[x], x);
+				}
 
 				for (int x = 0; x < value.WhereDetails.Count; ++x)
 				{
@@ -257,11 +265,13 @@ namespace REPORT.Builder
 			{
 				this.replaceWheres.Clear();
 
-				this.uxValueFromTable.Items.Clear();
-
+				this.uxSelectColumnsStack.Children.Clear();
+				
 				this.uxWhereOptions.Children.Clear();
 
 				this.whereOptions.Clear();
+
+				this.AddSelectFromColumnOption(string.Empty, 0);
 
 				DataItemModel fromTable = this.uxFromTable.SelectedItem.To<DataItemModel>();
 
@@ -275,14 +285,28 @@ namespace REPORT.Builder
 						ItemKey = $"{fromTable.DisplayValue}.{tableColumn.DisplayValue}"
 					};
 
-					this.uxValueFromTable.Items.Add(optionColumn);
-
 					this.whereOptions.Add(optionColumn);
 				}
 
 				if (this.uxFromTable.SelectedValue.ParseToString() != ReportConstants.None)
 				{
 					this.AddReplaceWhere();
+				}
+			}
+			catch (Exception err)
+			{
+				MessageBox.Show(err.InnerExceptionMessage());
+			}
+		}
+
+		private void SelectColumnChanged(object sender, SelectionChangedEventArgs e)
+		{
+			try
+			{
+				if (this.uxSelectColumnsStack.Children[this.uxSelectColumnsStack.Children.Count - 1]
+					.To<ComboBoxTool>().SelectedValue.ParseToString() != ReportConstants.None)
+				{
+					this.AddSelectFromColumnOption(ReportConstants.None, this.uxSelectColumnsStack.Children.Count);
 				}
 			}
 			catch (Exception err)
@@ -399,6 +423,40 @@ namespace REPORT.Builder
 			this.replaceWheres.Add(replaceOption);
 		}
 
+		private void AddSelectFromColumnOption(string selectedValue, int desiredIndex)
+		{
+			DataItemModel fromTable = this.uxFromTable.SelectedItem.To<DataItemModel>();
+
+			bool haveChild = desiredIndex < this.uxSelectColumnsStack.Children.Count;
+
+			ComboBoxTool resultBox = haveChild ?
+				this.uxSelectColumnsStack.Children[desiredIndex].To<ComboBoxTool>()
+				:
+				new ComboBoxTool();
+
+			if (!haveChild)
+			{
+				resultBox.Items.Add(new DataItemModel { DisplayValue = ReportConstants.None, ItemKey = ReportConstants.None });
+
+				foreach (DataItemModel tableColumn in Integrity.GetColumnsForTable(fromTable.DisplayValue).OrderBy(t => t.DisplayValue))
+				{
+					DataItemModel optionColumn = new DataItemModel
+					{
+						DisplayValue = $"{fromTable.DisplayValue}.{tableColumn.DisplayValue}",
+						ItemKey = $"{fromTable.DisplayValue}.{tableColumn.DisplayValue}"
+					};
+
+					resultBox.Items.Add(optionColumn);
+				}
+				resultBox.SelectionChanged += this.SelectColumnChanged;
+
+				this.uxSelectColumnsStack.Children.Add(resultBox);
+			}
+
+			resultBox.SelectedValue = selectedValue;
+		}
+
+		
 		#endregion
 
 		#region INVOKE METHODS
@@ -518,8 +576,6 @@ namespace REPORT.Builder
 			}
 		}
 
-		#endregion
-
-		
+		#endregion		
 	}
 }

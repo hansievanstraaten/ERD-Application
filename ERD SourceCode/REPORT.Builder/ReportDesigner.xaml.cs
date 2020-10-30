@@ -35,6 +35,8 @@ namespace REPORT.Builder
 	{
 		#region FIELDS
 
+		private bool isDataObject;
+
 		private readonly ReportTypeEnum reportDesignType;
 
 		private ReportMasterModel reportMaster;
@@ -318,13 +320,13 @@ namespace REPORT.Builder
 
 				this.SelectedSectionGroupIndex = sender.GetPropertyValue("SectionGroupIndex").ToInt32();
 
-				int sectionIndex = sender.GetPropertyValue("SectionIndex").ToInt32();
+				this.SelectedSectionIndex = sender.GetPropertyValue("SectionIndex").ToInt32();
 
-				bool isDataObject = (reportObject != null && reportObject.GetType() == typeof(ReportDataObject));
+				this.isDataObject = (reportObject != null && reportObject.GetType() == typeof(ReportDataObject));
 
 				if (this.selectedReportObject != null && isDataObject)
 				{
-					ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == sectionIndex);
+					ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == this.SelectedSectionIndex);
 
 					canvas.UpdateReplacementColumn(this.uxReplacceColumn.WhereHeader);
 
@@ -385,7 +387,7 @@ namespace REPORT.Builder
 
 						this.uxReplacceColumn.Clear();
 
-						ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == sectionIndex);
+						ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == this.SelectedSectionIndex);
 
 						this.uxReplacceColumn.SetValueColumns(canvas.ReportColumns);
 
@@ -816,6 +818,8 @@ namespace REPORT.Builder
 
 		#region PRIVATE PROPERTIES
 
+		private int SelectedSectionIndex { get; set; }
+
 		private int SelectedSectionGroupIndex { get; set; }
 
 		private double CanvasWidth
@@ -1047,6 +1051,15 @@ namespace REPORT.Builder
 
 		private XDocument GetReportXml()
 		{
+			if (this.selectedReportObject != null && isDataObject)
+			{
+				ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == this.SelectedSectionIndex);
+
+				canvas.UpdateReplacementColumn(this.uxReplacceColumn.WhereHeader);
+
+				canvas.UpdateInvokeReplaceModel(this.uxReplacceColumn.InvokeMethodSetup);
+			}
+
 			XDocument result = new XDocument();
 
 			XElement root = new XElement("Root");
@@ -1063,18 +1076,6 @@ namespace REPORT.Builder
 			root.Add(report);
 
 			result.Add(root);
-
-			//ReportXMLModel reportXml = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, this.ReportMaster.MasterReport_Id);
-
-			//if (reportXml == null)
-			//{
-			//    reportXml = new ReportXMLModel
-			//    {
-			//        MasterReport_Id = this.ReportMaster.MasterReport_Id,
-			//        ReportXMLVersion = this.ReportMaster.ReportXMLVersion,
-			//        PrintCount = 0
-			//    };
-			//}
 
 			return result;
 		}

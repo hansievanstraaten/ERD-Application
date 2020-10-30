@@ -23,6 +23,21 @@ namespace WPF.Tools.CommonControls
             }
         }
 
+        public Size MeasureString()
+        {
+            var formattedText = new FormattedText(
+                this.Text,
+                CultureInfo.CurrentCulture,
+                FlowDirection.LeftToRight,
+                new Typeface(this.FontFamily, this.FontStyle, this.FontWeight, this.FontStretch),
+                this.FontSize,
+                Brushes.Black,
+                new NumberSubstitution(),
+                1);
+
+            return new Size(formattedText.Width, formattedText.Height);
+        }
+
         public double StringRenderLength(string textValue)
         {
             FormattedText formattedText = new FormattedText(

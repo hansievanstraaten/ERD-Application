@@ -111,40 +111,49 @@ namespace REPORT.Builder.Common.DatabaseOptions
 
             StringBuilder result = new StringBuilder();
 
-            result.Append($"(SELECT {value.UseColumn} FROM {value.UseTable} WHERE ");
+            result.Append("(SELECT CONCAT(");
 
-            for(int x = 0; x < value.WhereDetails.Count; ++x)
-			{
-                ReportSQLReplaceDetailModel detail = value.WhereDetails[x];
+            foreach (string column in value.UseColumns)
+            {
+                result.Append($"(SELECT {column} FROM {value.UseTable} WHERE ");
 
-                if (detail.IsColumn)
+                for (int x = 0; x < value.WhereDetails.Count; ++x)
                 {
-                    if (x == (value.WhereDetails.Count - 1))
+                    ReportSQLReplaceDetailModel detail = value.WhereDetails[x];
+
+                    if (detail.IsColumn)
                     {
-                        result.Append($"{detail.WhereOption} = {detail.WhereValue} ");
+                        if (x == (value.WhereDetails.Count - 1))
+                        {
+                            result.Append($"{detail.WhereOption} = {detail.WhereValue} ");
+                        }
+                        else
+                        {
+                            result.Append($"{detail.WhereOption} = {detail.WhereValue} AND ");
+                        }
                     }
                     else
                     {
-                        result.Append($"{detail.WhereOption} = {detail.WhereValue} AND ");
+                        if (x == (value.WhereDetails.Count - 1))
+                        {
+                            result.Append($"{detail.WhereOption} = '{detail.WhereValue}' ");
+                        }
+                        else
+                        {
+                            result.Append($"{detail.WhereOption} = '{detail.WhereValue}' AND ");
+                        }
                     }
-                }
-                else
-                {
-                    if (x == (value.WhereDetails.Count - 1))
-                    {
-                        result.Append($"{detail.WhereOption} = '{detail.WhereValue}' ");
-                    }
-                    else
-                    {
-                        result.Append($"{detail.WhereOption} = '{detail.WhereValue}' AND ");
-                    }
+
                 }
 
+                result.Append("), ' ', ");
             }
 
-            result.Append(")");
+            result.Remove(result.Length - 2, 2);
 
-            result.Append($" AS {value.ReplaceColumn}");
+            result.Append($")) AS {value.ReplaceColumn}");
+
+            //string resultCheck = result.ToString();
 
             return result.ToString();
 		}

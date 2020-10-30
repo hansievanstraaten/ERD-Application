@@ -2,6 +2,7 @@
 using REPORT.Builder.Common;
 using REPORT.Builder.ReportTools;
 using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
@@ -46,13 +47,6 @@ namespace REPORT.Builder.Printing
             Canvas.SetTop(element, (element.GetPropertyValue("Top").ToDouble() + this.TopMargin));
 
             this.Children.Add(element);
-
-            double itemHeight = element.GetPropertyValue("TextHeight").ToDouble() + Canvas.GetTop(element);
-
-            if (this.TopOffset < itemHeight)
-            {
-                this.TopOffset = itemHeight;
-            }
         }
 
         public void AddPageFooterObject(XElement item)
@@ -68,7 +62,7 @@ namespace REPORT.Builder.Printing
             this.Children.Add(element);
         }
 
-        public bool AddObject(XElement item, SectionTypeEnum sectionType, out double elementBottom)
+        public bool AddObject(XElement item, SectionTypeEnum sectionType, out double elementBottom, out string textOverflow)
         {
             UIElement element = ObjectCreator.CreateReportObject(item, false);
 
@@ -78,16 +72,12 @@ namespace REPORT.Builder.Printing
             {
                 this.MeasureDataElement(element, out itemHeight);
             }
-            
-            if (sectionType != SectionTypeEnum.Page)
-            {
-                if ((itemHeight + this.TopOffset) > this.BottomOffset)
-                {
-                    elementBottom = 0;
-
-                    return false;
-                }
+            else
+			{
+                itemHeight = element.GetPropertyValue("TextHeight").ToDouble();
             }
+
+            textOverflow = string.Empty;
 
             Canvas.SetLeft(element, element.GetPropertyValue("Left").ToDouble());
 
@@ -97,7 +87,58 @@ namespace REPORT.Builder.Printing
 
             elementBottom = Canvas.GetTop(element) + itemHeight;
 
-			this.HaveElements = true;
+            if (elementBottom > this.BottomOffset)
+			{
+                if (!this.TryTrimWrapedText(element, elementBottom, out textOverflow))
+                {
+                    this.Children.Remove(element);
+
+                    elementBottom = 0;
+
+                    return false;
+                }
+			}
+
+            this.HaveElements = true;
+
+            return true;
+        }
+
+        private bool TryTrimWrapedText(UIElement element, double itemHeight, out string textRemainder)
+		{
+            StringBuilder remainder = new StringBuilder();
+
+            string elementText = element.GetPropertyValue("Text").ParseToString();
+
+            remainder.Append(elementText);
+
+            int trimCut = Convert.ToInt32(itemHeight - this.BottomOffset);
+
+            int trimLenght = elementText.Length - trimCut;
+
+            while (itemHeight > this.BottomOffset)
+            {
+                remainder.Remove(trimLenght, trimCut);
+
+                element.SetPropertyValue("Text", remainder.ToString());
+
+                this.MeasureDataElement(element, out itemHeight);
+
+                itemHeight = Canvas.GetTop(element) + itemHeight;
+
+                trimCut = Convert.ToInt32(itemHeight - this.BottomOffset);
+
+                trimLenght -= trimCut;
+
+                if (trimLenght <= 0)
+				{
+                    textRemainder = string.Empty;
+
+                    return false;
+				}
+            }
+
+            textRemainder = elementText.Replace(remainder.ToString(), string.Empty);
 
             return true;
         }
@@ -108,14 +149,14 @@ namespace REPORT.Builder.Printing
 
             if (dataObj.TextWrapping == TextWrapping.NoWrap && dataObj.Width != double.NaN)
 			{
-                itemHeight = dataObj.Height;
+                itemHeight = dataObj.GetPropertyValue("TextHeight").ToDouble();
 
                 return;
 			}
 
-            dataObj.MaxWidth = dataObj.Width;
+            Size size = dataObj.MeasureString();
 
-            Size size = new Size(dataObj.Width, double.PositiveInfinity);
+            dataObj.MaxWidth = size.Width;
 
             dataObj.Measure(size);
 

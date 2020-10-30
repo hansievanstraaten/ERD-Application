@@ -42,9 +42,9 @@
 
                 <CommonControls:ComboBoxTool Grid.Row="0" Grid.Column="1" x:Name="uxFromTable" SelectionChanged="FromTable_Changed" />
 
-                <CommonControls:LableItem Grid.Row="1" Grid.Column="0" Content="Replace With Value From" />
+                <CommonControls:LableItem Grid.Row="1" Grid.Column="0" Content="Replace With Values From" />
 
-                <CommonControls:ComboBoxTool Grid.Row="1" Grid.Column="1" x:Name="uxValueFromTable" />
+                <StackPanel Grid.Row="1" Grid.Column="1" x:Name="uxSelectColumnsStack" />
 
                 <CommonControls:LableItem Grid.Row="2" Grid.Column="0" Content="Where" />
 

@@ -212,9 +212,27 @@ namespace REPORT.Builder.Printing
 
             foreach(XElement item in canvasXml.GetReportObjects())
             {
+                READD:
                 double bottom = 0;
 
-                result.AddObject(item, sectionType, out bottom);
+                string textOverflow = string.Empty;
+
+                result.AddObject(item, sectionType, out bottom, out textOverflow);
+
+                if (!textOverflow.IsNullEmptyOrWhiteSpace())
+				{
+                    item.Attribute("Text").Value = textOverflow;
+
+                    this.AddCanvas(result);
+
+                    result = new PrintCanvas
+                    {
+                        Width = this.PageWidth,
+                        Height = this.PageHeight
+                    };
+
+                    goto READD;
+                }
             }
 
             this.AddCanvas(result);
@@ -242,6 +260,8 @@ namespace REPORT.Builder.Printing
                 {
                     this.activeCanvas.AddPageHeaderObject(item);
                 }
+
+                this.activeCanvas.TopOffset += this.activeCanvas.HeaderHeight;
             }
 
             if (this.isSingleTable)
@@ -280,12 +300,12 @@ namespace REPORT.Builder.Printing
         {
             XElement sectionHeader = this.GetReportSection(SectionTypeEnum.TableHeader, groupIndex);
 
-            if (sectionHeader.Attribute("CanvasHeight").Value.ToDecimal() <= 0)
+			if (sectionHeader.Attribute("CanvasHeight").Value.ToDecimal() <= 0)
 			{
-                return;
+				return;
 			}
 
-            this.AddObjectModels(sectionHeader, null);
+			this.AddObjectModels(sectionHeader, null);
         }
 
         private void SetSectionFooter(int groupIndex)
@@ -346,8 +366,6 @@ namespace REPORT.Builder.Printing
             bool isReset = false;
 
             foreach (XElement item in reportObjects)
-                //.OrderBy(l => l.Attribute("Top").Value.ToDouble())
-                //.ThenBy(t => t.Attribute("Left").Value.ToDouble()))
             {
                 if (item.IsDataObject())
                 {
@@ -362,6 +380,8 @@ namespace REPORT.Builder.Printing
 
                     dataItem.Attribute("ColumnModel").Remove();
 
+                    string testValue = (dataValue == null ? "OOPS What a mess" : dataValue.Value);
+
                     dataItem.Add(new XAttribute("Text", (dataValue == null ? "OOPS What a mess" : dataValue.Value)));
 
                     lowestBottom = this.AddObectModel(dataItem, lowestBottom, out isReset);
@@ -370,7 +390,7 @@ namespace REPORT.Builder.Printing
                 {
                     lowestBottom = this.AddObectModel(item, lowestBottom, out isReset);
                 }
-                
+
                 if (isReset)
                 {
                     minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble() + this.activeCanvas.TopOffset;
@@ -401,7 +421,16 @@ namespace REPORT.Builder.Printing
                 return result;
             }
 
-            bool canAdd = this.activeCanvas.AddObject(item, SectionTypeEnum.TableData, out elementBottom);
+            string textOverFlow = string.Empty;
+
+            bool canAdd = this.activeCanvas.AddObject(item, SectionTypeEnum.TableData, out elementBottom, out textOverFlow);
+
+            if (!textOverFlow.IsNullEmptyOrWhiteSpace())
+			{
+                item.Attribute("Text").Value = textOverFlow;
+
+                canAdd = false;
+			}
 
             if (canAdd)
             {

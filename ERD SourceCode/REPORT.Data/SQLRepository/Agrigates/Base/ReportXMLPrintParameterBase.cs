@@ -14,6 +14,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		private bool _IsActive;
 		private string _FilterCaption;
 		private string _DefaultValue;
+		private bool? _IsRequired;
 
 
 		// Primary Keys
@@ -113,6 +114,18 @@ namespace REPORT.Data.SQLRepository.Agrigates
 			set
 			{
 				base.OnPropertyChanged("DefaultValue", ref this._DefaultValue, value);
+			}
+		}
+		public bool? IsRequired
+		{
+			get
+			{
+				return this._IsRequired;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("IsRequired", ref this._IsRequired, value);
 			}
 		}
 

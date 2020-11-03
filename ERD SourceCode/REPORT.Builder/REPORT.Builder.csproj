@@ -147,6 +147,9 @@
     <Compile Include="ReportTools\ReportPageBreak.cs" />
     <Compile Include="ReportTools\ReportVerticalLine.cs" />
     <Compile Include="ReportTools\ResizeHandle.cs" />
+    <Compile Include="UpdateBuilder.xaml.cs">
+      <DependentUpon>UpdateBuilder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WhereBuilder.xaml.cs">
       <DependentUpon>WhereBuilder.xaml</DependentUpon>
     </Compile>
@@ -214,6 +217,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ReportSystemSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UpdateBuilder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

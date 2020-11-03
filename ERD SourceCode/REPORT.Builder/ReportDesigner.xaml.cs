@@ -184,9 +184,7 @@ namespace REPORT.Builder
 				repo.UpdateReportXML(reportXml);
 
 				repo.DisableReportXMLPrintFilters(this.ReportMaster.MasterReport_Id, this.ReportMaster.ReportXMLVersion);
-
-				List<ReportXMLPrintParameterModel> xxx = this.GetReportparameterFilters(reportXmlDocument);
-
+								
 				foreach (ReportXMLPrintParameterModel filter in this.GetReportparameterFilters(reportXmlDocument))
 				{
 					repo.UpdateReportXMLPrintParameter(filter);
@@ -331,6 +329,8 @@ namespace REPORT.Builder
 					canvas.UpdateReplacementColumn(this.uxReplacceColumn.WhereHeader);
 
 					canvas.UpdateInvokeReplaceModel(this.uxReplacceColumn.InvokeMethodSetup);
+
+					canvas.UpdateUpdateStatement(this.uxUpdate.UpdateStatement);
 				}
 
 				if (this.SelectedSectionGroupIndex > 0 && reportObject == null)
@@ -346,6 +346,10 @@ namespace REPORT.Builder
 					this.uxReplacceColumnCaption.Visibility = Visibility.Collapsed;
 
 					this.uxReplacceColumn.Visibility = Visibility.Collapsed;
+
+					this.uxUpdateCaption.Visibility = Visibility.Collapsed;
+
+					this.uxUpdate.Visibility = Visibility.Collapsed;
 
 					this.uxWhereBuilder.Visibility = Visibility.Visible;
 
@@ -367,6 +371,10 @@ namespace REPORT.Builder
 
 					this.uxReplacceColumn.Visibility = Visibility.Collapsed;
 
+					this.uxUpdateCaption.Visibility = Visibility.Collapsed;
+
+					this.uxUpdate.Visibility = Visibility.Collapsed;
+
 					this.uxWhereBuilder.Visibility = Visibility.Collapsed;
 
 					this.uxWhereBuilderCaption.Visibility = Visibility.Collapsed;
@@ -385,9 +393,13 @@ namespace REPORT.Builder
 
 						this.uxReplacceColumn.Visibility = Visibility.Visible;
 
-						this.uxReplacceColumn.Clear();
+						this.uxUpdateCaption.Visibility = Visibility.Visible;
+
+						this.uxUpdate.Visibility = Visibility.Visible;
 
 						ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == this.SelectedSectionIndex);
+
+						this.uxReplacceColumn.Clear();
 
 						this.uxReplacceColumn.SetValueColumns(canvas.ReportColumns);
 
@@ -396,12 +408,22 @@ namespace REPORT.Builder
 						this.uxReplacceColumn.InvokeMethodSetup = canvas.GetInvokeMethod(dataObject.ColumnModel.TableName, dataObject.ColumnModel.ColumnName);
 
 						this.uxReplacceColumn.RefreshCaptionWidth();
+
+						this.uxUpdate.Clear();
+
+						this.uxUpdate.SetValueColumns(canvas.ReportColumns);
+
+						this.uxUpdate.UpdateStatement = canvas.GetUpdateStatement(dataObject.ColumnModel.TableName, dataObject.ColumnModel.ColumnName);
 					}
 					else
 					{
 						this.uxReplacceColumnCaption.Visibility = Visibility.Collapsed;
 
 						this.uxReplacceColumn.Visibility = Visibility.Collapsed;
+
+						this.uxUpdateCaption.Visibility = Visibility.Collapsed;
+
+						this.uxUpdate.Visibility = Visibility.Collapsed;
 					}
 
 					this.uxPropertiesCaption.Visibility = Visibility.Visible;
@@ -1058,6 +1080,8 @@ namespace REPORT.Builder
 				canvas.UpdateReplacementColumn(this.uxReplacceColumn.WhereHeader);
 
 				canvas.UpdateInvokeReplaceModel(this.uxReplacceColumn.InvokeMethodSetup);
+
+				canvas.UpdateUpdateStatement(this.uxUpdate.UpdateStatement);
 			}
 
 			XDocument result = new XDocument();
@@ -1129,7 +1153,8 @@ namespace REPORT.Builder
 					MasterReport_Id = this.ReportMaster.MasterReport_Id,
 					FilterCaption = item.Attribute("PrintParameterCaption").Value,
 					DefaultValue = item.Attribute("PrintParameterDefaultValue").Value,
-					IsActive = true
+					IsActive = true,
+					IsRequired = item.Attribute("IsRequiredParameter").Value.TryToBool()
 				});
 			}
 

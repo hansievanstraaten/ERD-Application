@@ -455,7 +455,6 @@ namespace REPORT.Builder
 
 			resultBox.SelectedValue = selectedValue;
 		}
-
 		
 		#endregion
 

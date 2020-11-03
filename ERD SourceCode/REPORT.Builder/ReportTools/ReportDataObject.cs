@@ -18,6 +18,7 @@ namespace REPORT.Builder.ReportTools
 		private bool useInOrderBy;
 		private string printParameterDefaultValue;
 		private bool suppressIfNoData;
+		private bool isRequiredParameter;
 
 		public ReportDataObject()
 		{
@@ -38,6 +39,7 @@ namespace REPORT.Builder.ReportTools
 				result.Add(new XAttribute("ObjectTable", this.ColumnModel.TableName));
 				result.Add(new XAttribute("ObjectColumn", this.ColumnModel.ColumnName));
 				result.Add(new XAttribute("UseAsPrintParameter", this.UseAsPrintParameter));
+				result.Add(new XAttribute("IsRequiredParameter", this.IsRequiredParameter));
 				result.Add(new XAttribute("PrintParameterCaption", this.PrintParameterCaption));
 				result.Add(new XAttribute("PrintParameterDefaultValue", this.PrintParameterDefaultValue));
 				result.Add(new XAttribute("UseInOrderBy", this.UseInOrderBy));
@@ -78,7 +80,21 @@ namespace REPORT.Builder.ReportTools
 			}
 		}
 
-		[FieldInformation("Print Parameter Caption", Sort = 501)]
+		[FieldInformation("Is Parameter Required", Sort = 501)]
+		public bool IsRequiredParameter
+		{
+			get
+			{
+				return this.isRequiredParameter;
+			}
+
+			set
+			{
+				this.isRequiredParameter = value;
+			}
+		}
+
+		[FieldInformation("Print Parameter Caption", Sort = 502)]
 		public string PrintParameterCaption
 		{
 			get
@@ -92,7 +108,7 @@ namespace REPORT.Builder.ReportTools
 			}
 		}
 
-		[FieldInformation("Print Parameter Default", Sort = 502)]
+		[FieldInformation("Print Parameter Default", Sort = 503)]
 		public string PrintParameterDefaultValue
 		{
 			get
@@ -106,7 +122,7 @@ namespace REPORT.Builder.ReportTools
 			}
 		}
 
-		[FieldInformation("Use In Order By", Sort = 503)]
+		[FieldInformation("Use In Order By", Sort = 504)]
 		public bool UseInOrderBy
 		{
 			get
@@ -120,7 +136,7 @@ namespace REPORT.Builder.ReportTools
 			}
 		}
 
-		[FieldInformation("Is Suppressed", Sort = 504)]
+		[FieldInformation("Is Suppressed", Sort = 505)]
 		public bool Suppressed
 		{
 			get
@@ -143,7 +159,7 @@ namespace REPORT.Builder.ReportTools
 			}
 		}
 
-		[FieldInformation("Suppress if No Data", Sort = 505)]
+		[FieldInformation("Suppress if No Data", Sort = 506)]
 		public bool SuppressIfNoData
 		{
 			get

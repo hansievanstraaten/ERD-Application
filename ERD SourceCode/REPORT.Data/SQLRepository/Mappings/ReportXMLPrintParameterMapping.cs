@@ -18,6 +18,7 @@ namespace REPORT.Data.SQLRepository.Mappings
 			Property(colIsActive =>  colIsActive.IsActive).HasColumnName("IsActive");
 			Property(colFilterCaption =>  colFilterCaption.FilterCaption).HasColumnName("FilterCaption");
 			Property(colDefaultValue =>  colDefaultValue.DefaultValue).HasColumnName("DefaultValue");
+			Property(colIsRequired =>  colIsRequired.IsRequired).HasColumnName("IsRequired");
 
 		}
 	}

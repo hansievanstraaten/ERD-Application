@@ -89,7 +89,15 @@ namespace REPORT.Builder.Printing
 
             if (elementBottom > this.BottomOffset)
 			{
-                if (!this.TryTrimWrapedText(element, elementBottom, out textOverflow))
+                if (item.IsDataObject() && !this.TryTrimWrapedText(element, elementBottom, out textOverflow))
+                {
+                    this.Children.Remove(element);
+
+                    elementBottom = 0;
+
+                    return false;
+                }
+                else if (!item.IsDataObject())
                 {
                     this.Children.Remove(element);
 
@@ -118,6 +126,13 @@ namespace REPORT.Builder.Printing
 
             while (itemHeight > this.BottomOffset)
             {
+                if (trimLenght <= 0)
+                {
+                    textRemainder = string.Empty;
+
+                    return false;
+                }
+
                 remainder.Remove(trimLenght, trimCut);
 
                 element.SetPropertyValue("Text", remainder.ToString());
@@ -128,14 +143,7 @@ namespace REPORT.Builder.Printing
 
                 trimCut = Convert.ToInt32(itemHeight - this.BottomOffset);
 
-                trimLenght -= trimCut;
-
-                if (trimLenght <= 0)
-				{
-                    textRemainder = string.Empty;
-
-                    return false;
-				}
+                trimLenght -= trimCut <= 0 ? trimLenght : trimCut;
             }
 
             textRemainder = elementText.Replace(remainder.ToString(), string.Empty);

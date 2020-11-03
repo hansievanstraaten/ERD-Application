@@ -86,6 +86,13 @@ namespace REPORT.Builder.ReportComponents
                     invokeMehods.Add(method.ItemXml);
                 }
 
+                XElement updateStatements = new XElement("UpdateStatements");
+
+                foreach(UpdateStatementModel statement in this.SqlManager.UpdateStatementModels.Values)
+				{
+                    updateStatements.Add(statement.ItemXml);
+                }
+
                 result.Add(objectModels);
 
                 result.Add(parameterModels);
@@ -95,6 +102,8 @@ namespace REPORT.Builder.ReportComponents
                 result.Add(foreignGroupIndex);
 
                 result.Add(invokeMehods);
+
+                result.Add(updateStatements);
 
                 return result;
             }
@@ -140,6 +149,11 @@ namespace REPORT.Builder.ReportComponents
                 foreach (XElement item in value.Element("InvokeMethods").Elements())
                 {
                     this.SqlManager.UpdateInvokeReplaceModel(new ReportsInvokeReplaceModel { ItemXml = item });
+                }
+
+                foreach (XElement item in value.Element("UpdateStatements").Elements())
+                {
+                    this.SqlManager.UpdateUpdateStatement(new UpdateStatementModel { ItemXml = item });
                 }
 
                 this.SqlManager.AddWhereModels(paramatersList.ToArray());

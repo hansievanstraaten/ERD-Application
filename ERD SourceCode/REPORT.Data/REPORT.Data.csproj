@@ -133,6 +133,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbConfiguration.cs" />
+    <Compile Include="Migrations\202011032109069_ReportTablesMigration.cs" />
+    <Compile Include="Migrations\202011032109069_ReportTablesMigration.designer.cs">
+      <DependentUpon>202011032109069_ReportTablesMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202011032324072_DataSourceMigration.cs" />
+    <Compile Include="Migrations\202011032324072_DataSourceMigration.designer.cs">
+      <DependentUpon>202011032324072_DataSourceMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202011032325591_SystemTablesMigration.cs" />
+    <Compile Include="Migrations\202011032325591_SystemTablesMigration.designer.cs">
+      <DependentUpon>202011032325591_SystemTablesMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\DataSourceConfiguration.cs" />
     <Compile Include="Migrations\ReportTablesConfiguration.cs" />
     <Compile Include="Migrations\SystemTablesConfiguration.cs" />
@@ -141,6 +153,8 @@
     <Compile Include="Models\ReportSQLReplaceDetailModel.cs" />
     <Compile Include="Models\ReportSQLReplaceHeaderModel.cs" />
     <Compile Include="Models\ReportXMLPrintParameterModel.cs" />
+    <Compile Include="Models\UpdateStatementModel.cs" />
+    <Compile Include="Models\UpdateValueModel.cs" />
     <Compile Include="SQLRepository\Agrigates\Base\ReportCategoryBase.cs" />
     <Compile Include="SQLRepository\Agrigates\Base\ReportXMLPrintParameterBase.cs" />
     <Compile Include="SQLRepository\Agrigates\User\ReportCategory.cs" />
@@ -193,6 +207,15 @@
     <Compile Include="SQLRepository\Repositories\User\SystemTablesRepository.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\202011032109069_ReportTablesMigration.resx">
+      <DependentUpon>202011032109069_ReportTablesMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202011032324072_DataSourceMigration.resx">
+      <DependentUpon>202011032324072_DataSourceMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202011032325591_SystemTablesMigration.resx">
+      <DependentUpon>202011032325591_SystemTablesMigration.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
@@ -48,20 +49,25 @@ namespace REPORT.Builder.Printing
           XDocument xmlReport, 
           DatabaseModel connection, 
           ReportMaster reportMaster, 
-          List<ReportXMLPrintParameterModel> filtes)
+          List<ReportXMLPrintParameterModel> filters)
         {
+            if (filters.Count > 0 && filters.Any(p => p.IsRequired.IsTrue() && p.FilterValue.IsNullEmptyOrWhiteSpace()))
+			{
+                throw new ApplicationException("One or more required filters was not passed with a value. Report Print canceled.");
+			}
+
             if (this.repo == null)
             {
                 this.repo = new BuildReportRepository();
             }
 
-            if (filtes.Count == 0)
+            if (filters.Count == 0)
             {
                 this.tableFilters = new Dictionary<string, List<ReportXMLPrintParameterModel>>();
             }
             else
             {
-                this.tableFilters = filtes
+                this.tableFilters = filters
                     .GroupBy(g => g.TableName)
                     .ToDictionary(t => t.Key, c => c.ToList());
             }
@@ -74,8 +80,6 @@ namespace REPORT.Builder.Printing
                 .Where(ro => ro.IsDataObject() && ro.Attribute("UseInOrderBy").Value == "true")
                 .GroupBy(tn => tn.Attribute("ObjectTable").Value)
                 .ToDictionary(td => td.Key, td => td.ToArray());
-
-            //.FirstOrDefault(ro => ro.IsDataObject() && ro.Attribute("UseInOrderBy").Value == "true");
 
             Dictionary<string, string> orderByDictionary = new Dictionary<string, string>();
 
@@ -167,10 +171,12 @@ namespace REPORT.Builder.Printing
 
             this.repo.UpdateXmlPrinteCount(reportMaster.MasterReport_Id);
 
+            this.RunUpdateStements(xmlReport);
+
             return xmlReport;
         }
 
-        public XDocument GetReport(long masterreportId)
+        public XDocument GetReport(long masterreportId, List<ReportXMLPrintParameterModel> filters)
         {
             this.masterReport_Id = masterreportId;
 
@@ -180,9 +186,9 @@ namespace REPORT.Builder.Printing
 
             ReportMaster reportMaster = this.repo.GetReportMaster(this.masterReport_Id);
 
-            List<ReportXMLPrintParameterModel> filtes = this.repo.GetPrintparameters(this.masterReport_Id, this.repo.GetReportXMLVersion(this.masterReport_Id));
+            //List<ReportXMLPrintParameterModel> filtes = this.repo.GetPrintparameters(this.masterReport_Id, this.repo.GetReportXMLVersion(this.masterReport_Id));
 
-            return this.GetReport(result, null, reportMaster, filtes);
+            return this.GetReport(result, null, reportMaster, filters);
         }
 
         private void BuildReportData(XElement dataNode)
@@ -353,6 +359,11 @@ namespace REPORT.Builder.Printing
                 sqlManager.UpdateInvokeReplaceModel(new ReportsInvokeReplaceModel { ItemXml = item });
             }
 
+            foreach (XElement item in canvasXml.Element("UpdateStatements").Elements())
+            {
+                sqlManager.UpdateUpdateStatement(new UpdateStatementModel { ItemXml = item });
+            }
+
             this.indexSqlManager.Add(this.sectionIndex, sqlManager);
         }
 
@@ -379,10 +390,49 @@ namespace REPORT.Builder.Printing
                     continue;
 				}
 
-                column.Value = InvokeReplacement(columnKey, column.Value);
+                column.Add(new XAttribute("Value", column.Value));
 
+                column.Value = InvokeReplacement(columnKey, column.Value);
             }
 		}
+
+        private void RunUpdateStements(XDocument xmlReport)
+		{
+            foreach (CanvasSqlManager item in this.indexSqlManager.Values)
+            {
+                foreach (KeyValuePair<string, UpdateStatementModel> statement in item.UpdateStatementModels)
+                {
+                    List<string> updateColumns = null;
+
+                    string rawUpdateSql = item.SQLUpdates(statement.Value, out updateColumns);
+
+                    IEnumerable<XElement> values = xmlReport.Root.Descendants(statement.Value.TriggerTable);
+
+                    foreach (XElement row in values.Elements())
+                    {
+                        XElement valueElement = row.Element($"{statement.Value.TriggerColumn}_Value");
+
+                        if (valueElement == null)
+                        {   // Use the Value Attribute
+                            valueElement = row.Element($"{statement.Value.TriggerColumn}");
+                        }
+
+                        StringBuilder updateSql = new StringBuilder();
+
+                        updateSql.Append(rawUpdateSql);
+
+                        foreach (string column in updateColumns)
+                        {
+                            XElement columnItem = row.Element(column);
+
+                            updateSql.Replace($"[[{column}]]", columnItem.Value);
+                        }
+
+                        this.data.ExecuteNonQuery(updateSql.ToString());
+                    }
+                }
+            }
+        }
 
         private string InvokeReplacement(string columnKey, string columnValue)
 		{

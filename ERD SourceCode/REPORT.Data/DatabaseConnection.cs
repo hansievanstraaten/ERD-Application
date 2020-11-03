@@ -44,7 +44,9 @@ namespace REPORT.Data
         {
             get
             {
-                return this.connectionString.IsNullEmptyOrWhiteSpace() ? "OopsConnectionStrnigNotSet" : this.connectionString;
+                return this.connectionString.IsNullEmptyOrWhiteSpace() ?
+                    "Server=HO-PRG-005\\SQLEXPRESS;Database=ERD_Print;User ID=LocalUser;Password=LocalUser;Trusted_Connection=True" : 
+                    this.connectionString;
             }
 
             private set

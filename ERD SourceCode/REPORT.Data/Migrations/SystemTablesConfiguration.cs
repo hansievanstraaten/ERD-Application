@@ -12,7 +12,6 @@ namespace REPORT.Data.Migrations
 
 		protected override void Seed(SystemTablesContext context)
 		{
-			//base.Seed(context);
 		}
 	}
 }

@@ -25,6 +25,8 @@ namespace REPORT.Builder.ReportComponents
 
         private Dictionary<string, ReportsInvokeReplaceModel> invokeMethods = new Dictionary<string, ReportsInvokeReplaceModel>();
 
+        private Dictionary<string, UpdateStatementModel> updateStatements = new Dictionary<string, UpdateStatementModel>();
+
         internal CanvasSqlManager()
         {
             this.columnCountDictionary = new Dictionary<string, int>();
@@ -48,6 +50,11 @@ namespace REPORT.Builder.ReportComponents
                     this.orderByString);
             }
         }
+
+        internal string SQLUpdates(UpdateStatementModel updateStement, out List<string> columnValues)
+		{
+            return ObjectCreator.UpdateStatements(updateStement, out columnValues);			
+		}
 
         internal string TableName { get; private set; }
 
@@ -91,9 +98,17 @@ namespace REPORT.Builder.ReportComponents
 			}
 		}
 
+        internal Dictionary<string, UpdateStatementModel> UpdateStatementModels
+        {
+            get
+            {
+                return this.updateStatements;
+            }
+        }
+
         internal ReportSQLReplaceHeaderModel GetReplacementColumn(string tableName, string columnName)
 		{
-            string itemKey = $"[{tableName}].[{columnName}]";
+            string itemKey = this.BuildItemKey(tableName, columnName);
 
             if (this.replacementColumns.ContainsKey(itemKey))
 			{
@@ -107,9 +122,25 @@ namespace REPORT.Builder.ReportComponents
             };
 		}
 
+        internal UpdateStatementModel GetUpdateStatement(string tableName, string columnName)
+		{
+            string itemKey = this.BuildItemKey(tableName, columnName);
+
+            if (this.updateStatements.ContainsKey(itemKey))
+			{
+                return this.updateStatements[itemKey];
+			}
+
+            return new UpdateStatementModel
+            {
+                TriggerTable = tableName,
+                TriggerColumn = columnName
+            };
+        }
+
         internal void UpdateReplacementColumn(ReportSQLReplaceHeaderModel replacementValues)
         {
-            string itemKey = $"[{replacementValues.ReplaceTable}].[{replacementValues.ReplaceColumn}]";
+            string itemKey = this.BuildItemKey(replacementValues.ReplaceTable, replacementValues.ReplaceColumn);
 
             if (this.replacementColumns.ContainsKey(itemKey))
 			{
@@ -126,7 +157,7 @@ namespace REPORT.Builder.ReportComponents
 
         internal ReportsInvokeReplaceModel GetInvokeMethod(string tableName, string columnName)
 		{
-            string itemKey = $"[{tableName}].[{columnName}]";
+            string itemKey = this.BuildItemKey(tableName, columnName);
 
             if (this.invokeMethods.ContainsKey(itemKey))
 			{
@@ -147,7 +178,7 @@ namespace REPORT.Builder.ReportComponents
                 return;
 			}
 
-            string itemKey = $"[{invokeModel.TableName}].[{invokeModel.ColumnName}]";
+            string itemKey = this.BuildItemKey(invokeModel.TableName, invokeModel.ColumnName);
 
             if (this.invokeMethods.ContainsKey(itemKey))
 			{
@@ -160,6 +191,29 @@ namespace REPORT.Builder.ReportComponents
 			}
 
             this.invokeMethods.Add(itemKey, invokeModel);
+        }
+
+        internal void UpdateUpdateStatement(UpdateStatementModel updateStatement)
+		{
+            if (updateStatement == null)
+			{
+                return;
+			}
+
+            string itemKey = this.BuildItemKey(updateStatement.TriggerTable, updateStatement.TriggerColumn);
+
+            if (this.updateStatements.ContainsKey(itemKey))
+            {
+                this.updateStatements.Remove(itemKey);
+            }
+
+            if (updateStatement.Values.Count == 0
+                || updateStatement.WhereValus.Count == 0)
+			{
+                return;
+			}
+
+            this.updateStatements.Add(itemKey, updateStatement);
         }
 
         internal void AddFilterParameters(List<ReportXMLPrintParameterModel> filters)
@@ -276,5 +330,11 @@ namespace REPORT.Builder.ReportComponents
 
             this.columnCountDictionary.Add(columnName, lastColumnCount);
         }
+    
+        private string BuildItemKey(string tableName, string columnName)
+		{
+            return $"[{tableName}].[{columnName}]";
+        }
+    
     }
 }

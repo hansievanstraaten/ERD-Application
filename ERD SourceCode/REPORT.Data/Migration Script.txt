@@ -2,3 +2,11 @@
 Enable-Migrations -ProjectName REPORT.Data -ContextTypeName REPORT.Data.SQLRepository.DataContext.ReportsBuildContext -StartUpProjectName ERD.Viewer -Verbose
 Enable-Migrations -ProjectName REPORT.Data -ContextTypeName REPORT.Data.SQLRepository.DataContext.ReportTablesContext -StartUpProjectName ERD.Viewer -Verbose
 Enable-Migrations -ProjectName REPORT.Data -ContextTypeName REPORT.Data.SQLRepository.DataContext.SystemTablesContext -StartUpProjectName ERD.Viewer -Verbose
+
+add-migration -ConfigurationTypeName DataSourceConfiguration
+add-migration -ConfigurationTypeName ReportTablesConfiguration
+add-migration -ConfigurationTypeName SystemTablesConfiguration
+
+Update-Database -ConfigurationTypeName DataSourceConfiguration -target 202011032324072_DataSourceMigration
+Update-Database -ConfigurationTypeName ReportTablesConfiguration -target 202011032109069_ReportTablesMigration
+Update-Database -ConfigurationTypeName SystemTablesConfiguration -target 202011032325591_SystemTablesMigration

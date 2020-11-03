@@ -12,5 +12,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
             Dictionary<string, ReportSQLReplaceHeaderModel> replacementColumns,
             string orderByString);
 
+         string UpdateStatements(UpdateStatementModel updateStatements, out List<string> columnValues);
+
     }
 }

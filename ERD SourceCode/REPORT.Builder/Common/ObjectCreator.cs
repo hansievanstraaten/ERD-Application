@@ -116,5 +116,22 @@ namespace REPORT.Builder.Common
                     return sql.BuildSelectQuery(columns, whereParameterModel, reportFilters, replacementColumns, orderByString);
             }
         }
+
+        internal static string UpdateStatements(UpdateStatementModel updateStatements, out List<string> columnValues)
+		{
+            DatabaseTypeEnum buildType = Connections.Instance.DatabaseModel.DatabaseType;
+
+            IDataToSQL sql = null;
+
+            switch (buildType)
+            {
+                case DatabaseTypeEnum.SQL:
+                default:
+
+                    sql = new MsSQL();
+
+                    return sql.UpdateStatements(updateStatements, out columnValues);
+            }
+        }
     }
 }

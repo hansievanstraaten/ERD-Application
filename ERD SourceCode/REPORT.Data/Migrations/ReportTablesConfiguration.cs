@@ -7,7 +7,7 @@ namespace REPORT.Data.Migrations
 	{	
 		public ReportTablesConfiguration()
 		{
-			AutomaticMigrationsEnabled = true;
+			base.AutomaticMigrationsEnabled = true;			
 		}
 
 		protected override void Seed(ReportTablesContext context)

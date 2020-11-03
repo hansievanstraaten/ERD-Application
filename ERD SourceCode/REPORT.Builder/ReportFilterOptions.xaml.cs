@@ -97,6 +97,8 @@ namespace REPORT.Builder
 				this.uxParameters[x].HideHeader(true);
 
 				this.uxParameters[x, 0].Caption = item.FilterCaption;
+
+				this.uxParameters[x, 0].IsRequired = item.IsRequired.IsTrue();
 			}
 		}
 

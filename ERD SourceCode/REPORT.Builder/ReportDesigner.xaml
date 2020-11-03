@@ -76,6 +76,9 @@
                 <CommonControls:LableItem x:Name="uxReplacceColumnCaption"  Content="Replace Column Value With" FontWeight="ExtraBold" Visibility="Collapsed" />
                 <local:ReplaceBuilder x:Name="uxReplacceColumn" Visibility="Collapsed" />
 
+                <CommonControls:LableItem x:Name="uxUpdateCaption"  Content="Insert or Update on Print" FontWeight="ExtraBold" Visibility="Collapsed" />
+                <local:UpdateBuilder x:Name="uxUpdate" Visibility="Collapsed" />
+                
                 <CommonControls:LableItem x:Name="uxWhereBuilderCaption"  Content="Section Where Link" FontWeight="ExtraBold" Visibility="Collapsed" />
                 <local:WhereBuilder x:Name="uxWhereBuilder" Visibility="Collapsed" />
                 <CommonControls:LableItem x:Name="uxCanvasSqlCaption" Content="Canvas SQL" FontWeight="ExtraBold" Visibility="Collapsed" />

@@ -284,6 +284,11 @@ namespace REPORT.Builder.ReportComponents
             return this.SqlManager.GetReplacementColumn(tableName, columnName);
         }
 
+        public UpdateStatementModel GetUpdateStatement(string tableName, string columnName)
+		{
+            return this.SqlManager.GetUpdateStatement(tableName, columnName);
+		}
+
         public void UpdateReplacementColumn(ReportSQLReplaceHeaderModel replacementValues)
         {
             this.SqlManager.UpdateReplacementColumn(replacementValues);
@@ -298,6 +303,11 @@ namespace REPORT.Builder.ReportComponents
         {
             this.SqlManager.UpdateInvokeReplaceModel(invokeModel);
         }
+
+        public void UpdateUpdateStatement(UpdateStatementModel updateStatement)
+		{
+            this.SqlManager.UpdateUpdateStatement(updateStatement);
+		}
 
         public void RefreshPageStaticMarkers()
         {

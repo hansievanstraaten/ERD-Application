@@ -16,6 +16,7 @@ namespace REPORT.Data.Models
 		private string _FilterCaption;
 		private string _DefaultValue;
 		private string filterValue;
+		private bool? _IsRequired;
 
 		/// <summary>
 		/// <para>Report XML Version</para>
@@ -160,6 +161,17 @@ namespace REPORT.Data.Models
 			}
 		}
 
+		public bool? IsRequired
+		{
+			get
+			{
+				return this._IsRequired;
+			}
 
+			set
+			{
+				base.OnPropertyChanged("IsRequired", ref this._IsRequired, value);
+			}
+		}
 	}
 }

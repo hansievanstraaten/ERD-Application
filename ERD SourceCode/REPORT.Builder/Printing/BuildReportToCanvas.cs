@@ -8,6 +8,7 @@ using System.Linq;
 using System.Printing;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Markup;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
 
@@ -16,6 +17,8 @@ namespace REPORT.Builder.Printing
     public class BuildReportToCanvas
     {
         private bool isSingleTable = false;
+
+        private int tableRowIndex = 0;
 
         private int pageMarginTop;
 
@@ -107,14 +110,18 @@ namespace REPORT.Builder.Printing
                 {
                     foreach (XElement row in table.Elements())
                     {
-                        if (!isSingleTable)
+                        int rowIndex = this.tableRowIndex = table.Attribute("TableRowIndex").Value.ToInt32();
+
+                        if (!this.isSingleTable)
                         {
                             this.SetSectionHeader(0);
                         }
 
                         this.BuildReportData(row);
 
-                        if (this.dataSections.Count != 3)
+                        this.tableRowIndex = rowIndex;
+
+                        if (!this.isSingleTable)
                         {
                             this.SetSectionFooter(0);
                         }
@@ -330,13 +337,11 @@ namespace REPORT.Builder.Printing
 
             if (row.Elements().Any(e => e.HasElements))
             {
-                List<int> groupIndexes = new List<int>();
-
                 foreach (XElement childtable in row.Elements().Where(ch => ch.HasElements))
                 {
-                    int groupIndex = childtable.GetSectionGroupIndex();
+                    int rowIndex = this.tableRowIndex = childtable.Attribute("TableRowIndex").Value.ToInt32();
 
-                    groupIndexes.Add(groupIndex);
+                    int groupIndex = childtable.GetSectionGroupIndex();
 
                     this.SetSectionHeader(groupIndex);
 
@@ -344,14 +349,17 @@ namespace REPORT.Builder.Printing
                     {
                         this.BuildReportData(childRow);
                     }
-                
-                    for(int x = groupIndexes.Count; x > 0; --x)
-                    {
-                        this.SetSectionFooter(groupIndexes[x -1]);
-                    }
+
+                    this.tableRowIndex = rowIndex;
+
+                    this.SetSectionFooter(groupIndex);
                 }
             }
         }
+
+        //private string groupIndexElementString = "<ReportObject Top=\"0\" Left=\"0\" Foreground=\"#FF808080\" FontSize=\"12\" FontFamily=\"Segoe UI\"" +
+        //    " FontWeight=\"SemiBold\" TextAlignment=\"Left\" TextWrapping=\"NoWrap\" Width=\"NaN\" Height=\"NaN\" Background=\"#00FFFFFF\"" +
+        //    " Caption=\"Line Item\" ObjectType=\"ReportLabel\" />";
 
         private void AddObjectModels(XElement sectionElement, XElement row)
         {
@@ -364,6 +372,15 @@ namespace REPORT.Builder.Printing
             double lowestBottom = this.activeCanvas.TopOffset;
 
             bool isReset = false;
+
+            //// TEST CODE REMOVE
+            //XElement groupItem = XElement.Parse(this.groupIndexElementString);
+
+            //groupItem.Attribute("Caption").Value = $"SGI {sectionElement.GetSectionGroupIndex()}.{sectionElement.GetRowSectionIndex()}";
+
+            //this.AddObectModel(groupItem, lowestBottom, out isReset);
+
+            //isReset = false;
 
             foreach (XElement item in reportObjects)
             {
@@ -385,6 +402,21 @@ namespace REPORT.Builder.Printing
                     dataItem.Add(new XAttribute("Text", (dataValue == null ? "OOPS What a mess" : dataValue.Value)));
 
                     lowestBottom = this.AddObectModel(dataItem, lowestBottom, out isReset);
+                }
+                else if (item.IsSumObject())
+				{
+                    XElement rowValue = item.Elements().FirstOrDefault(e => e.Attribute("TableRowIndex").Value.ToInt32() == this.tableRowIndex);
+
+                    if (rowValue == null)
+                    {
+                        item.Attribute("Text").Value = "0";
+                    }
+                    else
+                    {
+                        item.Attribute("Text").Value = rowValue.Attribute("Value").Value;
+                    }
+
+                    lowestBottom = this.AddObectModel(item, lowestBottom, out isReset);
                 }
                 else
                 {

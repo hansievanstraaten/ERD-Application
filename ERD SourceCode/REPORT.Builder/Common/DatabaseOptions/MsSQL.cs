@@ -1,4 +1,5 @@
 ﻿using GeneralExtensions;
+using REPORT.Data.Common;
 using REPORT.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -161,17 +162,24 @@ namespace REPORT.Builder.Common.DatabaseOptions
                 {
                     string[] columnSplit = valueItem.UpdateValue.Split('.', StringSplitOptions.None);
 
-                    result.Append($"{valueItem.ColumnName} = '[[{columnSplit[1]}]]',");
+                    result.Append($"{valueItem.ColumnName} = '[[{columnSplit[1]}]]', ");
 
                     columnValues.Add(columnSplit[1]);
                 }
                 else
                 {
-                    result.Append($"{valueItem.ColumnName} = '{valueItem.UpdateValue}',");
+                    if (valueItem.UpdateValue == Constants.SqlGetDate)
+					{   // No Single Quates
+                        result.Append($"{valueItem.ColumnName} = {valueItem.UpdateValue}, ");
+                    }
+                    else
+					{
+                        result.Append($"{valueItem.ColumnName} = '{valueItem.UpdateValue}', ");
+					}
                 }
 			}
 
-            result.Remove(result.Length - 1, 1);
+            result.Remove(result.Length - 2, 2);
 
             result.AppendLine($"    WHERE {whereCaluse.ToString()}");
 
@@ -183,10 +191,10 @@ namespace REPORT.Builder.Common.DatabaseOptions
             
             foreach (UpdateValueModel valueItem in statement.Values)
             {
-                result.Append($"{valueItem.ColumnName},");
+                result.Append($"{valueItem.ColumnName}, ");
             }
 
-            result.Remove(result.Length - 1, 1);
+            result.Remove(result.Length - 2, 2);
 
             result.AppendLine(")");
 
@@ -198,17 +206,24 @@ namespace REPORT.Builder.Common.DatabaseOptions
                 {
                     string[] columnSplit = valueItem.UpdateValue.Split('.', StringSplitOptions.None);
 
-                    result.Append($"'[[{columnSplit[1]}]]',");
+                    result.Append($"'[[{columnSplit[1]}]]', ");
 
                     columnValues.Add(columnSplit[1]);
                 }
                 else
                 {
-                    result.Append($"'{valueItem.UpdateValue}',");
+                    if (valueItem.UpdateValue == Constants.SqlGetDate)
+                    {   // No Single Quates
+                        result.Append($"{valueItem.UpdateValue}, ");
+                    }
+                    else
+					{
+                        result.Append($"'{valueItem.UpdateValue}', ");
+					}
                 }
             }
 
-            result.Remove(result.Length - 1, 1);
+            result.Remove(result.Length - 2, 2);
 
             result.AppendLine(")");
 

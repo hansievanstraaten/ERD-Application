@@ -21,6 +21,8 @@ namespace REPORT.Builder.Printing
     {
         private int sectionIndex = 0;
 
+        private int tableRowIndex = 0;
+
         private long masterReport_Id;
 
         private BuildReportRepository repo;
@@ -120,6 +122,60 @@ namespace REPORT.Builder.Printing
 
             #endregion
 
+            foreach(XElement reportSum in xmlReport.Root.Descendants().Where(a => a.Attribute("ObjectType") != null
+                                                                               && a.Attribute("ObjectType").Value == "ReportSum"))
+            {
+                int parentSetionGroupIndex = reportSum.Attribute("ParentSectionGroupIndex").Value.ToInt32();
+
+                int sectionGroupIndex = reportSum.Attribute("SectionGroupIndex").Value.ToInt32();
+
+                string sumColumn = reportSum.Attribute("SumColumn").Value;
+
+                if (sumColumn.IsNullEmptyOrWhiteSpace())
+				{   // The user did not perfom a ful setup
+                    continue;
+				}
+
+                foreach(XElement tableRow in xmlReport.Root
+                    .Element("ReportData")
+                    .Descendants()
+                    .Where(pg => pg.Attribute("SectionGroupIndex") != null
+                                 && pg.Attribute("SectionGroupIndex").Value.ToInt32() == parentSetionGroupIndex))
+                {
+					IEnumerable<XElement> sumItems = parentSetionGroupIndex == sectionGroupIndex ?
+                        tableRow
+                        .Elements()
+                        .Elements()
+                        .Where(ln => ln.Name.LocalName == sumColumn)
+                        :
+                        tableRow
+                        .Descendants()
+                        .Where(ln => ln.Name.LocalName == sumColumn
+                                  && ln.Parent.Parent.Attribute("SectionGroupIndex") != null
+                                  && ln.Parent.Parent.Attribute("SectionGroupIndex").Value.ToInt32() == sectionGroupIndex);
+
+					decimal result = 0;
+
+                    if (sumItems.Count() != 0)
+                    {
+                        result = sumItems.Sum(si =>
+                        {
+                            decimal? innerResult = si.Value.TryToDecimal().Value;
+
+                            return innerResult.HasValue ? innerResult.Value : 0;
+                        });
+                    }
+
+                    XElement sumElemet = new XElement(sumColumn);
+
+                    sumElemet.Add(new XAttribute("Value", result));
+
+                    sumElemet.Add(new XAttribute("TableRowIndex", tableRow.Attribute("TableRowIndex").Value));
+
+                    reportSum.Add(sumElemet);
+                }
+			}
+
             #region PAGE OPTIONS
 
             if (reportMaster.FinalPage_Id.HasValue && reportMaster.FinalPage_Id.Value > 0)
@@ -186,8 +242,6 @@ namespace REPORT.Builder.Printing
 
             ReportMaster reportMaster = this.repo.GetReportMaster(this.masterReport_Id);
 
-            //List<ReportXMLPrintParameterModel> filtes = this.repo.GetPrintparameters(this.masterReport_Id, this.repo.GetReportXMLVersion(this.masterReport_Id));
-
             return this.GetReport(result, null, reportMaster, filters);
         }
 
@@ -213,6 +267,10 @@ namespace REPORT.Builder.Printing
             XElement sectionData = new XElement(sectionTableName);
 
             sectionData.Add(new XAttribute("SectionGroupIndex", this.SelectedSection.GetSectionGroupIndex()));
+
+            sectionData.Add(new XAttribute("TableRowIndex", this.tableRowIndex));
+
+            ++this.tableRowIndex;
 
             foreach (XElement row in data.Root.Elements())
             {

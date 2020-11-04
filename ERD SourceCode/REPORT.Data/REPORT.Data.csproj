@@ -132,18 +132,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Constants.cs" />
     <Compile Include="DbConfiguration.cs" />
-    <Compile Include="Migrations\202011032109069_ReportTablesMigration.cs" />
-    <Compile Include="Migrations\202011032109069_ReportTablesMigration.designer.cs">
-      <DependentUpon>202011032109069_ReportTablesMigration.cs</DependentUpon>
+    <Compile Include="Migrations\202011040719419_DataSourceMigration.cs" />
+    <Compile Include="Migrations\202011040719419_DataSourceMigration.designer.cs">
+      <DependentUpon>202011040719419_DataSourceMigration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202011032324072_DataSourceMigration.cs" />
-    <Compile Include="Migrations\202011032324072_DataSourceMigration.designer.cs">
-      <DependentUpon>202011032324072_DataSourceMigration.cs</DependentUpon>
+    <Compile Include="Migrations\202011040720223_ReportTablesMigration.cs" />
+    <Compile Include="Migrations\202011040720223_ReportTablesMigration.designer.cs">
+      <DependentUpon>202011040720223_ReportTablesMigration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202011032325591_SystemTablesMigration.cs" />
-    <Compile Include="Migrations\202011032325591_SystemTablesMigration.designer.cs">
-      <DependentUpon>202011032325591_SystemTablesMigration.cs</DependentUpon>
+    <Compile Include="Migrations\202011040720582_SystemTablesMigration.cs" />
+    <Compile Include="Migrations\202011040720582_SystemTablesMigration.designer.cs">
+      <DependentUpon>202011040720582_SystemTablesMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\DataSourceConfiguration.cs" />
     <Compile Include="Migrations\ReportTablesConfiguration.cs" />
@@ -207,14 +208,14 @@
     <Compile Include="SQLRepository\Repositories\User\SystemTablesRepository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202011032109069_ReportTablesMigration.resx">
-      <DependentUpon>202011032109069_ReportTablesMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202011040719419_DataSourceMigration.resx">
+      <DependentUpon>202011040719419_DataSourceMigration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202011032324072_DataSourceMigration.resx">
-      <DependentUpon>202011032324072_DataSourceMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202011040720223_ReportTablesMigration.resx">
+      <DependentUpon>202011040720223_ReportTablesMigration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202011032325591_SystemTablesMigration.resx">
-      <DependentUpon>202011032325591_SystemTablesMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202011040720582_SystemTablesMigration.resx">
+      <DependentUpon>202011040720582_SystemTablesMigration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -261,6 +262,7 @@
   <ItemGroup>
     <Content Include="Migration Script.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

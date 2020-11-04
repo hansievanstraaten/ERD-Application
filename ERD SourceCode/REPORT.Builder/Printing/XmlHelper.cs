@@ -15,6 +15,11 @@ namespace REPORT.Builder.Printing
             return reportObject.Attribute("ObjectType").Value == "ReportDataObject";
         }
 
+        internal static bool IsSumObject(this XElement reportObject)
+        {
+            return reportObject.Attribute("ObjectType").Value == "ReportSum";
+        }
+
         internal static bool IsEmptyDataSuppressed(this XElement reportObject)
 		{
             return reportObject.Attribute("SuppressIfNoData").Value.ToBool();

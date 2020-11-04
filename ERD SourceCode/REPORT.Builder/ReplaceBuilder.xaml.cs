@@ -1,20 +1,20 @@
 ﻿using ERD.Common;
 using GeneralExtensions;
-using REPORT.Builder.Constants;
+using Microsoft.Win32;
+using REPORT.Data.Common;
 using REPORT.Data.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
-using WPF.Tools.BaseClasses;
-using WPF.Tools.ToolModels;
-using WPF.Tools.Exstention;
-using WPF.Tools.CommonControls;
 using System.ComponentModel;
-using Microsoft.Win32;
+using System.Linq;
 using System.Reflection;
-using ViSo.Dialogs.Input;
+using System.Windows;
 using System.Windows.Controls;
+using ViSo.Dialogs.Input;
+using WPF.Tools.BaseClasses;
+using WPF.Tools.CommonControls;
+using WPF.Tools.Exstention;
+using WPF.Tools.ToolModels;
 
 namespace REPORT.Builder
 {
@@ -49,7 +49,7 @@ namespace REPORT.Builder
 		{
 			this.InitializeComponent();
 
-			this.uxFromTable.Items.Add(new DataItemModel { DisplayValue = ReportConstants.None, ItemKey = ReportConstants.None });
+			this.uxFromTable.Items.Add(new DataItemModel { DisplayValue = Constants.None, ItemKey = Constants.None });
 
 			this.uxOptionType.Items.Add(new DataItemModel { DisplayValue = this.fromTable, ItemKey = this.fromTable });
 
@@ -106,7 +106,7 @@ namespace REPORT.Builder
 
 		public void Clear()
 		{
-			this.uxFromTable.SelectedValue = ReportConstants.None;
+			this.uxFromTable.SelectedValue = Constants.None;
 
 			if (this.InvokeMethodSetup != null)
 			{
@@ -132,7 +132,7 @@ namespace REPORT.Builder
 
 				foreach (ReplaceWhere item in this.replaceWheres)
 				{
-					if (item.WhereOption == ReportConstants.None)
+					if (item.WhereOption == Constants.None)
 					{
 						continue;
 					}
@@ -154,7 +154,7 @@ namespace REPORT.Builder
 
 				this.ReplaceColumn = value.ReplaceColumn;
 
-				if (value.UseTable.IsNullEmptyOrWhiteSpace() || value.UseTable == ReportConstants.None)
+				if (value.UseTable.IsNullEmptyOrWhiteSpace() || value.UseTable == Constants.None)
 				{
 					return;
 				}
@@ -275,7 +275,7 @@ namespace REPORT.Builder
 
 				DataItemModel fromTable = this.uxFromTable.SelectedItem.To<DataItemModel>();
 
-				this.whereOptions.Add(new DataItemModel { DisplayValue = ReportConstants.None, ItemKey = ReportConstants.None });
+				this.whereOptions.Add(new DataItemModel { DisplayValue = Constants.None, ItemKey = Constants.None });
 
 				foreach (DataItemModel tableColumn in Integrity.GetColumnsForTable(fromTable.DisplayValue).OrderBy(t => t.DisplayValue))
 				{
@@ -288,7 +288,7 @@ namespace REPORT.Builder
 					this.whereOptions.Add(optionColumn);
 				}
 
-				if (this.uxFromTable.SelectedValue.ParseToString() != ReportConstants.None)
+				if (this.uxFromTable.SelectedValue.ParseToString() != Constants.None)
 				{
 					this.AddReplaceWhere();
 				}
@@ -304,9 +304,9 @@ namespace REPORT.Builder
 			try
 			{
 				if (this.uxSelectColumnsStack.Children[this.uxSelectColumnsStack.Children.Count - 1]
-					.To<ComboBoxTool>().SelectedValue.ParseToString() != ReportConstants.None)
+					.To<ComboBoxTool>().SelectedValue.ParseToString() != Constants.None)
 				{
-					this.AddSelectFromColumnOption(ReportConstants.None, this.uxSelectColumnsStack.Children.Count);
+					this.AddSelectFromColumnOption(Constants.None, this.uxSelectColumnsStack.Children.Count);
 				}
 			}
 			catch (Exception err)
@@ -320,7 +320,7 @@ namespace REPORT.Builder
 			try
 			{
 				if (index != (this.uxWhereOptions.Children.Count - 1)
-					&& selectedValue == ReportConstants.None)
+					&& selectedValue == Constants.None)
 				{
 					int endCount = this.uxWhereOptions.Children.Count;
 
@@ -336,7 +336,7 @@ namespace REPORT.Builder
 					return;
 				}
 				else if (index == (this.uxWhereOptions.Children.Count - 1)
-					&& selectedValue != ReportConstants.None)
+					&& selectedValue != Constants.None)
 				{
 					this.AddReplaceWhere();
 				}
@@ -436,7 +436,7 @@ namespace REPORT.Builder
 
 			if (!haveChild)
 			{
-				resultBox.Items.Add(new DataItemModel { DisplayValue = ReportConstants.None, ItemKey = ReportConstants.None });
+				resultBox.Items.Add(new DataItemModel { DisplayValue = Constants.None, ItemKey = Constants.None });
 
 				foreach (DataItemModel tableColumn in Integrity.GetColumnsForTable(fromTable.DisplayValue).OrderBy(t => t.DisplayValue))
 				{

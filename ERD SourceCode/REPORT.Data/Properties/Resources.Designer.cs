@@ -59,29 +59,5 @@ namespace REPORT.Data.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SET ANSI_NULLS ON
-        ///
-        ///SET QUOTED_IDENTIFIER ON
-        ///
-        ///IF NOT EXISTS (SELECT 1
-        ///                 FROM INFORMATION_SCHEMA.TABLES
-        ///                WHERE TABLE_NAME = &apos;DataSourceMaster&apos;)
-        ///BEGIN
-        ///    CREATE TABLE [DataSourceMaster]
-        ///         ( 
-        ///           [MasterReport_Id] [BigInt]  NOT NULL,
-        ///           [MainTableName] [VarChar] (255) NOT NULL,
-        ///    CONSTRAINT [PK_DataSourceMaster] PRIMARY KEY CLUSTERED
-        ///    (
-        ///        [MasterReport_Id] ASC
-        ///    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string ERD_Print {
-            get {
-                return ResourceManager.GetString("ERD_Print", resourceCulture);
-            }
-        }
     }
 }

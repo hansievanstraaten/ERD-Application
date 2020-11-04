@@ -89,6 +89,14 @@ namespace REPORT.Builder.Common
 
                     return pageBreak as UIElement;
 
+                case "ReportSum":
+
+                    ReportSum reportSum = new ReportSum();
+
+                    reportSum.ItemXml = xmlObject;
+
+                    return reportSum as UIElement;
+
                 default:
 
                     return new ReportLabel() as UIElement;

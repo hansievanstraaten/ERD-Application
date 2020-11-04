@@ -1,6 +1,6 @@
 ﻿using ERD.Common;
 using GeneralExtensions;
-using REPORT.Builder.Constants;
+using REPORT.Data.Common;
 using REPORT.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -11,10 +11,10 @@ using WPF.Tools.ToolModels;
 
 namespace REPORT.Builder
 {
-    /// <summary>
-    /// Interaction logic for UpdateBuilder.xaml
-    /// </summary>
-    public partial class UpdateBuilder : UserControlBase
+	/// <summary>
+	/// Interaction logic for UpdateBuilder.xaml
+	/// </summary>
+	public partial class UpdateBuilder : UserControlBase
     {
 		private UpdateStatementModel updateStatement;
 
@@ -30,7 +30,7 @@ namespace REPORT.Builder
         {
             this.InitializeComponent();
 
-            this.uxTableName.Items.Add(new DataItemModel { DisplayValue = ReportConstants.None, ItemKey = ReportConstants.None });
+            this.uxTableName.Items.Add(new DataItemModel { DisplayValue = Constants.None, ItemKey = Constants.None });
 
             foreach (DataItemModel systemTable in Integrity.GetSystemTables().OrderBy(t => t.DisplayValue))
             {
@@ -42,7 +42,10 @@ namespace REPORT.Builder
 		{
             get
 			{
-                this.updateStatement.UpdateTableName = this.uxTableName.SelectedValue.ParseToString();
+                if (this.updateStatement == null)
+				{
+                    this.updateStatement = new UpdateStatementModel();
+				}
 
                 this.updateStatement.Values.Clear();
 
@@ -54,7 +57,7 @@ namespace REPORT.Builder
 
                 foreach (ReplaceWhere item in this.selectedValueOptions)
 				{
-                    if (item.WhereOption == ReportConstants.None)
+                    if (item.WhereOption == Constants.None)
 					{
                         continue;
 					}
@@ -63,7 +66,9 @@ namespace REPORT.Builder
                     { 
                          ColumnName = item.WhereOption,
                          UpdateValue = item.WhereValue,
-                         IsDatabaseValue = this.valueOptionColumns.Any(a => a.DisplayValue == item.WhereValue),
+                         IsDatabaseValue = this.valueOptionColumns
+                            .Any(a => a.DisplayValue != Constants.SqlGetDate 
+                                   && a.DisplayValue == item.WhereValue),
                          ItemIndex = itemIndex
                     });
 
@@ -74,7 +79,7 @@ namespace REPORT.Builder
 
                 foreach (ReplaceWhere item in this.selectedWhereOptions)
                 {
-                    if (item.WhereOption == ReportConstants.None)
+                    if (item.WhereOption == Constants.None)
                     {
                         continue;
                     }
@@ -83,7 +88,9 @@ namespace REPORT.Builder
                     {
                         ColumnName = item.WhereOption,
                         UpdateValue = item.WhereValue,
-                        IsDatabaseValue = this.valueOptionColumns.Any(a => a.DisplayValue == item.WhereValue),
+                        IsDatabaseValue = this.valueOptionColumns
+                            .Any(a => a.DisplayValue != Constants.SqlGetDate
+                                   && a.DisplayValue == item.WhereValue),
                         ItemIndex = itemIndex
                     });
 
@@ -96,6 +103,11 @@ namespace REPORT.Builder
             set
 			{
                 this.updateStatement = value;
+
+                if (value.UpdateTableName == this.uxTableName.SelectedValue.ParseToString())
+				{   // Need to reset if the user selected the same object
+                    this.uxTableName.SelectedValue = Constants.None;
+                }
 
                 this.uxTableName.SelectedValue = value.UpdateTableName;
 
@@ -138,6 +150,8 @@ namespace REPORT.Builder
         {
             this.valueOptionColumns.Clear();
 
+            this.valueOptionColumns.Add(new DataItemModel { DisplayValue = Constants.SqlGetDate, ItemKey = Constants.SqlGetDate });
+
             DataItemModel[] columns = reportColumns
                 .Select(c => new DataItemModel { DisplayValue = $"{c.TableName}.{c.ColumnName}", ItemKey = $"{c.TableName}.{c.ColumnName}" })
                 .ToArray();
@@ -151,7 +165,7 @@ namespace REPORT.Builder
 			{
                 this.Clear();
 
-                if (this.uxTableName.SelectedValue.ParseToString() == ReportConstants.None)
+                if (this.uxTableName.SelectedValue.ParseToString() == Constants.None)
 				{
                     return;
 				}
@@ -174,7 +188,7 @@ namespace REPORT.Builder
             try
             {
                 if (index != (this.uxValues.Children.Count - 1)
-                    && selectedValue == ReportConstants.None)
+                    && selectedValue == Constants.None)
                 {
                     int endCount = this.uxValues.Children.Count;
 
@@ -190,7 +204,7 @@ namespace REPORT.Builder
                     return;
                 }
                 else if (index == (this.uxValues.Children.Count - 1)
-                    && selectedValue != ReportConstants.None)
+                    && selectedValue != Constants.None)
                 {
                     this.AddVauesItem();
                 }
@@ -207,7 +221,7 @@ namespace REPORT.Builder
             try
             {
                 if (index != (this.uxWhere.Children.Count - 1)
-                    && selectedValue == ReportConstants.None)
+                    && selectedValue == Constants.None)
                 {
                     int endCount = this.uxWhere.Children.Count;
 
@@ -223,7 +237,7 @@ namespace REPORT.Builder
                     return;
                 }
                 else if (index == (this.uxWhere.Children.Count - 1)
-                    && selectedValue != ReportConstants.None)
+                    && selectedValue != Constants.None)
                 {
                     this.AddWhereItem();
                 }
@@ -246,7 +260,7 @@ namespace REPORT.Builder
                 return;
 			}
 
-            this.valueSelectColumns.Add(new DataItemModel { DisplayValue = ReportConstants.None, ItemKey = ReportConstants.None });
+            this.valueSelectColumns.Add(new DataItemModel { DisplayValue = Constants.None, ItemKey = Constants.None });
 
             foreach (DataItemModel tableColumn in Integrity.GetColumnsForTable(fromTable.DisplayValue).OrderBy(t => t.DisplayValue))
             {

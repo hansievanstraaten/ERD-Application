@@ -1,5 +1,6 @@
 ﻿using GeneralExtensions;
 using REPORT.Data;
+using REPORT.Data.Common;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -28,7 +29,7 @@ namespace REPORT.Builder
                 return;
             }
 
-            this.ReportFileName = Path.Combine(projectFileDirectory, Constants.ReportConstants.ReportSetupFileName);
+            this.ReportFileName = Path.Combine(projectFileDirectory, Constants.ReportSetupFileName);
 
             DbConfiguration.Instance.Initialize(this.ReportFileName);
 

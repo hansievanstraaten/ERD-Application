@@ -77,7 +77,6 @@
     <Compile Include="Common\DatabaseOptions\IDataToSQL.cs" />
     <Compile Include="Common\DatabaseOptions\MsSQL.cs" />
     <Compile Include="Common\ObjectCreator.cs" />
-    <Compile Include="Constants\ReportConstants.cs" />
     <Compile Include="DatasourceSelector.xaml.cs">
       <DependentUpon>DatasourceSelector.xaml</DependentUpon>
     </Compile>
@@ -145,6 +144,7 @@
     <Compile Include="ReportTools\ReportLabel.cs" />
     <Compile Include="ReportTools\ReportLineBase.cs" />
     <Compile Include="ReportTools\ReportPageBreak.cs" />
+    <Compile Include="ReportTools\ReportSum.cs" />
     <Compile Include="ReportTools\ReportVerticalLine.cs" />
     <Compile Include="ReportTools\ResizeHandle.cs" />
     <Compile Include="UpdateBuilder.xaml.cs">

@@ -1,9 +1,9 @@
 ﻿using GeneralExtensions;
+using REPORT.Data.Common;
 using System.Collections.Generic;
+using System.Linq;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.ToolModels;
-using System.Linq;
-using REPORT.Builder.Constants;
 
 namespace REPORT.Builder
 {
@@ -30,7 +30,7 @@ namespace REPORT.Builder
 			get
 			{
 				return this.columnslIst.Any(a => 
-				a.DisplayValue != ReportConstants.None
+				a.DisplayValue != Constants.None
 				&& a.DisplayValue == this.WhereValue);
 			}
 		}
@@ -70,7 +70,7 @@ namespace REPORT.Builder
 				this.uxSelectedColumn.Items.Add(column);
 			}
 
-			this.uxSelectedColumn.SelectedValue = ReportConstants.None;
+			this.uxSelectedColumn.SelectedValue = Constants.None;
 		}
 
 		public void SetValueColumns(List<DataItemModel> columns)
@@ -86,7 +86,7 @@ namespace REPORT.Builder
 				this.uxWhereValue.Items.Add(column);
 			}
 
-			this.uxWhereValue.SelectedValue = ReportConstants.None;
+			this.uxWhereValue.SelectedValue = Constants.None;
 		}
 
 		private void SelectedColumn_Changed(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

@@ -1,5 +1,6 @@
 ﻿using GeneralExtensions;
 using REPORT.Data;
+using REPORT.Data.Common;
 using System;
 using System.IO;
 using System.Windows;
@@ -25,7 +26,7 @@ namespace REPORT.Builder
         {
             this.InitializeComponent();
 
-            this.ReportFileName = Path.Combine(projectFileDirectory, Constants.ReportConstants.ReportSetupFileName);
+            this.ReportFileName = Path.Combine(projectFileDirectory, Constants.ReportSetupFileName);
 
             this.InitializeTabs();
         }

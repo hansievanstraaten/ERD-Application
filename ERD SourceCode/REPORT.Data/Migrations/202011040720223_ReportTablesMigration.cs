@@ -1,4 +1,4 @@
-﻿namespace REPORT.Data.Migrations
+﻿namespace REPORT.Data.Migrations.ReportTablesConfig
 {
     using System;
     using System.Data.Entity.Migrations;

@@ -8,6 +8,10 @@ namespace REPORT.Data.Migrations
 		public SystemTablesConfiguration()
 		{
 			AutomaticMigrationsEnabled = true;
+
+			AutomaticMigrationDataLossAllowed = false;
+			MigrationsNamespace = "REPORT.Data.Migrations.SystemTablesConfig";
+			ContextKey = "SystemTablesConfiguration";
 		}
 
 		protected override void Seed(SystemTablesContext context)

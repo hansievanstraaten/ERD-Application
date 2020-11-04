@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using REPORT.Builder.Printing;
 using REPORT.Builder.ReportComponents;
 using REPORT.Builder.ReportTools;
+using REPORT.Data.Common;
 using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
@@ -24,6 +25,7 @@ using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.ColoutPicker;
 using WPF.Tools.Exstention;
+using WPF.Tools.ModelViewer;
 using WPF.Tools.ToolModels;
 
 namespace REPORT.Builder
@@ -36,6 +38,8 @@ namespace REPORT.Builder
 		#region FIELDS
 
 		private bool isDataObject;
+
+		private bool IsReportSum;
 
 		private readonly ReportTypeEnum reportDesignType;
 
@@ -184,7 +188,7 @@ namespace REPORT.Builder
 				repo.UpdateReportXML(reportXml);
 
 				repo.DisableReportXMLPrintFilters(this.ReportMaster.MasterReport_Id, this.ReportMaster.ReportXMLVersion);
-								
+
 				foreach (ReportXMLPrintParameterModel filter in this.GetReportparameterFilters(reportXmlDocument))
 				{
 					repo.UpdateReportXMLPrintParameter(filter);
@@ -320,10 +324,14 @@ namespace REPORT.Builder
 
 				this.SelectedSectionIndex = sender.GetPropertyValue("SectionIndex").ToInt32();
 
-				this.isDataObject = (reportObject != null && reportObject.GetType() == typeof(ReportDataObject));
+				Type objectType = reportObject == null ? null : reportObject.GetType();
 
-				if (this.selectedReportObject != null && isDataObject)
+				this.isDataObject = (reportObject != null && objectType == typeof(ReportDataObject));
+
+				if (this.selectedReportObject != null && this.isDataObject)
 				{
+					var xxx = this.selectedReportObject.GetPropertyValue("Text");
+
 					ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == this.SelectedSectionIndex);
 
 					canvas.UpdateReplacementColumn(this.uxReplacceColumn.WhereHeader);
@@ -331,6 +339,20 @@ namespace REPORT.Builder
 					canvas.UpdateInvokeReplaceModel(this.uxReplacceColumn.InvokeMethodSetup);
 
 					canvas.UpdateUpdateStatement(this.uxUpdate.UpdateStatement);
+				}
+
+				if (this.selectedReportObject != null && this.IsReportSum)
+				{
+					ReportSum item = this.selectedReportObject.To<ReportSum>();
+
+					item.DataSectionIndexChanged -= this.ReportSumDataSectionIndex_Changed;
+				}
+				
+				this.IsReportSum = (reportObject != null && objectType == typeof(ReportSum));
+
+				if (reportObject != null && this.IsReportSum)
+				{
+					this.SetSumDataSections(reportObject);
 				}
 
 				if (this.SelectedSectionGroupIndex > 0 && reportObject == null)
@@ -385,7 +407,7 @@ namespace REPORT.Builder
 				}
 				else if (reportObject != null)
 				{
-					if (isDataObject)
+					if (this.isDataObject)
 					{
 						ReportDataObject dataObject = reportObject.To<ReportDataObject>();
 
@@ -836,6 +858,47 @@ namespace REPORT.Builder
 			}
 		}
 
+		private void ReportSumDataSectionIndex_Changed(object sender, Guid elemntId, int sectionIndex)
+		{
+			try
+			{
+				ModelViewItem viewerItem = this.uxProperties["Sum Column"];
+
+				if (viewerItem == null)
+				{
+					return;
+				}
+
+				ReportSum item = sender.To<ReportSum>();
+
+				ReportSection canvas = this.dataReportSections.FirstOrDefault(i => i.SectionIndex == sectionIndex
+																			    && i.SectionType == SectionTypeEnum.TableData);
+
+				viewerItem.SetComboBoxItems(new DataItemModel[] { });
+
+				item.SumColumnValues = new DataItemModel[] { };
+				
+				if (canvas == null )
+				{   // ToDo Clear columns
+					return;
+				}
+
+				item.SectionGroupIndex = canvas.SectionGroupIndex;
+
+				DataItemModel[] columnItems = canvas.ReportColumns
+					.Select(rc => new DataItemModel { DisplayValue = rc.ColumnName, ItemKey = rc.ColumnName })
+					.ToArray();
+
+				item.SumColumnValues = columnItems;
+
+				viewerItem.SetComboBoxItems(columnItems);
+			}
+			catch (Exception err)
+			{
+				MessageBox.Show(err.InnerExceptionMessage());
+			}
+		}
+
 		#endregion
 
 		#region PRIVATE PROPERTIES
@@ -863,6 +926,41 @@ namespace REPORT.Builder
 		#endregion
 
 		#region PRIVATE METHODS
+
+		private void SetSumDataSections(object reportObject)
+		{
+			ReportSum item = reportObject.To<ReportSum>();
+
+			List<DataItemModel> result = new List<DataItemModel>();
+
+			result.Add(new DataItemModel { DisplayValue = Constants.None, ItemKey = -1 });
+
+			foreach (ReportSection canvas in this.dataReportSections.Where(d => d.SectionType == SectionTypeEnum.TableData))
+			{
+				result.Add(new DataItemModel { DisplayValue = canvas.SectionTitle, ItemKey = canvas.SectionIndex });
+			}
+
+			item.DataSections = result.ToArray();
+
+			item.ParentSectionGroupIndex = this.SelectedSectionGroupIndex;
+
+			item.DataSectionIndexChanged += this.ReportSumDataSectionIndex_Changed;
+
+			ReportSection sectionCanvas = this.dataReportSections.FirstOrDefault(i => i.SectionIndex == item.SectionIndex
+																				&& i.SectionType == SectionTypeEnum.TableData);
+
+			if (sectionCanvas == null)
+			{
+				return;
+			}
+
+			DataItemModel[] columnItems = sectionCanvas.ReportColumns
+					.Select(rc => new DataItemModel { DisplayValue = rc.ColumnName, ItemKey = rc.ColumnName })
+					.ToArray();
+
+
+			item.SumColumnValues = columnItems;
+		}
 
 		private void InitializeReportSections()
 		{
@@ -952,6 +1050,8 @@ namespace REPORT.Builder
 			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Vertical Line", ToolType = typeof(ReportVerticalLine) });
 
 			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Page Break", ToolType = typeof(ReportPageBreak) });
+
+			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Report Sum", ToolType = typeof(ReportSum) });
 		}
 
 		private void RefreshMarginMarkers()
@@ -1073,7 +1173,7 @@ namespace REPORT.Builder
 
 		private XDocument GetReportXml()
 		{
-			if (this.selectedReportObject != null && isDataObject)
+			if (this.selectedReportObject != null && this.isDataObject)
 			{
 				ReportSection canvas = this.dataReportSections.FirstOrDefault(d => d.SectionIndex == this.SelectedSectionIndex);
 

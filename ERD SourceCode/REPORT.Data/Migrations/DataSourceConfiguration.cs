@@ -9,6 +9,10 @@ namespace REPORT.Data.Migrations
         public DataSourceConfiguration()
         {
             AutomaticMigrationsEnabled = true;
+
+            AutomaticMigrationDataLossAllowed = false;
+            MigrationsNamespace = "REPORT.Data.Migrations.DataSourceConfig";
+            ContextKey = "DataSourceConfiguration";
         }
 
         protected override void Seed(DataSourceContext context)

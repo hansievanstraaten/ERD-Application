@@ -1,4 +1,5 @@
-﻿<src:UserControlBase xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools" 
+﻿<src:UserControlBase xmlns:Specialized="clr-namespace:WPF.Tools.Specialized;assembly=WPF.Tools"  
+                     xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools" 
                      xmlns:ModelViewer="clr-namespace:WPF.Tools.ModelViewer;assembly=WPF.Tools"  
                      x:Class="REPORT.Builder.DatasourceSelector"
                      xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
@@ -13,6 +14,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -22,11 +24,9 @@
         
         <ModelViewer:ModelViewer Grid.Row="0" Grid.Column="0" x:Name="uxMainTable" />
 
-        <!--<ScrollViewer Grid.Row="1" Grid.Column="0">
-            <CommonControls:ViSoTreeView x:Name="uxOtherTables" />            
-        </ScrollViewer>-->
-
-        <CommonControls:ViSoTreeView Grid.Row="1" Grid.Column="0" x:Name="uxOtherTables" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+        <Specialized:WatermarkTextBox Grid.Row="1" Grid.Column="0" x:Name="uxSearch" WatermarkText="Search" PreviewKeyUp="Search_PreviewKeyUp" />
+        
+        <CommonControls:ViSoTreeView Grid.Row="2" Grid.Column="0" x:Name="uxOtherTables" ScrollViewer.VerticalScrollBarVisibility="Auto" />
         
     </Grid>
 </src:UserControlBase>

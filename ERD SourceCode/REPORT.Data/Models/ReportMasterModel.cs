@@ -34,6 +34,7 @@ namespace REPORT.Data.Models
         private string _DescriptionText;
         private int _ReportXMLVersion;
 		private Int64? _CategoryId;
+		private bool isActiveVersion;
 
 
 		/// <summary>
@@ -151,6 +152,8 @@ namespace REPORT.Data.Models
 		}
 
 		[FieldInformation("Report Version", IsRequired = true, Sort = 4)]
+		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: true)]
+		[ValuesSource("ReportXMLVersions")]
 		public int ReportXMLVersion
 		{
 			get
@@ -162,8 +165,23 @@ namespace REPORT.Data.Models
 			{
 				this._ReportXMLVersion = value;
 
-				base.OnPropertyChanged("ReportXMLVersion", ref this._ReportXMLVersion, value);
+				base.OnPropertyChanged("ReportXMLVersion");
+			}
+		}
 
+		[FieldInformation("Is Active Version", Sort = 5)]
+		public bool IsActiveVesion
+		{
+			get
+			{
+				return this.isActiveVersion;
+			}
+
+			set
+			{
+				this.isActiveVersion = value;
+
+				base.OnPropertyChanged("IsActiveVesion");
 			}
 		}
 
@@ -171,7 +189,7 @@ namespace REPORT.Data.Models
 		/// <para>PaperKind</para>
 		/// <para></para>
 		/// </summary>
-		[FieldInformation("Paper Kind", IsRequired = true, Sort = 5)]
+		[FieldInformation("Paper Kind", IsRequired = true, Sort = 6)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("PaperKindValues")]
 		public int PaperKindEnum
@@ -191,7 +209,7 @@ namespace REPORT.Data.Models
 		/// <para>PageOrientation</para>
 		/// <para></para>
 		/// </summary>
-		[FieldInformation("Page Orientation", IsRequired = true, Sort = 6)]
+		[FieldInformation("Page Orientation", IsRequired = true, Sort = 7)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("PageOrientationValues")]
 		public int PageOrientationEnum
@@ -211,7 +229,7 @@ namespace REPORT.Data.Models
 		/// <para>Cover Page ID</para>
 		/// <para></para>
 		/// </summary>
-		[FieldInformation("Cover Page", IsVisible = false, Sort = 7)]
+		[FieldInformation("Cover Page", IsVisible = false, Sort = 8)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("CoverPageValues")]
 		public Int64? CoverPage_Id
@@ -231,7 +249,7 @@ namespace REPORT.Data.Models
 		/// <para>Headers and Footers Page ID</para>
 		/// <para></para>
 		/// </summary>
-		[FieldInformation("Page Headers and Footers", IsVisible = false, Sort = 8)]
+		[FieldInformation("Page Headers and Footers", IsVisible = false, Sort = 9)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("PageHeadersAndFootersValues")]
 		public Int64? HeaderAndFooterPage_Id
@@ -251,7 +269,7 @@ namespace REPORT.Data.Models
 		/// <para>Final Page ID</para>
 		/// <para></para>
 		/// </summary>
-		[FieldInformation("Final Page", IsVisible = false, Sort = 9)]
+		[FieldInformation("Final Page", IsVisible = false, Sort = 10)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("FinalPageValues")]
 		public Int64? FinalPage_Id
@@ -267,7 +285,7 @@ namespace REPORT.Data.Models
 			}
 		}
 
-		[FieldInformation("Production Connection", IsVisible = false, Sort = 10)]
+		[FieldInformation("Production Connection", IsVisible = false, Sort = 11)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("ProductionConnectionValues")]
 		public string ProductionConnection
@@ -290,7 +308,7 @@ namespace REPORT.Data.Models
 		/// <para></para>
 		/// </summary>
 
-		[FieldInformation("Page Left Margin", Sort = 11)]
+		[FieldInformation("Page Left Margin", Sort = 12)]
 		public int PageMarginLeft
 		{
 			get
@@ -304,7 +322,7 @@ namespace REPORT.Data.Models
 			}
 		}
 
-		[FieldInformation("Page Right Margin", Sort = 12)]
+		[FieldInformation("Page Right Margin", Sort = 13)]
 		/// <summary>
 		/// <para>Page Margin Right</para>
 		/// <para></para>
@@ -322,7 +340,7 @@ namespace REPORT.Data.Models
 			}
 		}
 
-		[FieldInformation("Page Top Margin", Sort = 13)]
+		[FieldInformation("Page Top Margin", Sort = 14)]
 		/// <summary>
 		/// <para>Page Margin Top</para>
 		/// <para></para>
@@ -340,7 +358,7 @@ namespace REPORT.Data.Models
 			}
 		}
 
-		[FieldInformation("Page Bottom Margin", Sort = 14)]
+		[FieldInformation("Page Bottom Margin", Sort = 15)]
 		/// <summary>
 		/// <para>Page Margin Bottom</para>
 		/// <para></para>
@@ -389,6 +407,23 @@ namespace REPORT.Data.Models
 			set
 			{
 				base.OnPropertyChanged("CategoryId", ref this._CategoryId, value);
+			}
+		}
+
+		public DataItemModel[] ReportXMLVersions
+		{
+			get
+			{
+				ReportTablesRepository repo = new ReportTablesRepository();
+
+				List<DataItemModel> result = new List<DataItemModel>();
+
+				foreach(int version in repo.GetReportXmlVersions(this.MasterReport_Id))
+				{
+					result.Add(new DataItemModel { DisplayValue = version.ParseToString(), ItemKey = version });
+				}
+
+				return result.ToArray();
 			}
 		}
 

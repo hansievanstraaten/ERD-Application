@@ -65,6 +65,7 @@
                         MasterReport_Id = c.Long(nullable: false),
                         BinaryXML = c.Binary(),
                         PrintCount = c.Long(nullable: false),
+                        IsActiveVersion = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => new { t.ReportXMLVersion, t.MasterReport_Id });
             

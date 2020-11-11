@@ -377,6 +377,24 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportXMLModel>().ToList();
 		}
 		
+		public List<ReportXMLModel> GetReportXMLByIsActiveVersion (bool IsActiveVersion)
+		{
+			List<ReportXML> result = this.dataContext
+				.ReportsXML
+				.Where(fk => fk.IsActiveVersion == IsActiveVersion)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<ReportXMLModel>();
+			}
+
+			
+			List<object> objectList = result.CopyToObject(typeof(ReportXMLModel));
+
+			return objectList.TryCast<ReportXMLModel>().ToList();
+		}
+		
 		public List<ReportConnectionModel> GetReportConnectionByDatabaseTypeEnum (int DatabaseTypeEnum)
 		{
 			List<ReportConnection> result = this.dataContext
@@ -672,6 +690,14 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 		public void UpdateReportXML(ReportXMLModel model)
 		{
+			if (model.IsActiveVersion)
+			{
+				foreach(ReportXML xml in this.dataContext.ReportsXML.Where(rm => rm.MasterReport_Id == model.MasterReport_Id))
+				{
+					xml.IsActiveVersion = false;
+				}
+			}
+
 			ReportXML existing = this.dataContext
 				.ReportsXML
 				.Where(rx => rx.ReportXMLVersion == model.ReportXMLVersion && rx.MasterReport_Id == model.MasterReport_Id  )

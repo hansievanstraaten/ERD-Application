@@ -9,6 +9,7 @@ namespace REPORT.Data.Models
 		private Int64 _MasterReport_Id;
 		private byte[] _BinaryXML;
 		private Int64 _PrintCount;
+		private bool _IsActiveVersion;
 
 		/// <summary>
 		/// <para>Report XML Version</para>
@@ -78,6 +79,17 @@ namespace REPORT.Data.Models
 			}
 		}
 
+		public bool IsActiveVersion
+		{
+			get
+			{
+				return this._IsActiveVersion;
+			}
 
+			set
+			{
+				base.OnPropertyChanged("IsActiveVersion", ref this._IsActiveVersion, value);
+			}
+		}
 	}
 }

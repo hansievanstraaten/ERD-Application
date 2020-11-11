@@ -647,6 +647,34 @@ namespace ERD.Viewer
             }
         }
 
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            try
+			{
+                About about = new About();
+
+                ControlDialog.ShowDialog("About", about, string.Empty, showCancelButton: false, autoSize: true);
+			}
+            catch (Exception err)
+			{
+                MessageBox.Show(err.InnerExceptionMessage());
+			}
+        }
+
+        private void ReleaseNotes_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ReleaseNotes notes = new ReleaseNotes();
+
+                ControlDialog.ShowDialog("Release Notes", notes, string.Empty, showCancelButton: false, autoSize: true);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
         private void InstallUpdates_Cliked(object sender, MouseButtonEventArgs e)
         {
             try
@@ -1578,7 +1606,5 @@ namespace ERD.Viewer
                 }
             });
         }
-
-        
-    }
+	}
 }

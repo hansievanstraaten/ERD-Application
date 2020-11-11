@@ -26,19 +26,19 @@ namespace ERD.Viewer.Database
             this.accessModel.Construct(connectionValues);
         }
 
-        public XDocument ExecuteQuery(string sqlQuery)
+        public XDocument ExecuteQuery(string sqlQuery, int commandTimeout = 30)
         {
-            return this.accessModel.ExecuteQuery(sqlQuery);
+            return this.accessModel.ExecuteQuery(sqlQuery, commandTimeout);
         }
 
-        public List<dynamic> ExecuteQueryDynamic(string sqlQuery)
+        public List<dynamic> ExecuteQueryDynamic(string sqlQuery, int commandTimeout = 30)
         {
-            return this.accessModel.ExecuteQueryDynamic(sqlQuery);
+            return this.accessModel.ExecuteQueryDynamic(sqlQuery, commandTimeout);
         }
 
-        public void ExecuteNonQuery(string sqlQuery)
+        public void ExecuteNonQuery(string sqlQuery, int commandTimeout = 30)
         {
-            this.accessModel.ExecuteNonQuery(sqlQuery);
+            this.accessModel.ExecuteNonQuery(sqlQuery, commandTimeout);
         }
 
         private IDataAccess CreateClass()

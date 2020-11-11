@@ -52,6 +52,10 @@
                 <MenuItem Header="Setup" Click="ReportSystemSetup_Click" />
                 <MenuItem Header="Reports" Click="SelectReport_Click" />
             </MenuItem>
+            <MenuItem Header="Help And About">
+                <MenuItem Header="About" Click="About_Click" />
+                <!--<MenuItem Header="Release Notes" Click="ReleaseNotes_Click" />-->
+            </MenuItem>
             <Specialized:FlashableLabel Content="Install Updates" x:Name="uxInstallUpdates" Visibility="Collapsed" OnMouseClicked="InstallUpdates_Cliked" />
         </Menu>
 

@@ -1,0 +1,37 @@
+﻿<src:UserControlBase xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
+                     x:Class="ERD.Viewer.About"
+                     xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                     xmlns:local="clr-namespace:ERD.Viewer"
+                     mc:Ignorable="d" 
+                     d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <CommonControls:LableItem Grid.Row="0" Grid.Column="0" Content="Welcome to ViSo-Nice" FontSize="18" FontWeight="Bold"/>
+
+        <CommonControls:TextBoxItem Grid.Row="1" Grid.Column="0" x:Name="uxAboutText" 
+                                   TextWrapping="WrapWithOverflow" 
+                                   IsReadOnly="True"
+                                   BorderThickness="0"
+                                   Margin="20,0,0,0"/>
+
+        <Image Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" x:Name="uxLogo" MaxWidth="250" VerticalAlignment="Top" HorizontalAlignment="Right" />
+
+        <CommonControls:LableItem Grid.Row="2" Grid.Column="0" Margin="20,10,0,10" >
+            <TextBlock TextDecorations="Underline" Text="Go to GitHub Repository" FontWeight="SemiBold" Foreground="DarkBlue" PreviewMouseLeftButtonUp="GoToGitHub_Cliked" />
+        </CommonControls:LableItem>
+    </Grid>
+</src:UserControlBase>

@@ -21,7 +21,7 @@ namespace REPORT.Builder.Printing
         }
 
         internal static bool IsEmptyDataSuppressed(this XElement reportObject)
-		{
+        {
             return reportObject.Attribute("SuppressIfNoData").Value.ToBool();
         }
 

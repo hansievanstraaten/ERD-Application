@@ -19,6 +19,8 @@ namespace REPORT.Builder.Printing
 {
     public class BuildReportXML
     {
+        private int commandTimeout = 300;
+
         private int sectionIndex = 0;
 
         private int tableRowIndex = 0;
@@ -132,7 +134,7 @@ namespace REPORT.Builder.Printing
                 string sumColumn = reportSum.Attribute("SumColumn").Value;
 
                 if (sumColumn.IsNullEmptyOrWhiteSpace())
-				{   // The user did not perfom a ful setup
+				{   // The user did not perfom a full setup
                     continue;
 				}
 
@@ -262,7 +264,7 @@ namespace REPORT.Builder.Printing
                     .AddOrderByString(this.orderByDictionary[sectionTableName]);
 			}
 
-			XDocument data = this.data.ExecuteQuery(this.FormatSQL(this.indexSqlManager[this.sectionIndex].SQLQuery));
+			XDocument data = this.data.ExecuteQuery(this.FormatSQL(this.indexSqlManager[this.sectionIndex].SQLQuery), this.commandTimeout);
 
             XElement sectionData = new XElement(sectionTableName);
 
@@ -334,7 +336,15 @@ namespace REPORT.Builder.Printing
                         this.executingValues.Remove(parameterName);
                     }
 
-                    this.executingValues.Add(parameterName, row.Element(columnSeek).Value);
+                    XElement seekElement = row.Element($"{columnSeek}_Value") == null ?
+                        row.Element(columnSeek)
+                        :
+                        row.Element($"{columnSeek}_Value");
+
+                    this.executingValues.Add(parameterName, (seekElement.Attribute("Value") == null ?
+                        seekElement.Value
+                        :
+                        seekElement.Attribute("Value").Value));
                 }
             }
         }

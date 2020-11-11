@@ -2,10 +2,13 @@
 using GeneralExtensions;
 using REPORT.Data.Models;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing.Printing;
 using System.Printing;
 using System.Windows;
+using System.Windows.Controls;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
 using WPF.Tools.BaseClasses;
@@ -23,15 +26,21 @@ namespace REPORT.Builder.ReportComponents
 
         public delegate void ReportObjectSelectedEvent(object sender, object reportObject);
 
+        public delegate void ReportSectionDeleteRequestEvent(object sender, int sectionGroupIndex);
+
         public event RequestNewDataSectionsEvent RequestNewDataSections;
 
         public event ReportColumnAddedEvent ReportColumnAdded;
 
         public event ReportObjectSelectedEvent ReportObjectSelected;
 
+        public event ReportSectionDeleteRequestEvent ReportSectionDeleteRequest;
+
         private int markerTopMargin = 100;
 
         private int markerBottomMargin = 100;
+
+		private int sectionGroupIndex;
 
         private double canvasHeight;
 
@@ -42,15 +51,15 @@ namespace REPORT.Builder.ReportComponents
         private PageMediaSize pageSize;
 
         private PageOrientationEnum pageOrientation;
-        
-        public ReportSection()
+
+		public ReportSection()
         {
             this.InitializeComponent();
 
             this.SizeChanged += this.ReportSection_SizeChanged;
         }
-
-        public XElement SectionXml
+        
+		public XElement SectionXml
         {
             get
             {
@@ -101,7 +110,29 @@ namespace REPORT.Builder.ReportComponents
 
         public int SectionIndex { get; set; }
 
-        public int SectionGroupIndex { get; set; }
+        public int SectionGroupIndex 
+        { 
+            get
+			{
+                return this.sectionGroupIndex;
+			}
+            
+            set
+			{
+                this.sectionGroupIndex = value;
+
+                if (value > 0 && (this.ContextMenu == null || this.ContextMenu.Items.Count == 0))
+                {
+                    this.ContextMenu = new ContextMenu();
+
+                    MenuItem delete = new MenuItem { Header = "Delete Section" };
+
+                    delete.Click += this.SectionDeleteRequest_Click;
+
+                    this.ContextMenu.Items.Add(delete);
+                }
+            }
+        }
 
         public int MarkerTopMargin
         {
@@ -395,6 +426,25 @@ namespace REPORT.Builder.ReportComponents
         private void SectionCanvas_RequestNewDataSection(object sender, ReportColumnModel column)
         {
             this.RequestNewDataSections?.Invoke(sender, column, this.SectionGroupIndex);
+        }
+
+        private void SectionDeleteRequest_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string msg = $"Are you sure that you would like to delete this section ({this.SectionTitle}) and all its related sections?";
+
+                if (MessageBox.Show(msg, "Warning", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+				{
+                    return;
+				}
+
+                this.ReportSectionDeleteRequest?.Invoke(this, this.SectionGroupIndex);
+            }
+            catch (Exception err)
+			{
+                MessageBox.Show(err.InnerExceptionMessage());
+			}
         }
 
         private void SetPageAndCanvasSize()

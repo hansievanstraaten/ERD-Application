@@ -357,10 +357,6 @@ namespace REPORT.Builder.Printing
             }
         }
 
-        //private string groupIndexElementString = "<ReportObject Top=\"0\" Left=\"0\" Foreground=\"#FF808080\" FontSize=\"12\" FontFamily=\"Segoe UI\"" +
-        //    " FontWeight=\"SemiBold\" TextAlignment=\"Left\" TextWrapping=\"NoWrap\" Width=\"NaN\" Height=\"NaN\" Background=\"#00FFFFFF\"" +
-        //    " Caption=\"Line Item\" ObjectType=\"ReportLabel\" />";
-
         private void AddObjectModels(XElement sectionElement, XElement row)
         {
             double minBottom = sectionElement.Attribute("CanvasHeight").Value.ToDouble() + this.activeCanvas.TopOffset;
@@ -372,15 +368,6 @@ namespace REPORT.Builder.Printing
             double lowestBottom = this.activeCanvas.TopOffset;
 
             bool isReset = false;
-
-            //// TEST CODE REMOVE
-            //XElement groupItem = XElement.Parse(this.groupIndexElementString);
-
-            //groupItem.Attribute("Caption").Value = $"SGI {sectionElement.GetSectionGroupIndex()}.{sectionElement.GetRowSectionIndex()}";
-
-            //this.AddObectModel(groupItem, lowestBottom, out isReset);
-
-            //isReset = false;
 
             foreach (XElement item in reportObjects)
             {
@@ -396,8 +383,6 @@ namespace REPORT.Builder.Printing
                     XElement dataItem = new XElement(item); // Do this tp preserve the original xml
 
                     dataItem.Attribute("ColumnModel").Remove();
-
-                    string testValue = (dataValue == null ? "OOPS What a mess" : dataValue.Value);
 
                     dataItem.Add(new XAttribute("Text", (dataValue == null ? "OOPS What a mess" : dataValue.Value)));
 

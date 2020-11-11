@@ -174,12 +174,12 @@ namespace WPF.Tools.BaseClasses
                 return;
             }
 
-            if (oldValue != null && (oldValue.Equals(newValue) || oldValue.CompareTo(newValue) == 0))
-            {
-                return;
-            }
+			if (oldValue != null && (oldValue.Equals(newValue) || oldValue.CompareTo(newValue) == 0))
+			{
+				return;
+			}
 
-            if (oldValue == null || oldValue.CompareTo(newValue) != 0)
+			if (oldValue == null || oldValue.CompareTo(newValue) != 0)
             {
                 if (oldValue != null)
                 {

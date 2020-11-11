@@ -10,10 +10,10 @@ namespace ERD.DatabaseScripts
 
         void Construct(Dictionary<string, string> setupValues);
 
-        XDocument ExecuteQuery(string sqlQuery);
+        XDocument ExecuteQuery(string sqlQuery, int commandTimeout = 30);
 
-        List<dynamic> ExecuteQueryDynamic(string sqlQuery);
+        List<dynamic> ExecuteQueryDynamic(string sqlQuery, int commandTimeout = 30);
 
-        int ExecuteNonQuery(string sqlQuery);
+        int ExecuteNonQuery(string sqlQuery, int commandTimeout = 30);
     }
 }

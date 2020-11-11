@@ -16,6 +16,16 @@ namespace REPORT.Data.SQLRepository.Repositories
 
         public int GetReportXMLVersion(long MasterReport_Id)
         {
+			ReportXML model = this.dataContext
+				.ReportsXML
+				.FirstOrDefault(r => r.MasterReport_Id == MasterReport_Id
+						 && r.IsActiveVersion == true);
+
+			if (model != null)
+			{
+				return model.ReportXMLVersion;
+			}
+
 			int result = this.dataContext
 				.ReportsXML
 				.Where(r => r.MasterReport_Id == MasterReport_Id)
@@ -29,6 +39,21 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result;
 		}
 	
+		public List<int> GetReportXmlVersions(long MasterReport_Id)
+		{
+			List<ReportXML> result = this.dataContext
+				.ReportsXML
+				.Where(r => r.MasterReport_Id == MasterReport_Id)
+				.ToList();
+
+			if (result.Count == 0)
+			{
+				return new List<int>();
+			}
+
+			return result.OrderBy(o => o.ReportXMLVersion).Select(r => r.ReportXMLVersion).ToList();
+		}
+
 		public void SetReportConnectionsSttus(long masterReportId, bool isProduction, bool isActive)
         {
 			List<ReportConnection> connections = base.dataContext
@@ -139,6 +164,16 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return objectList.TryCast<ReportXMLPrintParameterModel>().ToList();
 		}
 
+		public bool IsActiveVersion(long masterReport_Id, int reportXMLVersion)
+		{
+			ReportXML xml = base.dataContext
+				.ReportsXML
+				.FirstOrDefault(rx => rx.MasterReport_Id == masterReport_Id
+								   && rx.ReportXMLVersion == reportXMLVersion);
+
+			return xml == null ? false : xml.IsActiveVersion;
+		}
+
 		public bool CategoryHaveReports(long categoryId)
 		{
 			List<ReportCategory> categories = base.dataContext.ReportCategories.ToList();
@@ -208,5 +243,37 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			base.dataContext.SaveChanges();
 		}
+
+		new public void UpdateReportXML(ReportXMLModel model)
+		{
+			if (model.IsActiveVersion)
+			{
+				foreach (ReportXML xml in this.dataContext.ReportsXML.Where(rm => rm.MasterReport_Id == model.MasterReport_Id))
+				{
+					xml.IsActiveVersion = false;
+				}
+			}
+
+			ReportXML existing = this.dataContext
+				.ReportsXML
+				.Where(rx => rx.ReportXMLVersion == model.ReportXMLVersion && rx.MasterReport_Id == model.MasterReport_Id)
+				.FirstOrDefault();
+
+			if (existing == null)
+			{
+				existing = model.CopyToObject(new ReportXML()) as ReportXML;
+
+				this.dataContext.ReportsXML.Add(existing);
+			}
+			else
+			{
+				existing = model.CopyToObject(existing) as ReportXML;
+			}
+
+			this.dataContext.SaveChanges();
+
+			model = existing.CopyToObject(model) as ReportXMLModel;
+		}
+
 	}
 }

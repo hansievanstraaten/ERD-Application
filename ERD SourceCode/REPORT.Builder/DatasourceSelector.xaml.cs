@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Documents;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.CommonControls;
 using WPF.Tools.ToolModels;
@@ -50,7 +51,7 @@ namespace REPORT.Builder
                     return false;
                 }
 
-                foreach(TreeViewItemTool item in this.treeTableItems.Where(ch => ch.IsChecked))
+                foreach (TreeViewItemTool item in this.treeTableItems.Where(ch => ch.IsChecked))
                 {
                     DataSourceTableModel sourceTable = new DataSourceTableModel
                     {
@@ -70,6 +71,36 @@ namespace REPORT.Builder
 
                 return false;
             }
+        }
+        
+        private void Search_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            try
+			{
+                string searchText = this.uxSearch.Text.ToLower();
+
+                bool isEmptyString = searchText.IsNullEmptyOrWhiteSpace();
+
+                foreach(TreeViewItemTool item in this.uxOtherTables.Items)
+				{
+                    if (isEmptyString)
+					{
+                        item.Visibility = Visibility.Visible;
+					}
+                    else if(item.Header.ParseToString().ToLower().Contains(searchText))
+					{
+                        item.Visibility = Visibility.Visible;
+                    }
+                    else
+					{
+                        item.Visibility = Visibility.Collapsed;
+                    }
+				}
+			}
+            catch
+			{
+                // DO NOTHING
+			}
         }
 
         private void InitializeMainTable(long masterReportId)
@@ -92,16 +123,16 @@ namespace REPORT.Builder
 
             this.uxMainTable[0, 0].IsReadOnly = savedModel != null;
 
-            foreach(DataItemModel table in systemTables)
+            foreach (DataItemModel table in systemTables)
             {
                 if (table.DisplayValue == this.MainTable.MainTableName)
                 {
                     continue;
                 }
 
-                TreeViewItemTool tableItem = new TreeViewItemTool 
+                TreeViewItemTool tableItem = new TreeViewItemTool
                 {
-                    Header = table.DisplayValue, 
+                    Header = table.DisplayValue,
                     IsCheckBox = true,
                     IsChecked = selectedTables.ContainsKey(table.DisplayValue) ? selectedTables[table.DisplayValue].IsAvailable : false
                 };

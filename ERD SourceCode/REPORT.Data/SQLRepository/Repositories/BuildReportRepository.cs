@@ -63,15 +63,23 @@ namespace REPORT.Data.SQLRepository.Repositories
 
         public XDocument GetReportXml(long masterReport_Id)
         {
-            int reportXMLVersion = this.dataContext
-                .ReportsXML
-                .Where(r => r.MasterReport_Id == masterReport_Id)
-                .Max(m => m.ReportXMLVersion);
-
             ReportXML report = this.dataContext
                 .ReportsXML
-                .FirstOrDefault(xml => xml.MasterReport_Id == masterReport_Id
-                       && xml.ReportXMLVersion == reportXMLVersion);
+                .FirstOrDefault(r => r.MasterReport_Id == masterReport_Id
+                                  && r.IsActiveVersion == true);
+
+            if (report == null)
+            {
+                int reportXMLVersion = this.dataContext
+                    .ReportsXML
+                    .Where(r => r.MasterReport_Id == masterReport_Id)
+                    .Max(m => m.ReportXMLVersion);
+
+                report = this.dataContext
+                    .ReportsXML
+                    .FirstOrDefault(xml => xml.MasterReport_Id == masterReport_Id
+                           && xml.ReportXMLVersion == reportXMLVersion);
+            }
 
             if (report == null)
             {

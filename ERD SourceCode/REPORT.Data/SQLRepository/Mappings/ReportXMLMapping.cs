@@ -15,6 +15,7 @@ namespace REPORT.Data.SQLRepository.Mappings
 			Property(colMasterReport_Id =>  colMasterReport_Id.MasterReport_Id).HasColumnName("MasterReport_Id");
 			Property(colBinaryXML =>  colBinaryXML.BinaryXML).HasColumnName("BinaryXML");
 			Property(colPrintCount =>  colPrintCount.PrintCount).HasColumnName("PrintCount");
+			Property(colIsActiveVersion =>  colIsActiveVersion.IsActiveVersion).HasColumnName("IsActiveVersion");
 
 		}
 	}

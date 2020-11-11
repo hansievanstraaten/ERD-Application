@@ -58,8 +58,7 @@ namespace ERD.DatabaseScripts.MsSql
             this._trustedConnection = setupValues["TrustedConnection"].ToBool();                
         }
 
-
-        public XDocument ExecuteQuery(string sqlQuery)
+        public XDocument ExecuteQuery(string sqlQuery, int commandTimeout = 30)
         {
             StringBuilder resultString = new StringBuilder();
 
@@ -67,7 +66,7 @@ namespace ERD.DatabaseScripts.MsSql
 
             try
             {
-                IDataReader reader = this.ExecuteCommand(sqlQuery);
+                IDataReader reader = this.ExecuteCommand(sqlQuery, commandTimeout);
 
                 Dictionary<int, string> columns = new Dictionary<int, string>();
 
@@ -123,13 +122,13 @@ namespace ERD.DatabaseScripts.MsSql
             return XDocument.Parse(resultString.ToString());
         }
 
-        public List<dynamic> ExecuteQueryDynamic(string sqlQuery)
+        public List<dynamic> ExecuteQueryDynamic(string sqlQuery, int commandTimeout = 30)
         {
             List<dynamic> result = new List<dynamic>();
 
             try
             {
-                IDataReader reader = this.ExecuteCommand(sqlQuery);
+                IDataReader reader = this.ExecuteCommand(sqlQuery, commandTimeout);
 
                 Dictionary<int, string> columns = new Dictionary<int, string>();
 
@@ -186,7 +185,7 @@ namespace ERD.DatabaseScripts.MsSql
             return result;
         }
 
-        public int ExecuteNonQuery(string sqlQuery)
+        public int ExecuteNonQuery(string sqlQuery, int commandTimeout = 30)
         {
             try
             {
@@ -195,6 +194,8 @@ namespace ERD.DatabaseScripts.MsSql
                 this.connection.Open();
 
                 SqlCommand cmd = this.connection.CreateCommand();
+
+                cmd.CommandTimeout = commandTimeout;
 
                 cmd.CommandText = sqlQuery;
 
@@ -253,7 +254,7 @@ namespace ERD.DatabaseScripts.MsSql
             Connections.Instance.SessionPasswords.Add(sessionKey, model);
         }
 
-        private IDataReader ExecuteCommand(string sqlQuery)
+        private IDataReader ExecuteCommand(string sqlQuery, int commandTimeout)
         {
             try
             {
@@ -262,6 +263,8 @@ namespace ERD.DatabaseScripts.MsSql
                 this.connection.Open();
 
                 SqlCommand cmd = this.connection.CreateCommand();
+
+                cmd.CommandTimeout = commandTimeout;
 
                 cmd.CommandText = sqlQuery;
 

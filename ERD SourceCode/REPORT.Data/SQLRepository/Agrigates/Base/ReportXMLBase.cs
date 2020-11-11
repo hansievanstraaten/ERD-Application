@@ -11,7 +11,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		private Int64 _MasterReport_Id;
 		private byte[] _BinaryXML;
 		private Int64 _PrintCount;
-
+		private bool _IsActiveVersion;
 
 		// Primary Keys
 		[Key]
@@ -70,6 +70,18 @@ namespace REPORT.Data.SQLRepository.Agrigates
 			set
 			{
 				base.OnPropertyChanged("PrintCount", ref this._PrintCount, value);
+			}
+		}
+		public bool IsActiveVersion
+		{
+			get
+			{
+				return this._IsActiveVersion;
+			}
+
+			set
+			{
+				base.OnPropertyChanged("IsActiveVersion", ref this._IsActiveVersion, value);
 			}
 		}
 

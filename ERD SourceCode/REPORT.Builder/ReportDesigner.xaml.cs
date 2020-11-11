@@ -41,7 +41,7 @@ namespace REPORT.Builder
 
 		private bool IsReportSum;
 
-		private readonly ReportTypeEnum reportDesignType;
+		private ReportTypeEnum reportDesignType;
 
 		private ReportMasterModel reportMaster;
 
@@ -75,42 +75,7 @@ namespace REPORT.Builder
 			}
 			else
 			{
-				ReportTablesRepository repo = new ReportTablesRepository();
-
-				//this.ReportMaster.ReportXMLVersion = repo.GetReportXMLVersion(masterModel.MasterReport_Id);
-
-				ReportXMLModel reportXML = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, masterModel.MasterReport_Id);
-
-				string reportXml = reportXML.BinaryXML.UnzipFile().ParseToString();
-
-				XDocument report = XDocument.Parse(reportXml);
-
-				this.reportDesignType = (ReportTypeEnum)report.Root.Element("ReportSettings").Attribute("ReportTypeEnum").Value.ToInt32();
-
-				foreach (XElement sectionElement in report.Root.Element("ReportSettings").Elements("ReportSection").OrderBy(si => si.Attribute("SectionIndex").Value.ToInt32()))
-				{
-					ReportSection section = new ReportSection { IsDesignMode = true };
-
-					section.SectionXml = sectionElement;
-
-					this.uxReportSections.Children.Add(section);
-
-					section.ReportObjectSelected += this.ReportObject_Selected;
-
-					if (section.SectionType == SectionTypeEnum.TableData)
-					{
-						section.RequestNewDataSections += this.NewDataSection_Requested;
-
-						section.ReportColumnAdded += this.ReportColumn_Added;
-					}
-					else if (this.reportDesignType == ReportTypeEnum.CoverPage
-						|| this.reportDesignType == ReportTypeEnum.FinalPage)
-					{
-						section.RefreshPageStaticMarkers();
-					}
-
-					this.dataReportSections.Add(section);
-				}
+				this.LoadReportXml();
 			}
 
 			this.uxReportSections.MinWidth = this.CanvasWidth + 200;
@@ -118,6 +83,8 @@ namespace REPORT.Builder
 			this.RefreshMarginMarkers();
 
 			this.SetupDataReportsOptions();
+
+			this.CheckActiveVersion();
 
 			this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
 		}
@@ -158,6 +125,8 @@ namespace REPORT.Builder
 		{
 			try
 			{
+				this.ReportMaster.PropertyChanged -= this.ReportMaster_PropertyChanged;
+
 				if (this.uxReportMasterModel.HasValidationError)
 				{
 					return false;
@@ -180,6 +149,8 @@ namespace REPORT.Builder
 						PrintCount = 0
 					};
 				}
+
+				reportXml.IsActiveVersion = this.ReportMaster.IsActiveVesion;
 
 				XDocument reportXmlDocument = this.GetReportXml();
 
@@ -245,6 +216,13 @@ namespace REPORT.Builder
 
 				#endregion
 
+				this.uxReportMasterModel["Report Version"]
+					.SetComboBoxItems(repo.GetReportXmlVersions(this.ReportMaster.MasterReport_Id)
+										  .Select(v => new DataItemModel { DisplayValue = v.ParseToString(), ItemKey = v })
+										  .ToArray());
+
+				this.uxReportMasterModel["Report Version"].SetValue(this.ReportMaster.ReportXMLVersion);
+
 				return true;
 			}
 			catch (Exception err)
@@ -252,6 +230,10 @@ namespace REPORT.Builder
 				MessageBox.Show(err.InnerExceptionMessage());
 
 				return false;
+			}
+			finally
+			{
+				this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
 			}
 		}
 
@@ -636,6 +618,27 @@ namespace REPORT.Builder
 
 						break;
 
+					case "ReportXMLVersion":
+
+						int version = this.ReportMaster.ReportXMLVersion;
+
+						ReportTablesRepository repo = new ReportTablesRepository();
+
+						if (repo.GetReportXmlVersions(this.ReportMaster.MasterReport_Id).Contains(version))
+						{
+							this.LoadReportXml();
+						}
+						else
+						{
+							this.InitializeReportSections();
+
+							this.SetMainDataSource();
+						}
+
+						this.CheckActiveVersion();
+
+						break;
+
 				}
 
 				this.RefreshMarginMarkers();
@@ -767,6 +770,8 @@ namespace REPORT.Builder
 		{
 			try
 			{
+				this.ReportMaster.PropertyChanged -= this.ReportMaster_PropertyChanged;
+
 				if (this.uxReportMasterModel.HasValidationError)
 				{
 					return;
@@ -781,6 +786,10 @@ namespace REPORT.Builder
 			catch (Exception err)
 			{
 				MessageBox.Show(err.InnerExceptionMessage());
+			}
+			finally
+			{
+				this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
 			}
 		}
 
@@ -825,6 +834,8 @@ namespace REPORT.Builder
 		{
 			try
 			{
+				this.ReportMaster.PropertyChanged -= this.ReportMaster_PropertyChanged;
+
 				if (this.uxReportMasterModel.HasValidationError)
 				{
 					return;
@@ -855,6 +866,10 @@ namespace REPORT.Builder
 			catch (Exception err)
 			{
 				MessageBox.Show(err.InnerExceptionMessage());
+			}
+			finally
+			{
+				this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
 			}
 		}
 
@@ -899,6 +914,53 @@ namespace REPORT.Builder
 			}
 		}
 
+		private void ReportSectionDelete_Request(object sender, int sectionGroupIndex)
+		{
+			try
+			{
+				List<ReportSection> removeSection = this.dataReportSections
+					.Where(s => s.SectionGroupIndex == sectionGroupIndex)
+					.ToList();
+				
+				foreach(ReportSection section in removeSection)
+				{
+					this.uxReportSections.Children.Remove(section);
+
+					this.dataReportSections.Remove(section);
+				}
+
+				int iterationGroupIndex = sectionGroupIndex + 1;
+
+				int maxGroupIndex = this.GetMaxSectionGroupIndex();
+
+				while(iterationGroupIndex <= maxGroupIndex)
+				{
+					foreach (ReportSection group in this.dataReportSections
+						.Where(s => s.SectionGroupIndex == iterationGroupIndex))
+					{
+						group.SectionGroupIndex = (iterationGroupIndex - 1);
+					}
+
+					++iterationGroupIndex;
+				}
+
+				ReportSection[] orderBySections = this.dataReportSections
+					.OrderBy(si => si.SectionIndex)
+					.ToArray();
+
+				for (int x = 0; x < this.dataReportSections.Count; ++x)
+				{
+					orderBySections[x].SectionIndex = x;
+				}
+
+				this.RefreshSectionTitles();
+			}
+			catch (Exception err)
+			{
+				MessageBox.Show(err.InnerExceptionMessage());
+			}
+		}
+
 		#endregion
 
 		#region PRIVATE PROPERTIES
@@ -926,6 +988,13 @@ namespace REPORT.Builder
 		#endregion
 
 		#region PRIVATE METHODS
+
+		private void CheckActiveVersion()
+		{
+			ReportTablesRepository repo = new ReportTablesRepository();
+
+			this.ReportMaster.IsActiveVesion = repo.IsActiveVersion(this.ReportMaster.MasterReport_Id, this.ReportMaster.ReportXMLVersion);
+		}
 
 		private void SetSumDataSections(object reportObject)
 		{
@@ -962,9 +1031,72 @@ namespace REPORT.Builder
 			item.SumColumnValues = columnItems;
 		}
 
+		private void ClearSections()
+		{
+			foreach(ReportSection section in this.dataReportSections)
+			{
+				section.ReportObjectSelected -= this.ReportObject_Selected;
+
+				section.ReportSectionDeleteRequest -= this.ReportSectionDelete_Request;
+
+				section.RequestNewDataSections -= this.NewDataSection_Requested;
+
+				section.ReportColumnAdded -= this.ReportColumn_Added;
+			}
+
+			this.uxReportSections.Children.Clear();
+
+			this.dataReportSections.Clear();
+		}
+
+		private void LoadReportXml()
+		{
+			this.ClearSections();
+
+			ReportTablesRepository repo = new ReportTablesRepository();
+
+			ReportXMLModel reportXML = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, this.ReportMaster.MasterReport_Id);
+
+			string reportXml = reportXML.BinaryXML.UnzipFile().ParseToString();
+
+			XDocument report = XDocument.Parse(reportXml);
+
+			this.reportDesignType = (ReportTypeEnum)report.Root.Element("ReportSettings").Attribute("ReportTypeEnum").Value.ToInt32();
+
+			foreach (XElement sectionElement in report.Root.Element("ReportSettings").Elements("ReportSection").OrderBy(si => si.Attribute("SectionIndex").Value.ToInt32()))
+			{
+				ReportSection section = new ReportSection { IsDesignMode = true };
+
+				section.SectionXml = sectionElement;
+
+				this.uxReportSections.Children.Add(section);
+
+				section.ReportObjectSelected += this.ReportObject_Selected;
+
+				if (section.SectionType == SectionTypeEnum.TableData)
+				{
+					section.RequestNewDataSections += this.NewDataSection_Requested;
+
+					section.ReportColumnAdded += this.ReportColumn_Added;
+				}
+				else if (this.reportDesignType == ReportTypeEnum.CoverPage
+					|| this.reportDesignType == ReportTypeEnum.FinalPage)
+				{
+					section.RefreshPageStaticMarkers();
+				}
+
+				if (section.SectionGroupIndex > 0)
+				{
+					section.ReportSectionDeleteRequest += this.ReportSectionDelete_Request;
+				}
+
+				this.dataReportSections.Add(section);
+			}
+		}
+
 		private void InitializeReportSections()
 		{
-			this.uxReportSections.Children.Clear();
+			this.ClearSections();
 
 			switch (this.reportDesignType)
 			{
@@ -1106,10 +1238,8 @@ namespace REPORT.Builder
 			this.uxReportMasterModel.AllignAllCaptions();
 		}
 
-		private void LoadDataSource()
+		private void SetMainDataSource()
 		{
-			this.uxTableTree.Items.Clear();
-
 			foreach (ReportSection section in this.uxReportSections.Children)
 			{
 				if (section.SectionGroupIndex != 0)
@@ -1121,6 +1251,13 @@ namespace REPORT.Builder
 
 				section.RefresSectionTitle();
 			}
+		}
+
+		private void LoadDataSource()
+		{
+			this.uxTableTree.Items.Clear();
+
+			this.SetMainDataSource();
 
 			TreeViewItem mainTreeItem = new TreeViewItem { Header = this.DataSourceMainTable.MainTableName };
 
@@ -1321,13 +1458,17 @@ namespace REPORT.Builder
 
 			header.ReportObjectSelected += this.ReportObject_Selected;
 
+			header.ReportSectionDeleteRequest += this.ReportSectionDelete_Request;
+
+			data.ReportSectionDeleteRequest += this.ReportSectionDelete_Request;
+
+			footer.ReportSectionDeleteRequest += this.ReportSectionDelete_Request;
+
 			data.ReportObjectSelected += this.ReportObject_Selected;
 
 			data.RequestNewDataSections += this.NewDataSection_Requested;
 
 			data.ReportColumnAdded += this.ReportColumn_Added;
-
-			//data.ReportSectionWhereClauseChanged += this.ReportSectionWhereClause_Changed;
 
 			footer.ReportObjectSelected += this.ReportObject_Selected;
 
@@ -1346,6 +1487,12 @@ namespace REPORT.Builder
 		{
 			return this.dataReportSections.Count == 0 ? 0 :
 				(this.dataReportSections.Select(gr => gr.SectionGroupIndex).Max() + 1);
+		}
+
+		private int GetMaxSectionGroupIndex()
+		{   // Zero based index
+			return this.dataReportSections.Count == 0 ? 0 :
+				(this.dataReportSections.Select(gr => gr.SectionGroupIndex).Max());
 		}
 
 		private int GetMaxSectionIndex()

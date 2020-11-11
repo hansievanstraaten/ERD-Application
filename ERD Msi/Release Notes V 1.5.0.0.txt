@@ -1,0 +1,19 @@
+Release notes: 1.5.0.0
+*********************
+
+Minor bugs and fixes:
+*********************
+Script Builder:
+  1. Foreach Foreign Key in Table – Excludes columns where the foreign key forms part of the primary key structure. This may impact your existing builds  
+  2. Foreach table in Project – New option.
+
+New:
+  • Add About Screen
+  • Add Release Notes
+  • Add functionality to retrieve help documentation
+  • Add functionality to open access to Repository
+
+
+Preview:
+********
+Preview the new Report Builder available. 

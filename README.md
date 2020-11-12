@@ -11,6 +11,8 @@ Welcome to ViSo-Nice ERD Application.<BR/><BR/>
 
 <a style="color:#0000FF" href="https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/ViSo.Viewer.msi" download="ViSo.Viewer.msi">Download Application</a>
 
+New: Now with a simple Direct from the DB reporting solution.
+
 
 The Application was developed as part of a necessity to have a visual representation on a database and managing database entities as part of the representation.
 

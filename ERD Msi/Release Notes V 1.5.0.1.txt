@@ -8,4 +8,5 @@ Added Functionality:
 
 Minor bugs and fixes:
 *********************
+1. Correction on Scripting Concatenation
 

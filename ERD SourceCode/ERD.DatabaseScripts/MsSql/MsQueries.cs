@@ -188,7 +188,7 @@ namespace ERD.DatabaseScripts
 
       result.Append(itemsArray.Concatenate("', '"));
 
-      result.Remove((result.Length - 3), 3);
+      result.Remove((result.Length - 2), 2);
 
       return result.ToString();
     }

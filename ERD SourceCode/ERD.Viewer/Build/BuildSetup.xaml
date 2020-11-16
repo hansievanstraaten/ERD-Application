@@ -25,6 +25,7 @@
         <StackPanel Grid.Row="0" Grid.Column="0">
             <CommonControls:ActionButton ResourceImageName="Save" ToolTip="save" Click="Save_Click" />
             <CommonControls:ActionButton ResourceImageName="Add" ToolTip="Add Build Option" Click="TabAdd_Click" />
+            <CommonControls:ActionButton ResourceImageName="Import" ToolTip="Import From Another Project" Click="Import_Click" />
         </StackPanel>
 
         <StackPanel Grid.Row="0" Grid.Column="1" x:Name="uxParametersList">

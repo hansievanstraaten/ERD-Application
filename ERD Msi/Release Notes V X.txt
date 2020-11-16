@@ -1,0 +1,11 @@
+Release notes: X
+**************
+
+Added Functionality:
+*********************
+1. Add import function for Script builder. This helps to save time when switching from or starting a new project. 
+
+
+Minor bugs and fixes:
+*********************
+

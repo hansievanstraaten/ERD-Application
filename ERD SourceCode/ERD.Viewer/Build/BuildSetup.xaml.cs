@@ -1,10 +1,15 @@
-﻿using ERD.Build;
+﻿using ERD.Base;
+using ERD.Build;
 using ERD.Build.Models;
 using ERD.Models;
 using GeneralExtensions;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
+using System.Windows.Media;
 using ViSo.Dialogs.Input;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.CommonControls;
@@ -106,6 +111,40 @@ namespace ERD.Viewer.Build
         {
             this.ShowAddTab();
         }
+		
+        private void Import_Click(object sender, RoutedEventArgs e)
+		{
+            try
+			{
+                OpenFileDialog dlg = new OpenFileDialog();
+
+                dlg.Filter = $"(*.{FileTypes.estp})|*.{FileTypes.estp}";
+
+                bool? result = dlg.ShowDialog();
+
+                if (!result.HasValue || !result.Value)
+                {
+                    return;
+                }
+
+                string buildFile = File.ReadAllText(dlg.FileName);
+
+                BuildSetupModel importSetup = JsonConvert.DeserializeObject(buildFile, typeof(BuildSetupModel)) as BuildSetupModel;
+
+                int activeTab = this.uxTabs.SelectedIndex;
+
+                foreach(OptionSetupModel optionModel in importSetup.BuildOptions)
+				{
+                    this.SetTab(optionModel);
+                }
+
+                this.uxTabs.SetActive(activeTab);
+            }
+            catch (Exception err)
+			{
+                MessageBox.Show(err.InnerExceptionMessage());
+			}
+		}
 
         private void ShowAddTab()
         {
@@ -132,16 +171,7 @@ namespace ERD.Viewer.Build
             {
                 foreach (OptionSetupModel optionModel in BuildScript.Setup.BuildOptions)
                 {
-                    BuildOption option = new BuildOption(this.canvas, this.allErdCanvasModels)
-                    {
-                        Title = optionModel.OptionModelName,
-                        OptionSetup = optionModel,
-                        ShowCloseButton = true
-                    };
-
-                    this.uxTabs.Items.Add(option);
-
-                    this.uxTabs.Content.MaxHeight = this.ActualHeight - 65;
+                    this.SetTab(optionModel);
                 }
 
                 this.uxTabs.SetActive(0);
@@ -150,6 +180,20 @@ namespace ERD.Viewer.Build
             {
                 MessageBox.Show(err.InnerExceptionMessage());
             }
+        }
+
+        private void SetTab(OptionSetupModel optionModel)
+		{
+            BuildOption option = new BuildOption(this.canvas, this.allErdCanvasModels)
+            {
+                Title = optionModel.OptionModelName,
+                OptionSetup = optionModel,
+                ShowCloseButton = true
+            };
+
+            this.uxTabs.Items.Add(option);
+
+            this.uxTabs.Content.MaxHeight = this.ActualHeight - 65;
         }
 
         private void LoadBuildParamaters()
@@ -179,5 +223,6 @@ namespace ERD.Viewer.Build
                 BuildScript.Setup.BuildOptions.Add(option.OptionSetup);
             }
         }
-    }
+
+	}
 }

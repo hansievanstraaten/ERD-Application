@@ -86,6 +86,30 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result.CopyToObject(new ReportConnectionModel()) as ReportConnectionModel;
 		}
 
+		public List<ReportMasterModel> GetReportMasterByCategoryId( long categoryId)
+		{
+			List<ReportMaster> agrigates = this.dataContext
+				.ReportsMaster
+				.Where(fk => fk.CategoryId == categoryId)
+				.ToList();
+
+			if (agrigates.Count == 0)
+			{
+				return new List<ReportMasterModel>();
+			}
+
+			List<object> objectList = agrigates.CopyToObject(typeof(ReportMasterModel));
+
+			List<ReportMasterModel> result = objectList.TryCast<ReportMasterModel>().OrderBy(n => n.ReportName).ToList();
+
+			foreach (ReportMasterModel item in result)
+			{
+				item.ReportXMLVersion = this.GetReportXMLVersion(item.MasterReport_Id);
+			}
+
+			return result;
+		}
+
 		public List<ReportMasterModel> GetReportMasterByReportTypeEnum(int ReportTypeEnum, string projectName)
 		{
 			List<ReportMaster> agrigates = this.dataContext
@@ -149,8 +173,13 @@ namespace REPORT.Data.SQLRepository.Repositories
 			List<object> objectList = result.CopyToObject(typeof(ReportCategoryModel));
 
 			return objectList.TryCast<ReportCategoryModel>().ToList();
-		}	
-	
+		}
+
+		public List<ReportXMLPrintParameterModel> GetPrintparameters(long masterReport_Id)
+		{
+			return this.GetPrintparameters(masterReport_Id, this.GetReportXMLVersion(masterReport_Id));
+		}
+
 		public List<ReportXMLPrintParameterModel> GetPrintparameters(long masterReport_Id, int reportXMLVersion)
 		{
 			List<ReportXMLPrintParameter> result = base.dataContext

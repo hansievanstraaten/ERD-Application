@@ -130,6 +130,8 @@ namespace ERD.Viewer.Database.MsSql
 
       DataAccess dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
+      var xxx = SQLQueries.DatabaseQueries.DatabaseInTableColumnsQuery(tableNamesArray);
+
       XDocument columnsXml = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseInTableColumnsQuery(tableNamesArray));
 
       Dictionary<string, List<XElement>> groupedTables = new Dictionary<string, List<XElement>>();

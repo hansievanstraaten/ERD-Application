@@ -12,13 +12,19 @@ namespace ERD.Build.BuildEnums
         [Description("Foreach Column in Table")]
         ForeachColumnInTable,
 
-        [Description("Foreach Primary Key in Table")]
+        [Description("Foreach Primary Key in Table (Include Foreign Keys)")]
         ForeachPrimaryKeyInTable,
 
-        [Description("Foreach Foreign Key in Table")]
+        [Description("Foreach Primary Key in Table (Exclude Foreign Keys)")]
+        ForeachPrimaryOnlyKeyInTable,
+
+        [Description("Foreach Foreign Key in Table (Exclude Primary Keys)")]
         ForeachForeignKeyInTable,
 
-        [Description("Foreach Non-Key Column in Table")]
+		[Description("Foreach Foreign Key in Table (Include Primary Keys)")]
+		ForeachPrimaryForeignKeyInTable,
+
+		[Description("Foreach Non-Key Column in Table")]
         ForeachNonColumnInTable,
 
         [Description("Foreach Referenced Table")]

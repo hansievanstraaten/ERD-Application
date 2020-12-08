@@ -277,7 +277,8 @@ namespace ERD.Build
 
                     #region FOREACH PRIMARY KEY IN TABLE  
 
-                    ColumnObjectModel[] keyColumnsArray = this.SelectedTable.Columns.Where(pk => pk.InPrimaryKey).ToArray();
+                    ColumnObjectModel[] keyColumnsArray = this.SelectedTable.Columns
+                        .Where(pk => pk.InPrimaryKey).ToArray();
 
                     for (int keyCol = 0; keyCol < keyColumnsArray.Length; ++keyCol)
                     {
@@ -290,13 +291,33 @@ namespace ERD.Build
 
                 #endregion
 
+                case RepeatTypeEnum.ForeachPrimaryOnlyKeyInTable:
+
+                    #region FOREACH PRIMARY KEY IN TABLE  
+
+                    ColumnObjectModel[] keyOnlyColumnsArray = this.SelectedTable.Columns
+                        .Where(pk => pk.InPrimaryKey
+                                  && !pk.IsForeignkey).ToArray();
+
+                    for (int keyCol = 0; keyCol < keyOnlyColumnsArray.Length; ++keyCol)
+                    {
+                        this.SelectedColumn = keyOnlyColumnsArray[keyCol];
+
+                        injectionText.Append(this.ReplaceParameters(buildType.Code));
+                    }
+
+                    break;
+
+                #endregion
+
                 case RepeatTypeEnum.ForeachForeignKeyInTable:
 
-                    #region FOREACH FOREIGN KEY IN TABLE  
+                    #region FOREACH FOREIGN KEY IN TABLE (NON-PRIMARY KEY)
 
                     ColumnObjectModel[] foreignKeyColumnsArray = this.SelectedTable.Columns
                         .Where(pk => pk.IsForeignkey
-                                && !pk.InPrimaryKey).ToArray();
+                                && !pk.InPrimaryKey)
+                        .ToArray();
 
                     for (int keyCol = 0; keyCol < foreignKeyColumnsArray.Length; ++keyCol)
                     {
@@ -309,12 +330,32 @@ namespace ERD.Build
 
                 #endregion
 
+                case RepeatTypeEnum.ForeachPrimaryForeignKeyInTable:
+
+                    #region FOREACH FOREIGN KEY IN TABLE (INCLUDED PRIMARY KEYS) 
+
+                    ColumnObjectModel[] foreignAndPrimaryKeyColumnsArray = this.SelectedTable.Columns
+                        .Where(pk => pk.IsForeignkey)
+                        .ToArray();
+
+                    for (int keyCol = 0; keyCol < foreignAndPrimaryKeyColumnsArray.Length; ++keyCol)
+                    {
+                        this.SelectedColumn = foreignAndPrimaryKeyColumnsArray[keyCol];
+
+                        injectionText.Append(this.ReplaceParameters(buildType.Code));
+                    }
+
+					break;
+
+					#endregion
 
                 case RepeatTypeEnum.ForeachNonColumnInTable:
 
                     #region FOREACH NON-KEY COLUMN IN TABLE
 
-                    ColumnObjectModel[] nonKeyColumnsArray = this.SelectedTable.Columns.Where(nk => !nk.InPrimaryKey && !nk.IsForeignkey).ToArray();
+                    ColumnObjectModel[] nonKeyColumnsArray = this.SelectedTable.Columns
+                        .Where(nk => !nk.InPrimaryKey 
+                                  && !nk.IsForeignkey).ToArray();
 
                     for (int keyCol = 0; keyCol < nonKeyColumnsArray.Length; ++keyCol)
                     {
@@ -338,9 +379,9 @@ namespace ERD.Build
                         injectionText.Append(this.ReplaceParameters(buildType.Code));
                     }
 
-                    #endregion
-
                     break;
+
+                    #endregion
 
                 case RepeatTypeEnum.ForeachReferencedTable:
 
@@ -367,12 +408,13 @@ namespace ERD.Build
                         injectionText.Append(this.ReplaceParameters(buildType.Code));
                     }
 
-                    #endregion
-
                     break;                
+
+                    #endregion
 
                 case RepeatTypeEnum.Once:
                 default:
+
                     injectionText.Append(this.ReplaceParameters(buildType.Code));
 
                     break;

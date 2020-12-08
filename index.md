@@ -6,6 +6,8 @@ Welcome to ViSo-Nice ERD Application.
 
 New: Now with a simple Direct from the DB reporting solution.
 
+Current Version supports Microsoft SQL and C# Code. More may follow in due time. New: Now with a simple Direct from the DB reporting solution.
+
 The Application was developed as part of a necessity to have a visual representation on a database and managing database entities as part of the representation.
 Support for multiple databases, without the necessity to create a new instance of the ERD Model. Alternative database connections are not required to provide a password that makes this application ideal for deployment to production environments where the production database is not available for development.
 Multiple canvases per model allows for smaller canvases and acts as one great ERD. Each canvas is saved on its own that allows for developers to work on the same ERD Model without Merage conflicts. For Later development the locking of canvases will be implemented to ensure that developers do not work on the same canvas at the same time.

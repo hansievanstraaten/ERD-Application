@@ -11,6 +11,7 @@ Welcome to ViSo-Nice ERD Application.<BR/><BR/>
 
 <a style="color:#0000FF" href="https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/ViSo.Viewer.msi" download="ViSo.Viewer.msi">Download Application</a>
 
+Current Version supports Microsoft SQL and C# Code. More may follow in due time.
 New: Now with a simple Direct from the DB reporting solution.
 
 

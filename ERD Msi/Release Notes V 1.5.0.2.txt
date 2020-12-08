@@ -1,0 +1,7 @@
+Release notes: 1.5.0.1
+**************
+
+Added Functionality:
+*********************
+1. Added more options in foreach for Keys in scrip builder. The script builder allows for specific foreach builds on Primary and Foreign keys to allow for better scripting options.
+NOTE: This may influence existing Scripts. Sorry for the inconvenience

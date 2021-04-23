@@ -33,7 +33,7 @@ namespace ERD.Common
                     strVersion = "Given Product is not found the list of Installed Programs";
                 }
             }
-            catch 
+            catch (Exception err)
             {
                 throw;
             }

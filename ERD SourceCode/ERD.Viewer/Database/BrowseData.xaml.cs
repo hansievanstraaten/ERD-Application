@@ -48,8 +48,6 @@ namespace ERD.Viewer.Database
       this.uxColumn0.Height = new GridLength(250, GridUnitType.Auto);
 
       this.uxColumn1.Height = new GridLength(3, GridUnitType.Pixel);
-
-      this.Title = $"Browse - {Connections.Instance.DatabaseModel.ServerName} - {Connections.Instance.DatabaseModel.DatabaseName} - {tableModel.TableName}";
       
       string selectQuery = TableQueryBuilder.BuildSelectTop(tableModel);
       
@@ -59,6 +57,8 @@ namespace ERD.Viewer.Database
 
         this.ActionSQLQuery();
       }
+
+      this.Title = $"Browse - {Connections.Instance.DatabaseModel.ServerName} - {Connections.Instance.DatabaseModel.DatabaseName} - {tableModel.TableName}";
     }
 
     public DataTable QueryResults

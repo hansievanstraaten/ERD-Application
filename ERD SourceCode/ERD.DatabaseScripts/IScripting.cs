@@ -12,17 +12,19 @@ namespace ERD.Viewer.Database
 
         string ScriptTableCreate(TableModel table);
 
-        string BuildeColumnCreate(string tableName, ColumnObjectModel column);
+        string CreateSchema(string schemaName);
+
+        string BuildeColumnCreate(string schemaName, string tableName, ColumnObjectModel column);
 
         string BuildColumnAlter(string tableName, ColumnObjectModel column);
 
         string BuildForeignKey(TableModel table);
 
-        string DropForeignKey(string tableName, string constaintName);
+        string DropForeignKey(string schema, string tableName, string constaintName);
 
         string DropTable(TableModel table);
 
-        string DropColumn(string tableName, string columnName);
+        string DropColumn(string schema, string tableName, string columnName);
 
         string DatabaseDataType(ColumnObjectModel column);
 

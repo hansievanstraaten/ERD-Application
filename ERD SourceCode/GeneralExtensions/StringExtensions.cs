@@ -109,7 +109,7 @@ namespace GeneralExtensions
       return rgx.Replace(value, string.Empty);
     }
 
-    public static bool IsNumberic(this string value)
+    public static bool IsNumeric(this string value)
     {
       decimal resultValue = 0;
 

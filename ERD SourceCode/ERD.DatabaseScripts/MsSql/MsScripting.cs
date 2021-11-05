@@ -2,6 +2,7 @@
 using ERD.Common;
 using ERD.DatabaseScripts;
 using ERD.Models;
+using ERD.Models.ModelExstentions;
 using GeneralExtensions;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace ERD.Viewer.Database.MsSql
                 return DatabaseTypeEnum.SQL;
             }
         }
+
 
         public string ScriptTableCreate(TableModel table)
         {
@@ -42,12 +44,15 @@ namespace ERD.Viewer.Database.MsSql
 
             foreach (ColumnObjectModel deletedColumn in table.DeltedColumns)
             {
-                result.Append(this.DropColumn(table.TableName, deletedColumn.ColumnName));
+                result.Append(this.DropColumn(table.SchemaName, table.TableName, deletedColumn.ColumnName));
             }
 
             table.DeltedColumns = new ColumnObjectModel[] { };
 
             #endregion
+
+            result.AppendLine();
+            result.AppendLine(this.CreateSchema(table.SchemaName));
 
             result.AppendLine();
             result.AppendLine("IF NOT EXISTS (SELECT 1");
@@ -56,7 +61,7 @@ namespace ERD.Viewer.Database.MsSql
 
             result.AppendLine("BEGIN");
 
-            result.AppendLine($"    CREATE TABLE [{table.TableName}]");
+            result.AppendLine($"    CREATE TABLE {table.FullNameBraced()}");
             result.AppendLine("         ( ");
 
             foreach (ColumnObjectModel column in table.Columns.OrderByDescending(p => p.IsIdentity).ThenByDescending(k => k.InPrimaryKey))
@@ -100,7 +105,26 @@ namespace ERD.Viewer.Database.MsSql
                 table.Columns.Where(pkc => pkc.InPrimaryKey).Select(col => col.ColumnName).ToArray() :
                 new string[] { };
 
-            result.Append(this.BuildePrimaryKeyClusterCheck(table.PrimaryKeyClusterConstraintName, table.TableName, primaryKeyColumns));
+            result.Append(this.BuildePrimaryKeyClusterCheck(table.PrimaryKeyClusterConstraintName, table.FullNameBraced(), primaryKeyColumns));
+
+            return result.ToString();
+        }
+        
+        public string CreateSchema(string schemaName)
+		{
+            if (schemaName.IsNullEmptyOrWhiteSpace() || schemaName.ToLower() == "dbo")
+			{
+                return string.Empty;
+			}
+
+            StringBuilder result = new StringBuilder();
+
+            result.AppendLine("IF NOT EXISTS (SELECT  1");
+            result.AppendLine("                 FROM INFORMATION_SCHEMA.SCHEMATA");
+            result.AppendLine($"                 WHERE   SCHEMA_NAME = '{schemaName}')");
+            result.AppendLine("BEGIN");
+            result.AppendLine($"    EXECUTE('CREATE SCHEMA [{schemaName}] AUTHORIZATION [dbo]');");
+            result.AppendLine("END");
 
             return result.ToString();
         }
@@ -115,14 +139,14 @@ namespace ERD.Viewer.Database.MsSql
             result.AppendLine($"                WHERE TABLE_NAME = '{table.TableName}')");
 
             result.AppendLine("BEGIN");
-            result.AppendLine($"    DROP TABLE {table.TableName}");
+            result.AppendLine($"    DROP TABLE {table.FullNameBraced()}");
             result.AppendLine("END");
             result.AppendLine();
 
             return result.ToString();
         }
 
-        public string DropColumn(string tableName, string columnName)
+        public string DropColumn(string schema, string tableName, string columnName)
         {
             StringBuilder result = new StringBuilder();
 
@@ -132,7 +156,7 @@ namespace ERD.Viewer.Database.MsSql
             result.AppendLine($"                  AND COLUMN_NAME = '{columnName}')");
 
             result.AppendLine("BEGIN");
-            result.AppendLine($"    ALTER TABLE [{tableName}]");
+            result.AppendLine($"    ALTER TABLE [{schema}].[{tableName}]");
             result.AppendLine($"    DROP COLUMN [{columnName}];");
             result.AppendLine("END");
             result.AppendLine();
@@ -140,14 +164,14 @@ namespace ERD.Viewer.Database.MsSql
             return result.ToString();
         }
 
-        public string DropForeignKey(string tableName, string constaintName)
+        public string DropForeignKey(string schema, string tableName, string constaintName)
         {
             StringBuilder result = new StringBuilder();
 
             result.AppendLine("IF EXISTS(SELECT 1");
             result.AppendLine("          FROM SYS.FOREIGN_KEYS");
-            result.AppendLine($"         WHERE OBJECT_ID = OBJECT_ID(N'dbo.{constaintName}')");
-            result.AppendLine($"         AND PARENT_OBJECT_ID = OBJECT_ID(N'dbo.{tableName}'))");
+            result.AppendLine($"         WHERE OBJECT_ID = OBJECT_ID(N'{schema}{constaintName}')");
+            result.AppendLine($"         AND PARENT_OBJECT_ID = OBJECT_ID(N'{schema}{tableName}'))");
             result.AppendLine("BEGIN");
             result.AppendLine($" ALTER TABLE[{tableName}] DROP CONSTRAINT[{constaintName}]");
             result.AppendLine("END");
@@ -215,12 +239,12 @@ namespace ERD.Viewer.Database.MsSql
                     parentColumns.Remove((parentColumns.Length - 2), 2);
 
                     result.AppendLine();
-                    result.AppendLine($"IF (OBJECT_ID('dbo.{foreignKey.Key}', 'F') IS NULL)");
+                    result.AppendLine($"IF (OBJECT_ID('{table.SchemaNameBraced(true)}{foreignKey.Key}', 'F') IS NULL)");
                     result.AppendLine("BEGIN");
-                    result.AppendLine($"    ALTER TABLE [dbo].[{table.TableName}]  WITH CHECK ADD  CONSTRAINT [{fkName}] FOREIGN KEY({childColumns.ToString()})");
-                    result.AppendLine($"    REFERENCES [dbo].[{foreignKey.Value[0].ForeignKeyTable}] ({parentColumns.ToString()})");
+                    result.AppendLine($"    ALTER TABLE {table.FullNameBraced()}  WITH CHECK ADD  CONSTRAINT [{fkName}] FOREIGN KEY({childColumns.ToString()})");
+                    result.AppendLine($"    REFERENCES {table.SchemaNameBraced(true)}[{foreignKey.Value[0].ForeignKeyTable}] ({parentColumns.ToString()})");
                     result.AppendLine();
-                    result.AppendLine($"ALTER TABLE [dbo].[{table.TableName}] CHECK CONSTRAINT [{fkName}]");
+                    result.AppendLine($"ALTER TABLE {table.FullNameBraced()} CHECK CONSTRAINT [{fkName}]");
                     result.AppendLine("END");
                 }
             }
@@ -228,7 +252,7 @@ namespace ERD.Viewer.Database.MsSql
             return result.ToString();
         }
 
-        public string BuildeColumnCreate(string tableName, ColumnObjectModel column)
+        public string BuildeColumnCreate(string schemaName, string tableName, ColumnObjectModel column)
         {
             StringBuilder result = new StringBuilder();
 
@@ -241,7 +265,7 @@ namespace ERD.Viewer.Database.MsSql
                 result.AppendLine($"            WHERE TABLE_NAME  = '{tableName}' ");
                 result.AppendLine($"              AND COLUMN_NAME = '{originalName.Item1}')");
                 result.AppendLine("BEGIN");
-                result.AppendLine($"    EXEC sp_rename '{tableName}.{originalName.Item1}', '{originalName.Item2}', 'COLUMN';");
+                result.AppendLine($"    EXEC sp_rename '[{schemaName}].[{tableName}].[{originalName.Item1}]', '{originalName.Item2}', 'COLUMN';");
                 result.AppendLine("END");
 
                 result.AppendLine();
@@ -259,7 +283,7 @@ namespace ERD.Viewer.Database.MsSql
 
             result.AppendLine("BEGIN");
 
-            result.AppendLine($"    ALTER TABLE [{tableName}]");
+            result.AppendLine($"    ALTER TABLE [{schemaName}].[{tableName}]");
             if (column.IsIdentity)
             {
                 result.AppendLine($"    ADD [{column.ColumnName}] [{column.SqlDataType}]  IDENTITY(1,1) NOT NULL");
@@ -391,7 +415,7 @@ namespace ERD.Viewer.Database.MsSql
 
             foreach (ColumnObjectModel column in table.Columns)
             {
-                result.AppendLine(this.BuildeColumnCreate(table.TableName, column));
+                result.AppendLine(this.BuildeColumnCreate(table.SchemaName, table.TableName, column));
             }
 
             result.AppendLine(this.BuildColumnChanges(table));
@@ -422,7 +446,7 @@ namespace ERD.Viewer.Database.MsSql
 
                 if (originalDataType != null || originalNullable != null || originalMaxLen != null || originalPrecision != null || originalScale != null)
                 {
-                    result.Append(this.BuildColumnAlter(table.TableName, column));
+                    result.Append(this.BuildColumnAlter(table.FullNameBraced(), column));
                 }
             }
 
@@ -490,9 +514,9 @@ namespace ERD.Viewer.Database.MsSql
                         continue;
                     }
 
-                    result.AppendLine($"    IF (OBJECT_ID('dbo.{columnRelation.ForeignConstraintName}', 'F') IS NOT NULL)");
+                    result.AppendLine($"    IF (OBJECT_ID('{table.SchemaNameBraced(true)}[{columnRelation.ForeignConstraintName}]', 'F') IS NOT NULL)");
                     result.AppendLine("    BEGIN");
-                    result.AppendLine($"        ALTER TABLE [dbo].[{columnRelation.ChildTable}]  drop [{columnRelation.ForeignConstraintName}]");
+                    result.AppendLine($"        ALTER TABLE {table.SchemaNameBraced(true)}[{columnRelation.ChildTable}]  drop [{columnRelation.ForeignConstraintName}]");
                     result.AppendLine("    END");
                     result.AppendLine();
 
@@ -507,9 +531,9 @@ namespace ERD.Viewer.Database.MsSql
                     continue;
                 }
 
-                result.AppendLine($"    IF (OBJECT_ID('dbo.{fkColumn.ForeignConstraintName}', 'F') IS NOT NULL)");
+                result.AppendLine($"    IF (OBJECT_ID('{table.SchemaNameBraced(true)}[{fkColumn.ForeignConstraintName}]', 'F') IS NOT NULL)");
                 result.AppendLine("    BEGIN");
-                result.AppendLine($"        ALTER TABLE [dbo].[{table.TableName}]  drop [{fkColumn.ForeignConstraintName}]");
+                result.AppendLine($"        ALTER TABLE {table.FullNameBraced()}  drop [{fkColumn.ForeignConstraintName}]");
                 result.AppendLine("    END");
                 result.AppendLine();
 
@@ -520,9 +544,9 @@ namespace ERD.Viewer.Database.MsSql
             result.AppendLine("        FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS");
             result.AppendLine($"           WHERE CONSTRAINT_NAME = '{table.PrimaryKeyClusterConstraintName}')");
             result.AppendLine("            BEGIN");
-            result.AppendLine($"               ALTER TABLE {table.TableName} DROP CONSTRAINT {table.PrimaryKeyClusterConstraintName}");
+            result.AppendLine($"               ALTER TABLE {table.FullNameBraced()} DROP CONSTRAINT {table.PrimaryKeyClusterConstraintName}");
             result.AppendLine();
-            result.AppendLine($"               ALTER TABLE {table.TableName}");
+            result.AppendLine($"               ALTER TABLE {table.FullNameBraced()}");
 
             if (keyCount == 1)
             {
@@ -576,7 +600,7 @@ namespace ERD.Viewer.Database.MsSql
             result.AppendLine("               WHERE IS_PRIMARY_KEY = 1");
             result.AppendLine($"               AND[NAME] = '{constarintName}')");
             result.AppendLine("BEGIN");
-            result.AppendLine($"    ALTER TABLE[{tableName}]");
+            result.AppendLine($"    ALTER TABLE{tableName}");
             result.AppendLine($"    ADD CONSTRAINT {constarintName} PRIMARY KEY CLUSTERED({keyColumns.ToString()});");
             result.AppendLine("END");
 

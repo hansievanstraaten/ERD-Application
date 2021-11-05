@@ -32,7 +32,7 @@ namespace ERD.DatabaseScripts.Engineering
     {
       IReverseEngineer result = this.CreateClass(this.dispatch);
 
-      return result.GetTableColumns(tableName);
+      return result.GetTableColumns(Integrity.GetTableSchema(tableName), tableName);
     }
 
     public Dictionary<string, List<ColumnObjectModel>> GetInTableColumns(string[] tableNamesArray)

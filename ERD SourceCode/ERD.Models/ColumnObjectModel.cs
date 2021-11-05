@@ -273,7 +273,7 @@ namespace ERD.Models
                 this.SqlDataType = result;
 
                 //if (valueSplit.Length == 2 && valueSplit[1].ToUpper() != "MAX")
-                if (valueSplit.Length == 2 && valueSplit[1].IsNumberic())
+                if (valueSplit.Length == 2 && valueSplit[1].IsNumeric())
                 {
                     this.MaxLength = valueSplit[1].ToInt32();
                 }

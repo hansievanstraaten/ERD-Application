@@ -18,6 +18,7 @@ using REPORT.Builder;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -679,41 +680,61 @@ namespace ERD.Viewer
         {
             try
             {
-                string message = $"Would you like to Download and Install version {VersionManager.ServerVersion} now?";
-
-                if (MessageBox.Show(message, "New Version", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                if (VersionManager.CheckForUpdatesFailed)
                 {
-                    return;
+                    string url = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/VersionFile.txt";
+
+                    string message = "Sorry, the check for updates failed." + Environment.NewLine + Environment.NewLine +
+                                     "We are tying to read this file:" + Environment.NewLine +
+                                     url + Environment.NewLine + Environment.NewLine +
+                                     "Please contact your systems administrator for support on accessing the above file.";
+
+                    MessageBox.Show(message);
+
+                    Process.Start(url);
                 }
-
-                if (General.ProjectModel != null)
+                else
                 {
-                    string saveModelMessage = string.Format("Would you like to save your work?{0}{0}" +
-                                              " - Yes, to save and Continue with updates{0}" +
-                                              " - No, to Continue with updates{0}" +
-                                              " - Cancel to no save and cancel updates{0}", Environment.NewLine);
+					#region Version check passed and normal install updates process
 
-                    MessageBoxResult result = MessageBox.Show(saveModelMessage, "Save", MessageBoxButton.YesNoCancel);
+					string message = $"Would you like to Download and Install version {VersionManager.ServerVersion} now?";
 
-                    if (result == MessageBoxResult.Cancel)
+                    if (MessageBox.Show(message, "New Version", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                     {
                         return;
                     }
-                    else if (result == MessageBoxResult.Yes)
+
+                    if (General.ProjectModel != null)
                     {
-                        this.SaveModel();
+                        string saveModelMessage = string.Format("Would you like to save your work?{0}{0}" +
+                                                  " - Yes, to save and Continue with updates{0}" +
+                                                  " - No, to Continue with updates{0}" +
+                                                  " - Cancel to no save and cancel updates{0}", Environment.NewLine);
+
+                        MessageBoxResult result = MessageBox.Show(saveModelMessage, "Save", MessageBoxButton.YesNoCancel);
+
+                        if (result == MessageBoxResult.Cancel)
+                        {
+                            return;
+                        }
+                        else if (result == MessageBoxResult.Yes)
+                        {
+                            this.SaveModel();
+                        }
+                        else if (result != MessageBoxResult.No)
+                        {
+                            return;
+                        }
                     }
-                    else if (result != MessageBoxResult.No)
-                    {
-                        return;
-                    }
+
+                    VersionManager version = new VersionManager();
+
+                    version.InstallUpdates();
+
+                    Application.Current.Shutdown();
+
+					#endregion
                 }
-
-                VersionManager version = new VersionManager();
-
-                version.InstallUpdates();
-
-                Application.Current.Shutdown();
             }
             catch (Exception err)
             {
@@ -1399,9 +1420,10 @@ namespace ERD.Viewer
 
             double maxWidth = tables.HasElements() ? tables.Max(m => ((TableMenuItem) m).DesiredNameWidth) : 0;
 
-            foreach (TableModel tableItem in tablesList.OrderBy(n => n.TableName))
+            foreach (TableModel tableItem in tablesList.OrderBy(n => n.SchemaName)
+                                                       .ThenBy(t => t.TableName))
             {
-                string itemName = tableItem.TableName.Replace(' ', '_');
+                string itemName = tableItem.TableName.MakeAlphaNumeric();
 
                 UIElement tableElement = tables.FirstOrDefault(t => ((TableMenuItem) t).Name == itemName);
 
@@ -1410,7 +1432,7 @@ namespace ERD.Viewer
                     continue;
                 }
 
-                TableMenuItem item = new TableMenuItem(tableItem) {Name = itemName};
+                TableMenuItem item = new TableMenuItem(tableItem) {Name = itemName };
 
                 item.TableMenuItemDoubleClick += this.TableMenuItem_DoubleClick;
 
@@ -1436,7 +1458,7 @@ namespace ERD.Viewer
 
         private void LoadToolsStack()
         {
-            TableMenuItem tableTool = new TableMenuItem(new TableModel {TableName = "Table", IsNewTable = true}) {Name = "Table"};
+            TableMenuItem tableTool = new TableMenuItem(new TableModel {TableName = "Table", SchemaName = string.Empty, IsNewTable = true}) {Name = "Table"};
 
             tableTool.TableMenuItemDoubleClick += this.TableMenuItem_DoubleClick;
 
@@ -1581,6 +1603,11 @@ namespace ERD.Viewer
                     {
                         this.Dispatcher.Invoke(() =>
                         {
+                            if (VersionManager.CheckForUpdatesFailed)
+							{
+                                this.uxInstallUpdates.Content = "Updates Failed";
+                            }
+
                             this.uxInstallUpdates.Visibility = Visibility.Visible;
 
                             this.uxInstallUpdates.StartAnimation();

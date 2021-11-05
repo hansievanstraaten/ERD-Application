@@ -2,6 +2,7 @@
 using ERD.Common;
 using ERD.FileManagement;
 using ERD.Models;
+using ERD.Models.ModelExstentions;
 using ERD.Viewer.Tables;
 using GeneralExtensions;
 using Newtonsoft.Json;
@@ -82,7 +83,7 @@ namespace ERD.Viewer.Tools
         {
             get
             {
-                return this.ErdSegment.SegmentTables.FirstOrDefault(tn => tn.TableName == tableName);
+                return this.ErdSegment.SegmentTables.FirstOrDefault(tn => tn.TableName == tableName || tn.FullName() == tableName);
             }
         }
 

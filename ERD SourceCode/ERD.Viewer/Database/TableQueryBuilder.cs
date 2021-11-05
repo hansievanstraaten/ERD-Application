@@ -33,7 +33,7 @@ namespace ERD.Viewer.Database
 
       result.AppendLine();
 
-      result.AppendLine($" FROM [{table.TableName}]");
+      result.AppendLine($" FROM [{table.SchemaName}].[{table.TableName}]");
 
       return result.ToString();
     }

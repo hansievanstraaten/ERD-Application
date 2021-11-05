@@ -19,6 +19,8 @@ namespace ERD.Common
 
         private static Dictionary<string, SqlDbType> globalColumnsDataType = new Dictionary<string, SqlDbType>();
 
+        private static Dictionary<string, string> tableSchemaNames = new Dictionary<string, string>();
+
         /// <summary>
         /// Key = ownerTable to lower
         /// </summary>
@@ -150,6 +152,16 @@ namespace ERD.Common
             }
 
             return $"{result}_{itemCount}";
+        }
+
+        public static string GetTableSchema(string tableName)
+        {
+            if (Integrity.tableSchemaNames.ContainsKey(tableName))
+            {
+                return Integrity.tableSchemaNames[tableName];
+            }
+
+            return "dbo";
         }
 
         public static string GetPrimaryKeyTable(string columnName)
@@ -332,6 +344,7 @@ namespace ERD.Common
             {
                 // NOTE: We check case but dont use it
                 Integrity.tableMasterList.Add(table.TableName);
+                Integrity.tableSchemaNames.Add(table.TableName, table.SchemaName);
             }
 
             if (!Integrity.tableColumns.ContainsKey(tableNameKey))

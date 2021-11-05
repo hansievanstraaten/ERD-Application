@@ -8,7 +8,7 @@ namespace ERD.DatabaseScripts.Engineering
   {
     List<TableModel> GetTables(Dispatcher dispatcher);
 
-    List<ColumnObjectModel> GetTableColumns(string tableName);
+    List<ColumnObjectModel> GetTableColumns(string schema, string tableName);
 
     Dictionary<string, List<ColumnObjectModel>> GetInTableColumns(string[] tableNamesArray);
 

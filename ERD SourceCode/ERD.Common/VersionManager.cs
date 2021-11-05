@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GeneralExtensions;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -15,10 +16,14 @@ namespace ERD.Common
         
         public static string ServerVersion { get; set; }
 
+        public static bool CheckForUpdatesFailed { get; private set; }
+
         public bool HaveUpdates(string thisVersion)
         {
             try
             {
+                CheckForUpdatesFailed = false;
+
                 string downloadFile = Path.Combine(this.downloadUrl, this.versionFile);
 
                 string saveVersionFile = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), this.versionFile);
@@ -33,6 +38,15 @@ namespace ERD.Common
                     .Replace("\r", string.Empty);
 
                 File.Delete(saveVersionFile);
+
+                if (!this.IsVersionNumber(VersionManager.ServerVersion))
+				{
+                    CheckForUpdatesFailed = true;
+
+                    VersionManager.ServerVersion = string.Empty;
+                    // We now need to notify the user that the system updates failed.
+                    return true;
+				}
 
                 return thisVersion != VersionManager.ServerVersion;
             }
@@ -75,5 +89,30 @@ namespace ERD.Common
                 return result;
             }
         }
+    
+        private bool IsVersionNumber(string version)
+		{
+            if (version.IsNullEmptyOrWhiteSpace())
+			{
+                return false;
+			}
+
+            string[] versionSplit = version.Split('.');
+
+            if (versionSplit.Length != 4)
+			{
+                return false;
+			}
+
+            for(int x = 0; x < 4; ++x)
+			{
+                if (!versionSplit[x].IsNumeric())
+				{
+                    return false;
+				}
+			}
+
+            return true;
+		}
     }
 }

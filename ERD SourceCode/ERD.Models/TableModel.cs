@@ -16,6 +16,8 @@ namespace ERD.Models
 
         private string tableName;
 
+        private string schemaName = "dbo";
+
         private string friendlyName;
 
         private string erdSegmentModelName;
@@ -62,11 +64,24 @@ namespace ERD.Models
             set
             {
                 base.OnPropertyChanged("TableName", ref this.tableName, value);
-
             }
         }
 
-        [FieldInformation("Friendly Name", Sort = 2)]
+        [FieldInformation("Schema", DisableSpellChecker = true, Sort = 21)]
+        public string SchemaName
+        {
+            get
+            {
+                return this.schemaName;
+            }
+
+            set
+            {
+                base.OnPropertyChanged("SchemaName", ref this.schemaName, value);
+            }
+        }
+
+        [FieldInformation("Friendly Name", Sort = 3)]
         public string FriendlyName
         {
             get
@@ -86,7 +101,7 @@ namespace ERD.Models
             }
         }
 
-        [FieldInformation("Plural Name", DisableSpellChecker = true, Sort = 3)]
+        [FieldInformation("Plural Name", DisableSpellChecker = true, Sort = 4)]
         public string PluralName
         {
             get
@@ -102,7 +117,7 @@ namespace ERD.Models
             }
         }
         
-        [FieldInformation("Description", Sort = 4)]
+        [FieldInformation("Description", Sort = 5)]
         public string Description
         {
             get

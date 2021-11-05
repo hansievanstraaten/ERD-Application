@@ -1,19 +1,21 @@
 ﻿namespace ERD.DatabaseScripts
 {
-  public interface ISQLQueries
-  {
-    string DatabaseTablesQuery(string databaseName);
-    
-    string DatabaseColumnUsageQuery(string columnName);
+    public interface ISQLQueries
+    {
+        string DatabaseTablesQuery(string databaseName);
 
-    string DatabaseTableColumnsQuery(string tableName);
+        string DatabaseColumnUsageQuery(string columnName);
 
-    string DatabaseInTableColumnsQuery(string[] tableNamesArray);
+        string DatabaseTableColumnsQuery(string schema, string tableName);
 
-    string DatabaseColumnKeysQuery(string tableName, string columnName);
+        string DatabaseInTableColumnsQuery(string[] tableNamesArray);
 
-    string DatabaseInColumnKeysQuery(string tableName, string[] columnNamesArray);
+        string DatabaseColumnKeysQuery(string tableName, string columnName);
 
-    string DatabasePrimaryClusterName(string tableName);
-  }
+        string DatabaseInColumnKeysQuery(string tableName, string[] columnNamesArray);
+
+        string DatabasePrimaryClusterName();
+
+        string DatabasePrimaryClusterName(string tableName);
+    }
 }

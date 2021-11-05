@@ -26,17 +26,24 @@ namespace WPF.Tools.CommonControls
 
         public double StringRenderLength(string textValue)
         {
-            FormattedText formattedText = new FormattedText(
-        textValue,
-        CultureInfo.CurrentCulture,
-        FlowDirection.LeftToRight,
-        new Typeface(this.FontFamily, this.FontStyle, this.FontWeight, this.FontStretch),
-        this.FontSize,
-        Brushes.Black,
-        new NumberSubstitution(),
-        1);
+            if (textValue.IsNullEmptyOrWhiteSpace())
+			{
+                return 0;
+			}
 
-            return formattedText.Width;
+            int charCount = textValue.ToCharArray().Length;
+
+            FormattedText formattedText = new FormattedText(
+                        textValue,
+                        CultureInfo.CurrentCulture,
+                        FlowDirection.LeftToRight,
+                        new Typeface(this.FontFamily, this.FontStyle, this.FontWeight, this.FontStretch),
+                        this.FontSize,
+                        Brushes.Black,
+                        new NumberSubstitution(),
+                        1);
+
+            return formattedText.Width + charCount;
         }
 
         public double StringRenderHeight(string textValue)

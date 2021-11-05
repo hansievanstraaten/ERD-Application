@@ -1,0 +1,12 @@
+Release notes: 1.6.0.0
+**************
+
+Feature
+*********************
+1. Implement support for Schemas
+
+
+Bug Fix:
+*********************
+1. Allow to read tables with special characters in the name
+2. Fix bug on update check where security blocks the access

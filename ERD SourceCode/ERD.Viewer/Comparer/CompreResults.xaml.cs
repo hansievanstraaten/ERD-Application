@@ -228,7 +228,7 @@ namespace ERD.Viewer.Comparer
 
           foreach(ColumnObjectModel column in model.TableObject.Columns)
           {
-            tableResult.AppendLine(Scripting.BuildeColumnCreate(model.TableName, column));
+            tableResult.AppendLine(Scripting.BuildeColumnCreate(Integrity.GetTableSchema(model.TableName), model.TableName, column));
 
             tableResult.AppendLine(Scripting.BuildColumnAlter(model.TableName, column));
           }
@@ -245,7 +245,7 @@ namespace ERD.Viewer.Comparer
       {
         case ObjectTypeEnum.Column:
 
-          return Scripting.BuildeColumnCreate(model.TableName, model.TableObject.Columns.First(col => col.ColumnName == model.ObjectName));
+          return Scripting.BuildeColumnCreate(Integrity.GetTableSchema(model.TableName), model.TableName, model.TableObject.Columns.First(col => col.ColumnName == model.ObjectName));
 
         case ObjectTypeEnum.ForeignKeyConstraint:
 
@@ -265,7 +265,7 @@ namespace ERD.Viewer.Comparer
       {
         case ObjectTypeEnum.Column:
 
-          return Scripting.DropColumn(model.TableName, model.ObjectName);
+          return Scripting.DropColumn(Integrity.GetTableSchema(model.TableName), model.TableName, model.ObjectName);
 
         case ObjectTypeEnum.ForeignKeyConstraint:
 

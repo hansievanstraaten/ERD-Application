@@ -1,0 +1,8 @@
+Release notes: 1.6.0.2
+*********************
+
+Minor bugs and fixes:
+*********************
+Table drop:
+ 1. Correct a bug that duplicated tables with special characters in the name when they are droped on the canvas
+

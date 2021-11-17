@@ -3,11 +3,13 @@ using ERD.DatabaseScripts;
 using ERD.DatabaseScripts.Engineering;
 using ERD.Models;
 using GeneralExtensions;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Threading;
 using System.Xml.Linq;
+using ViSo.Dialogs.ModelViewer;
 using WPF.Tools.Functions;
 
 namespace ERD.Viewer.Database.MsSql
@@ -43,8 +45,21 @@ namespace ERD.Viewer.Database.MsSql
 
             dispatcher.Invoke(() =>
             {
+                RECONNECT:
+
                 dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
+            
+                if (!dataAccess.TestConnection())
+			    {
+                    if (ModelView.ShowDialog("Connection Failure", Connections.Instance.DatabaseModel).IsFalse())
+					{
+                        throw new Exception("Connection failure. User opt out.");
+					}
+
+                    goto RECONNECT;
+                }
             });
+
 
             XDocument tablesXml = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseTablesQuery(Connections.Instance.DatabaseModel.DatabaseName));
 

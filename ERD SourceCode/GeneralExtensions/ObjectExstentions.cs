@@ -318,6 +318,39 @@ namespace GeneralExtensions
             return result;
         }
 
+        public static object CopyTo<T>(this T source, object result)
+        {
+            var sourceT = source.GetType();
+
+            var resultT = result.GetType();
+
+            foreach (PropertyInfo item in sourceT.GetProperties())
+            {
+                if (item.CanRead && !item.CanWrite)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var resultP = resultT.GetProperty(item.Name);
+
+                    if (resultP == null)
+                    {
+                        continue;
+                    }
+
+                    resultP.SetValue(result, item.GetValue(source, null), null);
+                }
+                catch
+                {
+                    // Do Nothing
+                }
+            }
+
+            return result;
+        }
+
         public static T TryCast<T>(object o)
         {
             return (T)o;

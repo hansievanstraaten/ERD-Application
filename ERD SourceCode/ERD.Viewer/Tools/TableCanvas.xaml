@@ -19,6 +19,8 @@
                                          Click="AdditionalTables_Clicked" />
             <CommonControls:ActionButton ResourceImageName="Print" ToolTip="Print Canvas." 
                                          Click="PrintCanvas_Clicked" />
+            <CommonControls:ActionButton ResourceImageName="Edit" ToolTip="Edit canvas metadata."
+                                         Click="EditCanvasData_Clicked"/>
             <CommonControls:LableItem x:Name="uxTabMetadata" Foreground="Blue" />
             <CommonControls:LableItem x:Name="uxTabLock" Foreground="Red" />
         </StackPanel>

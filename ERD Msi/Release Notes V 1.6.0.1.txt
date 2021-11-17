@@ -1,0 +1,11 @@
+Release notes: 1.6.0.1
+*********************
+
+Minor bugs and fixes:
+*********************
+Open Project:
+ 1. Test for connection to prevent failure should the database have changed
+
+
+Enhacements:
+ 1. Add Canvas edit function to allow for changing the prefix

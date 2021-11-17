@@ -58,6 +58,30 @@ namespace ERD.DatabaseScripts.MsSql
             this._trustedConnection = setupValues["TrustedConnection"].ToBool();                
         }
 
+        public bool TestConnection()
+		{
+            try
+            {
+                this.connection = new SqlConnection(string.Format(this.connectionString, this._server, this._database, this._username, this._password, this._trustedConnection));
+
+                this.connection.Open();
+
+                return true;
+            }
+            catch (SqlException sqlErr)
+            {
+                return false;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                this.CloseConnection();
+            }
+		}
+
         public XDocument ExecuteQuery(string sqlQuery, int commandTimeout = 30)
         {
             StringBuilder resultString = new StringBuilder();
@@ -272,15 +296,7 @@ namespace ERD.DatabaseScripts.MsSql
             }
             catch
             {
-                if (this.connection != null)
-                {
-                    if (this.connection.State == System.Data.ConnectionState.Open)
-                    {
-                        this.connection.Close();
-                    }
-
-                    this.connection = null;
-                }
+                this.CloseConnection();
 
                 throw;
             }

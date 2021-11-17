@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using ViSo.Common;
+using ViSo.Dialogs.ModelViewer;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Functions;
 
@@ -31,6 +32,8 @@ namespace ERD.Viewer.Tools
         public event TableAddedEvent TableAdded;
 
         public event TableRemovedEvent TableRemoved;
+
+        private string headingText = "Tables Prefix: ";
 
         public TableCanvas(ErdCanvasModel erdSegment, DatabaseModel databaseModel)
         {
@@ -57,7 +60,7 @@ namespace ERD.Viewer.Tools
 
             this.SizeChanged += this.TableCanvas_SizeChanged;
 
-            this.uxTabMetadata.Content = $"Tables Prefix: {this.ErdSegment.TablePrefix}";
+            this.uxTabMetadata.Content = $"{this.headingText} {this.ErdSegment.TablePrefix}";
 
         }
 
@@ -272,6 +275,34 @@ namespace ERD.Viewer.Tools
             this.uxTableCanvas.MinHeight = this.uxCanvasScroll.ActualHeight + 1000;
         }
 
+		private void EditCanvasData_Clicked(object sender, RoutedEventArgs e)
+		{
+            try
+			{
+                ErdCanvasEditModel editModel = this.ErdSegment.CopyTo(new ErdCanvasEditModel()).To<ErdCanvasEditModel>();
+
+                if (ModelView.ShowDialog("Edit Canvas", editModel).IsFalse())
+				{
+                    return;
+				}
+
+                if (editModel.TablePrefix == this.ErdSegment.TablePrefix)
+				{
+                    return;
+				}
+
+                this.ErdSegment.SetLock(true, true);
+
+                editModel.CopyTo(this.ErdSegment);
+
+                this.uxTabMetadata.Content = $"{this.headingText} {this.ErdSegment.TablePrefix}";
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
         private void PrintCanvas_Clicked(object sender, RoutedEventArgs e)
         {
             try
@@ -314,5 +345,6 @@ namespace ERD.Viewer.Tools
 
             this.uxTabLock.Content = "This Canvas is locked by You";
         }
-    }
+
+	}
 }

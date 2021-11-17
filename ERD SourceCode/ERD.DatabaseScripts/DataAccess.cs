@@ -19,6 +19,11 @@ namespace ERD.Viewer.Database
             this.accessModel.Construct(databaseModel);
         }
 
+        public bool TestConnection()
+		{
+            return this.accessModel.TestConnection();
+		}
+
         public DataAccess(DatabaseTypeEnum databaseType, Dictionary<string, string> connectionValues)
         {
             this.accessModel = this.CreateClass(databaseType);

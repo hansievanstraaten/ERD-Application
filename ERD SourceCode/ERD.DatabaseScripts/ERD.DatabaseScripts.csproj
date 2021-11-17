@@ -95,6 +95,10 @@
       <Project>{CFB74CAF-B98C-4387-94E3-AE9AFBE16B7E}</Project>
       <Name>ViSo.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ViSo.Dialogs\ViSo.Dialogs.csproj">
+      <Project>{53C1D2AE-46E4-428F-80FB-7E1B238A2276}</Project>
+      <Name>ViSo.Dialogs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj">
       <Project>{53799C60-AA9D-4DEB-86E0-8E70DD1844F3}</Project>
       <Name>WPF.Tools</Name>

@@ -71,6 +71,7 @@
     <Compile Include="ColumnObjectModel.cs" />
     <Compile Include="ColumnRelationMapModel.cs" />
     <Compile Include="DatabaseRelation.cs" />
+    <Compile Include="ErdCanvasEditModel.cs" />
     <Compile Include="ErdCanvasModel.cs" />
     <Compile Include="IncludeTableModel.cs" />
     <Compile Include="ModelBase.cs" />

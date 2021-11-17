@@ -59,7 +59,7 @@ namespace ERD.Models
             set;
         }
 
-        [FieldInformation("Table Prefix")]
+        [FieldInformation("Table Prefix", DisableSpellChecker = true)]
         public string TablePrefix
         {
             get;

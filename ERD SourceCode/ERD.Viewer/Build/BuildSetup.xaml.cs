@@ -70,20 +70,20 @@ namespace ERD.Viewer.Build
 
         private void BuildSetup_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            try
-            {
-                if (this.uxTabs.Content == null)
-                {
-                    return;
-                }
+			try
+			{
+				if (this.uxTabs.Content == null)
+				{
+					return;
+				}
 
-                this.uxTabs.Content.MaxHeight = e.NewSize.Height - 65;
-            }
-            catch
-            {
-                // DO NOTHING
-            }
-        }
+				this.uxTabs.Content.MaxHeight = e.NewSize.Height - 65;
+			}
+			catch
+			{
+				// DO NOTHING
+			}
+		}
 
         private void BuildSetup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

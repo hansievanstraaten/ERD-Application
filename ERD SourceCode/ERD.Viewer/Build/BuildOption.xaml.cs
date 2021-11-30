@@ -76,7 +76,6 @@ namespace ERD.Viewer.Build
 
         private void BuildOption_Loaded(object sender, RoutedEventArgs e)
         {
-
             try
             {
                 if (base.WasFirstLoaded)
@@ -104,12 +103,14 @@ namespace ERD.Viewer.Build
 
                 foreach (BuildTypeModel buildType in this.OptionSetup.BuildTypes)
                 {
-                    buildType.PropertyChanged += this.BuildType_Changed;
-
                     this.uxBuildTypes.Items.Add(buildType);
 
                     this.uxBuildTypes[buildType.BuildTypeIndex].Header = $"{buildType.BuildTypeName} = [[{buildType.BuildTypeIndex}]]";
+
+                    buildType.PropertyChanged += this.BuildType_Changed;
                 }
+
+                this.LoadSampleScript();
 
                 base.WasFirstLoaded = true;
             }
@@ -153,13 +154,13 @@ namespace ERD.Viewer.Build
                     BuildTypeIndex = this.OptionSetup.BuildTypes.Length
                 };
 
-                buildType.PropertyChanged += this.BuildType_Changed;
-
                 this.OptionSetup.BuildTypes = this.OptionSetup.BuildTypes.Add(buildType);
 
                 this.uxBuildTypes.Items.Add(buildType);
 
                 this.uxBuildTypes[buildType.BuildTypeIndex].Header = $"{InputBox.Result} = [[{buildType.BuildTypeIndex}]]";
+
+                buildType.PropertyChanged += this.BuildType_Changed;
             }
             catch (Exception err)
             {
@@ -169,7 +170,10 @@ namespace ERD.Viewer.Build
 
         private void BuildType_Changed(object sender, PropertyChangedEventArgs e)
         {
-            this.LoadSampleScript();
+            if (this.IsLoaded)
+            {
+                this.LoadSampleScript();
+            }
         }
 
         private void OptionSetup_Browse(object sender, string buttonKey)

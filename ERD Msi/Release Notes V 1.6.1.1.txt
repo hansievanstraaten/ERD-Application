@@ -1,0 +1,6 @@
+Release notes: 1.6.1.1
+*********************
+
+Minor bugs and fixes:
+*********************:
+Improve script builder editor speed on start up

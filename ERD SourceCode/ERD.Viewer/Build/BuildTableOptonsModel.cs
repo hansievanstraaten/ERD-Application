@@ -15,7 +15,7 @@ namespace ERD.Viewer.Build
 	{
 		private string tableName;
 
-		[FieldInformation("Table", Sort = 0)]
+		[FieldInformation("Table Selected for Sample Scripting", Sort = 0)]
 		[ItemType(ModelItemTypeEnum.ComboBox, isComboboxEdit: false)]
 		[ValuesSource("TablesSource")]
 		public string TableName 

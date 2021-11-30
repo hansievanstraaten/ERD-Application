@@ -7,7 +7,9 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using ViSo.Dialogs.Input;
@@ -24,6 +26,8 @@ namespace ERD.Viewer.Build
     {
         private ErdCanvasModel canvas;
 
+        private TableModel selectedTable;
+
         private List<ErdCanvasModel> allErdCanvasModels;
 
         public BuildSetup(ErdCanvasModel sampleCanvas, List<ErdCanvasModel> allErdCanvases)
@@ -33,6 +37,8 @@ namespace ERD.Viewer.Build
             this.canvas = sampleCanvas;
 
             this.allErdCanvasModels = allErdCanvases;
+
+            this.SetSampleTableOptions();
 
             this.LoadBuildParamaters();
 
@@ -146,6 +152,30 @@ namespace ERD.Viewer.Build
 			}
 		}
 
+        private void SampleTable_Changed(object sender, PropertyChangedEventArgs e)
+        {
+            try
+			{
+                BuildTableOptonsModel optionModel = sender.To<BuildTableOptonsModel>();
+
+                DataItemModel dataModel = optionModel.TablesSource.FirstOrDefault(tn => tn.ItemKey.ParseToString() == optionModel.TableName);
+
+                ErdCanvasModel canvas = this.allErdCanvasModels.FirstOrDefault(c => c.ModelSegmentControlName == dataModel.Tag.ParseToString());
+
+                this.selectedTable = canvas.SegmentTables.FirstOrDefault(t => t.TableName == optionModel.TableName);
+
+                foreach(BuildOption tabItem in this.uxTabs.Items)
+				{
+                    tabItem.SelectedTable = this.selectedTable;
+				}
+
+            }
+            catch (Exception err)
+			{
+                MessageBox.Show(err.Message);
+			}
+        }
+
         private void ShowAddTab()
         {
             try
@@ -155,7 +185,7 @@ namespace ERD.Viewer.Build
                     return;
                 }
 
-                BuildOption option = new BuildOption(this.canvas, this.allErdCanvasModels) {Title = InputBox.Result, ShowCloseButton = true};
+                BuildOption option = new BuildOption(this.canvas, this.allErdCanvasModels) {Title = InputBox.Result, ShowCloseButton = true, SelectedTable = this.selectedTable};
 
                 this.uxTabs.Items.Add(option);
             }
@@ -188,7 +218,8 @@ namespace ERD.Viewer.Build
             {
                 Title = optionModel.OptionModelName,
                 OptionSetup = optionModel,
-                ShowCloseButton = true
+                ShowCloseButton = true,
+                SelectedTable = this.selectedTable
             };
 
             this.uxTabs.Items.Add(option);
@@ -224,5 +255,28 @@ namespace ERD.Viewer.Build
             }
         }
 
+        private void SetSampleTableOptions()
+        {
+            BuildTableOptonsModel sampleTables = new BuildTableOptonsModel();
+
+            List<DataItemModel> result = new List<DataItemModel>();
+
+            foreach (ErdCanvasModel canvas in this.allErdCanvasModels)
+            {
+                result.AddRange(canvas.SegmentTables
+                    .Select(t => new DataItemModel { DisplayValue = t.TableName, ItemKey = t.TableName, Tag = canvas.ModelSegmentControlName }));
+            }
+
+            sampleTables.TablesSource = result.ToArray();
+
+            this.uxSampleTables.Items.Add(sampleTables);
+
+            this.selectedTable = this.allErdCanvasModels[0].SegmentTables[0];
+
+            sampleTables.TableName = this.selectedTable.TableName;
+
+            sampleTables.PropertyChanged += this.SampleTable_Changed;
+        }
+		
 	}
 }

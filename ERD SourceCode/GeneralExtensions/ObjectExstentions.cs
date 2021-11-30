@@ -648,9 +648,7 @@ namespace GeneralExtensions
                 return false;
             }
 
-            var sourceT = source.GetType();
-
-            value = value;
+            Type sourceT = source.GetType();
 
             if (removeSpaces)
             {

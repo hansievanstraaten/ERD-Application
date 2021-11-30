@@ -13,8 +13,6 @@ namespace REPORT.Data.SQLRepository
 {
 	public class DbScript
 	{
-		private ReportTablesContext contex;
-
 		public void InitializeReportsDB(ReportSetupModel reportSetup)
 		{
 			Dictionary<string, string> connectionValues = new Dictionary<string, string>();

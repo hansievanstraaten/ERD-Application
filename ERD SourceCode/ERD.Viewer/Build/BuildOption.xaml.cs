@@ -13,16 +13,18 @@ using WPF.Tools.ModelViewer;
 
 namespace ERD.Viewer.Build
 {
-    /// <summary>
-    /// Interaction logic for BuildOption.xaml
-    /// </summary>
-    public partial class BuildOption : UserControlBase
+	/// <summary>
+	/// Interaction logic for BuildOption.xaml
+	/// </summary>
+	public partial class BuildOption : UserControlBase
     {
+        private string lastLoadTableName = string.Empty;
+
+        private TableModel selectedTable;
+
         private SampleScript scripting = new SampleScript();
 
         private OptionSetupModel optionSetup;
-
-        private ErdCanvasModel canvas;
 
         private List<ErdCanvasModel> allErdCanvasModels;
 
@@ -30,11 +32,33 @@ namespace ERD.Viewer.Build
         {
             this.InitializeComponent();
 
-            this.canvas = sampleCanvas;
+            this.SelectedCanvas = sampleCanvas;
+
+            this.SelectedTable = this.SelectedCanvas.SegmentTables[0];
 
             this.allErdCanvasModels = allErdCanvases;
 
             this.Loaded += this.BuildOption_Loaded;
+        }
+
+        public ErdCanvasModel SelectedCanvas { get; set; }
+
+        public TableModel SelectedTable 
+        { 
+            get
+			{
+                return this.selectedTable;
+			}
+            
+            set
+			{
+                this.selectedTable = value;
+
+                if (this.IsLoaded)
+				{
+                    this.LoadSampleScript();
+				}
+			}
         }
 
         public OptionSetupModel OptionSetup
@@ -52,13 +76,19 @@ namespace ERD.Viewer.Build
 
         private void BuildOption_Loaded(object sender, RoutedEventArgs e)
         {
-            if (base.WasFirstLoaded)
-            {
-                return;
-            }
 
             try
             {
+                if (base.WasFirstLoaded)
+                {
+                    if (this.SelectedTable.TableName != this.lastLoadTableName)
+					{
+                        this.LoadSampleScript();
+					}
+
+                    return;
+                }
+
                 if (this.OptionSetup == null)
                 {
                     this.OptionSetup = new OptionSetupModel();
@@ -139,37 +169,7 @@ namespace ERD.Viewer.Build
 
         private void BuildType_Changed(object sender, PropertyChangedEventArgs e)
         {
-            this.scripting.LanguageOption = this.OptionSetup.LanguageOption;
-
-            try
-            {
-                switch (this.OptionSetup.RepeatOption)
-                {
-                    case RepeatOptionEnum.ForeachCanvas:
-
-                        this.uxSampleScript.Text = this.scripting.BuildSampleForeachCanvasScript(this.canvas, this.allErdCanvasModels, this.OptionSetup);
-
-                        break;
-
-                    case RepeatOptionEnum.ForeachTableProject:
-
-                        this.uxSampleScript.Text = this.scripting.BuildSampleForeachTableScript(this.canvas, this.allErdCanvasModels, this.canvas.SegmentTables[0], this.OptionSetup);
-
-                        break;
-
-                    case RepeatOptionEnum.SingleFile:
-
-                        this.uxSampleScript.Text = this.scripting.BuildSingleFile(this.OptionSetup);
-
-                        break;
-
-                }
-
-            }
-            catch (Exception err)
-            {
-                // DO NOTHING
-            }
+            this.LoadSampleScript();
         }
 
         private void OptionSetup_Browse(object sender, string buttonKey)
@@ -253,6 +253,43 @@ namespace ERD.Viewer.Build
                     this.uxAddBuildType.IsEnabled = true;
 
                     break;
+            }
+        }
+    
+        private void LoadSampleScript()
+		{
+            try
+            {
+                this.scripting.LanguageOption = this.OptionSetup.LanguageOption;
+
+                this.lastLoadTableName = this.SelectedTable.TableName;
+
+                switch (this.OptionSetup.RepeatOption)
+                {
+                    case RepeatOptionEnum.ForeachCanvas:
+
+                        this.uxSampleScript.Text = this.scripting.BuildSampleForeachCanvasScript(this.SelectedCanvas, this.allErdCanvasModels, this.OptionSetup);
+
+                        break;
+
+                    case RepeatOptionEnum.ForeachTableProject:
+
+                        this.uxSampleScript.Text = this.scripting.BuildSampleForeachTableScript(this.SelectedCanvas, this.allErdCanvasModels, this.SelectedTable, this.OptionSetup);
+
+                        break;
+
+                    case RepeatOptionEnum.SingleFile:
+
+                        this.uxSampleScript.Text = this.scripting.BuildSingleFile(this.OptionSetup);
+
+                        break;
+
+                }
+
+            }
+            catch (Exception err)
+            {
+                // DO NOTHING
             }
         }
     }

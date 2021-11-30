@@ -79,8 +79,9 @@
     <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup />
   <PropertyGroup>
-    <NoWin32Manifest>true</NoWin32Manifest>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -206,6 +207,7 @@
     <Compile Include="Build\BuildSetup.xaml.cs">
       <DependentUpon>BuildSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Build\BuildTableOptonsModel.cs" />
     <Compile Include="Columns\ColumnsEdit.xaml.cs">
       <DependentUpon>ColumnsEdit.xaml</DependentUpon>
     </Compile>
@@ -372,6 +374,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
+    <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

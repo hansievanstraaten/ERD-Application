@@ -155,8 +155,6 @@ namespace GeneralExtensions
 
     public static string FirstToUpper(this string e)
     {
-      e = e;
-
       if (string.IsNullOrEmpty(e))
       {
         return string.Empty;

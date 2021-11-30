@@ -510,7 +510,7 @@ namespace REPORT.Builder
 				return;
 			}
 
-			Type classType = classType = this.tyesDictionary[this.InvokeMethodSetup.NamespaceValue];
+			Type classType = this.tyesDictionary[this.InvokeMethodSetup.NamespaceValue];
 
 			List<DataItemModel> methodList = new List<DataItemModel>();
 

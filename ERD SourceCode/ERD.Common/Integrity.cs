@@ -450,8 +450,6 @@ namespace ERD.Common
 
         public static void RemoveColumnMapping(ColumnObjectModel column, string ownerTable)
         {
-            ownerTable = ownerTable;
-
             string columnNameKey = column.ColumnName;
 
             lock (globalColumnsCountLock)

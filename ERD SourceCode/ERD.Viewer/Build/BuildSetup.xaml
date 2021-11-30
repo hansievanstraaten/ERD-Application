@@ -1,4 +1,5 @@
-﻿<src:WindowBase xmlns:TabControl="clr-namespace:WPF.Tools.TabControl;assembly=WPF.Tools"  
+﻿<src:WindowBase xmlns:ModelViewer="clr-namespace:WPF.Tools.ModelViewer;assembly=WPF.Tools"  
+                xmlns:TabControl="clr-namespace:WPF.Tools.TabControl;assembly=WPF.Tools"  
                 xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
                 x:Class="ERD.Viewer.Build.BuildSetup"
                 xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
@@ -14,6 +15,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -21,18 +23,20 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-
-        <StackPanel Grid.Row="0" Grid.Column="0">
+        
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
             <CommonControls:ActionButton ResourceImageName="Save" ToolTip="save" Click="Save_Click" />
             <CommonControls:ActionButton ResourceImageName="Add" ToolTip="Add Build Option" Click="TabAdd_Click" />
             <CommonControls:ActionButton ResourceImageName="Import" ToolTip="Import From Another Project" Click="Import_Click" />
         </StackPanel>
 
-        <StackPanel Grid.Row="0" Grid.Column="1" x:Name="uxParametersList">
+        <ModelViewer:ModelViewer x:Name="uxSampleTables" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"  />
+
+        <StackPanel Grid.Row="1" Grid.Column="1" x:Name="uxParametersList">
             <CommonControls:LableItem Content="Script Argument Parameters" FontWeight="Bold" />
         </StackPanel>
 
-        <TabControl:TabControl Grid.Row="0" Grid.Column="2" x:Name="uxTabs" />
+        <TabControl:TabControl Grid.Row="1" Grid.Column="2" x:Name="uxTabs" />
         
     </Grid>
 </src:WindowBase>

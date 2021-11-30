@@ -1,0 +1,7 @@
+Release notes: 1.6.0.2
+*********************
+
+Script Build Enhancement:
+*********************
+Allow for table to be selected as script preview in the script builder setup
+

@@ -15,7 +15,7 @@ namespace ERD.DatabaseScripts
         public string DatabaseColumnUsageQuery(string columnName)
         {
             string query = "SELECT [TAB].[NAME] AS [TABLENAME]," +
-                           "  [COL].[MAX_LENGTH]," +
+                           "  [INF_COL].[CHARACTER_MAXIMUM_LENGTH] AS 'MAX_LENGTH'," +
                            "  [COL].[PRECISION]," +
                            "  [COL].[SCALE]," +
                            "  [COL].[IS_NULLABLE]," +
@@ -51,7 +51,7 @@ namespace ERD.DatabaseScripts
         {
             string query = "SELECT [TAB].[NAME] AS [TABLENAME]," +
                            "  [COL].[NAME] AS [COLUMNNAME]," +
-                           "  [COL].[MAX_LENGTH]," +
+                           "  [INF_COL].[CHARACTER_MAXIMUM_LENGTH] AS 'MAX_LENGTH'," +
                            "  [COL].[PRECISION]," +
                            "  [COL].[SCALE]," +
                            "  [COL].[IS_NULLABLE]," +
@@ -93,7 +93,7 @@ namespace ERD.DatabaseScripts
         {
             string query = "SELECT [TAB].[NAME] AS [TABLENAME]," +
                            "  [COL].[NAME] AS [COLUMNNAME]," +
-                           "  [COL].[MAX_LENGTH]," +
+                           "  [INF_COL].[CHARACTER_MAXIMUM_LENGTH] AS 'MAX_LENGTH'," +
                            "  [COL].[PRECISION]," +
                            "  [COL].[SCALE]," +
                            "  [COL].[IS_NULLABLE]," +

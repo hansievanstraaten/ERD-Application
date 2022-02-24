@@ -1,0 +1,10 @@
+Release notes: 1.6.1.2
+*********************
+
+Minor bugs and fixes:
+*********************:
+Column length 
+	• Correct column lenght for N-Types
+	
+Scrip Builder
+	• Correct alter table column script

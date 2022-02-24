@@ -313,7 +313,7 @@ namespace ERD.Viewer.Database.MsSql
             result.AppendLine($"            WHERE TABLE_NAME  = '{tableName}' ");
             result.AppendLine($"              AND COLUMN_NAME = '{column.ColumnName}')");
             result.AppendLine("BEGIN");
-            result.AppendLine($"    ALTER TABLE [{tableName}]");
+            result.AppendLine($"    ALTER TABLE {tableName}");
             result.AppendLine($"    ALTER COLUMN [{column.ColumnName}] [{this.ColumnDataType(column)}] {this.FieldLength(column)} {this.NullString(column)}");
             result.AppendLine("END");
 

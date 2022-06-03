@@ -28,6 +28,7 @@ using MenuItem = System.Windows.Controls.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using ViSo.Dialogs.ModelViewer;
+using ERD.Viewer.Database.ExportData;
 
 namespace ERD.Viewer.Tools
 {
@@ -299,6 +300,21 @@ namespace ERD.Viewer.Tools
             }
         }
 
+        private void ExportData_Clicked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ExportManager export = new ExportManager(this.Table, (MenuItem) sender);
+
+                export.Show();
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
         private void ViewDataBaseScript_Clicked(object sender, RoutedEventArgs e)
         {
             try
@@ -417,10 +433,10 @@ namespace ERD.Viewer.Tools
             }
         }
 
-        private void SetupModel_Browse(object sender, string buttonKey)
-        {
-            EventParser.ParseMessage(sender, new ParseMessageEventArguments {Title = "SetupModel_Browse", Arguments = new object[] {buttonKey}});
-        }
+        //private void SetupModel_Browse(object sender, string buttonKey)
+        //{
+        //    EventParser.ParseMessage(sender, new ParseMessageEventArguments {Title = "SetupModel_Browse", Arguments = new object[] {buttonKey}});
+        //}
 
         private void TableName_RightButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -452,34 +468,53 @@ namespace ERD.Viewer.Tools
 
         private void InitializeTableNameContextMenu()
         {
-            #region HEADER CONTEXT SETUP
+            #region VIEW & EXPORT DATA SETUP
 
             this.uxTableName.ContextMenu = new ContextMenu();
             
             MenuItem viewData = new MenuItem {Header = "View Data"};
 
+            MenuItem exportData = new MenuItem { Header = "Export Data" };
+
             if (Connections.Instance.AlternativeModels.Count > 0)
             {
-                MenuItem defaultItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
+                MenuItem defaultViewItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
 
-                defaultItem.Click += this.ViewData_Clicked;
+                defaultViewItem.Click += this.ViewData_Clicked;
 
-                viewData.Items.Add(defaultItem);
+                viewData.Items.Add(defaultViewItem);
+
+
+                MenuItem defaultExportItem = new MenuItem { Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName };
+
+                defaultExportItem.Click += this.ExportData_Clicked;
+
+                exportData.Items.Add(defaultExportItem);
 
                 foreach (KeyValuePair<string, AltDatabaseModel> connection in Connections.Instance.AlternativeModels)
                 {
-                    MenuItem item = new MenuItem {Header = $"{connection.Key} ({connection.Value.DatabaseName})", Tag = connection.Key};
+                    MenuItem viewItem = new MenuItem {Header = $"{connection.Key} ({connection.Value.DatabaseName})", Tag = connection.Key};
 
-                    item.Click += this.ViewData_Clicked;
+                    viewItem.Click += this.ViewData_Clicked;
 
-                    viewData.Items.Add(item);
+                    viewData.Items.Add(viewItem);
+
+                    MenuItem exportItem = new MenuItem { Header = $"{connection.Key} ({connection.Value.DatabaseName})", Tag = connection.Key };
+
+                    exportItem.Click += this.ExportData_Clicked;
+
+                    exportData.Items.Add(exportItem);
                 }
             }
-            else // if (Connections.Instance.AlternativeModels.Count == 0)
+            else
             {
                 viewData.Click += this.ViewData_Clicked;
+
+                exportData.Click += this.ExportData_Clicked;
             }
-            
+
+            #endregion
+
             MenuItem editHeader = new MenuItem { Header = "Edit Table Header" };
 
             MenuItem viewDbScript = new MenuItem {Header = "View Database Script"};
@@ -510,6 +545,8 @@ namespace ERD.Viewer.Tools
 
             this.uxTableName.ContextMenu.Items.Add(viewData);
 
+            this.uxTableName.ContextMenu.Items.Add(exportData);
+
             this.uxTableName.ContextMenu.Items.Add(viewDbScript);
 
             this.uxTableName.ContextMenu.Items.Add(viewCSharp);
@@ -521,8 +558,6 @@ namespace ERD.Viewer.Tools
             this.uxTableName.ContextMenu.Items.Add(remove);
 
             this.uxTableName.ContextMenu.Items.Add(dropTable);
-
-            #endregion
         }
     
         private void InitializeColumnsContextMenu()

@@ -217,7 +217,9 @@
     <Compile Include="Database\BrowseData.xaml.cs">
       <DependentUpon>BrowseData.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Database\TableQueryBuilder.cs" />
+    <Compile Include="Database\ExportData\ExportManager.xaml.cs">
+      <DependentUpon>ExportManager.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Database\UserNameAndPassword.xaml.cs">
       <DependentUpon>UserNameAndPassword.xaml</DependentUpon>
     </Compile>
@@ -280,6 +282,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Database\BrowseData.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Database\ExportData\ExportManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -399,6 +405,10 @@
     <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj">
       <Project>{42d76052-8d0d-4571-8d65-861b7bb5cb6d}</Project>
       <Name>ERD.DatabaseScripts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ERD.DataExport\ERD.DataExport.csproj">
+      <Project>{CD3DC81D-E1CD-4BFD-B3C5-6C7F07205C32}</Project>
+      <Name>ERD.DataExport</Name>
     </ProjectReference>
     <ProjectReference Include="..\ERD.FileManagement\ERD.FileManagement.csproj">
       <Project>{6b6583b1-3798-4e85-b287-5db4689a3479}</Project>

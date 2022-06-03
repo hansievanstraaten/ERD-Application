@@ -1,4 +1,5 @@
 ﻿using ERD.Common;
+using ERD.DatabaseScripts;
 using ERD.Models;
 using GeneralExtensions;
 using System;
@@ -49,8 +50,8 @@ namespace ERD.Viewer.Database
 
       this.uxColumn1.Height = new GridLength(3, GridUnitType.Pixel);
       
-      string selectQuery = TableQueryBuilder.BuildSelectTop(tableModel);
-      
+      string selectQuery = SQLQueries.DatabaseQueries.BuildSelectTop(tableModel);
+
       if (!selectQuery.IsNullEmptyOrWhiteSpace())
       {
         this.uxSqlQuery.Text = selectQuery;

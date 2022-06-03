@@ -1,4 +1,5 @@
-﻿<src:WindowBase xmlns:DataGridObjects="clr-namespace:WPF.Tools.DataGridObjects;assembly=WPF.Tools"  xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
+﻿<src:WindowBase xmlns:DataGridObjects="clr-namespace:WPF.Tools.DataGridObjects;assembly=WPF.Tools"  
+                xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
                 xmlns:Specialized="clr-namespace:WPF.Tools.Specialized;assembly=WPF.Tools"  
                 x:Class="ERD.Viewer.Database.BrowseData"
                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"

@@ -1,0 +1,8 @@
+Release notes: 1.6.1.2
+*********************
+Implement data migration and export functionality. Note this functionality is not intended for huge data sets. (Depends on your machine)
+
+
+Minor bugs and fixes:
+*********************:
+

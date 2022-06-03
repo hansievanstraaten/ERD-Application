@@ -351,7 +351,7 @@ namespace ERD.DatabaseScripts.MsSql
                     return converter.ConvertTimeStamp(bytes);
 
                 case "bit":
-                    return Convert.ToBoolean(data);
+                    return Convert.ToBoolean(data) ? 1 : 0;
 
                 case "uniqueidentifier":
 

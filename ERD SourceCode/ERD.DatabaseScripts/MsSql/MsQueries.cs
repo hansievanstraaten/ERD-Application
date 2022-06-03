@@ -1,10 +1,46 @@
-﻿using GeneralExtensions;
+﻿using ERD.Models;
+using GeneralExtensions;
+using System.Linq;
 using System.Text;
 
 namespace ERD.DatabaseScripts
 {
     internal class MsQueries : ISQLQueries
     {
+        public string BuildSelectTop(TableModel table, int topValue = 100)
+        {
+            if (table.Columns.Count() == 0)
+            {
+                return string.Empty;
+            }
+
+            StringBuilder result = new StringBuilder();
+
+            for (int x = 0; x < table.Columns.Length; x++)
+            {
+                if (x == 0)
+                {
+                    string topString = topValue == 0 ? string.Empty : $" TOP {topValue}";
+
+                    result.AppendLine($"SELECT {topString} [{table.Columns[x].ColumnName}], ");
+                }
+                else
+                {
+                    result.AppendLine($"                           [{table.Columns[x].ColumnName}], ");
+                }
+            }
+
+            int removeIndex = result.Length - 4;
+
+            result.Remove(removeIndex, 4);
+
+            result.AppendLine();
+
+            result.AppendLine($" FROM [{table.SchemaName}].[{table.TableName}]");
+
+            return result.ToString();
+        }
+
         public string DatabaseTablesQuery(string databaseName)
         {
             string query = "SELECT [TABLE_NAME], [TABLE_SCHEMA] FROM [INFORMATION_SCHEMA].[TABLES] WHERE ([TABLE_TYPE] = 'BASE TABLE') AND ([TABLE_CATALOG] = '{0}')";

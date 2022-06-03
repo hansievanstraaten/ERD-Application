@@ -7,6 +7,7 @@ using GeneralExtensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -23,6 +24,241 @@ namespace ERD.Viewer.Database.MsSql
             }
         }
 
+        public string ScriptMerge(TableModel tableModel, string[] matchOnColumns, string csvFile, char delimiter, bool mergeIdentityValues, bool embedDataInSQL)
+        {
+            if (!matchOnColumns.HasElements())
+            {
+                throw new ArgumentException("Match on Columns require atleast one column.");
+            }
+
+            int tableColumnsCount = tableModel.Columns.Length;
+
+            StringBuilder result = new StringBuilder();
+
+            result.AppendLine("DROP TABLE IF EXISTS #csvData");
+
+            result.AppendLine();
+            result.AppendLine("BEGIN TRANSACTION");
+
+            result.AppendLine();
+            result.AppendLine("BEGIN TRY");
+
+            #region CREATE TEMP TABLE AND INSERT DATA
+
+            result.AppendLine("     CREATE TABLE #csvData");
+            result.AppendLine("	    (");
+
+            for(int x = 0; x < tableColumnsCount; ++x)
+            {
+                ColumnObjectModel column = tableModel.Columns[x];
+
+                if (x == (tableColumnsCount - 1))
+                {
+                    result.AppendLine($"           [{column.ColumnName}] [{this.ColumnDataType(column)}] {this.FieldLength(column)}"); // {this.NullString(column)}");
+                }
+                else
+                {
+                    result.AppendLine($"           [{column.ColumnName}] [{this.ColumnDataType(column)}] {this.FieldLength(column)},"); // {this.NullString(column)},");
+                }
+            }
+            
+            result.AppendLine("	    )");
+
+            result.AppendLine();
+
+            if (embedDataInSQL)
+            {
+                result.AppendLine("     INSERT INTO #csvData ");
+
+                result.Append("     (");
+
+                for (int x = 0; x < tableColumnsCount; ++x)
+                {
+                    ColumnObjectModel column = tableModel.Columns[x];
+
+                    if (x == (tableColumnsCount - 1))
+                    {
+                        result.Append($"[{column.ColumnName}]");
+                    }
+                    else
+                    {
+                        result.Append($"[{column.ColumnName}], ");
+                    }
+                }
+
+                result.AppendLine(")");
+
+                result.AppendLine("     VALUES ");
+
+                string[] dataLines = File.ReadAllLines(csvFile);
+
+                for(int l = 1; l < dataLines.Length; ++l)
+                {
+                    string line = dataLines[l];
+
+                    string[] lineItems = line.Split(delimiter, StringSplitOptions.None);
+
+                    result.Append("     (");
+
+                    for (int x = 0; x < tableColumnsCount; ++x)
+                    {
+                        string lineItem = lineItems[x].Replace("'", "''");
+
+                        if (x == (tableColumnsCount - 1))
+                        {
+                            result.Append($"'{lineItem}'");
+                        }
+                        else
+                        {
+                            result.Append($"'{lineItem}', ");
+                        }
+                    }
+
+                    if (l == (dataLines.Length - 1))
+                    {
+                        result.AppendLine(")");
+                    }
+                    else
+                    {
+                        result.AppendLine("),");
+                    }
+                }
+
+
+                //result.AppendLine("     )");
+            }
+            else
+            {
+                result.AppendLine("     BULK INSERT #csvData");
+                result.AppendLine($"     FROM '{csvFile}'");
+                result.AppendLine("     WITH");
+                result.AppendLine("     (");
+                result.AppendLine("         FIRSTROW = 2,");
+                result.AppendLine($"        FIELDTERMINATOR = '{delimiter}',");
+                result.AppendLine("         ROWTERMINATOR = '\n'");
+                result.AppendLine("     );");
+            }
+            
+            result.AppendLine();
+
+            #endregion
+
+            #region MERGE AND USING
+
+            result.AppendLine($"     MERGE [{tableModel.TableName}]  AS[TARGET]");
+            result.AppendLine("     USING #csvData	AS [SOURCE]");
+            result.AppendLine($"	    ON [TARGET].[{matchOnColumns[0]}] = [SOURCE].[{matchOnColumns[0]}]");
+
+            for (int x = 1; x < matchOnColumns.Length; ++x)
+            {
+                result.AppendLine($"        AND[TARGET].[{matchOnColumns[x]}] = [SOURCE].[{matchOnColumns[x]}]");
+            }
+
+            #endregion
+
+            #region WHEN MATCHED
+
+            result.AppendLine("     WHEN MATCHED");
+            result.AppendLine("        THEN UPDATE SET");
+
+            for (int x = 0; x < tableColumnsCount; ++x)
+            {
+                ColumnObjectModel column = tableModel.Columns[x];
+
+                if  (column.SqlDataType ==  SqlDbType.Timestamp ||
+                    (!mergeIdentityValues && column.IsIdentity))
+                {
+                    continue;
+                }
+
+                if (x == (tableColumnsCount - 1))
+                {
+                    result.AppendLine($"            [TARGET].[{column.ColumnName}] = [SOURCE].[{column.ColumnName}]");
+                }
+                else
+                {
+                    result.AppendLine($"            [TARGET].[{column.ColumnName}] = [SOURCE].[{column.ColumnName}],");
+                }
+            }
+
+            #endregion
+
+            #region WHEN NOT MATCHED BY TARGET
+
+            result.AppendLine("    WHEN NOT MATCHED BY TARGET");
+            result.Append("       THEN INSERT(");
+
+            for (int x = 0; x < tableColumnsCount; ++x)
+            {
+                ColumnObjectModel column = tableModel.Columns[x];
+
+                if (column.SqlDataType == SqlDbType.Timestamp ||
+                    (!mergeIdentityValues && column.IsIdentity))
+                {
+                    continue;
+                }
+
+                if (x == (tableColumnsCount - 1))
+                {
+                    result.AppendLine($"[{column.ColumnName}])");
+                }
+                else
+                {
+                    result.Append($"[{column.ColumnName}],");
+                }
+            }
+
+            result.Append("            VALUES(");
+
+            for (int x = 0; x < tableColumnsCount; ++x)
+            {
+                ColumnObjectModel column = tableModel.Columns[x];
+
+                if (column.SqlDataType == SqlDbType.Timestamp ||
+                    (!mergeIdentityValues && column.IsIdentity))
+                {
+                    continue;
+                }
+
+                if (x == (tableColumnsCount - 1))
+                {
+                    result.AppendLine($"[SOURCE].[{column.ColumnName}])");
+                }
+                else
+                {
+                    result.Append($"[SOURCE].[{column.ColumnName}],");
+                }
+            }
+
+            #endregion
+
+            result.AppendLine("     WHEN NOT MATCHED BY SOURCE");
+            result.AppendLine("        THEN DELETE;");
+
+            result.AppendLine();
+
+            result.AppendLine("     DROP TABLE IF EXISTS #csvData;");
+
+            result.AppendLine("     COMMIT TRANSACTION;");
+            result.AppendLine("END TRY");
+            result.AppendLine("BEGIN CATCH");
+            result.AppendLine("    ROLLBACK TRANSACTION;");
+            result.AppendLine("    DROP TABLE IF EXISTS #csvData;");
+
+            result.AppendLine("    THROW;");
+            result.AppendLine("END CATCH");
+
+
+            string fileName = Path.GetFileNameWithoutExtension(csvFile);
+
+            string filePath = Path.GetDirectoryName(csvFile);
+
+            string sqlFileName = Path.Combine(filePath, $"{fileName}.sql");
+
+            File.WriteAllText(sqlFileName, result.ToString());
+            
+            return sqlFileName;
+        }
 
         public string ScriptTableCreate(TableModel table)
         {

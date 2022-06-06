@@ -11,11 +11,19 @@ namespace ERD.DatabaseScripts
     {
         private static IScripting scripting;
 
-        public static string ScriptMerge(TableModel tableModel, string[] matchOnColumns, string csvFile, char delimiter, bool mergeIdentityValues, bool embedDataInSQL)
+        public static string ScriptMerge(TableModel tableModel, 
+            string[] matchOnColumns, 
+            string csvFile, 
+            char delimiter, 
+            bool mergeIdentityValues,
+            bool embedDataInSQL,
+            bool mergeInser,
+            bool mergeUpdate,
+            bool mergeDelete)
         {
             IScripting scriptor = Scripting.CreateClass();
 
-            return scripting.ScriptMerge(tableModel, matchOnColumns, csvFile, delimiter, mergeIdentityValues, embedDataInSQL);
+            return scripting.ScriptMerge(tableModel, matchOnColumns, csvFile, delimiter, mergeIdentityValues, embedDataInSQL, mergeInser, mergeUpdate, mergeDelete);
         }
 
         public static string ScriptTableCreate(TableModel table)

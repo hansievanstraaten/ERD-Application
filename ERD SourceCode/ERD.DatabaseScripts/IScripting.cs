@@ -10,7 +10,8 @@ namespace ERD.Viewer.Database
             get;
         }
 
-        string ScriptMerge(TableModel tableModel, string[] matchOnColumns, string csvFile, char delimiter, bool mergeIdentityValues, bool embedDataInSQL);
+        string ScriptMerge(TableModel tableModel, string[] matchOnColumns, string csvFile, char delimiter, bool mergeIdentityValues, bool embedDataInSQL,
+            bool mergeInser, bool mergeUpdate, bool mergeDelete);
 
         string ScriptTableCreate(TableModel table);
 

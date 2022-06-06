@@ -1,0 +1,9 @@
+Release notes: 1.7.0.1
+*********************
+
+Minor bugs and fixes:
+*********************:
+Correct Path selection
+	• Path selection did not apply when the file output for data export was selected.
+
+Add function to select if the export should script for Insert, Update and Delete respectively.

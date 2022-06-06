@@ -24,7 +24,15 @@ namespace ERD.Viewer.Database.MsSql
             }
         }
 
-        public string ScriptMerge(TableModel tableModel, string[] matchOnColumns, string csvFile, char delimiter, bool mergeIdentityValues, bool embedDataInSQL)
+        public string ScriptMerge(TableModel tableModel,
+            string[] matchOnColumns, 
+            string csvFile, 
+            char delimiter, 
+            bool mergeIdentityValues, 
+            bool embedDataInSQL,
+            bool mergeInser,
+            bool mergeUpdate,
+            bool mergeDelete)
         {
             if (!matchOnColumns.HasElements())
             {
@@ -158,26 +166,29 @@ namespace ERD.Viewer.Database.MsSql
 
             #region WHEN MATCHED
 
-            result.AppendLine("     WHEN MATCHED");
-            result.AppendLine("        THEN UPDATE SET");
-
-            for (int x = 0; x < tableColumnsCount; ++x)
+            if (mergeUpdate)
             {
-                ColumnObjectModel column = tableModel.Columns[x];
+                result.AppendLine("     WHEN MATCHED");
+                result.AppendLine("        THEN UPDATE SET");
 
-                if  (column.SqlDataType ==  SqlDbType.Timestamp ||
-                    (!mergeIdentityValues && column.IsIdentity))
+                for (int x = 0; x < tableColumnsCount; ++x)
                 {
-                    continue;
-                }
+                    ColumnObjectModel column = tableModel.Columns[x];
 
-                if (x == (tableColumnsCount - 1))
-                {
-                    result.AppendLine($"            [TARGET].[{column.ColumnName}] = [SOURCE].[{column.ColumnName}]");
-                }
-                else
-                {
-                    result.AppendLine($"            [TARGET].[{column.ColumnName}] = [SOURCE].[{column.ColumnName}],");
+                    if (column.SqlDataType == SqlDbType.Timestamp ||
+                        (!mergeIdentityValues && column.IsIdentity))
+                    {
+                        continue;
+                    }
+
+                    if (x == (tableColumnsCount - 1))
+                    {
+                        result.AppendLine($"            [TARGET].[{column.ColumnName}] = [SOURCE].[{column.ColumnName}]");
+                    }
+                    else
+                    {
+                        result.AppendLine($"            [TARGET].[{column.ColumnName}] = [SOURCE].[{column.ColumnName}],");
+                    }
                 }
             }
 
@@ -185,55 +196,65 @@ namespace ERD.Viewer.Database.MsSql
 
             #region WHEN NOT MATCHED BY TARGET
 
-            result.AppendLine("    WHEN NOT MATCHED BY TARGET");
-            result.Append("       THEN INSERT(");
-
-            for (int x = 0; x < tableColumnsCount; ++x)
+            if (mergeInser)
             {
-                ColumnObjectModel column = tableModel.Columns[x];
+                result.AppendLine("    WHEN NOT MATCHED BY TARGET");
+                result.Append("       THEN INSERT(");
 
-                if (column.SqlDataType == SqlDbType.Timestamp ||
-                    (!mergeIdentityValues && column.IsIdentity))
+                for (int x = 0; x < tableColumnsCount; ++x)
                 {
-                    continue;
+                    ColumnObjectModel column = tableModel.Columns[x];
+
+                    if (column.SqlDataType == SqlDbType.Timestamp ||
+                        (!mergeIdentityValues && column.IsIdentity))
+                    {
+                        continue;
+                    }
+
+                    if (x == (tableColumnsCount - 1))
+                    {
+                        result.AppendLine($"[{column.ColumnName}])");
+                    }
+                    else
+                    {
+                        result.Append($"[{column.ColumnName}],");
+                    }
                 }
 
-                if (x == (tableColumnsCount - 1))
-                {
-                    result.AppendLine($"[{column.ColumnName}])");
-                }
-                else
-                {
-                    result.Append($"[{column.ColumnName}],");
-                }
-            }
+                result.Append("            VALUES(");
 
-            result.Append("            VALUES(");
-
-            for (int x = 0; x < tableColumnsCount; ++x)
-            {
-                ColumnObjectModel column = tableModel.Columns[x];
-
-                if (column.SqlDataType == SqlDbType.Timestamp ||
-                    (!mergeIdentityValues && column.IsIdentity))
+                for (int x = 0; x < tableColumnsCount; ++x)
                 {
-                    continue;
-                }
+                    ColumnObjectModel column = tableModel.Columns[x];
 
-                if (x == (tableColumnsCount - 1))
-                {
-                    result.AppendLine($"[SOURCE].[{column.ColumnName}])");
-                }
-                else
-                {
-                    result.Append($"[SOURCE].[{column.ColumnName}],");
+                    if (column.SqlDataType == SqlDbType.Timestamp ||
+                        (!mergeIdentityValues && column.IsIdentity))
+                    {
+                        continue;
+                    }
+
+                    if (x == (tableColumnsCount - 1))
+                    {
+                        result.AppendLine($"[SOURCE].[{column.ColumnName}])");
+                    }
+                    else
+                    {
+                        result.Append($"[SOURCE].[{column.ColumnName}],");
+                    }
                 }
             }
 
             #endregion
 
-            result.AppendLine("     WHEN NOT MATCHED BY SOURCE");
-            result.AppendLine("        THEN DELETE;");
+            #region WHEN NOT EXIST IN SOURCE
+
+            if (mergeDelete)
+            {
+                result.AppendLine("     WHEN NOT MATCHED BY SOURCE");
+                result.AppendLine("        THEN DELETE;");
+            }
+
+            #endregion
 
             result.AppendLine();
 

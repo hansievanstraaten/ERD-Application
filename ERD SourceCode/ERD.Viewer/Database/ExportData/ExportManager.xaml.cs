@@ -92,7 +92,15 @@ namespace ERD.Viewer.Database.ExportData
 
                 string csvFile = exporter.Export(this.Options.Source, this.selectedTableModel, this.Options.DataDelimiter, this.Options.OutputDirectory, this.Options.TopX);
 
-                mergeSqlFile = Scripting.ScriptMerge(this.selectedTableModel, this.GetSelectedColumns(), csvFile, this.Options.DataDelimiter, this.Options.MergeIdentityValues, this.Options.PlaceDataInSQL);
+                mergeSqlFile = Scripting.ScriptMerge(this.selectedTableModel, 
+                    this.GetSelectedColumns(), 
+                    csvFile, 
+                    this.Options.DataDelimiter, 
+                    this.Options.MergeIdentityValues, 
+                    this.Options.PlaceDataInSQL, 
+                    this.Options.MergeInsert,
+                    this.Options.MergeUpdate,
+                    this.Options.MergeDelete);
 
                 if (!this.Options.PlaceDataInSQL)
                 {

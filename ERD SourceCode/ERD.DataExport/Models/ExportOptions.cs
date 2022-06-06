@@ -23,6 +23,12 @@ namespace ERD.DataExport.Models
         private bool mergeIdentityValues;
         
         private bool placeDataInSQL;
+        
+        private bool mergeUpdate = true;
+        
+        private bool mergeInsert = true;
+
+        private bool mergeDelete = false;
 
         [FieldInformation("Source", IsRequired = true, Sort = 1, IsReadOnly = true)]
         [ItemTypeAttribute(ModelItemTypeEnum.ComboBox, IsComboboxEditable = false)]
@@ -38,7 +44,7 @@ namespace ERD.DataExport.Models
             {
                 this.source = value;
 
-                base.OnPropertyChanged(this.Source);
+                base.OnPropertyChanged("Source");
             }
         }
 
@@ -56,7 +62,7 @@ namespace ERD.DataExport.Models
             {
                 this.description = value;
 
-                base.OnPropertyChanged(this.Destination);
+                base.OnPropertyChanged("Destination");
             }
         }
 
@@ -73,7 +79,7 @@ namespace ERD.DataExport.Models
             {
                 this.outputDirectory = value;
 
-                base.OnPropertyChanged(this.OutputDirectory);
+                base.OnPropertyChanged("OutputDirectory");
             }
         }
 
@@ -140,6 +146,57 @@ namespace ERD.DataExport.Models
                 this.placeDataInSQL = value;
 
                 base.OnPropertyChanged("PlaceDataInSQL");
+            }
+        }
+
+        [FieldInformation("Update existing rows in target.", Sort = 7)]
+        [ItemTypeAttribute(ModelItemTypeEnum.CheckBox)]
+        public bool MergeUpdate
+        {
+            get
+            {
+                return this.mergeUpdate;
+            }
+
+            set
+            {
+                this.mergeUpdate = value;
+
+                base.OnPropertyChanged("MergeUpdate");
+            }
+        }
+
+        [FieldInformation("Insert new rows in target.", Sort = 8)]
+        [ItemTypeAttribute(ModelItemTypeEnum.CheckBox)]
+        public bool MergeInsert
+        {
+            get
+            {
+                return this.mergeInsert;
+            }
+
+            set
+            {
+                this.mergeInsert = value;
+
+                base.OnPropertyChanged("MergeInsert");
+            }
+        }
+
+        [FieldInformation("Delete unmatched row from target.", Sort = 9)]
+        [ItemTypeAttribute(ModelItemTypeEnum.CheckBox)]
+        public bool MergeDelete
+        {
+            get
+            {
+                return this.mergeDelete;
+            }
+
+            set
+            {
+                this.mergeDelete = value;
+
+                base.OnPropertyChanged("MergeDelete");
             }
         }
 

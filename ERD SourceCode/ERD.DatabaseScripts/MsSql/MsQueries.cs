@@ -232,8 +232,11 @@ namespace ERD.DatabaseScripts
             result.Append("'");
 
             result.Append(itemsArray.Concatenate("', '"));
-
-            result.Remove((result.Length - 2), 2);
+            
+            if (result.Length >= 2)
+            {
+                result.Remove((result.Length - 2), 2);
+            }
 
             return result.ToString();
         }

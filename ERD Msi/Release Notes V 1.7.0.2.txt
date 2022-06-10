@@ -1,0 +1,8 @@
+Release notes: 1.7.0.2
+*********************
+Implement specific script selection from table header menu to assist in script generation for code maintenance.
+
+
+Minor bugs and fixes:
+*********************:
+

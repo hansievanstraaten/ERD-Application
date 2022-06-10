@@ -339,34 +339,30 @@ namespace ERD.Viewer.Tools
             }
         }
 
-        private void ViewCSharpScript_Cliked(object sender, RoutedEventArgs e)
+        private void ViewAllScript_Cliked(object sender, RoutedEventArgs e)
         {
             try
             {
-                ErdCanvasModel canvas = EventParser.ParseQuery(this, new ParseQueryEventArguments
-                {
-                    Title = "TableObjectCanvasQuery",
-                    Arguments = new object[] {this.Table.TableName}
-                }).To<ErdCanvasModel>();
-
-                SampleScript scriptor = new SampleScript();
-
                 foreach (OptionSetupModel option in BuildScript.Setup.BuildOptions.Where(o => o.RepeatOption == RepeatOptionEnum.ForeachTableProject))
                 {
-                    scriptor.LanguageOption = option.LanguageOption;
-
-                    string fileName = option.OutputFileName.Replace("[[TableName]]", this.Table.TableName);
-
-                    string filePath = Path.Combine(Path.GetTempPath(), $"{fileName}.txt");
-
-                    List<ErdCanvasModel> allErdCancases = EventParser.ParseQuery(this, "GetAllErdCanvasesAsList").To<List<ErdCanvasModel>>();
-
-                    string result = scriptor.BuildSampleForeachTableScript(canvas, allErdCancases, this.Table, option);
-
-                    File.WriteAllText(filePath, result);
-
-                    Process.Start(filePath);
+                    this.GenerateScriptFile(option);
                 }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message);
+            }
+        }
+
+        private void ViewSelectedScript_Cliked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MenuItem item = (MenuItem)sender;
+
+                OptionSetupModel option = item.Tag as OptionSetupModel;
+
+                this.GenerateScriptFile(option);
             }
             catch (Exception err)
             {
@@ -515,11 +511,31 @@ namespace ERD.Viewer.Tools
 
             #endregion
 
+            #region SCRIPT GENERATION
+
+            MenuItem viewCodeScript = new MenuItem {Header = "View Generated Script"};
+
+            MenuItem allScript = new MenuItem { Header = "<Script All>" };
+
+            allScript.Click += this.ViewAllScript_Cliked;
+
+            viewCodeScript.Items.Add(allScript);
+
+            foreach (OptionSetupModel option in BuildScript.Setup.BuildOptions.Where(o => o.RepeatOption == RepeatOptionEnum.ForeachTableProject))
+            {
+                MenuItem optionItem = new MenuItem { Header = option.OptionModelName, Tag = option };
+
+                optionItem.Click += this.ViewSelectedScript_Cliked;
+
+                viewCodeScript.Items.Add(optionItem);
+            }
+
+            #endregion
+
+            
             MenuItem editHeader = new MenuItem { Header = "Edit Table Header" };
 
             MenuItem viewDbScript = new MenuItem {Header = "View Database Script"};
-
-            MenuItem viewCSharp = new MenuItem {Header = "View Generated Script"};
 
             MenuItem undoChanges = new MenuItem {Header = "Undo Changes"};
 
@@ -529,17 +545,17 @@ namespace ERD.Viewer.Tools
 
             MenuItem dropTable = new MenuItem {Header = "Drop Table"};
 
+            
             editHeader.Click += this.EditHeader_Cliked;
 
             viewDbScript.Click += this.ViewDataBaseScript_Clicked;
-
-            viewCSharp.Click += this.ViewCSharpScript_Cliked;
 
             undoChanges.Click += this.UndoChanges_Clicked;
 
             remove.Click += this.Remove_Clicked;
 
             dropTable.Click += this.DropTable_Clicked;
+
 
             this.uxTableName.ContextMenu.Items.Add(editHeader);
 
@@ -549,7 +565,7 @@ namespace ERD.Viewer.Tools
 
             this.uxTableName.ContextMenu.Items.Add(viewDbScript);
 
-            this.uxTableName.ContextMenu.Items.Add(viewCSharp);
+            this.uxTableName.ContextMenu.Items.Add(viewCodeScript);
 
             this.uxTableName.ContextMenu.Items.Add(undoChanges);
 
@@ -559,7 +575,7 @@ namespace ERD.Viewer.Tools
 
             this.uxTableName.ContextMenu.Items.Add(dropTable);
         }
-    
+
         private void InitializeColumnsContextMenu()
         {
             #region DATA GRID SETUP
@@ -657,6 +673,31 @@ namespace ERD.Viewer.Tools
             {
                 MessageBox.Show(err.GetFullExceptionMessage());
             }
+        }
+    
+        private void GenerateScriptFile(OptionSetupModel option)
+        {
+            ErdCanvasModel canvas = EventParser.ParseQuery(this, new ParseQueryEventArguments
+            {
+                Title = "TableObjectCanvasQuery",
+                Arguments = new object[] { this.Table.TableName }
+            }).To<ErdCanvasModel>();
+
+            SampleScript scriptor = new SampleScript();
+
+            scriptor.LanguageOption = option.LanguageOption;
+
+            string fileName = option.OutputFileName.Replace("[[TableName]]", this.Table.TableName);
+
+            string filePath = Path.Combine(Path.GetTempPath(), $"{fileName}.txt");
+
+            List<ErdCanvasModel> allErdCancases = EventParser.ParseQuery(this, "GetAllErdCanvasesAsList").To<List<ErdCanvasModel>>();
+
+            string result = scriptor.BuildSampleForeachTableScript(canvas, allErdCancases, this.Table, option);
+
+            File.WriteAllText(filePath, result);
+
+            Process.Start(filePath);
         }
     }
 }

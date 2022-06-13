@@ -183,7 +183,7 @@ namespace ERD.Viewer.Database.MsSql
 
                     if (x == (tableColumnsCount - 1))
                     {
-                        result.AppendLine($"            [TARGET].[{column.ColumnName}] = [SOURCE].[{column.ColumnName}]");
+                        result.Append($"            [TARGET].[{column.ColumnName}] = [SOURCE].[{column.ColumnName}]");
                     }
                     else
                     {
@@ -193,6 +193,15 @@ namespace ERD.Viewer.Database.MsSql
             }
 
             #endregion
+
+            if (!mergeInser && !mergeDelete)
+            {
+                result.AppendLine(";");
+            }
+            else
+            {
+                result.AppendLine();
+            }
 
             #region WHEN NOT MATCHED BY TARGET
 
@@ -235,7 +244,7 @@ namespace ERD.Viewer.Database.MsSql
 
                     if (x == (tableColumnsCount - 1))
                     {
-                        result.AppendLine($"[SOURCE].[{column.ColumnName}])");
+                        result.Append($"[SOURCE].[{column.ColumnName}])");
                     }
                     else
                     {
@@ -245,6 +254,15 @@ namespace ERD.Viewer.Database.MsSql
             }
 
             #endregion
+
+            if (!mergeDelete)
+            {
+                result.AppendLine(";");
+            }
+            else
+            {
+                result.AppendLine();
+            }
 
             #region WHEN NOT EXIST IN SOURCE
 

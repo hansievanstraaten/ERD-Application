@@ -1,0 +1,8 @@
+Release notes: 1.7.0.3
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+Fix bug ons merge scripting
+

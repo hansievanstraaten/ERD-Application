@@ -1,0 +1,8 @@
+Release notes: 1.7.0.3
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+Fix bug with table header menu producing a close of the application when no sript file exists
+

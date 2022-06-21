@@ -513,21 +513,25 @@ namespace ERD.Viewer.Tools
 
             #region SCRIPT GENERATION
 
-            MenuItem viewCodeScript = new MenuItem {Header = "View Generated Script"};
-
-            MenuItem allScript = new MenuItem { Header = "<Script All>" };
-
-            allScript.Click += this.ViewAllScript_Cliked;
-
-            viewCodeScript.Items.Add(allScript);
-
-            foreach (OptionSetupModel option in BuildScript.Setup.BuildOptions.Where(o => o.RepeatOption == RepeatOptionEnum.ForeachTableProject))
+            MenuItem viewCodeScript = new MenuItem { Header = "View Generated Script" };
+            
+            if (BuildScript.Setup != null)
             {
-                MenuItem optionItem = new MenuItem { Header = option.OptionModelName, Tag = option };
 
-                optionItem.Click += this.ViewSelectedScript_Cliked;
+                MenuItem allScript = new MenuItem { Header = "<Script All>" };
 
-                viewCodeScript.Items.Add(optionItem);
+                allScript.Click += this.ViewAllScript_Cliked;
+
+                viewCodeScript.Items.Add(allScript);
+
+                foreach (OptionSetupModel option in BuildScript.Setup.BuildOptions.Where(o => o.RepeatOption == RepeatOptionEnum.ForeachTableProject))
+                {
+                    MenuItem optionItem = new MenuItem { Header = option.OptionModelName, Tag = option };
+
+                    optionItem.Click += this.ViewSelectedScript_Cliked;
+
+                    viewCodeScript.Items.Add(optionItem);
+                }
             }
 
             #endregion
@@ -565,7 +569,10 @@ namespace ERD.Viewer.Tools
 
             this.uxTableName.ContextMenu.Items.Add(viewDbScript);
 
-            this.uxTableName.ContextMenu.Items.Add(viewCodeScript);
+            if (BuildScript.Setup != null)
+            {
+                this.uxTableName.ContextMenu.Items.Add(viewCodeScript);
+            }
 
             this.uxTableName.ContextMenu.Items.Add(undoChanges);
 

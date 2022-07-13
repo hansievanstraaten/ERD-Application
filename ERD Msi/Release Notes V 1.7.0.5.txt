@@ -1,0 +1,8 @@
+Release notes: 1.7.0.5
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+Fix bug on export when exporting to default connection table
+

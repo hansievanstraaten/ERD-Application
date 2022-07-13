@@ -33,7 +33,7 @@ namespace ERD.Viewer.Database.ExportData
 
             this.Options.Source = connectionMenue.Tag.IsNullEmptyOrWhiteSpace() ? Connections.Instance.DefaultConnectionName : connectionMenue.Tag.ToString();
 
-            this.Options.Destination = "FileOutputOnly";
+            this.Options.Destination = "Default";
 
             this.Options.OutputDirectory = Path.GetTempPath();
 
@@ -50,7 +50,7 @@ namespace ERD.Viewer.Database.ExportData
 
             try
             {
-                if (this.Options.Destination == "FileOutputOnly")
+                if (this.Options.Destination == "Default")
                 {
                     this.uxModelView["Place Data In SQL"].IsReadOnly = false;
                 }

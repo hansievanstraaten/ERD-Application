@@ -223,7 +223,7 @@ namespace ERD.DataExport.Models
             {
                 List<DataItemModel> result = new List<DataItemModel>();
 
-                result.Add(new DataItemModel { DisplayValue = "<File Output Only>", ItemKey = "FileOutputOnly" });
+                result.Add(new DataItemModel { DisplayValue = "<File Output Only>", ItemKey = "Default" });
 
                 if (Connections.Instance.DefaultConnectionName != this.Source)
                 {

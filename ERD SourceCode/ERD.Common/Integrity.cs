@@ -137,7 +137,7 @@ namespace ERD.Common
 
         public static string BuildForeighKeyName(string parentTable, string childTable)
         {
-            string result = $"FK_{parentTable}_{childTable}";
+            string result = $"FK_{parentTable.MakeAlphaNumeric()}_{childTable.MakeAlphaNumeric()}";
 
             if (!Integrity.foreignKeyConstraintNames.Contains(result))
             {

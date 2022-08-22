@@ -1,0 +1,8 @@
+Release notes: 1.7.0.6
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+Fix bug on vertula relation (Non alpha numeric characters)
+

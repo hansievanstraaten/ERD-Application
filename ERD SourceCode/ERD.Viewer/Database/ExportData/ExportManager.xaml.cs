@@ -104,7 +104,7 @@ namespace ERD.Viewer.Database.ExportData
 
                 if (!this.Options.PlaceDataInSQL)
                 {
-                    MessageBox.Show("Export completed");
+                    MessageBox.Show("Files was created but not executed");
 
                     string argument = $"/select, \"{mergeSqlFile}\"";
 
@@ -119,7 +119,7 @@ namespace ERD.Viewer.Database.ExportData
 
                 access.ExecuteNonQuery(sqlMergeScript, 0);
 
-                MessageBox.Show("Merge completed");
+                MessageBox.Show("Migration was successful");
 
                 this.Close();
 

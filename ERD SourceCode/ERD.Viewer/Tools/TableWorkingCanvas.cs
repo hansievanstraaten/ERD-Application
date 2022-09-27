@@ -143,13 +143,20 @@ namespace ERD.Viewer.Tools
             {
                 await Task.Factory.StartNew(() =>
                 {
-                    ReverseEngineer reverseEngineer = new ReverseEngineer(this.Dispatcher);
+                    try
+                    {
+                        ReverseEngineer reverseEngineer = new ReverseEngineer(this.Dispatcher);
 
-                    EventParser.ParseMessage(this, this.Dispatcher, string.Empty, "Reading table information.");
+                        EventParser.ParseMessage(this, this.Dispatcher, string.Empty, "Reading table information.");
 
-                    table.Columns = table.Columns.AddRange(reverseEngineer.GetTableColumns(table.TableName).ToArray());
+                        table.Columns = table.Columns.AddRange(reverseEngineer.GetTableColumns(table.TableName).ToArray());
 
-                    table.PrimaryKeyClusterConstraintName = reverseEngineer.GetTablePrimaryKeyCluster(table.TableName);
+                        table.PrimaryKeyClusterConstraintName = reverseEngineer.GetTablePrimaryKeyCluster(table.TableName);
+                    }
+                    catch (Exception err)
+                    {
+                        EventParser.ParseError(this, err);
+                    }
                 });
             }
 

@@ -100,7 +100,7 @@ namespace ERD.Viewer.Database.MsSql
 
                 string[] dataLines = File.ReadAllLines(csvFile);
 
-                for(int l = 1; l < dataLines.Length; ++l)
+                for (int l = 1; l < dataLines.Length; ++l)
                 {
                     string line = dataLines[l];
 
@@ -131,9 +131,6 @@ namespace ERD.Viewer.Database.MsSql
                         result.AppendLine("),");
                     }
                 }
-
-
-                //result.AppendLine("     )");
             }
             else
             {

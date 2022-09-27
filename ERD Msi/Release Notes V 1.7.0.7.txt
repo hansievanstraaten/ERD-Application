@@ -1,0 +1,8 @@
+Release notes: 1.7.0.7
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+Fix bug on table creat if db connection failed
+

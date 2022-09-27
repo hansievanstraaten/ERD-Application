@@ -64,6 +64,11 @@ namespace ERD.DataExport
                 {
                     string columnValue = boxedRowValues[x].ParseToString();
 
+                    if (!columnValue.IsNullEmptyOrWhiteSpace())
+                    {
+                        columnValue = columnValue.Replace("\r\n", String.Empty);
+                    }
+
                     if(columnValue.Contains(delimiter))
                     {
                         throw new ArgumentException("Data contains the delimiter. Please change the delimiter.");

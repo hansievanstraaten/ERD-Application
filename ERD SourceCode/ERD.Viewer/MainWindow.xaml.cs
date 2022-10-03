@@ -521,7 +521,9 @@ namespace ERD.Viewer
 
                 UIElement[] tables = this.uxTableStack.FindVisualControls(typeof(TableMenuItem));
 
-                string itemName = tableModel.TableName.Replace(' ', '_');
+                string itemName = tableModel.TableName
+                    .Replace(' ', '_')
+                    .Replace(".", string.Empty);
 
                 TableMenuItem tableItem = tables.FirstOrDefault(t => ((TableMenuItem) t).Name == itemName) as TableMenuItem;
 

@@ -1,0 +1,8 @@
+Release notes: 1.7.0.8
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+Fix bug on table "Remove from Canvas" cater for doted names
+

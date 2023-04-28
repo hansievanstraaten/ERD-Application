@@ -1,0 +1,9 @@
+Release notes: 1.7.0.9
+*********************
+Upgrade newton soft to latest version
+
+Minor bugs and fixes:
+*********************:
+Implement empty canvas support
+
+

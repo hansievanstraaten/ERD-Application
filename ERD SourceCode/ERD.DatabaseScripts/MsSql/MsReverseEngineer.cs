@@ -142,6 +142,11 @@ namespace ERD.Viewer.Database.MsSql
 
         public Dictionary<string, List<ColumnObjectModel>> GetInTableColumns(string[] tableNamesArray)
         {
+            if (!tableNamesArray.HasElements())
+            {
+                return new Dictionary<string, List<ColumnObjectModel>>();
+            }
+
             EventParser.ParseMessage(this, this.dispatcher, "Reading Tables", "");
 
             Dictionary<string, List<ColumnObjectModel>> result = new Dictionary<string, List<ColumnObjectModel>>();

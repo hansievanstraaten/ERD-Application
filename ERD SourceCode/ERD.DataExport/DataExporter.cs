@@ -58,23 +58,25 @@ namespace ERD.DataExport
             // Build Data
             foreach (IDictionary<string, object> dataRow in resultList)
             {
-                object[] boxedRowValues = dataRow.Values.ToArray();
-
-                for (int x = 0; x < columnCount; ++x)
+                for(int x = 0; x < dataRow.Count; ++x)
                 {
-                    string columnValue = boxedRowValues[x].ParseToString();
+                    KeyValuePair<string, object> row = dataRow.ElementAt(x);
 
-                    if (!columnValue.IsNullEmptyOrWhiteSpace())
-                    {
-                        columnValue = columnValue.Replace("\r\n", String.Empty);
-                    }
+					ColumnObjectModel column = tableModel.Columns.First(c => c.ColumnName == row.Key);
 
-                    if(columnValue.Contains(delimiter))
-                    {
-                        throw new ArgumentException("Data contains the delimiter. Please change the delimiter.");
-                    }
+					string columnValue = column.AllowNulls && row.Value == null ? "null" : row.Value.ParseToString();
 
-                    result.Append(columnValue);
+					if (!columnValue.IsNullEmptyOrWhiteSpace())
+					{
+						columnValue = columnValue.Replace("\r\n", String.Empty);
+					}
+
+					if (columnValue.Contains(delimiter))
+					{
+						throw new ArgumentException("Data contains the delimiter. Please change the delimiter.");
+					}
+
+					result.Append(columnValue);
 
                     if (x == columnCount - 1)
                     {
@@ -85,7 +87,35 @@ namespace ERD.DataExport
                         result.Append(delimiter);
                     }
                 }
-            }
+
+				//           object[] boxedRowValues = dataRow.Values.ToArray();
+
+				//           for (int x = 0; x < columnCount; ++x)
+				//           {
+				//string columnValue = boxedRowValues[x] == null ? "null" : boxedRowValues[x].ParseToString();
+
+				//               if (!columnValue.IsNullEmptyOrWhiteSpace())
+				//               {
+				//                   columnValue = columnValue.Replace("\r\n", String.Empty);
+				//               }
+
+				//               if(columnValue.Contains(delimiter))
+				//               {
+				//                   throw new ArgumentException("Data contains the delimiter. Please change the delimiter.");
+				//               }
+
+				//               result.Append(columnValue);
+
+				//               if (x == columnCount - 1)
+				//               {
+				//                   result.AppendLine();
+				//               }
+				//               else
+				//               {
+				//                   result.Append(delimiter);
+				//               }
+				//           }
+			}
 
             string resultFileName = $"{tableModel.TableName}_Data.csv";
 

@@ -113,13 +113,20 @@ namespace ERD.Viewer.Database.ExportData
                     return;
                 }
 
-                string sqlMergeScript = File.ReadAllText(mergeSqlFile);
+                if (this.Options.Source == this.Options.Destination)
+                {
+					MessageBox.Show("Export was successful");
+				}
+                else
+                {
+                    string sqlMergeScript = File.ReadAllText(mergeSqlFile);
 
-                DataAccess access = new DataAccess(Connections.Instance.GetConnection(this.Options.Destination));
+                    DataAccess access = new DataAccess(Connections.Instance.GetConnection(this.Options.Destination));
 
-                access.ExecuteNonQuery(sqlMergeScript, 0);
+                    access.ExecuteNonQuery(sqlMergeScript, 0);
 
-                MessageBox.Show("Migration was successful");
+                    MessageBox.Show("Migration was successful");
+                }
 
                 this.Close();
 

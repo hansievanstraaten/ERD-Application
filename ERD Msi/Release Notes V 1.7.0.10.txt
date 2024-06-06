@@ -1,0 +1,9 @@
+Release notes: 1.7.0.10
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+Correct Export script to check for null values
+
+

@@ -112,13 +112,29 @@ namespace ERD.Viewer.Database.MsSql
                     {
                         string lineItem = lineItems[x].Replace("'", "''");
 
-                        if (x == (tableColumnsCount - 1))
+						ColumnObjectModel column = tableModel.Columns[x];
+
+						if (x == (tableColumnsCount - 1))
                         {
-                            result.Append($"'{lineItem}'");
+                            if (column.AllowNulls == true && lineItem == "null")
+                            {
+                                result.Append($"{lineItem}");
+                            }
+                            else
+                            {
+                                result.Append($"'{lineItem}'");
+                            }
                         }
                         else
                         {
-                            result.Append($"'{lineItem}', ");
+							if (column.AllowNulls == true && lineItem == "null")
+							{
+								result.Append($"{lineItem}, ");
+							}
+							else
+							{
+								result.Append($"'{lineItem}', ");
+							}
                         }
                     }
 

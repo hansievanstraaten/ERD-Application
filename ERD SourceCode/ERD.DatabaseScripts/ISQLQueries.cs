@@ -5,6 +5,7 @@ namespace ERD.DatabaseScripts
     public interface ISQLQueries
     {
         string BuildSelectTop(TableModel table, int topValue = 100);
+
         string DatabaseTablesQuery(string databaseName);
 
         string DatabaseColumnUsageQuery(string columnName);

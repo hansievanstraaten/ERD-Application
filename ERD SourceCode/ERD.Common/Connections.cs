@@ -150,6 +150,36 @@ namespace ERD.Common
             }
         }
 
+        public void SetConnection(string connectionName, bool raiseConnectionChangeEvent)
+        {
+            if (string.IsNullOrWhiteSpace(connectionName) || connectionName == Connections.Instance.DefaultConnectionName)
+            {
+                Connections.Instance.DatabaseModel = Connections.Instance.DefaultDatabaseModel;
+
+                EventParser.ParseMessage(Connections.Instance.DatabaseModel, "DatabaseConnection", Connections.Instance.DefaultConnectionName);
+
+                this.IsDefaultConnection = true;
+
+                if (raiseConnectionChangeEvent)
+                {
+                    Connections.Instance.ConnectionChanged?.Invoke(Connections.Instance, Connections.Instance.DatabaseModel);
+                }
+
+                return;
+            }
+
+            Connections.Instance.DatabaseModel = Connections.Instance.AlternativeModels[connectionName];
+
+            EventParser.ParseMessage(Connections.Instance.DatabaseModel, "DatabaseConnection", connectionName);
+
+            this.IsDefaultConnection = false;
+
+            if (raiseConnectionChangeEvent)
+            {
+                Connections.Instance.ConnectionChanged?.Invoke(Connections.Instance, Connections.Instance.DatabaseModel);
+            }
+        }
+
         public void SetConnection(MenuItem item, bool raiseConnectionChangeEvent)
         {
             if (item.Tag == null || item.Tag.ToString() == Connections.Instance.DefaultConnectionName)
@@ -169,6 +199,7 @@ namespace ERD.Common
             }
 
             Connections.Instance.DatabaseModel = Connections.Instance.AlternativeModels[item.Tag.ToString()];
+
 
             EventParser.ParseMessage(Connections.Instance.DatabaseModel, "DatabaseConnection", item.Tag.ToString());
 

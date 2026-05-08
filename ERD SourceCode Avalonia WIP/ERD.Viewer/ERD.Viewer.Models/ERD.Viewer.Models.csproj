@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ERD.Viewer.DataScriptFactory\ERD.Viewer.DataScriptFactory.csproj" />
+    <ProjectReference Include="..\ERD.Viewer.Shared\ERD.Viewer.Shared.csproj" />
+    <ProjectReference Include="..\ERD.Viewer.Tools\ERD.Viewer.Tools.csproj" />
+  </ItemGroup>
+
+</Project>

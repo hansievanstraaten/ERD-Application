@@ -1,0 +1,42 @@
+<src:ViewerWindowBase xmlns="https://github.com/avaloniaui"
+					  xmlns:src="clr-namespace:ERD.Viewer.Tools.BaseControls;assembly=ERD.Viewer.Tools"
+					  xmlns:sharedControls="using:ERD.Viewer.Tools.SharedControls"
+					  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+					  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+					  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+					  x:Class="ERD.Viewer.ProjectSetup"
+					  Title="ProjectSetup">
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="3" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<ScrollViewer Grid.Column="0" Grid.Row="1" >
+			<!--
+			<ModelViewer:ModelViewer x:Name="uxProjectSetup"  />
+			-->
+		</ScrollViewer>
+
+		<sharedControls:VerticalGridSplit Grid.Column="1" Grid.Row="1" />
+
+		<ScrollViewer Grid.Column="2" Grid.Row="1" >
+			<!--
+			<ModelViewer:ModelViewer x:Name="uxAlternativeConnections" />
+			-->
+		</ScrollViewer>
+
+		<StackPanel Orientation="Horizontal">
+			<Button x:Name="uxOk" Content="OK" Width="75" Margin="5" Click="Ok_Click" />
+			<Button x:Name="uxCancel" Content="Cancel" Width="75" Margin="5" Click="Cancel_Click" />
+		</StackPanel>
+
+	</Grid>
+</src:ViewerWindowBase>

@@ -3,10 +3,12 @@ using ERD.DatabaseScripts;
 using ERD.DatabaseScripts.Engineering;
 using ERD.Models;
 using GeneralExtensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using ViSo.Dialogs.ModelViewer;
@@ -99,40 +101,20 @@ namespace ERD.Viewer.Database.MsSql
 
             XDocument columnsXml = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseTableColumnsQuery(schema, tableName));
 
-            foreach (XElement item in columnsXml.Root.Elements())
+            Dictionary<string, List<XElement>> columnGroups = columnsXml
+                .Elements()
+                .Elements()
+                .GroupBy(x => (string)x.Element("COLUMNNAME") ?? string.Empty)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (KeyValuePair<string, List<XElement>> columnGroup in columnGroups)
             {
-                string columnName = item.Element("COLUMNNAME").Value;
-
-                EventParser.ParseMessage(this, this.dispatcher, "Reading Column ", columnName);
-
-                if (result.Any(col => col.ColumnName == columnName))
+                if (result.Any(col => col.ColumnName == columnGroup.Key))
                 {
                     continue;
                 }
 
-                string originalPosistion = Connections.Instance.IsDefaultConnection ? item.Element("ORDINAL_POSITION").Value : string.Empty;
-
-                XDocument primaryKey = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseColumnKeysQuery(tableName, columnName));
-
-                ColumnObjectModel column = new ColumnObjectModel
-                {
-                    ColumnName = columnName,
-                    IsIdentity = item.Element("IS_IDENTITY").Value.ToBool(),
-                    AllowNulls = item.Element("IS_NULLABLE").Value.ToBool(),
-                    MaxLength = item.Element("MAX_LENGTH").Value.ToInt32(),
-                    Precision = item.Element("PRECISION").Value.ToInt32(),
-                    Scale = item.Element("SCALE").Value.ToInt32(),
-                    IsForeignkey = !item.Element("PRIMARY_TABLE").Value.IsNullEmptyOrWhiteSpace(),
-                    ForeignKeyTable = item.Element("PRIMARY_TABLE").Value,
-                    ForeignKeyColumn = item.Element("PRIMARY_COLUMNNAME").Value,
-                    ForeignConstraintName = item.Element("FK_CONSTRAINT_NAME").Value,
-                    SqlDataType = this.ParseSqlDbType(item.Element("DATA_TYPE").Value),
-                    InPrimaryKey = primaryKey.Descendants().Any(d => d.Value == "PRIMARY KEY"),
-                    Column_Id = item.Element("COLUMN_ID").Value.ToInt32(),
-                    OriginalPosition = originalPosistion.IsNullEmptyOrWhiteSpace() ? 0 : originalPosistion.ToInt32()
-                };
-
-                column.HasModelChanged = false;
+                ColumnObjectModel column = this.CreateColumn(tableName, columnGroup, ref dataAccess);
 
                 result.Add(column);
             }
@@ -179,46 +161,80 @@ namespace ERD.Viewer.Database.MsSql
 
                 XDocument primaryKeys = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseInColumnKeysQuery(tableColumns.Key, columnNamesArray));
 
-                foreach (XElement item in tableColumns.Value)
-                {
-                    string columnName = item.Element("COLUMNNAME").Value;
+                Dictionary<string, List<XElement>> columnGroups = tableColumns.Value
+                .GroupBy(x => (string)x.Element("COLUMNNAME") ?? string.Empty)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-                    if (result[tableColumns.Key].Any(col => col.ColumnName == columnName))
+                foreach (KeyValuePair<string, List<XElement>> item in columnGroups)
+                {
+                    if (result[tableColumns.Key].Any(col => col.ColumnName == item.Key))
                     {
                         continue;
                     }
 
-                    string originalPosistion = item.Element("ORDINAL_POSITION").Value;
-
-                    XElement primaryKey = primaryKeys.Root.Elements()
-                      .FirstOrDefault(el => el.Element("COLUMN_NAME").Value == columnName
-                                            && el.Element("CONSTRAINT_TYPE").Value == "PRIMARY KEY");
-
-                    ColumnObjectModel column = new ColumnObjectModel
-                    {
-                        ColumnName = columnName,
-                        IsIdentity = item.Element("IS_IDENTITY").Value.ToBool(),
-                        AllowNulls = item.Element("IS_NULLABLE").Value.ToBool(),
-                        MaxLength = item.Element("MAX_LENGTH").Value.ToInt32(),
-                        Precision = item.Element("PRECISION").Value.ToInt32(),
-                        Scale = item.Element("SCALE").Value.ToInt32(),
-                        IsForeignkey = !item.Element("PRIMARY_TABLE").Value.IsNullEmptyOrWhiteSpace(),
-                        ForeignKeyTable = item.Element("PRIMARY_TABLE").Value,
-                        ForeignKeyColumn = item.Element("PRIMARY_COLUMNNAME").Value,
-                        ForeignConstraintName = item.Element("FK_CONSTRAINT_NAME").Value,
-                        SqlDataType = this.ParseSqlDbType(item.Element("DATA_TYPE").Value),
-                        InPrimaryKey = primaryKey == null ? false : primaryKey.Descendants().Any(d => d.Value == "PRIMARY KEY"),
-                        Column_Id = item.Element("COLUMN_ID").Value.ToInt32(),
-                        OriginalPosition = originalPosistion.IsNullEmptyOrWhiteSpace() ? 0 : originalPosistion.ToInt32()
-                    };
-
-                    column.HasModelChanged = false;
+                    ColumnObjectModel column = this.CreateColumn(tableColumns.Key, item, ref dataAccess);
 
                     result[tableColumns.Key].Add(column);
                 }
             }
 
             return result;
+        }
+
+        private ColumnObjectModel CreateColumn(string tableName, KeyValuePair<string, List<XElement>> columnGroupItem,
+            ref DataAccess dataAccess)
+        {
+            XElement item = columnGroupItem.Value.FirstOrDefault(c =>
+                    c.Element("TABLENAME").Value == tableName
+                    && c.Element("COLUMNNAME").Value == columnGroupItem.Key);
+
+            if (item == null)
+            {
+                throw new Exception("Someting very bad just happend, the primary column data not availabe");
+            }
+
+            EventParser.ParseMessage(this, this.dispatcher, "Reading Column ", columnGroupItem.Key);
+
+            string originalPosistion = Connections.Instance.IsDefaultConnection ? item.Element("ORDINAL_POSITION").Value : string.Empty;
+
+            XDocument primaryKey = dataAccess.ExecuteQuery(SQLQueries.DatabaseQueries.DatabaseColumnKeysQuery(tableName, columnGroupItem.Key));
+
+            ColumnObjectModel column = new ColumnObjectModel
+            {
+                ColumnName = columnGroupItem.Key,
+                IsIdentity = item.Element("IS_IDENTITY").Value.ToBool(),
+                AllowNulls = item.Element("IS_NULLABLE").Value.ToBool(),
+                MaxLength = item.Element("MAX_LENGTH").Value.ToInt32(),
+                Precision = item.Element("PRECISION").Value.ToInt32(),
+                Scale = item.Element("SCALE").Value.ToInt32(),
+                IsForeignkey = !item.Element("PRIMARY_TABLE").Value.IsNullEmptyOrWhiteSpace(),
+                SqlDataType = this.ParseSqlDbType(item.Element("DATA_TYPE").Value),
+                InPrimaryKey = primaryKey.Descendants().Any(d => d.Value == "PRIMARY KEY"),
+                Column_Id = item.Element("COLUMN_ID").Value.ToInt32(),
+                OriginalPosition = originalPosistion.IsNullEmptyOrWhiteSpace() ? 0 : originalPosistion.ToInt32()
+            };
+
+            List<XElement> constraints = columnGroupItem.Value
+                .Where(fk => string.IsNullOrWhiteSpace(fk.Element("FK_CONSTRAINT_NAME").Value) == false)
+                .ToList();
+
+            foreach(XElement foreignKey in constraints)
+            {
+                ForeignKeyObjectModel fkModel = new ForeignKeyObjectModel
+                {
+                    LocalColumnName = columnGroupItem.Key,
+                    OriginalPosition = originalPosistion.IsNullEmptyOrWhiteSpace() ? 0 : originalPosistion.ToInt32(),
+                    ForeignKeyTable = foreignKey.Element("PRIMARY_TABLE").Value,
+                    ForeignConstraintName = foreignKey.Element("FK_CONSTRAINT_NAME").Value,
+                    ForeignKeyColumn = foreignKey.Element("PRIMARY_COLUMNNAME").Value
+                };
+
+                column.ForeignKeys.Add(fkModel);
+            }
+
+            column.HasModelChanged = false;
+
+            return column;
         }
 
         private SqlDbType ParseSqlDbType(string value)

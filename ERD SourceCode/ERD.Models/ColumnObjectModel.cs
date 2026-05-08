@@ -12,6 +12,12 @@ namespace ERD.Models
     [ModelName("Data Column")]
     public class ColumnObjectModel : ModelBase
     {
+        private string foreignKeyTable;
+        private string foreignKeyColumn;
+        private string foreignConstraintName;
+
+
+
         private bool inPrimaryKey;
         private bool allowNulls = true;
         private bool isForeignkey;
@@ -23,9 +29,6 @@ namespace ERD.Models
         private int column_Id;
         private int originalPosition;
         private string columnName;
-        private string foreignKeyTable;
-        private string foreignKeyColumn;
-        private string foreignConstraintName;
         private string description;
         private string friendlyName;
         private SqlDbType? sqlDataType;
@@ -93,12 +96,6 @@ namespace ERD.Models
             {
                 base.OnPropertyChanged("IsIdentity", ref this.isIdentity, value);
             }
-        }
-
-        public bool IsVertualRelation
-        {
-            get;
-            set;
         }
 
         public bool IsDeleted
@@ -313,45 +310,6 @@ namespace ERD.Models
             }
         }
 
-        public string ForeignKeyTable
-        {
-            get
-            {
-                return this.foreignKeyTable;
-            }
-
-            set
-            {
-                base.OnPropertyChanged("ForeignKeyTable", ref this.foreignKeyTable, value);
-            }
-        }
-
-        public string ForeignKeyColumn
-        {
-            get
-            {
-                return this.foreignKeyColumn;
-            }
-
-            set
-            {
-                base.OnPropertyChanged("ForeignKeyColumn", ref this.foreignKeyColumn, value);
-            }
-        }
-
-        public string ForeignConstraintName
-        {
-            get
-            {
-                return this.foreignConstraintName;
-            }
-
-            set
-            {
-                base.OnPropertyChanged("ForeignConstraintName", ref this.foreignConstraintName, value);
-            }
-        }
-
         public SqlDbType? SqlDataType
         {
             get
@@ -436,5 +394,7 @@ namespace ERD.Models
                 return this.InvokeMethod("ERD.Common.IntegrityInvoker,ERD.Common", "GetSystemColumns", null).To<List<DataItemModel>>().ToArray();
             }
         }
+
+        public List<ForeignKeyObjectModel> ForeignKeys { get; set; } = new List<ForeignKeyObjectModel>();
     }
 }

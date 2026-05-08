@@ -19,7 +19,7 @@ namespace ERD.Models.ModelExstentions
             return $"{table.SchemaName}.{table.TableName}";
         }
 
-        public static string FullNameBraced(this TableModel table)
+        public static string FullNameSQLFormat(this TableModel table)
         {
             if (table.SchemaName.IsNullEmptyOrWhiteSpace())
             {
@@ -28,10 +28,22 @@ namespace ERD.Models.ModelExstentions
 
             return $"[{table.SchemaName}].[{table.TableName}]";
         }
-    
+
+        public static string FullNamePostgreFormat(this TableModel table)
+        {
+            if (table.SchemaName.IsNullEmptyOrWhiteSpace())
+            {
+                return $"\"{table.TableName}\"";
+            }
+
+            string defaultName = table.SchemaName.ToLower() == "dbo" ? "public" : table.SchemaName;
+
+            return $"\"{defaultName}\".\"{table.TableName}\"";
+        }
+
         public static string QualifyingName(this TableModel table)
         {
-            return $"{table.SchemaNameBraced(true)}{table.FullNameBraced()}";
+            return $"{table.SchemaNameBraced(true)}{table.FullNameSQLFormat()}";
         }
 
         public static string SchemaNameBraced(this TableModel table, bool addDot)

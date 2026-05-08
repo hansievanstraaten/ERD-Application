@@ -393,7 +393,7 @@ namespace ERD.Build
                     {
                         foreach (TableModel table in canvas.SegmentTables)
                         {
-                            if (table.Columns.Any(col => col.ForeignKeyTable == this.SelectedTable.TableName)
+                            if (table.Columns.Any(col => col.ForeignKeys.Any(k => k.ForeignKeyTable == this.SelectedTable.TableName))
                                                          && !referenceTables.ContainsKey(table.TableName))
                             {
                                 referenceTables.Add(table.TableName, table);

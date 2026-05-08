@@ -156,6 +156,7 @@ namespace ERD.Viewer.Tools
 
             Dictionary<string, ColumnRelationMapModel[]> foreignKeys = this.Table.Columns
                 .Where(c => c.IsForeignkey)
+                .SelectMany(c => c.ForeignKeys)
                 .GroupBy(t => t.ForeignKeyTable)
                 .ToDictionary(d => d.Key, d => d
                     .Select(a => new ColumnRelationMapModel
@@ -163,7 +164,7 @@ namespace ERD.Viewer.Tools
                         ParentTable = a.ForeignKeyTable,
                         ParentColumn = a.ForeignKeyColumn,
                         ChildTable = this.Table.TableName,
-                        ChildColumn = a.ColumnName,
+                        ChildColumn = a.LocalColumnName,
                         ForeignConstraintName = a.ForeignConstraintName,
                         RelationTypes = a.IsVertualRelation ? RelationTypesEnum.VirtualRelation : RelationTypesEnum.DatabaseRelation
                     }).ToArray());
@@ -290,7 +291,7 @@ namespace ERD.Viewer.Tools
         {
             try
             {
-                BrowseData browse = new BrowseData(this.Table, (MenuItem) sender);
+                BrowseData browse = new BrowseData(this.Table, (MenuItem)sender);
 
                 browse.Show();
             }

@@ -1,0 +1,100 @@
+<src:ViewerWindowBase xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:src="clr-namespace:ERD.Viewer.Tools.BaseControls;assembly=ERD.Viewer.Tools"
+        xmlns:specialized="using:ERD.Viewer.Tools.Specialized"
+        xmlns:sharedControls="using:ERD.Viewer.Tools.SharedControls"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ERD.Viewer.MainWindow"
+        Closed="OnMainWindow_Closed"
+        Title="ERD.Viewer">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" MinHeight="26" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="150" />
+            <ColumnDefinition Width="3" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Menu x:Name="uxMainMenu" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
+            <MenuItem Header="File">
+                <MenuItem x:Name="uxNewProject" Header="New Project" Click="NewProject_Click"/>
+                <MenuItem x:Name="uxOpenProject" Header="Open Project" Click="OpenProject_Click"/>
+                <Separator/>
+                <MenuItem x:Name="uxMenuSaveProject" IsEnabled="False" Header="Save Project" Click="Save_Click"/>
+                <Separator/>
+                <MenuItem x:Name="uxExit" Header="Exit" Click="ExitProject_Click"/>
+            </MenuItem>
+            <MenuItem x:Name="uxMenuProject" IsEnabled="False" Header="Project">
+                <MenuItem Header="Edit Project" Click="EditProject_Click" />
+                <Separator />
+                <MenuItem Header="Add Project Canvas" Click="AddCanvas_Click" />
+            </MenuItem>
+            <MenuItem x:Name="uxMenuDatabase" IsEnabled="False" Header="Database">
+                <MenuItem x:Name="uxGetDbTables" Header="Get DB Tables" Click="GetDbTables_Click" />
+                <MenuItem x:Name="uxRefreshFromDB" Header="Refresh Canvases From DB" Click="RefreshFromDB_Click" />
+                <MenuItem x:Name="uxCompareToDB" Header="Compare to DB" Click="CompareToDB_Click" />
+                <Separator />
+                <MenuItem x:Name="uxForwardEngineer" Header="Forward Engineer" Click="ForwardEngineer_Click" />
+                <MenuItem x:Name="uxScriptChanges" Header="Script Changes" Click="ScriptDbChanges_Click" />
+            </MenuItem>
+            <MenuItem x:Name="uxMenuBuild" IsEnabled="False" Header="Build">
+                <MenuItem x:Name="uxMenuBuildSetup" Header="Script Builder Setup" Click="ScriptBuildSetup_Click" />
+                <MenuItem x:Name="uxMenuBuildRun" Header="Run Script Builder" Click="ScriptBuildRun_Click" />
+            </MenuItem>
+            <MenuItem x:Name="uxMenuReport" IsEnabled="False" Header="Report Builder (Preview)">
+                <MenuItem Header="Setup" Click="ReportSystemSetup_Click" />
+                <MenuItem Header="Reports" Click="SelectReport_Click" />
+            </MenuItem>
+            <MenuItem Header="Help And About">
+                <MenuItem Header="About" Click="About_Click" />
+                <!--<MenuItem Header="Release Notes" Click="ReleaseNotes_Click" />-->
+            </MenuItem>
+            <specialized:FlashableLabel Content="Install Updates" x:Name="uxInstallUpdates" IsVisible="False" OnMouseClicked="InstallUpdates_Cliked" />
+        </Menu>
+		
+        <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="3" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ScrollViewer Grid.Row="0">
+                <StackPanel x:Name="uxToolsStack" Orientation="Vertical">
+
+                </StackPanel>
+            </ScrollViewer>
+
+
+            <sharedControls:HorizontalGridSplit Grid.Row="1" />
+
+            <sharedControls:LableItem Grid.Row="2" Content="Database Tables" FontWeight="Bold" />
+
+            <sharedControls:TextBoxItem x:Name="uxTableSearch" Grid.Row="3" Watermark="Search Tables" TextChanged="TableSearch_Changed" />
+            
+            <ScrollViewer Grid.Row="4">
+                <StackPanel x:Name="uxTableStack" Orientation="Vertical" />
+            </ScrollViewer>
+        </Grid>
+
+        <sharedControls:VerticalGridSplit Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" />
+
+        <TabControl x:Name="uxTabControl" Grid.Row="1" Grid.Column="2" />
+
+        <sharedControls:LableItem x:Name="uxDatabaseConnection" Grid.Row="2" Grid.Column="2"  HorizontalContentAlignment="Left" 
+                                  FontWeight="Bold"
+                                  DisplayUnderscore="True"/>
+
+        <specialized:MessageLabel x:Name="uxMessage" Grid.Row="2" Grid.Column="2" Foreground="DarkRed"  HorizontalContentAlignment="Right" />
+
+    </Grid>
+</src:ViewerWindowBase>

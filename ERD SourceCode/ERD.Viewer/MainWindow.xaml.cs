@@ -387,9 +387,9 @@ namespace ERD.Viewer
                 if (Connections.Instance.IsDefaultConnection)
                 {
                     this.RefreshColumnIds();
-
-                    this.SetForwardEngineerOptions(true);
                 }
+                    
+                this.SetForwardEngineerOptions(true);
                 
                 this.SaveModel();
             }
@@ -812,7 +812,7 @@ namespace ERD.Viewer
                             foreach (TableModel table in segment.SegmentTables)
                             {
                                 table.PrimaryKeyClusterConstraintName = reverse.GetTablePrimaryKeyCluster(table.TableName);
-
+                                
                                 if (!tableAndColumns.ContainsKey(table.TableName))
                                 {   // The table is on the canvas but not in the database
                                     // New table, or exists in the default DB but not in the connection DB
@@ -870,22 +870,13 @@ namespace ERD.Viewer
 
                                             tableColumn.IsForeignkey = databaseColumn.IsForeignkey;
 
-                                            tableColumn.ForeignKeyTable = databaseColumn.ForeignKeyTable;
-
-                                            tableColumn.ForeignKeyColumn = databaseColumn.ForeignKeyColumn;
-
-                                            tableColumn.ForeignConstraintName = databaseColumn.ForeignConstraintName;
-
+                                            tableColumn.ForeignKeys = databaseColumn.ForeignKeys;
                                         }
-                                        else if (!tableColumn.IsVertualRelation)
+                                        else if (tableColumn.ForeignKeys.Any(v => v.IsVertualRelation == false))
                                         {
                                             tableColumn.IsForeignkey = false;
 
-                                            tableColumn.ForeignKeyTable = string.Empty;
-
-                                            tableColumn.ForeignKeyColumn = string.Empty;
-
-                                            tableColumn.ForeignConstraintName = string.Empty;
+                                            tableColumn.ForeignKeys.AddRange(tableColumn.ForeignKeys.Where(v => v.IsVertualRelation == false));
                                         }
                                         
                                         continue;

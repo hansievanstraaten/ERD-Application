@@ -2,6 +2,7 @@
 using ERD.Common;
 using ERD.DatabaseScripts;
 using ERD.DatabaseScripts.MsSql;
+using ERD.DatabaseScripts.Postgres;
 using ERD.Models;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -57,6 +58,11 @@ namespace ERD.Viewer.Database
 
             switch (databaseType)
             {
+                case DatabaseTypeEnum.POSTGRES:
+                    result = new PgDataAccess();
+
+                    break;
+
                 case DatabaseTypeEnum.SQL:
                 default:
                     result = new MsDataAccess();

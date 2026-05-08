@@ -1,0 +1,36 @@
+<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:ct="using:ERD.Viewer.Tools.SharedControls">
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<!-- Add Controls for Previewer Here -->
+		</Border>
+	</Design.PreviewWith>
+
+	<Styles.Resources>
+		<!-- Fixed LinearGradientBrush: Offset values must be 0.0..1.0 -->
+		<LinearGradientBrush x:Key="GridSplitter" StartPoint="0,0" EndPoint="1,1">
+			<GradientStop Color="#F0F0F0" Offset="0.0" />
+			<GradientStop Color="#E8E8E8" Offset="0.33" />
+			<GradientStop Color="#E0E0E0" Offset="0.66" />
+			<GradientStop Color="#D8D8D8" Offset="1.0" />
+		</LinearGradientBrush>
+
+		<Style x:Key="TextBoxItemStyle" Selector="ct|TextBoxItem">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Background="{TemplateBinding Background}"
+							Padding="{TemplateBinding Padding}">
+						<!-- Required template part -->
+						<TextPresenter x:Name="PART_TextPresenter"
+                       Text="{TemplateBinding Text}"
+                       Background="{TemplateBinding Background}"
+                       TextWrapping="{TemplateBinding TextWrapping}" />
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+	</Styles.Resources>
+
+</Styles>

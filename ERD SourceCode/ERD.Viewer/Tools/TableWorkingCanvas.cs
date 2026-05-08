@@ -691,7 +691,8 @@ namespace ERD.Viewer.Tools
 
             string[] tablesArray = relationKey.Split(new string[] {"||"}, StringSplitOptions.RemoveEmptyEntries);
 
-            int childKeyLinkCount = childTable.Table.Columns.Where(cc => cc.ForeignKeyTable == tablesArray[0] && cc.InPrimaryKey).Count();
+            //int childKeyLinkCount = childTable.Table.Columns.Where(cc => cc.ForeignKeyTable == tablesArray[0] && cc.InPrimaryKey).Count();
+            int childKeyLinkCount = childTable.Table.Columns.Where(cc => cc.ForeignKeys.Any(t => t.ForeignKeyTable == tablesArray[0]) && cc.InPrimaryKey).Count();
 
             int childKeyCount = childTable.Table.Columns.Where(ck => ck.InPrimaryKey).Count();
 

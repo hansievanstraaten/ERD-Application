@@ -349,7 +349,7 @@ namespace ERD.Viewer.Database.MsSql
 
             result.AppendLine("BEGIN");
 
-            result.AppendLine($"    CREATE TABLE {table.FullNameBraced()}");
+            result.AppendLine($"    CREATE TABLE {table.FullNameSQLFormat()}");
             result.AppendLine("         ( ");
 
             foreach (ColumnObjectModel column in table.Columns.OrderByDescending(p => p.IsIdentity).ThenByDescending(k => k.InPrimaryKey))
@@ -393,7 +393,7 @@ namespace ERD.Viewer.Database.MsSql
                 table.Columns.Where(pkc => pkc.InPrimaryKey).Select(col => col.ColumnName).ToArray() :
                 new string[] { };
 
-            result.Append(this.BuildePrimaryKeyClusterCheck(table.PrimaryKeyClusterConstraintName, table.FullNameBraced(), primaryKeyColumns));
+            result.Append(this.BuildePrimaryKeyClusterCheck(table.PrimaryKeyClusterConstraintName, table.FullNameSQLFormat(), primaryKeyColumns));
 
             return result.ToString();
         }
@@ -427,7 +427,7 @@ namespace ERD.Viewer.Database.MsSql
             result.AppendLine($"                WHERE TABLE_NAME = '{table.TableName}')");
 
             result.AppendLine("BEGIN");
-            result.AppendLine($"    DROP TABLE {table.FullNameBraced()}");
+            result.AppendLine($"    DROP TABLE {table.FullNameSQLFormat()}");
             result.AppendLine("END");
             result.AppendLine();
 
@@ -473,20 +473,22 @@ namespace ERD.Viewer.Database.MsSql
 
             DataAccess dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
-            Dictionary<string, ColumnObjectModel[]> constraintDic = table.Columns
-                .Where(fk => fk.IsForeignkey && !fk.IsVertualRelation)
+            Dictionary<string, ForeignKeyObjectModel[]> constraintDic = table.Columns
+                .Where(fk => fk.IsForeignkey)
+                .SelectMany(fm => fm.ForeignKeys)
+                .Where(fk => fk.IsVertualRelation == false)
                 .GroupBy(fkn => fkn.ForeignConstraintName)
                 .ToDictionary(kd => kd.Key, kd => kd.ToArray());
 
             if (Connections.Instance.IsDefaultConnection)
             {
-                foreach (KeyValuePair<string, ColumnObjectModel[]> foreignKey in constraintDic)
+                foreach (KeyValuePair<string, ForeignKeyObjectModel[]> foreignKey in constraintDic)
                 {
                     string fkName = foreignKey.Key;
 
                     Dictionary<int, string> columnPosistions = new Dictionary<int, string>();
 
-                    foreach (ColumnObjectModel column in foreignKey.Value)
+                    foreach (ForeignKeyObjectModel column in foreignKey.Value)
                     {
                         string columnQuery = SQLQueries.DatabaseQueries.DatabaseColumnKeysQuery(column.ForeignKeyTable, column.ForeignKeyColumn);
 
@@ -501,7 +503,7 @@ namespace ERD.Viewer.Database.MsSql
 
                         column.OriginalPosition = rowItem.Element("ORDINAL_POSITION").Value.ToInt32();
 
-                        columnPosistions.Add(column.OriginalPosition, column.ColumnName);
+                        columnPosistions.Add(column.OriginalPosition, column.LocalColumnName);
                     }
 
                     StringBuilder childColumns = new StringBuilder();
@@ -515,9 +517,9 @@ namespace ERD.Viewer.Database.MsSql
 
                     foreach (KeyValuePair<int, string> columnItem in columnPosistions.OrderBy(s => s.Key))
                     {
-                        ColumnObjectModel column = foreignKey.Value.FirstOrDefault(c => c.ColumnName == columnItem.Value);
+                        ForeignKeyObjectModel column = foreignKey.Value.FirstOrDefault(c => c.LocalColumnName == columnItem.Value);
 
-                        childColumns.Append($"[{column.ColumnName}], ");
+                        childColumns.Append($"[{column.LocalColumnName}], ");
 
                         parentColumns.Append($"[{column.ForeignKeyColumn}], ");
                     }
@@ -529,10 +531,10 @@ namespace ERD.Viewer.Database.MsSql
                     result.AppendLine();
                     result.AppendLine($"IF (OBJECT_ID('{table.SchemaNameBraced(true)}{foreignKey.Key}', 'F') IS NULL)");
                     result.AppendLine("BEGIN");
-                    result.AppendLine($"    ALTER TABLE {table.FullNameBraced()}  WITH CHECK ADD  CONSTRAINT [{fkName}] FOREIGN KEY({childColumns.ToString()})");
+                    result.AppendLine($"    ALTER TABLE {table.FullNameSQLFormat()}  WITH CHECK ADD  CONSTRAINT [{fkName}] FOREIGN KEY({childColumns.ToString()})");
                     result.AppendLine($"    REFERENCES {table.SchemaNameBraced(true)}[{foreignKey.Value[0].ForeignKeyTable}] ({parentColumns.ToString()})");
                     result.AppendLine();
-                    result.AppendLine($"ALTER TABLE {table.FullNameBraced()} CHECK CONSTRAINT [{fkName}]");
+                    result.AppendLine($"ALTER TABLE {table.FullNameSQLFormat()} CHECK CONSTRAINT [{fkName}]");
                     result.AppendLine("END");
                 }
             }
@@ -734,7 +736,7 @@ namespace ERD.Viewer.Database.MsSql
 
                 if (originalDataType != null || originalNullable != null || originalMaxLen != null || originalPrecision != null || originalScale != null)
                 {
-                    result.Append(this.BuildColumnAlter(table.FullNameBraced(), column));
+                    result.Append(this.BuildColumnAlter(table.FullNameSQLFormat(), column));
                 }
             }
 
@@ -814,27 +816,30 @@ namespace ERD.Viewer.Database.MsSql
 
             foreach (ColumnObjectModel fkColumn in table.Columns.Where(fk => fk.IsForeignkey))
             {
-                if (scriptedForeignKeys.Contains(fkColumn.ForeignConstraintName))
+                foreach (ForeignKeyObjectModel fkModel in fkColumn.ForeignKeys)
                 {
-                    continue;
+                    if (scriptedForeignKeys.Contains(fkModel.ForeignConstraintName))
+                    {
+                        continue;
+                    }
+
+                    result.AppendLine($"    IF (OBJECT_ID('{table.SchemaNameBraced(true)}[{fkModel.ForeignConstraintName}]', 'F') IS NOT NULL)");
+                    result.AppendLine("    BEGIN");
+                    result.AppendLine($"        ALTER TABLE {table.FullNameSQLFormat()}  drop [{fkModel.ForeignConstraintName}]");
+                    result.AppendLine("    END");
+                    result.AppendLine();
+
+                    scriptedForeignKeys.Add(fkModel.ForeignConstraintName);
                 }
-
-                result.AppendLine($"    IF (OBJECT_ID('{table.SchemaNameBraced(true)}[{fkColumn.ForeignConstraintName}]', 'F') IS NOT NULL)");
-                result.AppendLine("    BEGIN");
-                result.AppendLine($"        ALTER TABLE {table.FullNameBraced()}  drop [{fkColumn.ForeignConstraintName}]");
-                result.AppendLine("    END");
-                result.AppendLine();
-
-                scriptedForeignKeys.Add(fkColumn.ForeignConstraintName);
             }
 
             result.AppendLine("    IF EXISTS (SELECT 1 ");
             result.AppendLine("        FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS");
             result.AppendLine($"           WHERE CONSTRAINT_NAME = '{table.PrimaryKeyClusterConstraintName}')");
             result.AppendLine("            BEGIN");
-            result.AppendLine($"               ALTER TABLE {table.FullNameBraced()} DROP CONSTRAINT {table.PrimaryKeyClusterConstraintName}");
+            result.AppendLine($"               ALTER TABLE {table.FullNameSQLFormat()} DROP CONSTRAINT {table.PrimaryKeyClusterConstraintName}");
             result.AppendLine();
-            result.AppendLine($"               ALTER TABLE {table.FullNameBraced()}");
+            result.AppendLine($"               ALTER TABLE {table.FullNameSQLFormat()}");
 
             if (keyCount == 1)
             {

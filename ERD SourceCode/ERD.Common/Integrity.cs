@@ -137,7 +137,12 @@ namespace ERD.Common
 
         public static string BuildForeighKeyName(string parentTable, string childTable)
         {
-            string result = $"FK_{parentTable.MakeAlphaNumeric()}_{childTable.MakeAlphaNumeric()}";
+            // Implementted to overcome the 63byte issue in Postgres
+            string cleanParent = parentTable.MakeAlphaNumeric().Truncate(20);
+            string cleanChild = childTable.MakeAlphaNumeric().Truncate(20);
+            string hashPostFix = $"{parentTable}_{childTable}".ComputeHash().Truncate(8);
+
+            string result = $"FK_{cleanParent}_{cleanChild}_{hashPostFix}";
 
             if (!Integrity.foreignKeyConstraintNames.Contains(result))
             {
@@ -251,24 +256,26 @@ namespace ERD.Common
             List<ColumnRelationMapModel> result = new List<ColumnRelationMapModel>();
 
             foreach (KeyValuePair<string, ColumnObjectModel> column in Integrity.columnObjectModels
-                .Where(tm => tm.Value.ForeignKeyTable == ownerTable && tm.Value.ForeignKeyColumn == columnName))
+                .Where(tm => tm.Value.ForeignKeys.Any(t => t.ForeignKeyTable == ownerTable && t.ForeignConstraintName == columnName)))
             {
                 if (column.Key.StartsWith(ownerTableKey))
                 {
                     continue;
                 }
 
-                string[] keySplit = column.Key.Split(new string[] {"||"}, StringSplitOptions.RemoveEmptyEntries);
+                string[] keySplit = column.Key.Split(new string[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
 
-                result.Add(new ColumnRelationMapModel
+                foreach (ForeignKeyObjectModel foreignKey in column.Value.ForeignKeys)
                 {
-                    ForeignConstraintName = column.Value.ForeignConstraintName,
-                    ParentTable = ownerTable,
-                    ParentColumn = columnName,
-                    ChildTable = keySplit[0],
-                    ChildColumn = column.Value.ColumnName
-                });
-
+                    result.Add(new ColumnRelationMapModel
+                    {
+                        ForeignConstraintName = foreignKey.ForeignConstraintName,
+                        ParentTable = ownerTable,
+                        ParentColumn = columnName,
+                        ChildTable = keySplit[0],
+                        ChildColumn = column.Value.ColumnName
+                    });
+                }
             }
 
             return result;
@@ -303,14 +310,14 @@ namespace ERD.Common
         public static List<ColumnObjectModel> GetForeignKeyColumns(string tableName, string columnName)
         {
             return Integrity.columnObjectModels
-                .Where(tk => tk.Value.ForeignKeyColumn == columnName
-                            && tk.Value.ForeignKeyTable == tableName)
+                .Where(tk => tk.Value.ForeignKeys.Any(fk => fk.ForeignConstraintName == columnName
+                                                         && fk.ForeignKeyTable == tableName))
                 .Select(v => v.Value).ToList();
         }
 
         public static List<DataItemModel> GetSystemTables()
         {
-            return Integrity.tableMasterList.Select(tm => new DataItemModel {DisplayValue = tm, ItemKey = tm}).OrderBy(s => s.DisplayValue).ToList();
+            return Integrity.tableMasterList.Select(tm => new DataItemModel { DisplayValue = tm, ItemKey = tm }).OrderBy(s => s.DisplayValue).ToList();
         }
 
         public static List<DataItemModel> GetSystemColumns()
@@ -318,7 +325,7 @@ namespace ERD.Common
             lock (globalColumnsCountLock)
             {
                 return Integrity.globalColumnsCount.Select(co => co)
-                    .Select(ss => new DataItemModel {DisplayValue = ss.Key, ItemKey = ss.Key})
+                    .Select(ss => new DataItemModel { DisplayValue = ss.Key, ItemKey = ss.Key })
                     .OrderBy(o => o.ItemKey.ParseToString())
                     .ToList();
             }
@@ -333,7 +340,7 @@ namespace ERD.Common
                 return new List<DataItemModel>();
             }
 
-            return Integrity.tableColumns[tableName].Select(di => new DataItemModel {DisplayValue = di, ItemKey = di}).ToList();
+            return Integrity.tableColumns[tableName].Select(di => new DataItemModel { DisplayValue = di, ItemKey = di }).ToList();
         }
 
         public static void MapTable(TableModel table)
@@ -387,9 +394,9 @@ namespace ERD.Common
                 Integrity.primaryColumns.Add(columnNameKey, ownerTable);
             }
 
-            if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => fk == column.ForeignConstraintName))
+            if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => column.ForeignKeys.Any(k => k.ForeignConstraintName == fk)))
             {
-                Integrity.foreignKeyConstraintNames.Add(column.ForeignConstraintName);
+                Integrity.foreignKeyConstraintNames.AddRange(column.ForeignKeys.Select(f => f.ForeignConstraintName));
             }
 
             lock (globalColumnsCountLock)
@@ -404,7 +411,7 @@ namespace ERD.Common
                         {
                             Integrity.globalColumnsDataType.Remove(column.ColumnName);
                         }
-                        
+
                         Integrity.globalColumnsDataType.Add(column.ColumnName, column.SqlDataType.Value);
                     }
                 }
@@ -468,9 +475,12 @@ namespace ERD.Common
                 }
             }
 
-            if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => fk == column.ForeignConstraintName))
+            if (column.IsForeignkey && !Integrity.foreignKeyConstraintNames.Any(fk => column.ForeignKeys.Any(f => f.ForeignConstraintName == fk)))
             {
-                Integrity.foreignKeyConstraintNames.Remove(column.ForeignConstraintName);
+                foreach (ForeignKeyObjectModel foreignKey in column.ForeignKeys)
+                {
+                    Integrity.foreignKeyConstraintNames.Remove(foreignKey.ForeignConstraintName);                    
+                }
             }
 
             if (column.InPrimaryKey && !column.IsForeignkey && !Integrity.primaryColumns.ContainsKey(columnNameKey))
@@ -492,18 +502,16 @@ namespace ERD.Common
 
                 ColumnObjectModel column = Integrity.columnObjectModels[columnKey];
 
-                string constraintKey = $"{mappedColumn.ChildTable}||{column.ForeignConstraintName}";
+                string constraintKey = $"{mappedColumn.ChildTable}||{relation.RelationshipName}"; // {column.ForeignConstraintName}";
 
                 if (relation.RelationType == RelationTypesEnum.DatabaseRelation && !Integrity.DropRelations.Contains(constraintKey))
                 {
                     Integrity.DropRelations.Add(constraintKey);
                 }
 
-                column.ForeignConstraintName = string.Empty;
-
-                column.ForeignKeyColumn = string.Empty;
-
-                column.ForeignKeyTable = string.Empty;
+                column.ForeignKeys.RemoveAll(fk => fk.ForeignConstraintName == relation.RelationshipName
+                                              && fk.ForeignKeyTable == mappedColumn.ParentTable
+                                              && fk.ForeignKeyColumn == mappedColumn.ParentColumn);
 
                 column.IsForeignkey = false;
             }

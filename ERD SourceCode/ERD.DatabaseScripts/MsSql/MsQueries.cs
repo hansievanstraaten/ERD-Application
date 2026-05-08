@@ -86,82 +86,60 @@ namespace ERD.DatabaseScripts
         public string DatabaseTableColumnsQuery(string schema, string tableName)
         {
             string query = "SELECT [TAB].[NAME] AS [TABLENAME]," +
-                           "  [COL].[NAME] AS [COLUMNNAME]," +
-                           "  [INF_COL].[CHARACTER_MAXIMUM_LENGTH] AS 'MAX_LENGTH'," +
-                           "  [COL].[PRECISION]," +
-                           "  [COL].[SCALE]," +
-                           "  [COL].[IS_NULLABLE]," +
-                           "  [COL].[IS_IDENTITY]," +
-                           "  [PK_TAB].[NAME] AS [PRIMARY_TABLE]," +
-                           "  [PK_COL].[NAME] AS [PRIMARY_COLUMNNAME]," +
-                           "  [FK].[NAME] AS [FK_CONSTRAINT_NAME], " +
-                           "  [INF_COL].[DATA_TYPE], " +
-                           "  [COL].[COLUMN_ID], " +
-                           "  [INF_USE].[ORDINAL_POSITION] " +
-                           "FROM  [SYS].[TABLES] TAB " +
-                           "      INNER JOIN [SYS].[COLUMNS] COL " +
-                           "        ON  [COL].[OBJECT_ID]            = [TAB].[OBJECT_ID]" +
-                           "      LEFT OUTER JOIN [SYS].[FOREIGN_KEY_COLUMNS] FK_COLS" +
-                           "        ON  [FK_COLS].[PARENT_OBJECT_ID] = [TAB].[OBJECT_ID]" +
-                           "        AND [FK_COLS].[PARENT_COLUMN_ID] = [COL].[COLUMN_ID]" +
-                           "      LEFT OUTER JOIN [SYS].[FOREIGN_KEYS] FK" +
-                           "        ON  [FK].[OBJECT_ID]             = [FK_COLS].[CONSTRAINT_OBJECT_ID]" +
-                           "      LEFT OUTER JOIN [SYS].[TABLES] PK_TAB" +
-                           "        ON  [PK_TAB].[OBJECT_ID]         = [FK_COLS].[REFERENCED_OBJECT_ID]" +
-                           "      LEFT OUTER JOIN [SYS].[COLUMNS] PK_COL" +
-                           "        ON  [PK_COL].[COLUMN_ID]         = [FK_COLS].[REFERENCED_COLUMN_ID]" +
-                           "        AND [PK_COL].[OBJECT_ID]         = [FK_COLS].[REFERENCED_OBJECT_ID]" +
-                           "      LEFT OUTER JOIN [INFORMATION_SCHEMA].[COLUMNS] AS INF_COL" +
-                           "        ON  [INF_COL].[TABLE_NAME] = [TAB].[NAME]" +
-                           "        AND [INF_COL].[COLUMN_NAME] = [COL].[NAME]" +
-                           "      LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE INF_USE" +
-                           "        ON  [INF_USE].[TABLE_NAME]      = [TAB].[NAME]" +
-                           "        AND [INF_USE].[COLUMN_NAME]     = [COL].[NAME]" +
-                           "WHERE [TAB].[NAME] = '{0}' " +
+                           "    [COL].[NAME] AS [COLUMNNAME]," +
+                           "    [INF_COL].[CHARACTER_MAXIMUM_LENGTH] AS [MAX_LENGTH]," +
+                           "    [COL].[PRECISION]," +
+                           "    [COL].[SCALE]," +
+                           "    [COL].[IS_NULLABLE]," +
+                           "    [COL].[IS_IDENTITY]," +
+                           "    [PK_TAB].[NAME] AS [PRIMARY_TABLE]," +
+                           "    [PK_COL].[NAME] AS [PRIMARY_COLUMNNAME]," +
+                           "    [FK].[NAME] AS [FK_CONSTRAINT_NAME]," +
+                           "    [INF_COL].[DATA_TYPE]," +
+                           "    [COL].[COLUMN_ID]," +
+                           "    [FK_COLS].[CONSTRAINT_COLUMN_ID] AS [ORDINAL_POSITION]" +
+                           " FROM [SYS].[TABLES] TAB" +
+                           "    INNER JOIN [SYS].[COLUMNS] COL ON [COL].[OBJECT_ID] = [TAB].[OBJECT_ID]" +
+                           "    LEFT OUTER JOIN [SYS].[FOREIGN_KEY_COLUMNS] FK_COLS ON [FK_COLS].[PARENT_OBJECT_ID] = [TAB].[OBJECT_ID] AND [FK_COLS].[PARENT_COLUMN_ID] = [COL].[COLUMN_ID]" +
+                           "    LEFT OUTER JOIN [SYS].[FOREIGN_KEYS] FK ON [FK].[OBJECT_ID] = [FK_COLS].[CONSTRAINT_OBJECT_ID]" +
+                           "    LEFT OUTER JOIN [SYS].[TABLES] PK_TAB   ON [PK_TAB].[OBJECT_ID] = [FK_COLS].[REFERENCED_OBJECT_ID]" +
+                           "    LEFT OUTER JOIN [SYS].[COLUMNS] PK_COL  ON [PK_COL].[COLUMN_ID] = [FK_COLS].[REFERENCED_COLUMN_ID] AND [PK_COL].[OBJECT_ID] = [FK_COLS].[REFERENCED_OBJECT_ID]" +
+                           "    LEFT OUTER JOIN [INFORMATION_SCHEMA].[COLUMNS] INF_COL ON [INF_COL].[TABLE_NAME] = [TAB].[NAME] AND [INF_COL].[COLUMN_NAME] = [COL].[NAME]" +
+                           " WHERE [TAB].[NAME] = '{0}'" +
                            "  AND SCHEMA_NAME([TAB].[SCHEMA_ID]) = '{1}'" +
-                           "ORDER BY  SCHEMA_NAME([TAB].[SCHEMA_ID]) + '.' + [TAB].[NAME]," +
-                           "          [COL].[COLUMN_ID]";
+                           " ORDER BY [COL].[COLUMN_ID], [FK_COLS].[CONSTRAINT_COLUMN_ID]";
 
             return string.Format(query, tableName, schema);
         }
 
+        
+
         public string DatabaseInTableColumnsQuery(string[] tableNamesArray)
         {
             string query = "SELECT [TAB].[NAME] AS [TABLENAME]," +
-                           "  [COL].[NAME] AS [COLUMNNAME]," +
-                           "  [INF_COL].[CHARACTER_MAXIMUM_LENGTH] AS 'MAX_LENGTH'," +
-                           "  [COL].[PRECISION]," +
-                           "  [COL].[SCALE]," +
-                           "  [COL].[IS_NULLABLE]," +
-                           "  [COL].[IS_IDENTITY]," +
-                           "  [PK_TAB].[NAME] AS [PRIMARY_TABLE]," +
-                           "  [PK_COL].[NAME] AS [PRIMARY_COLUMNNAME]," +
-                           "  [FK].[NAME] AS [FK_CONSTRAINT_NAME], " +
-                           "  [INF_COL].[DATA_TYPE], " +
-                           "  [COL].[COLUMN_ID], " +
-                           "  [INF_USE].[ORDINAL_POSITION] " +
-                           "FROM  [SYS].[TABLES] TAB " +
-                           "      INNER JOIN [SYS].[COLUMNS] COL " +
-                           "        ON  [COL].[OBJECT_ID]            = [TAB].[OBJECT_ID]" +
-                           "      LEFT OUTER JOIN [SYS].[FOREIGN_KEY_COLUMNS] FK_COLS" +
-                           "        ON  [FK_COLS].[PARENT_OBJECT_ID] = [TAB].[OBJECT_ID]" +
-                           "        AND [FK_COLS].[PARENT_COLUMN_ID] = [COL].[COLUMN_ID]" +
-                           "      LEFT OUTER JOIN [SYS].[FOREIGN_KEYS] FK" +
-                           "        ON  [FK].[OBJECT_ID]             = [FK_COLS].[CONSTRAINT_OBJECT_ID]" +
-                           "      LEFT OUTER JOIN [SYS].[TABLES] PK_TAB" +
-                           "        ON  [PK_TAB].[OBJECT_ID]         = [FK_COLS].[REFERENCED_OBJECT_ID]" +
-                           "      LEFT OUTER JOIN [SYS].[COLUMNS] PK_COL" +
-                           "        ON  [PK_COL].[COLUMN_ID]         = [FK_COLS].[REFERENCED_COLUMN_ID]" +
-                           "        AND [PK_COL].[OBJECT_ID]         = [FK_COLS].[REFERENCED_OBJECT_ID]" +
-                           "      LEFT OUTER JOIN [INFORMATION_SCHEMA].[COLUMNS] AS INF_COL" +
-                           "        ON  [INF_COL].[TABLE_NAME] = [TAB].[NAME]" +
-                           "        AND [INF_COL].[COLUMN_NAME] = [COL].[NAME]" +
-                           "      LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE INF_USE" +
-                           "        ON  [INF_USE].[TABLE_NAME]      = [TAB].[NAME]" +
-                           "        AND [INF_USE].[COLUMN_NAME]     = [COL].[NAME]" +
-                           "WHERE     [TAB].[NAME] IN ({0}) " +
-                           "ORDER BY  SCHEMA_NAME([TAB].[SCHEMA_ID]) + '.' + [TAB].[NAME]," +
-                           "          [COL].[COLUMN_ID]";
+                           "    [COL].[NAME] AS [COLUMNNAME]," +
+                           "    [INF_COL].[CHARACTER_MAXIMUM_LENGTH] AS [MAX_LENGTH]," +
+                           "    [COL].[PRECISION]," +
+                           "    [COL].[SCALE]," +
+                           "    [COL].[IS_NULLABLE]," +
+                           "    [COL].[IS_IDENTITY]," +
+                           "    [PK_TAB].[NAME] AS [PRIMARY_TABLE]," +
+                           "    [PK_COL].[NAME] AS [PRIMARY_COLUMNNAME]," +
+                           "    [FK].[NAME] AS [FK_CONSTRAINT_NAME]," +
+                           "    [INF_COL].[DATA_TYPE]," +
+                           "    [COL].[COLUMN_ID]," +
+                           "    [FK_COLS].[CONSTRAINT_COLUMN_ID] AS [ORDINAL_POSITION]" +
+                           " FROM [SYS].[TABLES] TAB" +
+                           "    INNER JOIN [SYS].[COLUMNS] COL ON [COL].[OBJECT_ID] = [TAB].[OBJECT_ID]" +
+                           "    LEFT OUTER JOIN [SYS].[FOREIGN_KEY_COLUMNS] FK_COLS ON [FK_COLS].[PARENT_OBJECT_ID] = [TAB].[OBJECT_ID] AND [FK_COLS].[PARENT_COLUMN_ID] = [COL].[COLUMN_ID]" +
+                           "    LEFT OUTER JOIN [SYS].[FOREIGN_KEYS] FK ON [FK].[OBJECT_ID] = [FK_COLS].[CONSTRAINT_OBJECT_ID]" +
+                           "    LEFT OUTER JOIN [SYS].[TABLES] PK_TAB   ON [PK_TAB].[OBJECT_ID] = [FK_COLS].[REFERENCED_OBJECT_ID]" +
+                           "    LEFT OUTER JOIN [SYS].[COLUMNS] PK_COL  ON [PK_COL].[COLUMN_ID] = [FK_COLS].[REFERENCED_COLUMN_ID] AND [PK_COL].[OBJECT_ID] = [FK_COLS].[REFERENCED_OBJECT_ID]" +
+                           "    LEFT OUTER JOIN [INFORMATION_SCHEMA].[COLUMNS] INF_COL ON [INF_COL].[TABLE_NAME] = [TAB].[NAME] AND [INF_COL].[COLUMN_NAME] = [COL].[NAME]" +
+                           " WHERE [TAB].[NAME] IN ({0})" +
+                           " ORDER BY SCHEMA_NAME([TAB].[SCHEMA_ID]) + '.' + [TAB].[NAME]," +
+                           " [COL].[COLUMN_ID]," +
+                           " [FK_COLS].[CONSTRAINT_COLUMN_ID]";
 
             return string.Format(query, this.BuildInString(tableNamesArray));
         }

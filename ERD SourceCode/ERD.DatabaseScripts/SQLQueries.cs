@@ -1,27 +1,32 @@
 ﻿using ERD.Base;
 using ERD.Common;
+using ERD.DatabaseScripts.Postgres;
 
 namespace ERD.DatabaseScripts
 {
-  public static class SQLQueries
-  {
-    public static ISQLQueries DatabaseQueries
+    public static class SQLQueries
     {
-      get
-      {
-        ISQLQueries result;
-
-        switch (Connections.Instance.DatabaseModel.DatabaseType)
+        public static ISQLQueries DatabaseQueries
         {
-          case DatabaseTypeEnum.SQL:
-          default:
-            result = new MsQueries();
+            get
+            {
+                ISQLQueries result;
 
-            break;
+                switch (Connections.Instance.DatabaseModel.DatabaseType)
+                {
+                    case DatabaseTypeEnum.POSTGRES:
+                        result = new PgQueries();
+
+                        break;
+                    case DatabaseTypeEnum.SQL:
+                    default:
+                        result = new MsQueries();
+
+                        break;
+                }
+
+                return result;
+            }
         }
-
-        return result;
-      }
     }
-  }
 }

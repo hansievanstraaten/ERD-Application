@@ -73,6 +73,7 @@
     <Compile Include="DatabaseRelation.cs" />
     <Compile Include="ErdCanvasEditModel.cs" />
     <Compile Include="ErdCanvasModel.cs" />
+    <Compile Include="ForeignKeyObjectModel.cs" />
     <Compile Include="IncludeTableModel.cs" />
     <Compile Include="ModelBase.cs" />
     <Compile Include="ModelExstentions\TableModelExstentions.cs" />

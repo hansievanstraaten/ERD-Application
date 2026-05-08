@@ -1,5 +1,6 @@
 ﻿using ERD.Base;
 using ERD.Common;
+using ERD.DatabaseScripts.Postgres;
 using ERD.Models;
 using ERD.Viewer.Database;
 using ERD.Viewer.Database.MsSql;
@@ -100,6 +101,10 @@ namespace ERD.DatabaseScripts
 
             switch (Connections.Instance.DatabaseModel.DatabaseType)
             {
+                case DatabaseTypeEnum.POSTGRES:
+                    Scripting.scripting = new PgScripting();
+                    break;
+
                 case DatabaseTypeEnum.SQL:
                 default:
                     Scripting.scripting = new MsScripting();

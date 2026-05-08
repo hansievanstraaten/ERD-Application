@@ -16,269 +16,268 @@ using WPF.Tools.BaseClasses;
 
 namespace ERD.Viewer.Comparer
 {
-  /// <summary>
-  /// Interaction logic for CompreResults.xaml
-  /// </summary>
-  public partial class CompreResults : WindowBase
-  {
-    private CompareResultModel selectedResult;
-
-    private CompareResultModel[] comparedResults;
-    
-    public CompreResults(List<CompareResultModel> results)
+    /// <summary>
+    /// Interaction logic for CompreResults.xaml
+    /// </summary>
+    public partial class CompreResults : WindowBase
     {
-      this.InitializeComponent();
+        private CompareResultModel selectedResult;
 
-      this.DataContext = this;
+        private CompareResultModel[] comparedResults;
 
-      this.ComparedResults = results.ToArray();
-    }
-
-    public CompareResultModel SelectedResult
-    {
-      get
-      {
-        return this.selectedResult;
-      }
-
-      set
-      {
-        this.selectedResult = value;
-
-        base.OnPropertyChanged(() => this.SelectedResult);
-      }
-    }
-
-    public CompareResultModel[] ComparedResults
-    {
-      get
-      {
-        return this.comparedResults;
-      }
-
-      set
-      {
-        this.comparedResults = value;
-
-        base.OnPropertyChanged(() => this.ComparedResults);
-      }
-    }
-
-    private void Accept_Cliked(object sender, System.Windows.RoutedEventArgs e)
-    {
-      try
-      {
-        StringBuilder result = new StringBuilder();
-
-        string filePath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{General.ProjectModel.ModelName}_Comparison.sql");
-
-        int itemIndex = 1;
-
-        while (File.Exists(filePath))
+        public CompreResults(List<CompareResultModel> results)
         {
-          filePath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{General.ProjectModel.ModelName}_Comparison({itemIndex}).sql");
+            this.InitializeComponent();
 
-          ++itemIndex;
+            this.DataContext = this;
+
+            this.ComparedResults = results.ToArray();
         }
 
-        foreach (CompareResultModel model in this.ComparedResults)
+        public CompareResultModel SelectedResult
         {
-          switch (model.ObjectAction)
-          {
-            case ObjectActionEnum.AlterDatabase:
+            get
+            {
+                return this.selectedResult;
+            }
 
-              result.AppendLine(this.AlterDatabase(model));
+            set
+            {
+                this.selectedResult = value;
 
-              break;
-
-            case ObjectActionEnum.CreateInDatabase:
-
-              result.AppendLine(this.CreateInDatabase(model));
-
-              break;
-
-            case ObjectActionEnum.DropFromDatabase:
-
-              result.AppendLine(this.DropFromDatabase(model));
-
-              break;
-              
-            case ObjectActionEnum.Ignore:
-            default:
-              break;
-          }
+                base.OnPropertyChanged(() => this.SelectedResult);
+            }
         }
 
-        File.WriteAllText(filePath, result.ToString());
-
-        Process.Start(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads));
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
-    }
-    
-    private void Script_Cliked(object sender, System.Windows.RoutedEventArgs e)
-    {
-      try
-      {
-        StringBuilder result = new StringBuilder();
-
-        string filePath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{General.ProjectModel.ModelName}_Comparison.sql");
-
-        int itemIndex = 1;
-
-        while(File.Exists(filePath))
+        public CompareResultModel[] ComparedResults
         {
-          filePath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{General.ProjectModel.ModelName}_Comparison({itemIndex}).sql");
+            get
+            {
+                return this.comparedResults;
+            }
 
-          ++itemIndex;
+            set
+            {
+                this.comparedResults = value;
+
+                base.OnPropertyChanged(() => this.ComparedResults);
+            }
         }
 
-        foreach(CompareResultModel model in this.ComparedResults)
+        private void Accept_Cliked(object sender, System.Windows.RoutedEventArgs e)
         {
-          switch(model.ObjectAction)
-          {
-            case ObjectActionEnum.AlterDatabase:
+            try
+            {
+                StringBuilder result = new StringBuilder();
 
-              result.AppendLine(this.AlterDatabase(model));
+                string filePath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{General.ProjectModel.ModelName}_Comparison.sql");
 
-              break;
+                int itemIndex = 1;
 
-            case ObjectActionEnum.CreateInDatabase:
+                while (File.Exists(filePath))
+                {
+                    filePath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{General.ProjectModel.ModelName}_Comparison({itemIndex}).sql");
 
-              result.AppendLine(this.CreateInDatabase(model));
+                    ++itemIndex;
+                }
 
-              break;
+                foreach (CompareResultModel model in this.ComparedResults)
+                {
+                    switch (model.ObjectAction)
+                    {
+                        case ObjectActionEnum.AlterDatabase:
 
-            case ObjectActionEnum.DropFromDatabase:
+                            result.AppendLine(this.AlterDatabase(model));
 
-              result.AppendLine(this.DropFromDatabase(model));
+                            break;
 
-              break;
+                        case ObjectActionEnum.CreateInDatabase:
 
-            case ObjectActionEnum.Ignore:
-            default:
-              break;
-          }
+                            result.AppendLine(this.CreateInDatabase(model));
+
+                            break;
+
+                        case ObjectActionEnum.DropFromDatabase:
+
+                            result.AppendLine(this.DropFromDatabase(model));
+
+                            break;
+
+                        case ObjectActionEnum.Ignore:
+                        default:
+                            break;
+                    }
+                }
+
+                File.WriteAllText(filePath, result.ToString());
+
+                Process.Start(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads));
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
         }
 
-        File.WriteAllText(filePath, result.ToString());
-
-        Process.Start(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads));
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
-    }
-
-    private void Edit_Cliked(object sender, System.Windows.RoutedEventArgs e)
-    {
-      if (this.SelectedResult == null)
-      {
-        MessageBox.Show("Please select a discrepancy.");
-
-        return;
-      }
-
-      try
-      {
-        CompareResultModel copyModel = this.SelectedResult.CopyTo(new CompareResultModel());
-
-        if (ModelView.ShowDialog(this, true, "Edit Discrepancy", copyModel).IsFalse())
+        private void Script_Cliked(object sender, System.Windows.RoutedEventArgs e)
         {
-          return;
+            try
+            {
+                StringBuilder result = new StringBuilder();
+
+                string filePath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{General.ProjectModel.ModelName}_Comparison.sql");
+
+                int itemIndex = 1;
+
+                while (File.Exists(filePath))
+                {
+                    filePath = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{General.ProjectModel.ModelName}_Comparison({itemIndex}).sql");
+
+                    ++itemIndex;
+                }
+
+                foreach (CompareResultModel model in this.ComparedResults)
+                {
+                    switch (model.ObjectAction)
+                    {
+                        case ObjectActionEnum.AlterDatabase:
+
+                            result.AppendLine(this.AlterDatabase(model));
+
+                            break;
+
+                        case ObjectActionEnum.CreateInDatabase:
+
+                            result.AppendLine(this.CreateInDatabase(model));
+
+                            break;
+
+                        case ObjectActionEnum.DropFromDatabase:
+
+                            result.AppendLine(this.DropFromDatabase(model));
+
+                            break;
+
+                        case ObjectActionEnum.Ignore:
+                        default:
+                            break;
+                    }
+                }
+
+                File.WriteAllText(filePath, result.ToString());
+
+                Process.Start(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads));
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
         }
 
-        this.SelectedResult = copyModel.CopyTo(this.SelectedResult);
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
+        private void Edit_Cliked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (this.SelectedResult == null)
+            {
+                MessageBox.Show("Please select a discrepancy.");
+
+                return;
+            }
+
+            try
+            {
+                CompareResultModel copyModel = this.SelectedResult.CopyTo(new CompareResultModel());
+
+                if (ModelView.ShowDialog(this, true, "Edit Discrepancy", copyModel).IsFalse())
+                {
+                    return;
+                }
+
+                this.SelectedResult = copyModel.CopyTo(this.SelectedResult);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private string AlterDatabase(CompareResultModel model)
+        {
+            switch (model.ObjectType)
+            {
+                case ObjectTypeEnum.Column:
+
+                    return Scripting.BuildColumnAlter(model.TableName, model.TableObject.Columns.First(col => col.ColumnName == model.ObjectName));
+
+                case ObjectTypeEnum.ForeignKeyConstraint:
+
+                    StringBuilder foreingResult = new StringBuilder();
+
+                    string constraintKey = $"{model.TableName}||{model.ObjectName}";
+
+                    foreingResult.AppendLine(Scripting.DropForeignKey(constraintKey));
+
+                    foreingResult.AppendLine(Scripting.BuildForeignKey(model.TableObject));
+
+                    return foreingResult.ToString();
+
+                case ObjectTypeEnum.Table:
+
+                    StringBuilder tableResult = new StringBuilder();
+
+                    tableResult.AppendLine(Scripting.ScriptTableCreate(model.TableObject));
+
+                    foreach (ColumnObjectModel column in model.TableObject.Columns)
+                    {
+                        tableResult.AppendLine(Scripting.BuildeColumnCreate(Integrity.GetTableSchema(model.TableName), model.TableName, column));
+
+                        tableResult.AppendLine(Scripting.BuildColumnAlter(model.TableName, column));
+                    }
+
+                    tableResult.AppendLine(Scripting.BuildForeignKey(model.TableObject));
+
+                    return tableResult.ToString();
+            }
+
+            return string.Empty;
+        }
+
+        private string CreateInDatabase(CompareResultModel model)
+        {
+            switch (model.ObjectType)
+            {
+                case ObjectTypeEnum.Column:
+                    return Scripting.BuildeColumnCreate(Integrity.GetTableSchema(model.TableName), model.TableName, model.TableObject.Columns.First(col => col.ColumnName == model.ObjectName));
+
+                case ObjectTypeEnum.ForeignKeyConstraint:
+                    return Scripting.BuildForeignKey(model.TableObject);
+
+                case ObjectTypeEnum.Table:
+                    return Scripting.ScriptTableCreate(model.TableObject);
+            }
+
+            return string.Empty;
+        }
+
+        private string DropFromDatabase(CompareResultModel model)
+        {
+            switch (model.ObjectType)
+            {
+                case ObjectTypeEnum.Column:
+
+                    return Scripting.DropColumn(Integrity.GetTableSchema(model.TableName), model.TableName, model.ObjectName);
+
+                case ObjectTypeEnum.ForeignKeyConstraint:
+
+                    string constraintKey = $"{model.TableName}||{model.ObjectName}";
+
+                    return Scripting.DropForeignKey(constraintKey);
+
+                case ObjectTypeEnum.Table:
+
+                    return Scripting.DropTable(model.TableObject);
+            }
+
+            return string.Empty;
+        }
     }
-  
-    private string AlterDatabase(CompareResultModel model)
-    {
-      switch (model.ObjectType)
-      {
-        case ObjectTypeEnum.Column:
-
-          return Scripting.BuildColumnAlter(model.TableName, model.TableObject.Columns.First(col => col.ColumnName == model.ObjectName));
-
-        case ObjectTypeEnum.ForeignKeyConstraint:
-
-          StringBuilder foreingResult = new StringBuilder();
-
-          string constraintKey = $"{model.TableName}||{model.ObjectName}";
-
-          foreingResult.AppendLine(Scripting.DropForeignKey(constraintKey));
-
-          foreingResult.AppendLine(Scripting.BuildForeignKey(model.TableObject));
-
-          return foreingResult.ToString();
-
-        case ObjectTypeEnum.Table:
-
-          StringBuilder tableResult = new StringBuilder();
-
-          tableResult.AppendLine(Scripting.ScriptTableCreate(model.TableObject));
-
-          foreach(ColumnObjectModel column in model.TableObject.Columns)
-          {
-            tableResult.AppendLine(Scripting.BuildeColumnCreate(Integrity.GetTableSchema(model.TableName), model.TableName, column));
-
-            tableResult.AppendLine(Scripting.BuildColumnAlter(model.TableName, column));
-          }
-
-          return tableResult.ToString();
-      }
-
-      return string.Empty;
-    }
-
-    private string CreateInDatabase(CompareResultModel model)
-    {
-      switch(model.ObjectType)
-      {
-        case ObjectTypeEnum.Column:
-
-          return Scripting.BuildeColumnCreate(Integrity.GetTableSchema(model.TableName), model.TableName, model.TableObject.Columns.First(col => col.ColumnName == model.ObjectName));
-
-        case ObjectTypeEnum.ForeignKeyConstraint:
-
-          return Scripting.BuildForeignKey(model.TableObject);
-
-        case ObjectTypeEnum.Table:
-
-          return Scripting.ScriptTableCreate(model.TableObject);
-      }
-
-      return string.Empty;
-    }
-
-    private string DropFromDatabase(CompareResultModel model)
-    {
-      switch (model.ObjectType)
-      {
-        case ObjectTypeEnum.Column:
-
-          return Scripting.DropColumn(Integrity.GetTableSchema(model.TableName), model.TableName, model.ObjectName);
-
-        case ObjectTypeEnum.ForeignKeyConstraint:
-
-          string constraintKey = $"{model.TableName}||{model.ObjectName}";
-
-          return Scripting.DropForeignKey(constraintKey);
-
-        case ObjectTypeEnum.Table:
-
-          return Scripting.DropTable(model.TableObject);
-      }
-
-      return string.Empty;
-    }
-  }
 }

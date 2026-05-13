@@ -169,10 +169,6 @@ namespace ERD.DatabaseScripts.Postgres
 
             foreach (KeyValuePair<string, List<XElement>> tableColumns in groupedTables)
             {
-                if (tableColumns.Key == "RFQ_Audiences")
-                {
-                }
-
                 result.Add(tableColumns.Key, new List<ColumnObjectModel>());
 
                 EventParser.ParseMessage(this, this.dispatcher, "Reading Columns for ", tableColumns.Key);

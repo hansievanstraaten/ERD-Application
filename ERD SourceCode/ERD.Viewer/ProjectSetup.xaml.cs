@@ -9,120 +9,120 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace ERD.Viewer
 {
-  /// <summary>
-  /// Interaction logic for ProjectSetup.xaml
-  /// </summary>
-  public partial class ProjectSetup : WindowBase
-  {
-    private List<AltDatabaseModel> newAlternativeOptions = new List<AltDatabaseModel>();
-
-    public ProjectSetup(ProjectModel projectModel, DatabaseModel databaseModel)
+    /// <summary>
+    /// Interaction logic for ProjectSetup.xaml
+    /// </summary>
+    public partial class ProjectSetup : WindowBase
     {
-      this.InitializeComponent();
+        private List<AltDatabaseModel> newAlternativeOptions = new List<AltDatabaseModel>();
 
-      this.SelectedProjectModel = projectModel;
-
-      this.SelectedDatabaseModel = databaseModel;
-      
-      this.uxProjectSetup.Items.Add(projectModel);
-
-      this.uxProjectSetup.Items.Add(databaseModel);
-
-      foreach (KeyValuePair<string, AltDatabaseModel> item in Connections.Instance.AlternativeModels)
-      {
-        this.uxAlternativeConnections.Items.Add(item.Value);
-
-        int itemIndex = this.uxAlternativeConnections.Items.Count - 1;
-
-        this.uxAlternativeConnections[itemIndex].Header = $"Database Setup: {item.Value.ConnectionName}";
-
-        this.uxAlternativeConnections[itemIndex].ToggelCollaps(true);
-      }
-
-      this.uxProjectSetup.AllignAllCaptions();
-
-      this.uxProjectSetup.ModelViewItemBrowse += this.ModelViewItem_Browse;
-    }
-    
-    public ProjectModel SelectedProjectModel {get; private set;}
-
-    public DatabaseModel SelectedDatabaseModel {get; private set;}
-    
-    private void Accept_Click(object sender, RoutedEventArgs e)
-    {
-      try
-      {
-        if (this.uxProjectSetup.HasValidationError || this.uxAlternativeConnections.HasValidationError)
+        public ProjectSetup(ProjectModel projectModel, DatabaseModel databaseModel)
         {
-          return;
-        }
-        
-        foreach (AltDatabaseModel altModel in this.newAlternativeOptions)
-        {
-          if (Connections.Instance.AlternativeModels.ContainsKey(altModel.ConnectionName) || altModel.ConnectionName.StartsWith("Default"))
-          {
-            throw new ApplicationException($"Duplicate Connection Name {altModel.ConnectionName} not allowed.");
-          }
+            this.InitializeComponent();
 
-          Connections.Instance.AlternativeModels.Add(altModel.ConnectionName, altModel);
+            this.SelectedProjectModel = projectModel;
+
+            this.SelectedDatabaseModel = databaseModel;
+
+            this.uxProjectSetup.Items.Add(projectModel);
+
+            this.uxProjectSetup.Items.Add(databaseModel);
+
+            foreach (KeyValuePair<string, AltDatabaseModel> item in Connections.Instance.AlternativeModels)
+            {
+                this.uxAlternativeConnections.Items.Add(item.Value);
+
+                int itemIndex = this.uxAlternativeConnections.Items.Count - 1;
+
+                this.uxAlternativeConnections[itemIndex].Header = $"Database Setup: {item.Value.ConnectionName}";
+
+                this.uxAlternativeConnections[itemIndex].ToggelCollaps(true);
+            }
+
+            this.uxProjectSetup.AllignAllCaptions();
+
+            this.uxProjectSetup.ModelViewItemBrowse += this.ModelViewItem_Browse;
         }
 
-        Integrity.KeepColumnsUnique = this.SelectedProjectModel.KeepColumnsUnique;
+        public ProjectModel SelectedProjectModel { get; private set; }
 
-        Integrity.AllowDatabaseRelations = this.SelectedProjectModel.AllowRelations;
+        public DatabaseModel SelectedDatabaseModel { get; private set; }
 
-        Integrity.AllowVertualRelations = this.SelectedProjectModel.AllowVertualRelations;
-        
-        this.DialogResult = true;
-
-        this.Close();
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.Message);
-      }
-    }
-    
-    private void ModelViewItem_Browse(object sender, string buttonkey)
-    {
-      try
-      {
-        switch (buttonkey)
+        private void Accept_Click(object sender, RoutedEventArgs e)
         {
-            case "DirectoryBrowse":
+            try
+            {
+                if (this.uxProjectSetup.HasValidationError || this.uxAlternativeConnections.HasValidationError)
+                {
+                    return;
+                }
 
-              FolderBrowserDialog folder = new FolderBrowserDialog();
+                foreach (AltDatabaseModel altModel in this.newAlternativeOptions)
+                {
+                    if (Connections.Instance.AlternativeModels.ContainsKey(altModel.ConnectionName) || altModel.ConnectionName.StartsWith("Default"))
+                    {
+                        throw new ApplicationException($"Duplicate Connection Name {altModel.ConnectionName} not allowed.");
+                    }
 
-              if (folder.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-              {
-                return;
-              }
+                    Connections.Instance.AlternativeModels.Add(altModel.ConnectionName, altModel);
+                }
 
-              this.SelectedProjectModel.FileDirectory = folder.SelectedPath;
+                Integrity.KeepColumnsUnique = this.SelectedProjectModel.KeepColumnsUnique;
 
-              break;
+                Integrity.AllowDatabaseRelations = this.SelectedProjectModel.AllowRelations;
+
+                Integrity.AllowVertualRelations = this.SelectedProjectModel.AllowVertualRelations;
+
+                this.DialogResult = true;
+
+                this.Close();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message);
+            }
         }
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.Message);
-      }
+
+        private void ModelViewItem_Browse(object sender, string buttonkey)
+        {
+            try
+            {
+                switch (buttonkey)
+                {
+                    case "DirectoryBrowse":
+
+                        FolderBrowserDialog folder = new FolderBrowserDialog();
+
+                        if (folder.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                        {
+                            return;
+                        }
+
+                        this.SelectedProjectModel.FileDirectory = folder.SelectedPath;
+
+                        break;
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message);
+            }
+        }
+
+        private void AddConnection_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                AltDatabaseModel altOption = new AltDatabaseModel();
+
+                this.newAlternativeOptions.Add(altOption);
+
+                this.uxAlternativeConnections.Items.Add(altOption);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message);
+            }
+        }
     }
-
-    private void AddConnection_Click(object sender, RoutedEventArgs e)
-    {
-      try
-      {
-        AltDatabaseModel altOption = new AltDatabaseModel();
-
-        this.newAlternativeOptions.Add(altOption);
-
-        this.uxAlternativeConnections.Items.Add(altOption);
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.Message);
-      }
-    }
-  }
 }

@@ -1,7 +1,6 @@
 ﻿using ERD.Base;
 using ERD.Common;
 using ERD.Models;
-using ERD.Models.ModelExstentions;
 using ERD.Viewer.Database;
 using GeneralExtensions;
 using System;
@@ -10,10 +9,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
-using System.Windows.Markup;
-using System.Xml.Linq;
+using ERD.Common.ModelExstentions;
 
 namespace ERD.DatabaseScripts.Postgres
 {
@@ -41,7 +37,7 @@ namespace ERD.DatabaseScripts.Postgres
             if (string.IsNullOrWhiteSpace(schema))
                 return QuoteIdentifier(table);
 
-            string defaultName = schema.ToLower() == "dbo" ? "public" : schema;
+            string defaultName = Integrity.SchemaValidation(DatabaseTypeEnum.POSTGRES, schema);
 
             return $"{QuoteIdentifier(defaultName)}.{QuoteIdentifier(table)}";
         }
@@ -354,7 +350,7 @@ namespace ERD.DatabaseScripts.Postgres
 
         public string CreateSchema(string schemaName)
         {
-            if (string.IsNullOrWhiteSpace(schemaName) || schemaName.ToLower() == "public")
+            if (string.IsNullOrWhiteSpace(schemaName) || Integrity.DefaultSchemaNames.Contains(schemaName.ToLower()))
             {
                 return string.Empty;
             }
@@ -640,73 +636,73 @@ namespace ERD.DatabaseScripts.Postgres
             return result.ToString();
         }
 
-        private string BuildPrimaryKeys(TableModel table, int keyCount, out bool haveChanges)
-        {
-            // In PostgreSQL primary keys are declared inline in CREATE TABLE or via ALTER TABLE ADD CONSTRAINT
-            haveChanges = false;
-            StringBuilder result = new StringBuilder();
+        //private string BuildPrimaryKeys(TableModel table, int keyCount, out bool haveChanges)
+        //{
+        //    // In PostgreSQL primary keys are declared inline in CREATE TABLE or via ALTER TABLE ADD CONSTRAINT
+        //    haveChanges = false;
+        //    StringBuilder result = new StringBuilder();
 
-            var pkCols = table.Columns.Where(pkc => pkc.InPrimaryKey).Select(c => QuoteIdentifier(c.ColumnName)).ToArray();
+        //    var pkCols = table.Columns.Where(pkc => pkc.InPrimaryKey).Select(c => QuoteIdentifier(c.ColumnName)).ToArray();
 
-            if (pkCols.Length == 0)
-            {
-                return string.Empty;
-            }
+        //    if (pkCols.Length == 0)
+        //    {
+        //        return string.Empty;
+        //    }
 
-            string pkName = string.IsNullOrEmpty(table.PrimaryKeyClusterConstraintName) ? $"{table.TableName}_pkey" : table.PrimaryKeyClusterConstraintName;
+        //    string pkName = string.IsNullOrEmpty(table.PrimaryKeyClusterConstraintName) ? $"{table.TableName}_pkey" : table.PrimaryKeyClusterConstraintName;
 
-            result.AppendLine($"ALTER TABLE {table.FullNamePostgreFormat()} ADD CONSTRAINT {QuoteIdentifier(pkName)} PRIMARY KEY ({string.Join(", ", pkCols)});");
+        //    result.AppendLine($"ALTER TABLE {table.FullNamePostgreFormat()} ADD CONSTRAINT {QuoteIdentifier(pkName)} PRIMARY KEY ({string.Join(", ", pkCols)});");
 
-            foreach (var c in table.Columns.Where(pk => pk.InPrimaryKey))
-            {
-                if (c.HasModelChanged)
-                {
-                    haveChanges = true;
-                    break;
-                }
-            }
+        //    foreach (var c in table.Columns.Where(pk => pk.InPrimaryKey))
+        //    {
+        //        if (c.HasModelChanged)
+        //        {
+        //            haveChanges = true;
+        //            break;
+        //        }
+        //    }
 
-            return result.ToString();
-        }
+        //    return result.ToString();
+        //}
 
-        private string BuildDropAndCreatePrimaryKeys(TableModel table, int keyCount)
-        {
-            StringBuilder result = new StringBuilder();
+        //private string BuildDropAndCreatePrimaryKeys(TableModel table, int keyCount)
+        //{
+        //    StringBuilder result = new StringBuilder();
 
-            string pkName = string.IsNullOrEmpty(table.PrimaryKeyClusterConstraintName) ? $"{table.TableName}_pkey" : table.PrimaryKeyClusterConstraintName;
+        //    string pkName = string.IsNullOrEmpty(table.PrimaryKeyClusterConstraintName) ? $"{table.TableName}_pkey" : table.PrimaryKeyClusterConstraintName;
 
-            result.AppendLine($"ALTER TABLE {table.FullNamePostgreFormat()} DROP CONSTRAINT IF EXISTS {QuoteIdentifier(pkName)};");
-            result.AppendLine();
+        //    result.AppendLine($"ALTER TABLE {table.FullNamePostgreFormat()} DROP CONSTRAINT IF EXISTS {QuoteIdentifier(pkName)};");
+        //    result.AppendLine();
 
-            var pkCols = table.Columns.Where(pkc => pkc.InPrimaryKey).Select(c => QuoteIdentifier(c.ColumnName)).ToArray();
+        //    var pkCols = table.Columns.Where(pkc => pkc.InPrimaryKey).Select(c => QuoteIdentifier(c.ColumnName)).ToArray();
 
-            result.AppendLine($"ALTER TABLE {table.FullNamePostgreFormat()} ADD CONSTRAINT {QuoteIdentifier(pkName)} PRIMARY KEY ({string.Join(", ", pkCols)});");
-            result.AppendLine();
+        //    result.AppendLine($"ALTER TABLE {table.FullNamePostgreFormat()} ADD CONSTRAINT {QuoteIdentifier(pkName)} PRIMARY KEY ({string.Join(", ", pkCols)});");
+        //    result.AppendLine();
 
-            return result.ToString();
-        }
+        //    return result.ToString();
+        //}
 
-        private string BuildePrimaryKeyClusterCheck(string constarintName, string tableName, string[] primaryKeyColumns)
-        {
-            if (!primaryKeyColumns.HasElements())
-            {
-                return string.Empty;
-            }
+        //private string BuildePrimaryKeyClusterCheck(string constarintName, string tableName, string[] primaryKeyColumns)
+        //{
+        //    if (!primaryKeyColumns.HasElements())
+        //    {
+        //        return string.Empty;
+        //    }
 
-            StringBuilder result = new StringBuilder();
+        //    StringBuilder result = new StringBuilder();
 
-            string pkCols = string.Join(", ", primaryKeyColumns.Select(c => QuoteIdentifier(c)));
-            // Check and add primary key if not exists
-            result.AppendLine($"DO $$");
-            result.AppendLine($"BEGIN");
-            result.AppendLine($"    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{constarintName}') THEN");
-            result.AppendLine($"        ALTER TABLE {tableName} ADD CONSTRAINT {QuoteIdentifier(constarintName)} PRIMARY KEY ({pkCols});");
-            result.AppendLine($"    END IF;");
-            result.AppendLine($"END$$;");
-            result.AppendLine();
+        //    string pkCols = string.Join(", ", primaryKeyColumns.Select(c => QuoteIdentifier(c)));
+        //    // Check and add primary key if not exists
+        //    result.AppendLine($"DO $$");
+        //    result.AppendLine($"BEGIN");
+        //    result.AppendLine($"    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{constarintName}') THEN");
+        //    result.AppendLine($"        ALTER TABLE {tableName} ADD CONSTRAINT {QuoteIdentifier(constarintName)} PRIMARY KEY ({pkCols});");
+        //    result.AppendLine($"    END IF;");
+        //    result.AppendLine($"END$$;");
+        //    result.AppendLine();
 
-            return result.ToString();
-        }
+        //    return result.ToString();
+        //}
 
         private string ColumnDataType(ColumnObjectModel column)
         {

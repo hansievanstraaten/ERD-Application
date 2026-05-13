@@ -210,17 +210,17 @@ namespace ERD.Viewer.Tools.Relations
                         continue;
                     }
 
-                    //column.ForeignConstraintName = this.DatabaseRelation.RelationshipName;
-
-                    //column.ForeignKeyColumn = childToParentRelation[column.ColumnName];
-
-                    //column.ForeignKeyTable = this.DatabaseRelation.ParentTable;
-
-                    //column.IsVertualRelation = (this.DatabaseRelation.RelationType == RelationTypesEnum.VirtualRelation);
+                    column.ForeignKeys.Add(new ForeignKeyObjectModel 
+                    {
+                        ForeignConstraintName = this.DatabaseRelation.RelationshipName,
+                        ForeignKeyColumn = childToParentRelation[column.ColumnName],
+                        ForeignKeyTable = this.DatabaseRelation.ParentTable,
+                        IsVertualRelation = this.DatabaseRelation.RelationType == RelationTypesEnum.VirtualRelation,
+                        LocalColumnName = column.ColumnName,
+                        OriginalPosition = 0
+                    });
 
                     column.IsForeignkey = true;
-
-                    throw new Exception("This code should not be here, need to refactor the way the relation is being created and mapped to the columns.");
 
                     this.DatabaseRelation.Columns.Add(new ColumnRelationMapModel
                     {

@@ -2,7 +2,6 @@
 using ERD.Common;
 using ERD.DatabaseScripts;
 using ERD.Models;
-using ERD.Models.ModelExstentions;
 using GeneralExtensions;
 using System;
 using System.Collections.Generic;
@@ -11,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using ERD.Common.ModelExstentions;
 
 namespace ERD.Viewer.Database.MsSql
 {
@@ -400,7 +400,7 @@ namespace ERD.Viewer.Database.MsSql
         
         public string CreateSchema(string schemaName)
 		{
-            if (schemaName.IsNullEmptyOrWhiteSpace() || schemaName.ToLower() == "dbo")
+            if (schemaName.IsNullEmptyOrWhiteSpace() || Integrity.DefaultSchemaNames.Contains(schemaName.ToLower()))
 			{
                 return string.Empty;
 			}
@@ -444,7 +444,7 @@ namespace ERD.Viewer.Database.MsSql
             result.AppendLine($"                  AND COLUMN_NAME = '{columnName}')");
 
             result.AppendLine("BEGIN");
-            result.AppendLine($"    ALTER TABLE [{schema}].[{tableName}]");
+            result.AppendLine($"    ALTER TABLE [{Integrity.SchemaValidation(DatabaseTypeEnum.SQL, schema)}].[{tableName}]");
             result.AppendLine($"    DROP COLUMN [{columnName}];");
             result.AppendLine("END");
             result.AppendLine();
@@ -458,8 +458,8 @@ namespace ERD.Viewer.Database.MsSql
 
             result.AppendLine("IF EXISTS(SELECT 1");
             result.AppendLine("          FROM SYS.FOREIGN_KEYS");
-            result.AppendLine($"         WHERE OBJECT_ID = OBJECT_ID(N'{schema}{constaintName}')");
-            result.AppendLine($"         AND PARENT_OBJECT_ID = OBJECT_ID(N'{schema}{tableName}'))");
+            result.AppendLine($"         WHERE OBJECT_ID = OBJECT_ID(N'{Integrity.SchemaValidation(DatabaseTypeEnum.SQL, schema)}{constaintName}')");
+            result.AppendLine($"         AND PARENT_OBJECT_ID = OBJECT_ID(N'{Integrity.SchemaValidation(DatabaseTypeEnum.SQL, schema)}{tableName}'))");
             result.AppendLine("BEGIN");
             result.AppendLine($" ALTER TABLE[{tableName}] DROP CONSTRAINT[{constaintName}]");
             result.AppendLine("END");
@@ -529,10 +529,10 @@ namespace ERD.Viewer.Database.MsSql
                     parentColumns.Remove((parentColumns.Length - 2), 2);
 
                     result.AppendLine();
-                    result.AppendLine($"IF (OBJECT_ID('{table.SchemaNameBraced(true)}{foreignKey.Key}', 'F') IS NULL)");
+                    result.AppendLine($"IF (OBJECT_ID('{table.SchemaNameSQL(true)}{foreignKey.Key}', 'F') IS NULL)");
                     result.AppendLine("BEGIN");
                     result.AppendLine($"    ALTER TABLE {table.FullNameSQLFormat()}  WITH CHECK ADD  CONSTRAINT [{fkName}] FOREIGN KEY({childColumns.ToString()})");
-                    result.AppendLine($"    REFERENCES {table.SchemaNameBraced(true)}[{foreignKey.Value[0].ForeignKeyTable}] ({parentColumns.ToString()})");
+                    result.AppendLine($"    REFERENCES {table.SchemaNameSQL(true)}[{foreignKey.Value[0].ForeignKeyTable}] ({parentColumns.ToString()})");
                     result.AppendLine();
                     result.AppendLine($"ALTER TABLE {table.FullNameSQLFormat()} CHECK CONSTRAINT [{fkName}]");
                     result.AppendLine("END");
@@ -546,6 +546,8 @@ namespace ERD.Viewer.Database.MsSql
         {
             StringBuilder result = new StringBuilder();
 
+            string msSQLSchema = Integrity.SchemaValidation(DatabaseTypeEnum.SQL, schemaName);
+
             Tuple<object, object> originalName = column["ColumnName"];
 
             if (originalName != null)
@@ -555,7 +557,7 @@ namespace ERD.Viewer.Database.MsSql
                 result.AppendLine($"            WHERE TABLE_NAME  = '{tableName}' ");
                 result.AppendLine($"              AND COLUMN_NAME = '{originalName.Item1}')");
                 result.AppendLine("BEGIN");
-                result.AppendLine($"    EXEC sp_rename '[{schemaName}].[{tableName}].[{originalName.Item1}]', '{originalName.Item2}', 'COLUMN';");
+                result.AppendLine($"    EXEC sp_rename '[{msSQLSchema}].[{tableName}].[{originalName.Item1}]', '{originalName.Item2}', 'COLUMN';");
                 result.AppendLine("END");
 
                 result.AppendLine();
@@ -573,7 +575,7 @@ namespace ERD.Viewer.Database.MsSql
 
             result.AppendLine("BEGIN");
 
-            result.AppendLine($"    ALTER TABLE [{schemaName}].[{tableName}]");
+            result.AppendLine($"    ALTER TABLE [{msSQLSchema}].[{tableName}]");
             if (column.IsIdentity)
             {
                 result.AppendLine($"    ADD [{column.ColumnName}] [{column.SqlDataType}]  IDENTITY(1,1) NOT NULL");
@@ -804,9 +806,9 @@ namespace ERD.Viewer.Database.MsSql
                         continue;
                     }
 
-                    result.AppendLine($"    IF (OBJECT_ID('{table.SchemaNameBraced(true)}[{columnRelation.ForeignConstraintName}]', 'F') IS NOT NULL)");
+                    result.AppendLine($"    IF (OBJECT_ID('{table.SchemaNameSQL(true)}[{columnRelation.ForeignConstraintName}]', 'F') IS NOT NULL)");
                     result.AppendLine("    BEGIN");
-                    result.AppendLine($"        ALTER TABLE {table.SchemaNameBraced(true)}[{columnRelation.ChildTable}]  drop [{columnRelation.ForeignConstraintName}]");
+                    result.AppendLine($"        ALTER TABLE {table.SchemaNameSQL(true)}[{columnRelation.ChildTable}]  drop [{columnRelation.ForeignConstraintName}]");
                     result.AppendLine("    END");
                     result.AppendLine();
 
@@ -823,7 +825,7 @@ namespace ERD.Viewer.Database.MsSql
                         continue;
                     }
 
-                    result.AppendLine($"    IF (OBJECT_ID('{table.SchemaNameBraced(true)}[{fkModel.ForeignConstraintName}]', 'F') IS NOT NULL)");
+                    result.AppendLine($"    IF (OBJECT_ID('{table.SchemaNameSQL(true)}[{fkModel.ForeignConstraintName}]', 'F') IS NOT NULL)");
                     result.AppendLine("    BEGIN");
                     result.AppendLine($"        ALTER TABLE {table.FullNameSQLFormat()}  drop [{fkModel.ForeignConstraintName}]");
                     result.AppendLine("    END");

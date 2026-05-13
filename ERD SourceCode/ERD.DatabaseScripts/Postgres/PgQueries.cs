@@ -1,29 +1,8 @@
-﻿/* PSEUDOCODE / PLAN
-1. Purpose: Replace MS SQL Server specific queries with equivalent PostgreSQL queries.
-2. Maintain existing public API (ISQLQueries) and method signatures.
-3. Keep BuildSelectTop unchanged (already Postgres-friendly using LIMIT).
-4. Replace MS SQL Server queries that reference [sys], square-bracket identifiers, or SQL Server-specific functions with PostgreSQL-compatible queries using:
-   - information_schema.columns
-   - information_schema.table_constraints
-   - information_schema.key_column_usage
-   - information_schema.constraint_column_usage
-   - basic information_schema.tables / pg_catalog when necessary
-5. For methods that return primary key / constraint names:
-   - Use information_schema.table_constraints filtered by constraint_type = 'PRIMARY KEY'
-6. For FK / PK and column metadata:
-   - Use information_schema joins (key_column_usage, constraint_column_usage, table_constraints) to obtain:
-     table_name, max_length, numeric_precision, numeric_scale, is_nullable, is_identity (detect via column_default LIKE 'nextval(%' or is_identity = 'YES'), constraint names, referenced table/column, data_type
-7. Implement BuildInString to safely produce SQL IN list like: 'a','b','c' with simple SQL-escaping for single quotes.
-8. Keep StringBuilder and minimal string.Format usage. Ensure all string literals are valid for Postgres and order by schema.table and ordinal_position where appropriate.
-9. Output the modified C# file preserving namespace and class structure.
-
-Now emit the updated C# file implementing the above plan.
-*/
-
+﻿using ERD.Base;
+using ERD.Common;
 using ERD.Models;
-using ERD.Models.ModelExstentions;
-using System.Data.SqlTypes;
 using System.Text;
+using ERD.Common.ModelExstentions;
 
 namespace ERD.DatabaseScripts.Postgres
 {
@@ -45,8 +24,8 @@ namespace ERD.DatabaseScripts.Postgres
                     result.Append($"\"{table.Columns[x].ColumnName}\"");
                 }
                 else
-                { 
-                    result.Append($"            \"{table.Columns[x].ColumnName}\""); 
+                {
+                    result.Append($"            \"{table.Columns[x].ColumnName}\"");
                 }
 
                 if (x < table.Columns.Length - 1)
@@ -69,7 +48,7 @@ namespace ERD.DatabaseScripts.Postgres
                            "FROM information_schema.tables " +
                            "WHERE table_type = 'BASE TABLE' " +
                            " AND table_schema NOT IN ('pg_catalog', 'information_schema')" +
-                           " AND table_catalog = '{0}';";  
+                           " AND table_catalog = '{0}';";
 
             return string.Format(query, databaseName);
         }
@@ -138,39 +117,11 @@ namespace ERD.DatabaseScripts.Postgres
                            "     AND tab.table_schema = '{1}' " +
                            " ORDER BY col.ordinal_position, kcu.ordinal_position";
 
-            return string.Format(query, tableName, schema);
+            return string.Format(query, tableName, Integrity.SchemaValidation(DatabaseTypeEnum.POSTGRES, schema));
         }
 
         public string DatabaseInTableColumnsQuery(string[] tableNamesArray)
         {
-            //string query = "SELECT c.table_name AS TABLENAME," +
-            //               "  c.column_name AS COLUMNNAME," +
-            //               "  c.character_maximum_length AS MAX_LENGTH," +
-            //               "  c.numeric_precision AS PRECISION," +
-            //               "  c.numeric_scale AS SCALE," +
-            //               "  (CASE WHEN c.is_nullable = 'NO' THEN FALSE ELSE TRUE END) AS IS_NULLABLE," +
-            //               "  (CASE WHEN c.column_default LIKE 'nextval(%' OR c.is_identity = 'YES' THEN TRUE ELSE FALSE END) AS IS_IDENTITY," +
-            //               "  ccu.table_name AS PRIMARY_TABLE," +
-            //               "  ccu.column_name AS PRIMARY_COLUMNNAME," +
-            //               "  kcu.constraint_name AS FK_CONSTRAINT_NAME, " +
-            //               "  c.data_type AS DATA_TYPE, " +
-            //               "  c.ordinal_position AS COLUMN_ID, " +
-            //               "  c.ordinal_position AS ORDINAL_POSITION " +
-            //               "FROM information_schema.columns c " +
-            //               "LEFT JOIN information_schema.key_column_usage kcu " +
-            //               "  ON kcu.table_schema = c.table_schema " +
-            //               "  AND kcu.table_name = c.table_name " +
-            //               "  AND kcu.column_name = c.column_name " +
-            //               "LEFT JOIN information_schema.constraint_column_usage ccu " +
-            //               "  ON ccu.constraint_name = kcu.constraint_name " +
-            //               "  AND ccu.constraint_schema = kcu.constraint_schema " +
-            //               "LEFT JOIN information_schema.table_constraints tc " +
-            //               "  ON tc.constraint_name = kcu.constraint_name " +
-            //               "  AND tc.table_schema = kcu.constraint_schema " +
-            //               "  AND tc.table_name = kcu.table_name " +
-            //               "WHERE c.table_name IN ({0}) " +
-            //               "ORDER BY c.table_schema || '.' || c.table_name, c.ordinal_position;";
-
             string query = "SELECT tab.table_name AS \"TABLENAME\", " +
                            "     col.column_name AS \"COLUMNNAME\", " +
                            "     col.character_maximum_length AS \"MAX_LENGTH\", " +

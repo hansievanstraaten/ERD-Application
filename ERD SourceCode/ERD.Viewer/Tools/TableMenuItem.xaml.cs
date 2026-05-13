@@ -1,10 +1,10 @@
 ﻿using ERD.Models;
-using ERD.Models.ModelExstentions;
 using GeneralExtensions;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using WPF.Tools.BaseClasses;
+using ERD.Common.ModelExstentions;
 
 namespace ERD.Viewer.Tools
 {

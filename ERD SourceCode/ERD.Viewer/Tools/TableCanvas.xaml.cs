@@ -1,22 +1,18 @@
-﻿using ERD.Base;
-using ERD.Common;
+﻿using ERD.Common;
 using ERD.FileManagement;
 using ERD.Models;
-using ERD.Models.ModelExstentions;
 using ERD.Viewer.Tables;
 using GeneralExtensions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using ViSo.Common;
 using ViSo.Dialogs.ModelViewer;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Functions;
+using ERD.Common.ModelExstentions;
 
 namespace ERD.Viewer.Tools
 {

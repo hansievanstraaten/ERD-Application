@@ -1,0 +1,7 @@
+Release notes: 1.8.0.0
+*********************
+Add support for Postgres DB's
+
+Minor bugs and fixes:
+*********************:
+Correct relationship management. Please note that this version will at first not show relationships from previous versions. To correct this select Database -> Refresh Canvases from DB. Save the project and restart the application. This will load the relations. Old Virtual relations will be lost. Sorry for that 

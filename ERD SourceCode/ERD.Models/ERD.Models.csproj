@@ -76,7 +76,6 @@
     <Compile Include="ForeignKeyObjectModel.cs" />
     <Compile Include="IncludeTableModel.cs" />
     <Compile Include="ModelBase.cs" />
-    <Compile Include="ModelExstentions\TableModelExstentions.cs" />
     <Compile Include="ProjectModel.cs" />
     <Compile Include="ReportModels\ReportSetupModel.cs" />
     <Compile Include="TableModel.cs" />

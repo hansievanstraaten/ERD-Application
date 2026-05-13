@@ -68,6 +68,7 @@
     <Compile Include="General.cs" />
     <Compile Include="Integrity.cs" />
     <Compile Include="IntegrityInvoker.cs" />
+    <Compile Include="ModelExstentions\TableModelExstentions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SingletonLock.cs" />
     <Compile Include="VersionManager.cs" />

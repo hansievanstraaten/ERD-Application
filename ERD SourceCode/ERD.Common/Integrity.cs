@@ -12,30 +12,22 @@ namespace ERD.Common
     public static class Integrity
     {
         private static List<string> tableMasterList = new List<string>();
-
         private static List<string> foreignKeyConstraintNames = new List<string>();
-
         private static Dictionary<string, int> globalColumnsCount = new Dictionary<string, int>();
-
         private static Dictionary<string, SqlDbType> globalColumnsDataType = new Dictionary<string, SqlDbType>();
-
         private static Dictionary<string, string> tableSchemaNames = new Dictionary<string, string>();
-
         /// <summary>
         /// Key = ownerTable to lower
         /// </summary>
         private static Dictionary<string, List<string>> tableColumns = new Dictionary<string, List<string>>();
-
         /// <summary>
         /// Key = ColumnName to lower. This is used to get the columns that are primary keys only and used for building relations
         /// Value = the Master table oqning the primary key
         /// </summary>
         private static Dictionary<string, string> primaryColumns = new Dictionary<string, string>();
-
         private static Dictionary<string, ColumnObjectModel> columnObjectModels = new Dictionary<string, ColumnObjectModel>();
-
         private static object globalColumnsCountLock = new object();
-
+        
         public static List<string> DropRelations = new List<string>();
 
         public static bool KeepColumnsUnique
@@ -228,6 +220,29 @@ namespace ERD.Common
 
             return machList[0].Description;
         }
+                
+        public static string SchemaValidation(DatabaseTypeEnum databaseTye, string schemaName)
+        {
+            if (string.IsNullOrWhiteSpace(schemaName))
+            {
+                return schemaName;
+            }
+
+            if (DefaultSchemaNames.Contains(schemaName.ToLower()))
+            {
+                switch(databaseTye)
+                {
+                    case DatabaseTypeEnum.SQL: return "dbo";
+                    case DatabaseTypeEnum.POSTGRES: return "public";
+                    default: return schemaName;
+                }
+            }
+
+            return schemaName;
+        }
+
+        
+        public static string[] DefaultSchemaNames = new string[] { "dbo", "public" };
 
         public static ColumnObjectModel GetObjectModel(string ownerTable, string columnName)
         {

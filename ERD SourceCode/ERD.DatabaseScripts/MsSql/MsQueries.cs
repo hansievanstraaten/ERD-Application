@@ -1,4 +1,6 @@
-﻿using ERD.Models;
+﻿using ERD.Base;
+using ERD.Common;
+using ERD.Models;
 using GeneralExtensions;
 using System.Linq;
 using System.Text;
@@ -109,10 +111,8 @@ namespace ERD.DatabaseScripts
                            "  AND SCHEMA_NAME([TAB].[SCHEMA_ID]) = '{1}'" +
                            " ORDER BY [COL].[COLUMN_ID], [FK_COLS].[CONSTRAINT_COLUMN_ID]";
 
-            return string.Format(query, tableName, schema);
+            return string.Format(query, tableName, Integrity.SchemaValidation(DatabaseTypeEnum.SQL, schema));
         }
-
-        
 
         public string DatabaseInTableColumnsQuery(string[] tableNamesArray)
         {

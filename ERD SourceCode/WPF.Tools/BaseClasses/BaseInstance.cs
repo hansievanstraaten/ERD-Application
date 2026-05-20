@@ -17,7 +17,7 @@ namespace WPF.Tools.BaseClasses
 
     public Type CreateType(string assemblyName, string moduleName)
     {
-      AssemblyBuilder asm = AppDomain.CurrentDomain.DefineDynamicAssembly(
+      AssemblyBuilder asm = AssemblyBuilder.DefineDynamicAssembly(
         new AssemblyName(assemblyName),
         AssemblyBuilderAccess.RunAndCollect);
 

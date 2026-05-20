@@ -14,11 +14,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />
     <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj" />
     <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj" />

@@ -1,292 +1,32 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AD4E4CEB-2E5B-4E40-B63A-1A05B81F8D47}</ProjectGuid>
-    <OutputType>library</OutputType>
-    <RootNamespace>REPORT.Builder</RootNamespace>
-    <AssemblyName>REPORT.Builder</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <OutputType>Library</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="PdfSharp-WPF, Version=1.32.2608.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PdfSharp.Xps.1.0.0\lib\PdfSharp-WPF.dll</HintPath>
-    </Reference>
-    <Reference Include="PdfSharp.Xps, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PdfSharp.Xps.1.0.0\lib\PdfSharp.Xps.dll</HintPath>
-    </Reference>
     <Reference Include="ReachFramework" />
-    <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Printing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="PdfSharp.Xps" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CategorySelector.xaml.cs">
-      <DependentUpon>CategorySelector.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Common\DatabaseOptions\IDataToSQL.cs" />
-    <Compile Include="Common\DatabaseOptions\MsSQL.cs" />
-    <Compile Include="Common\ObjectCreator.cs" />
-    <Compile Include="DatasourceSelector.xaml.cs">
-      <DependentUpon>DatasourceSelector.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Printing\BuildReportToCanvas.cs" />
-    <Compile Include="Printing\CanvasToPDF.cs" />
-    <Compile Include="Printing\XmlHelper.cs" />
-    <Compile Include="Printing\BuildReportXML.cs" />
-    <Compile Include="Printing\PrintCanvas.cs" />
-    <Compile Include="Printing\PrintPreview.xaml.cs">
-      <DependentUpon>PrintPreview.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="ReplaceBuilder.xaml.cs">
-      <DependentUpon>ReplaceBuilder.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReplaceWhere.xaml.cs">
-      <DependentUpon>ReplaceWhere.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportCategories.xaml.cs">
-      <DependentUpon>ReportCategories.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportComponents\CanvasSqlManager.cs" />
-    <Compile Include="ReportComponents\PageSetupOptions.cs" />
-    <Compile Include="ReportComponents\ReportSection.xaml.cs">
-      <DependentUpon>ReportSection.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportComponents\ResizeHandles.cs" />
-    <Compile Include="ReportComponents\SectionCanvas.cs" />
-    <Compile Include="ReportComponents\ToolsMenuItem.xaml.cs">
-      <DependentUpon>ToolsMenuItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportDesigner.xaml.cs">
-      <DependentUpon>ReportDesigner.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportFilterOptions.xaml.cs">
-      <DependentUpon>ReportFilterOptions.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportHeaderFooters.xaml.cs">
-      <DependentUpon>ReportHeaderFooters.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportSelector.xaml.cs">
-      <DependentUpon>ReportSelector.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportSystemSetup.xaml.cs">
-      <DependentUpon>ReportSystemSetup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReportTools\CurrentDate.cs" />
-    <Compile Include="ReportTools\LabelBase.cs" />
-    <Compile Include="ReportTools\ReportBorder.cs" />
-    <Compile Include="ReportTools\ReportDataObject.cs" />
-    <Compile Include="ReportTools\ReportHorizontalLine.cs" />
-    <Compile Include="ReportTools\ReportImage.cs" />
-    <Compile Include="ReportTools\ReportLabel.cs" />
-    <Compile Include="ReportTools\ReportLineBase.cs" />
-    <Compile Include="ReportTools\ReportPageBreak.cs" />
-    <Compile Include="ReportTools\ReportSum.cs" />
-    <Compile Include="ReportTools\ReportVerticalLine.cs" />
-    <Compile Include="ReportTools\ResizeHandle.cs" />
-    <Compile Include="UpdateBuilder.xaml.cs">
-      <DependentUpon>UpdateBuilder.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="WhereBuilder.xaml.cs">
-      <DependentUpon>WhereBuilder.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="WhereParameter.xaml.cs">
-      <DependentUpon>WhereParameter.xaml</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
+    <ProjectReference Include="..\ERD.Base\ERD.Base.csproj" />
+    <ProjectReference Include="..\ERD.Common\ERD.Common.csproj" />
+    <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj" />
+    <ProjectReference Include="..\ERD.Models\ERD.Models.csproj" />
+    <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />
+    <ProjectReference Include="..\IconSet\IconSet.csproj" />
+    <ProjectReference Include="..\REPORT.Data\REPORT.Data.csproj" />
+    <ProjectReference Include="..\ViSo.Common\ViSo.Common.csproj" />
+    <ProjectReference Include="..\ViSo.Dialogs\ViSo.Dialogs.csproj" />
+    <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj" />
+    <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Page Include="CategorySelector.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="DatasourceSelector.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Printing\PrintPreview.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReplaceBuilder.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReplaceWhere.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReportCategories.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReportComponents\ReportSection.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReportComponents\ToolsMenuItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReportDesigner.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReportFilterOptions.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReportHeaderFooters.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReportSelector.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ReportSystemSetup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UpdateBuilder.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="WhereBuilder.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="WhereParameter.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ERD.Base\ERD.Base.csproj">
-      <Project>{2a61a104-cb60-4d3e-b4b4-38d4c822babb}</Project>
-      <Name>ERD.Base</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ERD.Common\ERD.Common.csproj">
-      <Project>{719BE630-883F-4009-ABFE-3D0965018D4B}</Project>
-      <Name>ERD.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj">
-      <Project>{42D76052-8D0D-4571-8D65-861B7BB5CB6D}</Project>
-      <Name>ERD.DatabaseScripts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ERD.Models\ERD.Models.csproj">
-      <Project>{a3a6b6f4-1959-4a99-a5ca-472bc1b605ea}</Project>
-      <Name>ERD.Models</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj">
-      <Project>{df72187c-d643-4e5f-af68-190c023930a9}</Project>
-      <Name>GeneralExtensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\IconSet\IconSet.csproj">
-      <Project>{8ae0a307-a872-4d6d-a58e-31d28ce5b89d}</Project>
-      <Name>IconSet</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\REPORT.Data\REPORT.Data.csproj">
-      <Project>{f5216b32-35a2-46f0-90c2-9667f7f80bcd}</Project>
-      <Name>REPORT.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ViSo.Common\ViSo.Common.csproj">
-      <Project>{cfb74caf-b98c-4387-94e3-ae9afbe16b7e}</Project>
-      <Name>ViSo.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ViSo.Dialogs\ViSo.Dialogs.csproj">
-      <Project>{53c1d2ae-46e4-428f-80fb-7e1b238a2276}</Project>
-      <Name>ViSo.Dialogs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj">
-      <Project>{44340843-a61b-4a2b-99d8-7142bf456d85}</Project>
-      <Name>ViSo.SharedEnums</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj">
-      <Project>{53799c60-aa9d-4deb-86e0-8e70dd1844f3}</Project>
-      <Name>WPF.Tools</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
-  </Target>
-  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
 </Project>

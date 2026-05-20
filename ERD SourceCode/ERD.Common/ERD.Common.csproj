@@ -20,4 +20,7 @@
     <ProjectReference Include="..\ERD.Base\ERD.Base.csproj" />
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
 </Project>

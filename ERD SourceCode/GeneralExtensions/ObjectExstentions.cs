@@ -195,7 +195,12 @@ namespace GeneralExtensions
                 {
                     // TODO: This is a proposed fix for SYSLIB0011. System.Text.Json serialization will not work for all types/formats previously supported by BinaryFormatter.
                     // If the type is not serializable by System.Text.Json, additional converters or changes may be required.
-                    JsonSerializer.Serialize(zipStream, source);
+                    using (var streamWriter = new StreamWriter(zipStream))
+{
+    JsonSerializer serializer = new JsonSerializer();
+    serializer.Serialize(streamWriter, source);
+    streamWriter.Flush();
+}
                 }
 
                 result = queryStream.ToArray();

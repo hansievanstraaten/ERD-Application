@@ -2,6 +2,11 @@
   <PropertyGroup>
     <TargetFramework>net8.0-windows7.0</TargetFramework>
     <OutputType>Library</OutputType>
+    <AssemblyTitle>ViSo.Common</AssemblyTitle>
+    <Product>ViSo.Common</Product>
+    <Copyright>Copyright ©  2019</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />

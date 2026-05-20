@@ -5,6 +5,11 @@
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <ApplicationIcon>ViSo_nice.ico</ApplicationIcon>
+    <AssemblyTitle>IconSet</AssemblyTitle>
+    <Product>IconSet</Product>
+    <Copyright>Copyright ©  2019</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />

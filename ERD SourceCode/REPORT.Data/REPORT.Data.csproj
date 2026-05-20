@@ -1,277 +1,54 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F5216B32-35A2-46F0-90C2-9667F7F80BCD}</ProjectGuid>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>REPORT.Data</RootNamespace>
-    <AssemblyName>REPORT.Data</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.0\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Configuration.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Configuration.Abstractions.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.Binder, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Configuration.Binder.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.3.1.9\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.9\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Options, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Options.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Primitives, Version=3.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.9\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Identity.Client, Version=3.0.8.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Identity.Client.3.0.8\lib\net45\Microsoft.Identity.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Logging.5.5.0\lib\net461\Microsoft.IdentityModel.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Collections.Immutable, Version=1.2.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.1.7.1\lib\net461\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ComponentModel.Annotations.4.7.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
-    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.Common, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.Common.4.3.0\lib\net451\System.Data.Common.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.7.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.1\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient.SNI" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="3.0.8" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="5.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.7.1" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Constants.cs" />
-    <Compile Include="DbConfiguration.cs" />
-    <Compile Include="Migrations\202011040719419_DataSourceMigration.cs" />
-    <Compile Include="Migrations\202011040719419_DataSourceMigration.designer.cs">
-      <DependentUpon>202011040719419_DataSourceMigration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202011040720223_ReportTablesMigration.cs" />
-    <Compile Include="Migrations\202011040720223_ReportTablesMigration.designer.cs">
-      <DependentUpon>202011040720223_ReportTablesMigration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202011040720582_SystemTablesMigration.cs" />
-    <Compile Include="Migrations\202011040720582_SystemTablesMigration.designer.cs">
-      <DependentUpon>202011040720582_SystemTablesMigration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\DataSourceConfiguration.cs" />
-    <Compile Include="Migrations\ReportTablesConfiguration.cs" />
-    <Compile Include="Migrations\SystemTablesConfiguration.cs" />
-    <Compile Include="Models\ReportCategoryModel.cs" />
-    <Compile Include="Models\ReportsInvokeReplaceModel.cs" />
-    <Compile Include="Models\ReportSQLReplaceDetailModel.cs" />
-    <Compile Include="Models\ReportSQLReplaceHeaderModel.cs" />
-    <Compile Include="Models\ReportXMLPrintParameterModel.cs" />
-    <Compile Include="Models\UpdateStatementModel.cs" />
-    <Compile Include="Models\UpdateValueModel.cs" />
-    <Compile Include="SQLRepository\Agrigates\Base\ReportCategoryBase.cs" />
-    <Compile Include="SQLRepository\Agrigates\Base\ReportXMLPrintParameterBase.cs" />
-    <Compile Include="SQLRepository\Agrigates\User\ReportCategory.cs" />
-    <Compile Include="SQLRepository\Agrigates\User\ReportXMLPrintParameter.cs" />
-    <Compile Include="SQLRepository\DbScript.cs" />
-    <Compile Include="SQLRepository\Mappings\ReportCategoryMapping.cs" />
-    <Compile Include="SQLRepository\Mappings\ReportXMLPrintParameterMapping.cs" />
-    <Compile Include="SQLRepository\Repositories\BuildReportRepository.cs" />
-    <Compile Include="DatabaseConnection.cs" />
-    <Compile Include="Models\DataSourceMasterModel.cs" />
-    <Compile Include="Models\DataSourceTableModel.cs" />
-    <Compile Include="Models\LookupModel.cs" />
-    <Compile Include="Models\ReportColumnModel.cs" />
-    <Compile Include="Models\ReportConnectionModel.cs" />
-    <Compile Include="Models\ReportMasterModel.cs" />
-    <Compile Include="Models\ReportXMLModel.cs" />
-    <Compile Include="Models\WhereParameterModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="SQLRepository\Agrigates\Base\DataSourceMasterBase.cs" />
-    <Compile Include="SQLRepository\Agrigates\Base\DataSourceTableBase.cs" />
-    <Compile Include="SQLRepository\Agrigates\Base\LookupBase.cs" />
-    <Compile Include="SQLRepository\Agrigates\Base\ReportConnectionBase.cs" />
-    <Compile Include="SQLRepository\Agrigates\Base\ReportMasterBase.cs" />
-    <Compile Include="SQLRepository\Agrigates\Base\ReportXMLBase.cs" />
-    <Compile Include="SQLRepository\Agrigates\User\DataSourceMaster.cs" />
-    <Compile Include="SQLRepository\Agrigates\User\DataSourceTable.cs" />
-    <Compile Include="SQLRepository\Agrigates\User\Lookup.cs" />
-    <Compile Include="SQLRepository\Agrigates\User\ReportConnection.cs" />
-    <Compile Include="SQLRepository\Agrigates\User\ReportMaster.cs" />
-    <Compile Include="SQLRepository\Agrigates\User\ReportXML.cs" />
-    <Compile Include="SQLRepository\DataContext\DataSourceContext.cs" />
-    <Compile Include="SQLRepository\DataContext\ReportTablesContext.cs" />
-    <Compile Include="SQLRepository\DataContext\SystemTablesContext.cs" />
-    <Compile Include="SQLRepository\Mappings\DataSourceMasterMapping.cs" />
-    <Compile Include="SQLRepository\Mappings\DataSourceTableMapping.cs" />
-    <Compile Include="SQLRepository\Mappings\LookupMapping.cs" />
-    <Compile Include="SQLRepository\Mappings\ReportConnectionMapping.cs" />
-    <Compile Include="SQLRepository\Mappings\ReportMasterMapping.cs" />
-    <Compile Include="SQLRepository\Mappings\ReportXMLMapping.cs" />
-    <Compile Include="SQLRepository\Repositories\Base\DataSourceRepository_Base.cs" />
-    <Compile Include="SQLRepository\Repositories\Base\ReportTablesRepository_Base.cs" />
-    <Compile Include="SQLRepository\Repositories\Base\SystemTablesRepository_Base.cs" />
-    <Compile Include="SQLRepository\Repositories\User\DataSourceRepository.cs" />
-    <Compile Include="SQLRepository\Repositories\User\ReportTablesRepository.cs" />
-    <Compile Include="SQLRepository\Repositories\User\SystemTablesRepository.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202011040719419_DataSourceMigration.resx">
-      <DependentUpon>202011040719419_DataSourceMigration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202011040720223_ReportTablesMigration.resx">
-      <DependentUpon>202011040720223_ReportTablesMigration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202011040720582_SystemTablesMigration.resx">
-      <DependentUpon>202011040720582_SystemTablesMigration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ERD.Base\ERD.Base.csproj">
-      <Project>{2A61A104-CB60-4D3E-B4B4-38D4C822BABB}</Project>
-      <Name>ERD.Base</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ERD.Common\ERD.Common.csproj">
-      <Project>{719be630-883f-4009-abfe-3d0965018d4b}</Project>
-      <Name>ERD.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj">
-      <Project>{42D76052-8D0D-4571-8D65-861B7BB5CB6D}</Project>
-      <Name>ERD.DatabaseScripts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ERD.Models\ERD.Models.csproj">
-      <Project>{A3A6B6F4-1959-4A99-A5CA-472BC1B605EA}</Project>
-      <Name>ERD.Models</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj">
-      <Project>{DF72187C-D643-4E5F-AF68-190C023930A9}</Project>
-      <Name>GeneralExtensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj">
-      <Project>{44340843-A61B-4A2B-99D8-7142BF456D85}</Project>
-      <Name>ViSo.SharedEnums</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj">
-      <Project>{53799C60-AA9D-4DEB-86E0-8E70DD1844F3}</Project>
-      <Name>WPF.Tools</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ERD_Print.txt" />
+    <ProjectReference Include="..\ERD.Base\ERD.Base.csproj" />
+    <ProjectReference Include="..\ERD.Common\ERD.Common.csproj" />
+    <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj" />
+    <ProjectReference Include="..\ERD.Models\ERD.Models.csproj" />
+    <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />
+    <ProjectReference Include="..\ViSo.SharedEnums\ViSo.SharedEnums.csproj" />
+    <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Migration Script.txt" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Data.SqlClient.SNI.1.1.0\build\net46\Microsoft.Data.SqlClient.SNI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Data.SqlClient.SNI.1.1.0\build\net46\Microsoft.Data.SqlClient.SNI.targets'))" />
-  </Target>
-  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
-  <Import Project="..\packages\Microsoft.Data.SqlClient.SNI.1.1.0\build\net46\Microsoft.Data.SqlClient.SNI.targets" Condition="Exists('..\packages\Microsoft.Data.SqlClient.SNI.1.1.0\build\net46\Microsoft.Data.SqlClient.SNI.targets')" />
 </Project>

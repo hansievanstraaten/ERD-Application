@@ -20,11 +20,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Functions;
-using ContextMenu = System.Windows.Controls.ContextMenu;
+using // TODO ContextMenu is no longer supported. Use ContextMenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+ContextMenu = System.Windows.Controls.ContextMenu;
 using DataFormats = System.Windows.DataFormats;
 using DataObject = System.Windows.DataObject;
 using DragDropEffects = System.Windows.DragDropEffects;
-using MenuItem = System.Windows.Controls.MenuItem;
+using // TODO MenuItem is no longer supported. Use ToolStripMenuItem instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+MenuItem = System.Windows.Controls.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using ViSo.Dialogs.ModelViewer;

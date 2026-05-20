@@ -6,7 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -194,9 +194,9 @@ namespace GeneralExtensions
             {
                 using (GZipStream zipStream = new GZipStream(queryStream, CompressionMode.Compress))
                 {
-                    BinaryFormatter formatter = new BinaryFormatter();
-
-                    formatter.Serialize(zipStream, source);
+                    // TODO: This is a proposed fix for SYSLIB0011. System.Text.Json serialization will not work for all types/formats previously supported by BinaryFormatter.
+                    // If the type is not serializable by System.Text.Json, additional converters or changes may be required.
+                    await JsonSerializer.SerializeAsync(zipStream, source);
                 }
 
                 result = queryStream.ToArray();

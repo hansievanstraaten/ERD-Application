@@ -8,12 +8,7 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ReachFramework" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Printing" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="EntityFramework" Version="6.5.2" />
     <PackageReference Include="PdfSharp.Xps" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>

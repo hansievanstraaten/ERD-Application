@@ -708,7 +708,10 @@ namespace ERD.Viewer.Tools
 
             double childWidth = childTable.DesiredSize.Width + childPoint.X;
 
-            TablePlacementEnum placement = ParentPlacementCalculator.CalculatePlacement(parentPoint, childPoint, parentWidth, childWidth, parentBottom, childBottom);
+            TablePlacementEnum placement = ParentPlacementCalculator.CalculatePlacement(
+                new System.Drawing.Point((int)parentPoint.X, (int)parentPoint.Y),
+                new System.Drawing.Point((int)childPoint.X, (int)childPoint.Y),
+                parentWidth, childWidth, parentBottom, childBottom);
 
             if (childTable.Table.TableName == parentTable.Table.TableName)
             {

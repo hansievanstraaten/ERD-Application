@@ -7,10 +7,6 @@
     <ApplicationIcon>ViSo_nice.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />
   </ItemGroup>
   <ItemGroup>

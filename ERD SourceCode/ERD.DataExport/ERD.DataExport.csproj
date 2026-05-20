@@ -6,10 +6,6 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data.DataSetExtensions" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\ERD.Base\ERD.Base.csproj" />
     <ProjectReference Include="..\ERD.Common\ERD.Common.csproj" />
     <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj" />

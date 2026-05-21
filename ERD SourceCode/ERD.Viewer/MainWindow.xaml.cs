@@ -693,7 +693,11 @@ namespace ERD.Viewer
 
                     MessageBox.Show(message);
 
-                    Process.Start(url);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
                 }
                 else
                 {
@@ -870,15 +874,23 @@ namespace ERD.Viewer
 
                                             tableColumn.IsForeignkey = databaseColumn.IsForeignkey;
 
-                                            tableColumn.ForeignKeys = databaseColumn.ForeignKeys;
+                                            List<ForeignKeyObjectModel> columnKeys = tableColumn.ForeignKeys.Where(v => v.IsVertualRelation == true)
+                                            .ToList();
+
+                                            columnKeys.AddRange(databaseColumn.ForeignKeys);
+
+                                            tableColumn.ForeignKeys = columnKeys;
                                         }
-                                        else if (tableColumn.ForeignKeys.Any(v => v.IsVertualRelation == false))
+                                        else if (tableColumn.IsForeignkey || tableColumn.ForeignKeys.Any(v => v.IsVertualRelation == false))
                                         {
                                             tableColumn.IsForeignkey = false;
 
-                                            tableColumn.ForeignKeys.AddRange(tableColumn.ForeignKeys.Where(v => v.IsVertualRelation == false));
+                                            List<ForeignKeyObjectModel> vertualKeys = tableColumn.ForeignKeys.Where(v => v.IsVertualRelation == true)
+                                            .ToList();
+
+                                            tableColumn.ForeignKeys = vertualKeys;
                                         }
-                                        
+
                                         continue;
                                     }
 

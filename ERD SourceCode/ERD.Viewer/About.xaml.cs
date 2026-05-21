@@ -37,8 +37,12 @@ namespace ERD.Viewer
 		{
 			try
 			{
-				Process.Start("https://github.com/hansievanstraaten/ERD-Application");
-			}
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "https://github.com/hansievanstraaten/ERD-Application",
+                    UseShellExecute = true
+                });
+            }
 			catch (Exception err)
 			{
 				MessageBox.Show(err.InnerExceptionMessage());

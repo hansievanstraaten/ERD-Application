@@ -213,7 +213,11 @@ namespace WPF.Tools.HTML
 
         hyperLink.IsEnabled = true;
         
-        hyperLink.RequestNavigate += (hyperlinkSender, args) => Process.Start(args.Uri.ToString());
+        hyperLink.RequestNavigate += (hyperlinkSender, args) => Process.Start(new ProcessStartInfo
+        {
+            FileName = args.Uri.ToString(),
+            UseShellExecute = true
+        });
       }
       catch (Exception err)
       {

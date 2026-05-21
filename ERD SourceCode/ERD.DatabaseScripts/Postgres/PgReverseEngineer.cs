@@ -222,7 +222,7 @@ namespace ERD.DatabaseScripts.Postgres
                 MaxLength = item.Element("MAX_LENGTH").Value.ToInt32(),
                 Precision = item.Element("PRECISION").Value.ToInt32(),
                 Scale = item.Element("SCALE").Value.ToInt32(),
-                IsForeignkey = !item.Element("PRIMARY_TABLE").Value.IsNullEmptyOrWhiteSpace(),
+                //IsForeignkey = !item.Element("PRIMARY_TABLE").Value.IsNullEmptyOrWhiteSpace(),
                 SqlDataType = this.ParseSqlDbType(item.Element("DATA_TYPE").Value),
                 InPrimaryKey = primaryKey.Descendants().Any(d => d.Value == "PRIMARY KEY"),
                 Column_Id = item.Element("COLUMN_ID").Value.ToInt32(),
@@ -232,6 +232,8 @@ namespace ERD.DatabaseScripts.Postgres
             List<XElement> constraints = columnGroupItem.Value
                 .Where(fk => string.IsNullOrWhiteSpace(fk.Element("FK_CONSTRAINT_NAME").Value) == false)
                 .ToList();
+
+            column.IsForeignkey = constraints.Count > 0;
 
             foreach (XElement foreignKey in constraints)
             {

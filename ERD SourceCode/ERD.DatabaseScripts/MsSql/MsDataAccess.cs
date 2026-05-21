@@ -1,10 +1,10 @@
 ﻿using ERD.Common;
 using ERD.Models;
 using GeneralExtensions;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Dynamic;
 using System.Text;
 using System.Xml.Linq;
@@ -14,7 +14,7 @@ namespace ERD.DatabaseScripts.MsSql
 {
     internal class MsDataAccess : IDataAccess
     {
-        private readonly string connectionString = "Server={0};Database={1};User ID={2};Password={3};Trusted_Connection={4}";
+        private readonly string connectionString = "Server={0};Database={1};User ID={2};Password={3};Trusted_Connection={4};Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;";
 
         private SqlConnection connection;
         private DataConverters converter = new DataConverters();
@@ -227,15 +227,7 @@ namespace ERD.DatabaseScripts.MsSql
             }
             catch
             {
-                if (this.connection != null)
-                {
-                    if (this.connection.State == System.Data.ConnectionState.Open)
-                    {
-                        this.connection.Close();
-                    }
-
-                    this.connection = null;
-                }
+                this.CloseConnection();
 
                 throw;
             }
@@ -297,7 +289,6 @@ namespace ERD.DatabaseScripts.MsSql
             catch
             {
                 this.CloseConnection();
-
                 throw;
             }
         }

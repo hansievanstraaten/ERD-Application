@@ -69,7 +69,11 @@ namespace ERD.Common
                     client.DownloadFile(downloadFile, saveVersionFile);
                 }
 
-                Process.Start(saveVersionFile);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = saveVersionFile,
+                    UseShellExecute = true
+                });
             }
             catch (Exception err)
             {

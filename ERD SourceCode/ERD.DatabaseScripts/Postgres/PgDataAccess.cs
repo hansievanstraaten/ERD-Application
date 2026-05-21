@@ -256,17 +256,11 @@ namespace ERD.DatabaseScripts.Postgres
             }
             catch
             {
-                if (this.connection != null)
-                {
-                    if (this.connection.State == ConnectionState.Open)
-                    {
-                        this.connection.Close();
-                    }
-
-                    this.connection = null;
-                }
-
                 throw;
+            }
+            finally
+            {
+                this.CloseConnection();
             }
         }
 

@@ -860,9 +860,13 @@ namespace REPORT.Builder
 
 				string result = pdf.ConvertToPdf(dlg.FileName, this.GetPrintCanvases(item));
 
-				Process.Start(result);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = result,
+                    UseShellExecute = true
+                });
 
-			}
+            }
 			catch (Exception err)
 			{
 				MessageBox.Show(err.InnerExceptionMessage());

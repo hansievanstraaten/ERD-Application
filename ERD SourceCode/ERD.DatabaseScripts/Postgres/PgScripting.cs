@@ -406,13 +406,19 @@ namespace ERD.DatabaseScripts.Postgres
             foreach (KeyValuePair<string, ForeignKeyObjectModel[]> kvp in constraintGroups)
             {
                 string fkName = kvp.Key;
-                ForeignKeyObjectModel[] cols = kvp.Value.Where(vr => vr.IsVertualRelation == false).ToArray();
-                string[] distinctColumns = cols.Select(c => c.ForeignKeyColumn).ToArray();
 
+                ForeignKeyObjectModel[] cols = kvp.Value.Where(vr => vr.IsVertualRelation == false).ToArray();
+                string[] distinctColumns = cols.Select(c => c.LocalColumnName).ToArray();
+                string[] distinctFColumns = cols.Select(c => c.ForeignKeyColumn).ToArray();
 
                 string childCols = string.Join(", ", distinctColumns.Select(c => QuoteIdentifier(c)));
                 string parentTable = cols[0].ForeignKeyTable;
-                string parentCols = string.Join(", ", distinctColumns.Select(c => QuoteIdentifier(c)));
+                string parentCols = string.Join(", ", distinctFColumns.Select(c => QuoteIdentifier(c)));
+
+                if (kvp.Key.Length > 64)
+                {
+                    fkName = Integrity.BuildForeighKeyName(parentTable, table.TableName);
+                }
 
                 result.AppendLine("DO $$");
                 result.AppendLine("BEGIN");

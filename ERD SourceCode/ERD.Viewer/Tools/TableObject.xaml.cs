@@ -1,13 +1,14 @@
 ﻿using ERD.Base;
 using ERD.Build;
+using ERD.Build.BuildEnums;
 using ERD.Build.Models;
 using ERD.Common;
 using ERD.DatabaseScripts;
 using ERD.DatabaseScripts.Engineering;
 using ERD.Models;
-using ERD.Build.BuildEnums;
 using ERD.Viewer.Columns;
 using ERD.Viewer.Database;
+using ERD.Viewer.Database.ExportData;
 using GeneralExtensions;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,8 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ViSo.Common;
+using ViSo.Dialogs.ModelViewer;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Functions;
 using // TODO ContextMenu is no longer supported. Use ContextMenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
@@ -29,8 +32,6 @@ using // TODO MenuItem is no longer supported. Use ToolStripMenuItem instead. Fo
 MenuItem = System.Windows.Controls.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
-using ViSo.Dialogs.ModelViewer;
-using ERD.Viewer.Database.ExportData;
 
 namespace ERD.Viewer.Tools
 {
@@ -334,7 +335,11 @@ namespace ERD.Viewer.Tools
 
                 File.WriteAllText(filePath, result.ToString());
 
-                Process.Start(filePath);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true
+                });
             }
             catch (Exception err)
             {
@@ -707,7 +712,11 @@ namespace ERD.Viewer.Tools
 
             File.WriteAllText(filePath, result);
 
-            Process.Start(filePath);
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            });
         }
     }
 }

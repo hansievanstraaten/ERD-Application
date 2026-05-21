@@ -111,7 +111,11 @@ namespace ERD.Viewer.Comparer
 
                 File.WriteAllText(filePath, result.ToString());
 
-                Process.Start(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads));
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = Paths.KnownFolder(KnownFolders.KnownFolder.Downloads),
+                    UseShellExecute = true
+                });
             }
             catch (Exception err)
             {
@@ -166,7 +170,11 @@ namespace ERD.Viewer.Comparer
 
                 File.WriteAllText(filePath, result.ToString());
 
-                Process.Start(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads));
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = Paths.KnownFolder(KnownFolders.KnownFolder.Downloads),
+                    UseShellExecute = true
+                });
             }
             catch (Exception err)
             {

@@ -1,0 +1,8 @@
+Release notes: 2.0.0.0
+*********************
+Migrate from .Net Framework 4.x to .Net 8
+
+Minor bugs and fixes:
+*********************:
+Correct relationship management.
+Improve Script Builder performance - Not where I want it yet

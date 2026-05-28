@@ -1,7 +1,7 @@
-Release notes: 2.0.0.1
+Release notes: 2.0.0.2
 *********************
 Migrate from .Net Framework 4.x to .Net 8
 
 Minor bugs and fixes:
 *********************:
-Build reference file correction
+Build reference .Net 8 required file

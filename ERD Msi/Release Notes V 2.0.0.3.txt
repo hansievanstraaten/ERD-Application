@@ -1,0 +1,7 @@
+Release notes: 2.0.0.3
+*********************
+Migrate from .Net Framework 4.x to .Net 8
+
+Minor bugs and fixes:
+*********************:
+Bin Sub DIR required in installer

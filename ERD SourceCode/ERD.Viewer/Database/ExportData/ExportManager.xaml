@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
         <ModelViewer:ModelViewer x:Name="uxModelView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" ModelViewItemBrowse="Options_Browse" />
@@ -26,7 +27,15 @@
         
         <CommonControls:ViSoTreeView x:Name="uxColumns" Grid.Row="1" Grid.Column="1" />
 
-        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="15, 5">
+        <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <TextBlock TextWrapping="Wrap">To migrate data from one database to another, the source and destination tables must have identical structures.
+        Select the destination database and ensure that the
+        <Run FontWeight="Bold">"Place Data in SQL"</Run>
+        option is enabled before starting the migration.
+            </TextBlock>
+        </Label>
+
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="15, 5">
             <CommonControls:ActionButton x:Name="uxButtonOk" Content="OK" Margin="2" Click="OkButton_Clicked" />
             <CommonControls:ActionButton x:Name="uxButtonCancel" Content="Cancel" Margin="2" Click="Cancel_Cliked" />
         </StackPanel>

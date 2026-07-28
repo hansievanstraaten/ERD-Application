@@ -23,7 +23,7 @@ namespace ERD.Models
     }
 
 
-    [FieldInformation("User Name", Sort = 3)]
+    [FieldInformation("User Name", Sort = 4)]
     new public string UserName
     {
       get
@@ -38,7 +38,7 @@ namespace ERD.Models
     }
     
 
-    [FieldInformation("Password", Sort = 4)]
+    [FieldInformation("Password", Sort = 5)]
     [ItemTypeAttribute(ModelItemTypeEnum.SecureString)]
     new public string Password
     {

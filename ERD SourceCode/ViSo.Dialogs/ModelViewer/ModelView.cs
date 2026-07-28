@@ -6,111 +6,119 @@ using System.Windows.Media;
 
 namespace ViSo.Dialogs.ModelViewer
 {
-  public static class ModelView
-  {
-    public delegate void OnItemBrowseEvent(object sender, object model, string buttonKey);
-
-    public static event OnItemBrowseEvent OnItemBrowse;
-
-    private static ViewerWindow viewer;
-
-    public static bool? ShowDialog(string windowTitle, object model)
+    public static class ModelView
     {
-      try
-      {
-        ModelView.viewer = new ViewerWindow(windowTitle, model);
+        public delegate void OnItemBrowseEvent(object sender, object model, string buttonKey);
 
-        ModelView.viewer.OnItemBrowse += ModelView.OnItem_Browse;
+        public static event OnItemBrowseEvent OnItemBrowse;
 
-        return ModelView.viewer.ShowDialog();
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
-      finally
-      {
-        ModelView.viewer.OnItemBrowse -= ModelView.OnItem_Browse;
+        private static ViewerWindow viewer;
 
-        ModelView.viewer = null;
-      }
+        public static bool? ShowDialog(string windowTitle, object model, bool[] visibility = null)
+        {
+            try
+            {
+                ModelView.viewer = new ViewerWindow(windowTitle, model);
 
-      return null;
+                if (visibility != null)
+                {
+                    for (int x = 0; x < visibility.Length; x++)
+                    {
+                        ModelView.viewer.ModelView[0][x].Visibility = visibility[x] ? Visibility.Visible : Visibility.Collapsed;
+                    }
+                }
+
+                ModelView.viewer.OnItemBrowse += ModelView.OnItem_Browse;
+
+                return ModelView.viewer.ShowDialog();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+            finally
+            {
+                ModelView.viewer.OnItemBrowse -= ModelView.OnItem_Browse;
+
+                ModelView.viewer = null;
+            }
+
+            return null;
+        }
+
+        public static bool? ShowDialog(string windowTitle, object[] models)
+        {
+            try
+            {
+                ModelView.viewer = new ViewerWindow(windowTitle, models);
+
+                ModelView.viewer.OnItemBrowse += ModelView.OnItem_Browse;
+
+                return ModelView.viewer.ShowDialog();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+            finally
+            {
+                ModelView.viewer.OnItemBrowse -= ModelView.OnItem_Browse;
+
+                ModelView.viewer = null;
+            }
+
+            return null;
+        }
+
+        public static bool? ShowDialog(Window owner, bool topMost, string windowTitle, object model)
+        {
+            try
+            {
+                ModelView.viewer = new ViewerWindow(windowTitle, model);
+
+                ModelView.viewer.OnItemBrowse += ModelView.OnItem_Browse;
+
+                ModelView.viewer.Owner = owner;
+
+                ModelView.viewer.Topmost = topMost;
+
+                return ModelView.viewer.ShowDialog();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+            finally
+            {
+                ModelView.viewer.OnItemBrowse -= ModelView.OnItem_Browse;
+
+                ModelView.viewer = null;
+            }
+
+            return null;
+        }
+
+        public static ViewerWindow Viewer
+        {
+            get
+            {
+                return ModelView.viewer;
+            }
+        }
+
+        private static void OnItem_Browse(object sender, object model, string buttonKey)
+        {
+            try
+            {
+                ModelView.OnItemBrowse?.Invoke(sender, model, buttonKey);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        public static object ModelObject { get; set; }
+
     }
-
-    public static bool? ShowDialog(string windowTitle, object[] models)
-    {
-      try
-      {
-        ModelView.viewer = new ViewerWindow(windowTitle, models);
-
-        ModelView.viewer.OnItemBrowse += ModelView.OnItem_Browse;
-
-        return ModelView.viewer.ShowDialog();
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
-      finally
-      {
-        ModelView.viewer.OnItemBrowse -= ModelView.OnItem_Browse;
-
-        ModelView.viewer = null;
-      }
-
-      return null;
-    }
-    
-    public static bool? ShowDialog(Window owner, bool topMost, string windowTitle, object model)
-    {
-      try
-      {
-        ModelView.viewer = new ViewerWindow(windowTitle, model);
-
-        ModelView.viewer.OnItemBrowse += ModelView.OnItem_Browse;
-
-        ModelView.viewer.Owner = owner;
-
-        ModelView.viewer.Topmost = topMost;
-
-        return ModelView.viewer.ShowDialog();
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
-      finally
-      {
-        ModelView.viewer.OnItemBrowse -= ModelView.OnItem_Browse;
-
-        ModelView.viewer = null;
-      }
-
-      return null;
-    }
-
-    public static ViewerWindow Viewer
-    {
-      get
-      {
-        return ModelView.viewer;
-      }
-    }
-
-    private static void OnItem_Browse(object sender, object model, string buttonKey)
-    {
-      try
-      {
-        ModelView.OnItemBrowse?.Invoke(sender, model, buttonKey);
-      }
-      catch (Exception err)
-      {
-        MessageBox.Show(err.InnerExceptionMessage());
-      }
-    }
-
-    public static object ModelObject { get; set;}
-
-  }
 }

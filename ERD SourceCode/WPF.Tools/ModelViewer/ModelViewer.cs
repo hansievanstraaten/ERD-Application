@@ -13,7 +13,11 @@ namespace WPF.Tools.ModelViewer
     {
         public delegate void ModelViewItemBrowseEvent(object sender, string buttonKey);
 
+        public delegate void ModelViewItemSelectedValueChangedEvent(object sender, object newValue);
+
         public event ModelViewItemBrowseEvent ModelViewItemBrowse;
+
+        public event ModelViewItemSelectedValueChangedEvent ModelViewItemSelectedValueChanged;
 
         private bool loadOnlyAttributedFields = true;
 
@@ -208,6 +212,8 @@ namespace WPF.Tools.ModelViewer
 
                         viewObject.ModelViewItemGotFocus += this.ModelItem_Focus;
 
+                        viewObject.ModelViewItemSelectedValueChanged += this.ModelItem_SelectedValueChanged;
+
                         this.Children.Add(viewObject);
                     }
 
@@ -231,6 +237,14 @@ namespace WPF.Tools.ModelViewer
                 case NotifyCollectionChangedAction.Move:
                 case NotifyCollectionChangedAction.Replace:
                     throw new NotImplementedException($"{e.Action} not Implemented");
+            }
+        }
+
+        private void ModelItem_SelectedValueChanged(object sender, object newValue)
+        {
+            if (this.ModelViewItemSelectedValueChanged != null)
+            {
+                this.ModelViewItemSelectedValueChanged(sender, newValue);
             }
         }
 

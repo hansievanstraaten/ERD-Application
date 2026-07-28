@@ -36,8 +36,10 @@ namespace ERD.DatabaseScripts.Postgres
         private NpgsqlConnection connection;
         private DataConverters converter = new DataConverters();
 
+        private bool _sslMode;
         private bool _trustedConnection;
         private string _server;
+        private string _port;
         private string _database;
         private string _username;
         private string _password;
@@ -48,7 +50,11 @@ namespace ERD.DatabaseScripts.Postgres
 
             this._database = databaseModel.DatabaseName;
 
+            this._port = databaseModel.PortName;
+
             this._trustedConnection = databaseModel.TrustedConnection;
+
+            this._sslMode = databaseModel.SSLMode;
 
             if (databaseModel.UserName.IsNullEmptyOrWhiteSpace() || databaseModel.Password.IsNullEmptyOrWhiteSpace())
             {
@@ -68,24 +74,30 @@ namespace ERD.DatabaseScripts.Postgres
 
             this._database = setupValues["DatabaseName"];
 
+            this._port = setupValues["PortName"];
+
             this._username = setupValues["UserName"];
 
             this._password = setupValues["Password"];
 
             this._trustedConnection = setupValues["TrustedConnection"].ToBool();
+
+            this._sslMode = setupValues["SSLMode"].ToBool();
         }
 
         private string GetConnectionString()
         {
-            // Host and Database are required. Support Integrated Security for trusted connections.
+            string portName = string.IsNullOrWhiteSpace(this._port) ? string.Empty : $"Port={this._port};";
+
             if (this._trustedConnection)
             {
-                // Integrated Security for Npgsql (GSS/SSPI) - username/password ignored.
-                return $"Host={this._server};Database={this._database};Integrated Security=true";
+                return $"Host={this._server};{portName}Database={this._database};Integrated Security=true";
             }
 
-            // Username/Password auth
-            return $"Host={this._server};Database={this._database};Username={this._username};Password={this._password}";
+            return this._sslMode ?
+                $"Host={this._server};{portName}Database={this._database};Username={this._username};Password={this._password};SSL Mode=Require;"
+                :
+                $"Host={this._server};{portName}Database={this._database};Username={this._username};Password={this._password}";
         }
 
         public bool TestConnection()

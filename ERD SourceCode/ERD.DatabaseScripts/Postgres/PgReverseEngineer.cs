@@ -25,6 +25,7 @@ using System.Security.Principal;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Windows.Automation.Peers;
+using System.Windows.Documents;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using ViSo.Dialogs.ModelViewer;
@@ -64,13 +65,15 @@ namespace ERD.DatabaseScripts.Postgres
 
             dispatcher.Invoke(() =>
             {
+                bool[] visibility = new bool[] { true, true, true, true, true, true, true, true };
+
             RECONNECT:
 
                 dataAccess = new DataAccess(Connections.Instance.DatabaseModel);
 
                 if (!dataAccess.TestConnection())
                 {
-                    if (ModelView.ShowDialog("Connection Failure", Connections.Instance.DatabaseModel).IsFalse())
+                    if (ModelView.ShowDialog("Connection Failure", Connections.Instance.DatabaseModel, visibility).IsFalse())
                     {
                         throw new Exception("Connection failure. User opt out.");
                     }

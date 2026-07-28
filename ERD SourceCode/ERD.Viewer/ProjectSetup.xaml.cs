@@ -1,10 +1,13 @@
-﻿using ERD.Common;
+﻿using ERD.Base;
+using ERD.Common;
 using ERD.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Windows;
 using System.Windows.Forms;
 using WPF.Tools.BaseClasses;
+using WPF.Tools.ModelViewer;
 using MessageBox = System.Windows.MessageBox;
 
 namespace ERD.Viewer
@@ -28,6 +31,8 @@ namespace ERD.Viewer
 
             this.uxProjectSetup.Items.Add(databaseModel);
 
+            this.SetDBOptions((ModelViewObject)this.uxProjectSetup[1], databaseModel.DatabaseType);
+
             foreach (KeyValuePair<string, AltDatabaseModel> item in Connections.Instance.AlternativeModels)
             {
                 this.uxAlternativeConnections.Items.Add(item.Value);
@@ -37,11 +42,17 @@ namespace ERD.Viewer
                 this.uxAlternativeConnections[itemIndex].Header = $"Database Setup: {item.Value.ConnectionName}";
 
                 this.uxAlternativeConnections[itemIndex].ToggelCollaps(true);
+
+                this.SetDBOptions((ModelViewObject)this.uxAlternativeConnections[itemIndex], databaseModel.DatabaseType);
             }
 
             this.uxProjectSetup.AllignAllCaptions();
 
             this.uxProjectSetup.ModelViewItemBrowse += this.ModelViewItem_Browse;
+            
+            this.uxProjectSetup.ModelViewItemSelectedValueChanged += this.SelectedValue_Changed;
+
+            this.uxAlternativeConnections.ModelViewItemSelectedValueChanged += this.SelectedValue_Changed;
         }
 
         public ProjectModel SelectedProjectModel { get; private set; }
@@ -123,6 +134,21 @@ namespace ERD.Viewer
             {
                 MessageBox.Show(err.Message);
             }
+        }
+
+        private void SelectedValue_Changed(object sender, object newValue)
+        {
+            DatabaseTypeEnum dbType = (DatabaseTypeEnum)newValue;
+
+            this.SetDBOptions((ModelViewObject)sender, dbType);
+        }
+
+        private void SetDBOptions(ModelViewObject dbSetupOption, DatabaseTypeEnum dbType)
+        {
+            int offset = dbSetupOption.Items.Count == 9 ? 1 : 0;
+
+            dbSetupOption[2 + offset].Visibility = dbType == DatabaseTypeEnum.POSTGRES ? Visibility.Visible : Visibility.Collapsed;
+            dbSetupOption[7 + offset].Visibility = dbType == DatabaseTypeEnum.POSTGRES ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

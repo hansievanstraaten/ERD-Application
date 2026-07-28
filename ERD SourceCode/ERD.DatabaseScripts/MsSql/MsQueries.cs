@@ -4,6 +4,7 @@ using ERD.Models;
 using GeneralExtensions;
 using System.Linq;
 using System.Text;
+using ERD.Common.ModelExstentions;
 
 namespace ERD.DatabaseScripts
 {
@@ -38,7 +39,7 @@ namespace ERD.DatabaseScripts
 
             result.AppendLine();
 
-            result.AppendLine($" FROM [{table.SchemaName}].[{table.TableName}]");
+            result.AppendLine($" FROM {table.FullNameSQLFormat()}");
 
             return result.ToString();
         }

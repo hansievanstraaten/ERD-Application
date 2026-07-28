@@ -20,10 +20,13 @@ namespace WPF.Tools.ModelViewer
 
         public delegate void ModelViewItemBrowseEvent(object sender, string buttonKey);
 
+        public delegate void ModelViewItemSelectedValueChangedEvent(object sender, object newValue);
+
         public event ModelViewItemGotFocusEvent ModelViewItemGotFocus;
 
         public event ModelViewItemBrowseEvent ModelViewItemBrowse;
 
+        public event ModelViewItemSelectedValueChangedEvent ModelViewItemSelectedValueChanged;
         public ModelViewObject(object classObject, bool loadOnlyAttributedFlag)
         {
             this.InitializeComponent();
@@ -216,6 +219,14 @@ namespace WPF.Tools.ModelViewer
             }
         }
 
+        private void ModelItemCombobox_Changed(object sender, object newValue)
+        {
+            if (this.ModelViewItemSelectedValueChanged != null)
+            {
+                this.ModelViewItemSelectedValueChanged(this, newValue);
+            }
+        }
+
         private void ModelViewItem_Browse(object sender, string buttonkey)
         {
             if (this.ModelViewItemBrowse != null)
@@ -281,6 +292,8 @@ namespace WPF.Tools.ModelViewer
                 ModelViewItem viewItem = this.CreateField(this.ClassObjectType.Name, this.ClassObject, inf);
 
                 viewItem.ModelViewItemGotFocus += this.ModelItem_Focus;
+
+                viewItem.ModelViewItemSelectedValueChanged += this.ModelItemCombobox_Changed;
 
                 this.Items.Add(viewItem);
             }

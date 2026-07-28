@@ -24,9 +24,13 @@ namespace WPF.Tools.ModelViewer
 
         public delegate void ModelViewItemBrowseEvent(object sender, string buttonKey);
 
+        public delegate void ModelViewItemSelectedValueChangedEvent(object sender, object newValue);
+
         public event ModelViewItemGotFocusEvent ModelViewItemGotFocus;
 
         public event ModelViewItemBrowseEvent ModelViewItemBrowse;
+
+        public event ModelViewItemSelectedValueChangedEvent ModelViewItemSelectedValueChanged;
 
         private bool isRequired;
 
@@ -376,6 +380,21 @@ namespace WPF.Tools.ModelViewer
             }
         }
 
+        private void Combobox_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (this.ModelViewItemSelectedValueChanged != null)
+                {
+                    this.ModelViewItemSelectedValueChanged(this, this.GetValue());
+                }
+            }
+            catch
+            {
+                // DO NOTHING
+            }
+        }
+
         private void BrowseButton_Clicked(object sender, RoutedEventArgs e)
         {
             if (this.ModelViewItemBrowse != null)
@@ -503,6 +522,8 @@ namespace WPF.Tools.ModelViewer
                     comboBox.HorizontalAlignment = HorizontalAlignment.Stretch;
 
                     comboBox.GotFocus += this.Item_Focuesd;
+
+                    comboBox.SelectionChanged += this.Combobox_Changed;
 
                     this.LoadContentValues(parentObject, comboBox);
 

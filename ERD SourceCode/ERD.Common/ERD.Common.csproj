@@ -21,6 +21,6 @@
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="10.0.10" />
   </ItemGroup>
 </Project>

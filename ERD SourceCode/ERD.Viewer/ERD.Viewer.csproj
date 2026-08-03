@@ -31,7 +31,6 @@
     <SignManifests>false</SignManifests>
     <TargetZone>LocalIntranet</TargetZone>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-	  <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -52,10 +51,11 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="10.0.10" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.87.0" />
-    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.16.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.22.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <PackageReference Include="PdfSharp.Xps" Version="1.0.0" />
+    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="10.0.10" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ERD.Base\ERD.Base.csproj" />
@@ -64,6 +64,7 @@
     <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj" />
     <ProjectReference Include="..\ERD.DataExport\ERD.DataExport.csproj" />
     <ProjectReference Include="..\ERD.FileManagement\ERD.FileManagement.csproj" />
+    <ProjectReference Include="..\ERD.LegacyHelper\ERD.LegacyHelper.csproj" />
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj" />
     <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />
     <ProjectReference Include="..\IconSet\IconSet.csproj" />

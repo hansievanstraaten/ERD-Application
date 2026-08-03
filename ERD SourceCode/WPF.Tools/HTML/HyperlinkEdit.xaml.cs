@@ -10,7 +10,7 @@ namespace WPF.Tools.HTML
   {
     public HyperlinkEdit()
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Hyperlink = new HyperLinkModel();
 

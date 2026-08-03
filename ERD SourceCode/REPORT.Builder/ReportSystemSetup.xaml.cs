@@ -18,7 +18,7 @@ namespace REPORT.Builder
     {
         public ReportSystemSetup(string projectFileDirectory)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             if (projectFileDirectory.IsNullEmptyOrWhiteSpace())
             {

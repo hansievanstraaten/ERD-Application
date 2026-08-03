@@ -30,7 +30,7 @@ namespace ERD.Viewer.Build
 
         public BuildOption(ErdCanvasModel sampleCanvas, List<ErdCanvasModel> allErdCanvases)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.SelectedCanvas = sampleCanvas;
 

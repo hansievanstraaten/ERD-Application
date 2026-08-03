@@ -22,7 +22,7 @@ namespace ERD.Viewer
   {
     public TextEditor(string title, string text)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Text = text;
     }

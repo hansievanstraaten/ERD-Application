@@ -22,7 +22,7 @@ namespace REPORT.Builder
 
         public WhereBuilder()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.SectionViewModel = new SelectViewModel();
 

@@ -14,7 +14,7 @@ namespace WPF.Tools.Specialized
     
     public PasswordBoxBindable(object dataContext)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.DataContext = dataContext;
 

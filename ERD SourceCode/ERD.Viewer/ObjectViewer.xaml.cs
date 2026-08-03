@@ -26,7 +26,7 @@ namespace ERD.Viewer
 
     public ObjectViewer(string windowTitle, object model)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Title = windowTitle;
 

@@ -21,7 +21,7 @@ namespace ERD.Viewer
 
         public ProjectSetup(ProjectModel projectModel, DatabaseModel databaseModel)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.SelectedProjectModel = projectModel;
 

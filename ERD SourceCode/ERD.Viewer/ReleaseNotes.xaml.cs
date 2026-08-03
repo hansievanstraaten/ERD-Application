@@ -10,7 +10,7 @@ namespace ERD.Viewer
 	{
 		public ReleaseNotes()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
 		}
 
 		private async void ConnectToGitHub()

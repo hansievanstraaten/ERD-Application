@@ -27,7 +27,7 @@ namespace REPORT.Builder
 
         public ReportHeaderFooters(ReportTypeEnum reportType)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.DataContext = this;
 

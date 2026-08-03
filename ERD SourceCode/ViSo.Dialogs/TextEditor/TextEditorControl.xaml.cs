@@ -9,7 +9,7 @@ namespace ViSo.Dialogs.TextEditor
   {
     public TextEditorControl(string text)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Text = text;
     }

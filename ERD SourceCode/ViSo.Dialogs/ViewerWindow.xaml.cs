@@ -17,7 +17,7 @@ namespace ViSo.Dialogs
 
         public ViewerWindow(string title, object[] models)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.Title = title;
 

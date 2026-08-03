@@ -27,7 +27,7 @@ namespace WPF.Tools.HTML
 
     public HTMLEditor()
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.LoadFontObjects();
     }

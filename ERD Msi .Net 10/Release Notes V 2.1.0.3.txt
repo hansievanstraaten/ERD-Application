@@ -1,0 +1,8 @@
+Release notes: 2.1.0.3
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+1. Improve download User experience
+2. Correct UI Editing in Visual Studio - Caused by migration

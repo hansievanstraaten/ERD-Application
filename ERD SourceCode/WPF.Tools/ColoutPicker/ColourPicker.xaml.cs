@@ -15,7 +15,7 @@ namespace WPF.Tools.ColoutPicker
   {
     public ColourPicker()
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.AutoSize = true;
     }

@@ -54,7 +54,7 @@ namespace REPORT.Builder.ReportComponents
 
 		public ReportSection()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.SizeChanged += this.ReportSection_SizeChanged;
         }

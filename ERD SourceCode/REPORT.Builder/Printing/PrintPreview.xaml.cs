@@ -19,7 +19,7 @@ namespace REPORT.Builder.Printing
 
         public PrintPreview(string reportName, Dictionary<int, PrintCanvas> pages)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.printReportName = reportName;
 

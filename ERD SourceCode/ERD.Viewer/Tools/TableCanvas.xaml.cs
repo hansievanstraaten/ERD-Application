@@ -33,7 +33,7 @@ namespace ERD.Viewer.Tools
 
         public TableCanvas(ErdCanvasModel erdSegment, DatabaseModel databaseModel)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.ErdSegment = erdSegment;
 

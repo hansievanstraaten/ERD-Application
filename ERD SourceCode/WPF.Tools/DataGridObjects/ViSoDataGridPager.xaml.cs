@@ -40,7 +40,7 @@ namespace WPF.Tools.DataGridObjects
 
     public ViSoDataGridPager()
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.ItemsSource = new DataGridPagerObjectsCollection<object>(this.pageSizes[0]);
 

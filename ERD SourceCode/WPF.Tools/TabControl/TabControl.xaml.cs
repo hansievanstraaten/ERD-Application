@@ -32,7 +32,7 @@ namespace WPF.Tools.TabControl
 
     public TabControl()
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Initialize();
 

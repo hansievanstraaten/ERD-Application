@@ -48,7 +48,7 @@ namespace WPF.Tools.TabControl
 
     public TabControlVertical()
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Initialize();
 

@@ -25,7 +25,7 @@ namespace WPF.Tools.Stacks
   {
     public SearchStackPanel()
     {
-      this.InitializeComponent();
+      InitializeComponent();
     }
 
     public string WatermarkText

@@ -29,7 +29,7 @@ namespace WPF.Tools.ModelViewer
         public event ModelViewItemSelectedValueChangedEvent ModelViewItemSelectedValueChanged;
         public ModelViewObject(object classObject, bool loadOnlyAttributedFlag)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             //this.Loaded += this.ModelViewObject_Loaded;
 

@@ -70,7 +70,7 @@ namespace ERD.Viewer.Tools
 
         public TableObject(TableModel table)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.InitializeColumnsContextMenu();
 

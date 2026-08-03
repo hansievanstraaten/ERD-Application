@@ -15,7 +15,7 @@ namespace ViSo.Dialogs.Controls
 
         public ControlWindow(string windowTitle, UserControlBase control, string boolUpdateMethod, bool showOkButton, bool showCancelButton)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.Title = windowTitle;
 

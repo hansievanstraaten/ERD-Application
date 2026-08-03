@@ -24,7 +24,7 @@ namespace REPORT.Builder
 
         public WhereParameter()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.uxAndOd.Items.Add(new DataItemModel
             {

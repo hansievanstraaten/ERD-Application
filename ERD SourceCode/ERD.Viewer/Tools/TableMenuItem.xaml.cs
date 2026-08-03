@@ -21,7 +21,7 @@ namespace ERD.Viewer.Tools
 
         public TableMenuItem(TableModel tableModel)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.TableModelObject = tableModel;
 

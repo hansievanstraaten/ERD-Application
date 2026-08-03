@@ -24,7 +24,7 @@ namespace REPORT.Builder
 
         public DatasourceSelector(long masterReportId)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.InitializeMainTable(masterReportId);
         }

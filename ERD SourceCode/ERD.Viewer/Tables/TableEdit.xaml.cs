@@ -13,7 +13,7 @@ namespace ERD.Viewer.Tables
   {
     public TableEdit(TableModel table)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Table = table;
 

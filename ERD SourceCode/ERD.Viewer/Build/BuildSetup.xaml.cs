@@ -65,7 +65,7 @@ namespace ERD.Viewer.Build
 
         public BuildSetup(ErdCanvasModel sampleCanvas, List<ErdCanvasModel> allErdCanvases)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.canvas = sampleCanvas;
 

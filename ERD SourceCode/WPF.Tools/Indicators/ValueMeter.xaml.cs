@@ -21,7 +21,7 @@ namespace WPF.Tools.Indicators
 
     public ValueMeter()
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Loaded += this.ValueMeter_Loaded;
     }

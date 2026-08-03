@@ -28,7 +28,7 @@ namespace REPORT.Builder
 
         public UpdateBuilder()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.uxTableName.Items.Add(new DataItemModel { DisplayValue = Constants.None, ItemKey = Constants.None });
 

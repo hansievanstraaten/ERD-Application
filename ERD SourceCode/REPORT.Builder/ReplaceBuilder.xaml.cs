@@ -47,7 +47,7 @@ namespace REPORT.Builder
 
 		public ReplaceBuilder()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
 
 			this.uxFromTable.Items.Add(new DataItemModel { DisplayValue = Constants.None, ItemKey = Constants.None });
 

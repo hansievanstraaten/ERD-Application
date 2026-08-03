@@ -17,7 +17,7 @@ namespace REPORT.Builder
 	{
 		public CategorySelector()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
 
 			this.LoadCategoryTree();
 		}

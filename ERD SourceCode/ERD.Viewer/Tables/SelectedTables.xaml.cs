@@ -22,7 +22,7 @@ namespace ERD.Viewer.Tables
 
         public SelectedTables(IncludeTableModel[] includedTables, string[] excludeTables)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.included = includedTables;
 

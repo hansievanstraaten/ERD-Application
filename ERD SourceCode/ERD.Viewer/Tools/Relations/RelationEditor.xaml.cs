@@ -32,7 +32,7 @@ namespace ERD.Viewer.Tools.Relations
 
         public RelationEditor(DatabaseRelation relation)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.DataContext = this;
 

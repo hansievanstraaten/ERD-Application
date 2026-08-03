@@ -20,7 +20,7 @@ namespace REPORT.Builder
 
 		public ReplaceWhere()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
 		}
 
 		public int Index { get; set; }

@@ -46,7 +46,7 @@ namespace WPF.Tools.ModelViewer
 
         public ModelViewItem(string parentTypeName, object parentObject, PropertyInfo property)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.DataContext = this;
 

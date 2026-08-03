@@ -13,7 +13,7 @@ namespace ERD.Viewer
 	{
 		public About()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
 
 			this.uxLogo.Source = IconSet.IconSets.ResourceImageSource("ViSo_nice", 150);
 

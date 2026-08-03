@@ -24,7 +24,7 @@ namespace REPORT.Builder
 
         public ReportSelector(string projectFileDirectory)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.ReportFileName = Path.Combine(projectFileDirectory, Constants.ReportSetupFileName);
 

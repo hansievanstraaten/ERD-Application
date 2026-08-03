@@ -12,7 +12,7 @@ namespace ERD.Viewer.Database
   {
     public UserNameAndPassword(UserNameAndPasswordModel model)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.Loaded += this.UserNameAndPassword_Loaded;
 

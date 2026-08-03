@@ -23,7 +23,7 @@ namespace REPORT.Builder
 
         public ReportCategories()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.uxReports = new ReportHeaderFooters(ReportTypeEnum.ReportContent);
 

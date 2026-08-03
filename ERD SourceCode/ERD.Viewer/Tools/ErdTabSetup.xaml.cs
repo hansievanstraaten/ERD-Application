@@ -13,7 +13,7 @@ namespace ERD.Viewer.Tools
   {
     public ErdTabSetup(ErdCanvasModel erdSegment)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.ErdSegment = erdSegment;
 

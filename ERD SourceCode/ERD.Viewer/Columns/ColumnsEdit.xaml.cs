@@ -16,7 +16,7 @@ namespace ERD.Viewer.Columns
     {
         public ColumnsEdit(ColumnObjectModel column, string tableName)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.TableName = tableName;
 

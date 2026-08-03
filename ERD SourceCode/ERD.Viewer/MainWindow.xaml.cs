@@ -45,7 +45,7 @@ namespace ERD.Viewer
         
         public MainWindow()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.Closing += this.MainWindow_Closing;
 
@@ -689,18 +689,16 @@ namespace ERD.Viewer
             {
                 if (VersionManager.CheckForUpdatesFailed)
                 {
-                    string url = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/VersionFile.txt";
-
                     string message = "Sorry, the check for updates failed." + Environment.NewLine + Environment.NewLine +
                                      "We are tying to read this file:" + Environment.NewLine +
-                                     url + Environment.NewLine + Environment.NewLine +
+                                     VersionManager.VersionFileURL + Environment.NewLine + Environment.NewLine +
                                      "Please contact your systems administrator for support on accessing the above file.";
 
                     MessageBox.Show(message);
 
                     Process.Start(new ProcessStartInfo
                     {
-                        FileName = url,
+                        FileName = VersionManager.VersionFileURL,
                         UseShellExecute = true
                     });
                 }
@@ -738,11 +736,13 @@ namespace ERD.Viewer
                         }
                     }
 
+                    this.uxInstallUpdates.IsEnabled = false;
+                    this.uxInstallUpdates.Content = "Downloading Updates...";
+
                     VersionManager version = new VersionManager();
+                    version.Update_Downloaded += this.Update_Downloaded;
 
-                    await version.InstallUpdates();
-
-                    Application.Current.Shutdown();
+                    _ = version.DownloadAndInstallUpdatesAsyn(Application.Current.Dispatcher);
 
 					#endregion
                 }
@@ -751,6 +751,30 @@ namespace ERD.Viewer
             {
                 MessageBox.Show(err.InnerExceptionMessage());
             }
+        }
+
+        private void Update_Downloaded(object sender, UpdateDownloadedEventArgs e)
+        {
+            MessageBox.Show(this, "The update has been downloaded and is ready to install. An attempt will be made to save current changes.", "Update Ready",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            try
+            {
+                this.SaveModel();
+            }
+            catch
+            {
+                // Do Nothing
+            }
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = e.InstallerPath,
+                UseShellExecute = true
+            });
+
+            Application.Current.Shutdown();
         }
 
         private async void ReverseEngineer(object sender)
@@ -1655,7 +1679,7 @@ namespace ERD.Viewer
 
                 VersionManager version = new VersionManager();
 
-                if (await version.HaveUpdates(thisVersion))
+                if (await version.HaveUpdatesAsync(thisVersion))
                 {
                     if (VersionManager.CheckForUpdatesFailed)
                     {

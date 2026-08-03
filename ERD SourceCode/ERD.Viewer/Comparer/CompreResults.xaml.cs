@@ -27,7 +27,7 @@ namespace ERD.Viewer.Comparer
 
         public CompreResults(List<CompareResultModel> results)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.DataContext = this;
 

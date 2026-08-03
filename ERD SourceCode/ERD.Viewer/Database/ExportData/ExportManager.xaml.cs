@@ -25,7 +25,7 @@ namespace ERD.Viewer.Database.ExportData
 
         public ExportManager(TableModel tableModel, MenuItem connectionMenue)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             Connections.Instance.SetConnection(connectionMenue, false);
 

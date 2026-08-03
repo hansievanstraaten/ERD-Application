@@ -25,7 +25,7 @@ namespace WPF.Tools.Paneling
 
     public PinPanel()
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.uxPinedTitle.Background = Brushes.DarkGray;
     }

@@ -55,7 +55,7 @@ namespace REPORT.Builder
 
 		public ReportDesigner(ReportMasterModel masterModel)
 		{
-			this.InitializeComponent();
+			InitializeComponent();
 
 			this.InitializeToolsStack();
 

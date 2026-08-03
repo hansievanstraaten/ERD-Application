@@ -17,7 +17,7 @@ namespace ERD.Viewer.Tools
 
     public RelationMenuItem(RelationTypesEnum relationType)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.relationTypeObject = relationType;
 

@@ -24,7 +24,7 @@ namespace ERD.Viewer.Database
 
         public BrowseData(string sqlQuery, string title)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.Title = $"Browse - {title}";
 

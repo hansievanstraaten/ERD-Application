@@ -16,7 +16,7 @@ namespace REPORT.Builder.ReportComponents
 
         public ToolsMenuItem()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         public Type ToolType { get; set; }

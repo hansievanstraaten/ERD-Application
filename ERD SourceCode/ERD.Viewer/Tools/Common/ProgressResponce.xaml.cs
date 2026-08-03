@@ -22,7 +22,7 @@ namespace ERD.Viewer.Tools.Common
   {
     public ProgressResponce(double maximum)
     {
-      this.InitializeComponent();
+      InitializeComponent();
 
       this.uxProgress.Maximum = maximum;
     }

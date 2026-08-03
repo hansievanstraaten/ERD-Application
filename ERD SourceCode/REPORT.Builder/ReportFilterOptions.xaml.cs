@@ -17,7 +17,7 @@ namespace REPORT.Builder
 	{
 		public ReportFilterOptions()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
 
 			this.Loaded += this.ReportFilterOptions_Loaded;
 		}

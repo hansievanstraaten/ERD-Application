@@ -4,15 +4,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using ViSo.Common;
 
 namespace ERD.Common
 {
     public class VersionManager
     {
-        //private readonly string downloadUrl = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/";
-        private readonly string downloadUrl = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi%20.Net%2010";
-        private readonly string versionFile = "VersionFile.txt";
+        public event EventHandler<UpdateDownloadedEventArgs>? Update_Downloaded;
+
         private readonly string msiFile = "ViSo.Viewer";
         private readonly string msiExstention = ".msi";
         
@@ -20,18 +21,43 @@ namespace ERD.Common
 
         public static bool CheckForUpdatesFailed { get; private set; }
 
-        public async Task<bool> HaveUpdates(string thisVersion)
+        public static string VersionFile
+        {
+            get
+            {
+                return "VersionFile.txt";
+            }
+        }
+
+        public static string VersionFileURL
+        {
+            get
+            {
+                string downloadFile = Path.Combine(DownloadUrl, VersionFile);
+                return downloadFile;
+            }
+        }
+
+        public static string DownloadUrl
+        {
+            get
+            {
+                //private readonly string downloadUrl = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/";
+                //private readonly string downloadUrl = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi%20.Net%2010/";
+                return "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi%20.Net%2010/";
+            }
+        }
+
+        public async Task<bool> HaveUpdatesAsync(string thisVersion)
         {
             try
             {
                 CheckForUpdatesFailed = false;
 
-                string downloadFile = Path.Combine(this.downloadUrl, this.versionFile);
-
-                string saveVersionFile = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), this.versionFile);
+                string saveVersionFile = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), VersionFile);
 
                 DownloadClient downloader = new DownloadClient();
-                await downloader.DownloadFile(downloadFile, saveVersionFile);
+                await downloader.DownloadFileAsync(VersionFileURL, saveVersionFile);
 
                 VersionManager.ServerVersion = File.ReadAllText(saveVersionFile)
                     .Replace("\n", string.Empty)
@@ -56,22 +82,18 @@ namespace ERD.Common
             }
         }
 
-        public async Task InstallUpdates()
+        public async Task DownloadAndInstallUpdatesAsyn(Dispatcher dispatcher)
         {
             try
             {
-                string downloadFile = Path.Combine(this.downloadUrl, $"{this.msiFile}{this.msiExstention}");
+                string downloadFile = Path.Combine(DownloadUrl, $"{this.msiFile}{this.msiExstention}");
 
                 string saveVersionFile = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{this.msiFile}.{VersionManager.ServerVersion}{this.msiExstention}");
 
                 DownloadClient downloader = new DownloadClient();
-                await downloader.DownloadFile(downloadFile, saveVersionFile);
+                await downloader.DownloadFileAsync(downloadFile, saveVersionFile);
 
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = saveVersionFile,
-                    UseShellExecute = true
-                });
+                Update_Downloaded?.Invoke(this, new UpdateDownloadedEventArgs(saveVersionFile));
             }
             catch (Exception err)
             {
@@ -96,7 +118,7 @@ namespace ERD.Common
                 return await _client.GetByteArrayAsync(address);
             }
 
-            public async Task DownloadFile(string downloadUrl, string saveFilePath)
+            public async Task DownloadFileAsync(string downloadUrl, string saveFilePath)
             {
                 byte[] data = await this.DownloadAsync(new Uri(downloadUrl));
                 File.WriteAllBytes(saveFilePath, data);

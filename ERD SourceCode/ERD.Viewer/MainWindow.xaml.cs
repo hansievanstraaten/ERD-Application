@@ -47,8 +47,6 @@ namespace ERD.Viewer
         {
             this.InitializeComponent();
 
-            this.SetTitle();
-
             this.Closing += this.MainWindow_Closing;
 
             this.DataContext = this;
@@ -64,6 +62,13 @@ namespace ERD.Viewer
             this.listener.FileLockChanged += this.ProjectLocks_Changed;
 
             Connections.Instance.ConnectionChanged += this.Connections_Changed;
+
+            this.Loaded += this.MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            _ = SetTitleAsync();
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
@@ -678,7 +683,7 @@ namespace ERD.Viewer
             }
         }
 
-        private void InstallUpdates_Cliked(object sender, MouseButtonEventArgs e)
+        private async void InstallUpdates_Cliked(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -735,7 +740,7 @@ namespace ERD.Viewer
 
                     VersionManager version = new VersionManager();
 
-                    version.InstallUpdates();
+                    await version.InstallUpdates();
 
                     Application.Current.Shutdown();
 
@@ -1306,7 +1311,7 @@ namespace ERD.Viewer
 
         private void ActivateMenu()
         {
-            this.SetTitle();
+            _ = this.SetTitleAsync();
 
             this.uxNewProject.IsEnabled = false;
 
@@ -1583,60 +1588,95 @@ namespace ERD.Viewer
                 item.IsEnabled = isEnabled;
             }
         }
-    
-        private async void SetTitle()
+
+        // private async void SetTitle()
+        // {
+        //     await Task.Factory.StartNew(() =>
+        //     {
+        //         try
+        //         {
+        //             string thisVersion = General.GetProductVersion("ViSo.Viewer");
+
+        //             string resultText = General.ProjectModel == null ?
+        //             $"ViSo-nice (Version {thisVersion})" 
+        //             :
+        //             $"ViSo-nice (Version {thisVersion}) - {General.ProjectModel.ModelName}";
+
+        //             this.Dispatcher.Invoke(() =>
+        //             {
+        //                 this.Title = resultText;
+        //             });
+
+        //             VersionManager version = new VersionManager();
+
+        //             if (await version.HaveUpdates(thisVersion))
+        //             {
+        //                 this.Dispatcher.Invoke(() =>
+        //                 {
+        //                     if (VersionManager.CheckForUpdatesFailed)
+        //{
+        //                         this.uxInstallUpdates.Content = "Updates Failed";
+        //                     }
+
+        //                     this.uxInstallUpdates.Visibility = Visibility.Visible;
+
+        //                     this.uxInstallUpdates.StartAnimation();
+        //                 });
+
+        //                 Sleep.ThreadWaitSeconds(10);
+
+        //                 this.Dispatcher.Invoke(() =>
+        //                 {
+        //                     this.uxInstallUpdates.EndAnimation();
+        //                 });
+        //             }
+        //         }
+        //         catch
+        //         {
+        //             this.Dispatcher.Invoke(() =>
+        //             {
+        //                 this.Title = General.ProjectModel == null ?
+        //                 "ViSo-nice"
+        //                 :
+        //                 $"ViSo-nice - {General.ProjectModel.ModelName}";
+        //             });
+        //         }
+        //     });
+        // }
+        private async Task SetTitleAsync()
         {
-            await Task.Factory.StartNew(() =>
+            try
             {
-                try
+                string thisVersion = General.GetProductVersion("ViSo.Viewer");
+
+                Title = General.ProjectModel == null
+                    ? $"ViSo-nice (Version {thisVersion})"
+                    : $"ViSo-nice (Version {thisVersion}) - {General.ProjectModel.ModelName}";
+
+                VersionManager version = new VersionManager();
+
+                if (await version.HaveUpdates(thisVersion))
                 {
-                    string thisVersion = General.GetProductVersion("ViSo.Viewer");
-
-                    string resultText = General.ProjectModel == null ?
-                    $"ViSo-nice (Version {thisVersion})" 
-                    :
-                    $"ViSo-nice (Version {thisVersion}) - {General.ProjectModel.ModelName}";
-
-                    this.Dispatcher.Invoke(() =>
+                    if (VersionManager.CheckForUpdatesFailed)
                     {
-                        this.Title = resultText;
-                    });
-
-                    VersionManager version = new VersionManager();
-
-                    if (version.HaveUpdates(thisVersion))
-                    {
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            if (VersionManager.CheckForUpdatesFailed)
-							{
-                                this.uxInstallUpdates.Content = "Updates Failed";
-                            }
-
-                            this.uxInstallUpdates.Visibility = Visibility.Visible;
-
-                            this.uxInstallUpdates.StartAnimation();
-                        });
-
-                        Sleep.ThreadWaitSeconds(10);
-
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            this.uxInstallUpdates.EndAnimation();
-                        });
+                        this.uxInstallUpdates.Content = "Updates Failed";
                     }
+
+                    this.uxInstallUpdates.Visibility = Visibility.Visible;
+                    this.uxInstallUpdates.StartAnimation();
+
+                    await Task.Delay(TimeSpan.FromSeconds(10));
+
+                    this.uxInstallUpdates.EndAnimation();
                 }
-                catch
-                {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        this.Title = General.ProjectModel == null ?
-                        "ViSo-nice"
-                        :
-                        $"ViSo-nice - {General.ProjectModel.ModelName}";
-                    });
-                }
-            });
+            }
+            catch
+            {
+                Title = General.ProjectModel == null
+                    ? "ViSo-nice"
+                    : $"ViSo-nice - {General.ProjectModel.ModelName}";
+            }
         }
-	}
+
+    }
 }

@@ -20,7 +20,7 @@ namespace ERD.Common
 
         public static bool CheckForUpdatesFailed { get; private set; }
 
-        public bool HaveUpdates(string thisVersion)
+        public async Task<bool> HaveUpdates(string thisVersion)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace ERD.Common
                 string saveVersionFile = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), this.versionFile);
 
                 DownloadClient downloader = new DownloadClient();
-                downloader.DownloadFile(downloadFile, saveVersionFile);
+                await downloader.DownloadFile(downloadFile, saveVersionFile);
 
                 VersionManager.ServerVersion = File.ReadAllText(saveVersionFile)
                     .Replace("\n", string.Empty)
@@ -56,7 +56,7 @@ namespace ERD.Common
             }
         }
 
-        public void InstallUpdates()
+        public async Task InstallUpdates()
         {
             try
             {
@@ -65,7 +65,7 @@ namespace ERD.Common
                 string saveVersionFile = Path.Combine(Paths.KnownFolder(KnownFolders.KnownFolder.Downloads), $"{this.msiFile}.{VersionManager.ServerVersion}{this.msiExstention}");
 
                 DownloadClient downloader = new DownloadClient();
-                downloader.DownloadFile(downloadFile, saveVersionFile);
+                await downloader.DownloadFile(downloadFile, saveVersionFile);
 
                 Process.Start(new ProcessStartInfo
                 {
@@ -96,9 +96,9 @@ namespace ERD.Common
                 return await _client.GetByteArrayAsync(address);
             }
 
-            public void DownloadFile(string downloadUrl, string saveFilePath)
+            public async Task DownloadFile(string downloadUrl, string saveFilePath)
             {
-                byte[] data = this.DownloadAsync(new Uri(downloadUrl)).Result;
+                byte[] data = await this.DownloadAsync(new Uri(downloadUrl));
                 File.WriteAllBytes(saveFilePath, data);
             }
         }

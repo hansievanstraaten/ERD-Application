@@ -1,0 +1,7 @@
+Release notes: 2.1.0.0
+*********************
+Upgrade from .Net 8 to .Net 10
+
+Minor bugs and fixes:
+*********************:
+Change download folder to retain .net 8 for now

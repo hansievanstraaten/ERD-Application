@@ -9,6 +9,7 @@ namespace ERD.Common
 {
     public class VersionManager
     {
+        //private readonly string downloadUrl = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/";
         private readonly string downloadUrl = "https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/";
         private readonly string versionFile = "VersionFile.txt";
         private readonly string msiFile = "ViSo.Viewer";

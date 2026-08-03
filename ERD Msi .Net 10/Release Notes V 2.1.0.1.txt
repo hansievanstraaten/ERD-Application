@@ -1,0 +1,7 @@
+Release notes: 2.1.0.0
+*********************
+
+
+Minor bugs and fixes:
+*********************:
+Correct GitHub download URL

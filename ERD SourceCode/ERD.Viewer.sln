@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.8.12023.21 stable
+VisualStudioVersion = 18.8.12023.21
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERD.Viewer", "ERD.Viewer\ERD.Viewer.csproj", "{7B2EBA4D-44AD-4703-8F18-3A4FBC380EA5}"
 EndProject

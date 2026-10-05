@@ -18,7 +18,6 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		private bool _IsProductionConnection;
 		private bool _IsActive;
 
-
 		// Primary Keys
 		[Key]
 		 	
@@ -34,6 +33,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("MasterReport_Id", ref this._MasterReport_Id, value);
 			}
 		}
+		
 		[Key]
 		 	
 		public string ReportConnectionName
@@ -48,7 +48,6 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("ReportConnectionName", ref this._ReportConnectionName, value);
 			}
 		}
-
 
 		// Foreign Keys
 

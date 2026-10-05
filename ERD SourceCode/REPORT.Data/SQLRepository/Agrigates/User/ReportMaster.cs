@@ -1,7 +1,3 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace REPORT.Data.SQLRepository.Agrigates
 {
     public class ReportMaster : ReportMasterBase

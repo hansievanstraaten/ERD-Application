@@ -30,6 +30,7 @@
                     <CommonControls:ActionButton ResourceImageName="Save" ToolTip="Save Report" Click="ReportSave_Cliked" />
                     <CommonControls:ActionButton ResourceImageName="PrintPreview" ToolTip="Preview Report" Click="ReportPrint_Cliked" />
                     <CommonControls:ActionButton ResourceImageName="ExportPDF" ToolTip="Export to PDF" Click="ExportPDF_Cliked" />
+                    <CommonControls:ActionButton ResourceImageName="Help" ToolTip="Help!!!" Click="Help_Cliked" />
                 </StackPanel>
                 <ModelViewer:ModelViewer x:Name="uxReportMasterModel" ModelViewItemBrowse="ReportMasterDescription_Browse" />
                 <CommonControls:LableItem Content="Tools" FontWeight="Bold" />
@@ -44,6 +45,7 @@
                                 Orientation="Horizontal" 
                                 HorizontalAlignment="Left">
                         <CommonControls:ActionButton ResourceImageName="CheckList" ToolTip="Select Data Source" Click="DataSourseSelect_Browse" />
+                        <CommonControls:LableItem FontWeight="Bold">Data Options</CommonControls:LableItem>
                     </StackPanel>
                 </Border>
                 <CommonControls:ViSoTreeView x:Name="uxTableTree" Visibility="Collapsed" />

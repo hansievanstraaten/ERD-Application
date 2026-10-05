@@ -10,12 +10,12 @@ namespace REPORT.Data.SQLRepository.Repositories
 {
 	public abstract class ReportTablesRepository_Base
 	{
-		public ReportTablesContext dataContext;
+		public DataSourceContext dataContext;
 
 		public ReportTablesRepository_Base()
 		{
-			this.dataContext = new ReportTablesContext();
-		}
+			this.dataContext = DataSourceContextFactory.CreateDataSourceContext(DatabaseConnection.Instance.StorageType, DatabaseConnection.Instance.ConnectionString);
+        }
 		
 		public ReportMasterModel GetReportMasterByPrimaryKey (Int64 MasterReport_Id  )
 		{

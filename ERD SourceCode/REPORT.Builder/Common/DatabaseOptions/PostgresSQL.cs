@@ -9,10 +9,10 @@ using ViSo.SharedEnums;
 
 namespace REPORT.Builder.Common.DatabaseOptions
 {
-	internal class MsSQL : IDataToSQL
+    internal class PostgresSQL : IDataToSQL
     {
         public string UpdateStatements(UpdateStatementModel updateStatements, out List<string> columnValues)
-		{
+        {
             columnValues = new List<string>();
 
             List<string> columnResults = new List<string>();
@@ -22,14 +22,13 @@ namespace REPORT.Builder.Common.DatabaseOptions
             columnValues.AddRange(columnResults.Distinct());
 
             return result;
-		}
+        }
 
-        public string BuildSelectQuery(
-            ReportColumnModel[] columns, 
-            List<WhereParameterModel> whereParameterModel, 
-            List<ReportXMLPrintParameterModel> reportFilters,
-            Dictionary<string, ReportSQLReplaceHeaderModel> replacementColumns,
-            string orderByString)
+        public string BuildSelectQuery(ReportColumnModel[] columns,
+        List<WhereParameterModel> whereParameterModel,
+        List<ReportXMLPrintParameterModel> reportFilters,
+        Dictionary<string, ReportSQLReplaceHeaderModel> replacementColumns,
+        string orderByString)
         {
             if (!columns.HasElements())
             {
@@ -40,31 +39,31 @@ namespace REPORT.Builder.Common.DatabaseOptions
 
             result.Append("SELECT ");
 
-            for(int x = 0; x < columns.Length; ++x)
+            for (int x = 0; x < columns.Length; ++x)
             {
                 ReportColumnModel column = columns[x];
 
-                if (x == columns.Length -1)
+                if (x == columns.Length - 1)
                 {
-                    result.AppendLine($"             [{columns[0].TableName}].[{column.ColumnName}] ");
+                    result.AppendLine($"             \"{column.ColumnName}\" ");
                 }
                 else if (x == 0)
                 {
-                    result.AppendLine($"[{columns[0].TableName}].[{column.ColumnName}], ");
+                    result.AppendLine($"\"{column.ColumnName}\", ");
                 }
                 else
                 {
-                    result.AppendLine($"             [{columns[0].TableName}].[{column.ColumnName}], ");
+                    result.AppendLine($"             \"{column.ColumnName}\", ");
                 }
             }
 
             // Add replacement SQL here
-            foreach(KeyValuePair<string, ReportSQLReplaceHeaderModel> replacekey in replacementColumns)
-			{
+            foreach (KeyValuePair<string, ReportSQLReplaceHeaderModel> replacekey in replacementColumns)
+            {
                 result.Replace(replacekey.Key, this.BuildReplacementSQL(replacekey));
-			}
+            }
 
-            result.AppendLine($" FROM [{columns[0].TableName}] WITH(NOLOCK) ");
+            result.AppendLine($" FROM \"{columns[0].TableName}\" ");
 
             bool haveWhereClause = false;
 
@@ -75,19 +74,21 @@ namespace REPORT.Builder.Common.DatabaseOptions
                 haveWhereClause = true;
             }
 
-            foreach(WhereParameterModel parameter in  whereParameterModel.OrderBy(so => so.OperatorIndex))
+            foreach (WhereParameterModel parameter in whereParameterModel.OrderBy(so => so.OperatorIndex))
             {
-                result.AppendLine($"{parameter.ColumnName} = @{parameter.ParameterName} {(parameter.AndOrOperator == SqlWhereOperatorsEnum.None ? string.Empty : parameter.AndOrOperator.ParseToString())} ");
+                result.AppendLine(
+                    $"{parameter.ColumnName} = @{parameter.ParameterName} " +
+                    $"{(parameter.AndOrOperator == SqlWhereOperatorsEnum.None ? string.Empty : parameter.AndOrOperator.ParseToString())} ");
             }
 
             List<ReportXMLPrintParameterModel> validFilters = reportFilters
                 .Where(rf => !rf.FilterValue.IsNullEmptyOrWhiteSpace())
                 .ToList();
 
-            if (reportFilters.Count > 0 
+            if (reportFilters.Count > 0
                 && !haveWhereClause
                 && validFilters.Count > 0)
-			{
+            {
                 result.Append(" WHERE ");
             }
             else if (haveWhereClause && validFilters.Count > 0)
@@ -96,7 +97,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
             }
 
             for (int x = 0; x < validFilters.Count; ++x)
-			{
+            {
                 ReportXMLPrintParameterModel filter = validFilters[x];
 
                 if (filter.FilterValue.IsNullEmptyOrWhiteSpace())
@@ -104,24 +105,24 @@ namespace REPORT.Builder.Common.DatabaseOptions
                     continue;
                 }
 
-                result.AppendLine($"{filter.TableName}.{filter.ColumnName} = '{filter.FilterValue}'");
-                
+                result.AppendLine($"\"{filter.ColumnName}\" = '{filter.FilterValue}'");
+
                 if (x < validFilters.Count - 1)
-				{
+                {
                     result.Append(" AND ");
-				}
+                }
             }
 
             if (!orderByString.IsNullEmptyOrWhiteSpace())
-			{
-                result.Append($" ORDER BY {orderByString} ASC");
-			}
+            {
+                result.Append($" ORDER BY \"{orderByString}\" ASC");
+            }
 
             return result.ToString();
         }
 
         private string BuildUpdateSql(UpdateStatementModel statement, out List<string> columnValues)
-		{
+        {
             columnValues = new List<string>();
 
             StringBuilder whereCaluse = new StringBuilder();
@@ -156,7 +157,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
             result.Append("    SET ");
 
             foreach (UpdateValueModel valueItem in statement.Values)
-			{
+            {
                 if (valueItem.IsDatabaseValue)
                 {
                     string[] columnSplit = valueItem.UpdateValue.Split('.', StringSplitOptions.None);
@@ -168,15 +169,15 @@ namespace REPORT.Builder.Common.DatabaseOptions
                 else
                 {
                     if (valueItem.UpdateValue == Constants.SqlGetDate)
-					{   // No Single Quates
+                    {   // No Single Quates
                         result.Append($"{valueItem.ColumnName} = {valueItem.UpdateValue}, ");
                     }
                     else
-					{
+                    {
                         result.Append($"{valueItem.ColumnName} = '{valueItem.UpdateValue}', ");
-					}
+                    }
                 }
-			}
+            }
 
             result.Remove(result.Length - 2, 2);
 
@@ -187,7 +188,7 @@ namespace REPORT.Builder.Common.DatabaseOptions
             result.AppendLine("BEGIN");
 
             result.AppendLine($"    INSERT INTO {statement.UpdateTableName} (");
-            
+
             foreach (UpdateValueModel valueItem in statement.Values)
             {
                 result.Append($"{valueItem.ColumnName}, ");
@@ -216,9 +217,9 @@ namespace REPORT.Builder.Common.DatabaseOptions
                         result.Append($"{valueItem.UpdateValue}, ");
                     }
                     else
-					{
+                    {
                         result.Append($"'{valueItem.UpdateValue}', ");
-					}
+                    }
                 }
             }
 
@@ -229,10 +230,10 @@ namespace REPORT.Builder.Common.DatabaseOptions
             result.AppendLine("END");
 
             return result.ToString();
-		}
+        }
 
         private string BuildReplacementSQL(KeyValuePair<string, ReportSQLReplaceHeaderModel> replacementKey)
-		{
+        {
             ReportSQLReplaceHeaderModel value = replacementKey.Value;
 
             StringBuilder result = new StringBuilder();
@@ -282,6 +283,6 @@ namespace REPORT.Builder.Common.DatabaseOptions
             result.Append($"{replacementKey.Key} AS {value.ReplaceColumn}_Value ");
 
             return result.ToString();
-		}
-	}
+        }
+    }
 }

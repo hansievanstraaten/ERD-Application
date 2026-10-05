@@ -2,7 +2,6 @@ using GeneralExtensions;
 using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.DataContext;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,12 +9,12 @@ namespace REPORT.Data.SQLRepository.Repositories
 {
 	public abstract class SystemTablesRepository_Base
 	{
-		public SystemTablesContext dataContext;
+		public DataSourceContext dataContext;
 
 		public SystemTablesRepository_Base()
 		{
-			this.dataContext = new SystemTablesContext();
-		}
+            this.dataContext = DataSourceContextFactory.CreateDataSourceContext(DatabaseConnection.Instance.StorageType, DatabaseConnection.Instance.ConnectionString);
+        }
 		
 		public LookupModel GetLookupByPrimaryKey (string LookupGroup, int GroupKey  )
 		{
@@ -30,9 +29,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.CopyToObject(new LookupModel()) as LookupModel;
 		}
-
-
-		
+				
 		public List<LookupModel> GetLookupByGroupDescription (string GroupDescription)
 		{
 			List<Lookup> result = this.dataContext

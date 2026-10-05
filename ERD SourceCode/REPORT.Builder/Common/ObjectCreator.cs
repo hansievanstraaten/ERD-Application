@@ -116,6 +116,10 @@ namespace REPORT.Builder.Common
 
             switch(buildType)
             {
+                case DatabaseTypeEnum.POSTGRES:
+                    sql = new PostgresSQL();
+                    return sql.BuildSelectQuery(columns, whereParameterModel, reportFilters, replacementColumns, orderByString);
+
                 case DatabaseTypeEnum.SQL:
                 default:
 
@@ -133,6 +137,10 @@ namespace REPORT.Builder.Common
 
             switch (buildType)
             {
+                case DatabaseTypeEnum.POSTGRES:
+                    sql = new PostgresSQL();
+                    return sql.UpdateStatements(updateStatements, out columnValues);
+
                 case DatabaseTypeEnum.SQL:
                 default:
 

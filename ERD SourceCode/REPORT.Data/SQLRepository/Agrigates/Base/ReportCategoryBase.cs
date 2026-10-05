@@ -12,7 +12,6 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		private bool _IsActive;
 		private Int64? _ParentCategoryId;
 
-
 		// Primary Keys
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)] 	
@@ -29,11 +28,6 @@ namespace REPORT.Data.SQLRepository.Agrigates
 			}
 		}
 
-
-		// Foreign Keys
-
-
-		// Columns
 		public string CategoryName
 		{
 			get
@@ -46,6 +40,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("CategoryName", ref this._CategoryName, value);
 			}
 		}
+		
 		public bool IsActive
 		{
 			get
@@ -58,6 +53,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("IsActive", ref this._IsActive, value);
 			}
 		}
+		
 		public Int64? ParentCategoryId
 		{
 			get
@@ -70,7 +66,5 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("ParentCategoryId", ref this._ParentCategoryId, value);
 			}
 		}
-
-
 	}
 }

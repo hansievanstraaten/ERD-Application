@@ -115,7 +115,7 @@ namespace REPORT.Builder.Printing
 
             List<int> result = new List<int>();
 
-            foreach(XElement item in canvas.Element("ForeignSectionIndexes").Elements())
+            foreach (XElement item in canvas.Element("ForeignSectionIndexes").Elements())
             {
                 result.Add(item.Value.ToInt32());
             }

@@ -1,4 +1,5 @@
-﻿using GeneralExtensions;
+﻿using ERD.Base;
+using GeneralExtensions;
 using REPORT.Data;
 using REPORT.Data.Common;
 using System;
@@ -11,10 +12,10 @@ using WPF.Tools.Exstention;
 
 namespace REPORT.Builder
 {
-	/// <summary>
-	/// Interaction logic for ReportSystemSetup.xaml
-	/// </summary>
-	public partial class ReportSystemSetup : UserControlBase
+    /// <summary>
+    /// Interaction logic for ReportSystemSetup.xaml
+    /// </summary>
+    public partial class ReportSystemSetup : UserControlBase
     {
         public ReportSystemSetup(string projectFileDirectory)
         {
@@ -38,7 +39,7 @@ namespace REPORT.Builder
             this.Unloaded += this.ReportSystemSetup_Unloaded;
         }
 
-		public string ReportFileName { get; private set; }
+        public string ReportFileName { get; private set; }
 
         public bool Save()
         {
@@ -60,13 +61,13 @@ namespace REPORT.Builder
             {
                 this.uxReportSetup.Items.Add(DbConfiguration.Instance.ReportSetup);
 
-                this.uxReportSetup["Database Type"].IsEnabled = false;
+                //this.uxReportSetup["Database Type"].IsEnabled = false;
 
                 DbConfiguration.Instance.ReportSetup.PropertyChanged += this.ReportSetup_Changed;
 
                 if (this.uxReportSetup["Database Type"].GetValue() == null)
                 {
-                    DbConfiguration.Instance.ReportSetup.StorageType = StorageTypeEnum.MsSql;
+                    DbConfiguration.Instance.ReportSetup.StorageType = StorageTypeEnum.SQLite;
                 }
                 else
                 {
@@ -82,18 +83,18 @@ namespace REPORT.Builder
         private void ReportSystemSetup_Unloaded(object sender, RoutedEventArgs e)
         {
             try
-			{
+            {
                 DbConfiguration.Instance.ReportSetup.PropertyChanged -= this.ReportSetup_Changed;
             }
             catch (Exception err)
-			{
+            {
                 MessageBox.Show(err.InnerExceptionMessage());
-			}
+            }
         }
 
         private void OnModelViewer_Browse(object sender, string buttonKey)
         {
-            switch(buttonKey)
+            switch (buttonKey)
             {
                 case "SaveDirectory":
 
@@ -112,7 +113,7 @@ namespace REPORT.Builder
 
         private void ReportSetup_Changed(object sender, PropertyChangedEventArgs e)
         {
-            switch(e.PropertyName)
+            switch (e.PropertyName)
             {
                 case "StorageType":
 
@@ -131,16 +132,8 @@ namespace REPORT.Builder
 
             switch (DbConfiguration.Instance.ReportSetup.StorageType)
             {
-                case StorageTypeEnum.SQLite:
-
-                    this.uxReportSetup["DB File Location"].Visibility = Visibility.Visible;
-
-                    break;
 
                 case StorageTypeEnum.MsSql:
-                default:
-
-                    this.uxReportSetup["DB File Location"].Visibility = Visibility.Collapsed;
 
                     if (this.uxReportSetup.Items.Count > 1)
                     {
@@ -151,7 +144,39 @@ namespace REPORT.Builder
                         this.uxReportSetup.Items.Add(DbConfiguration.Instance.ReportSetup.DataBaseSource);
                     }
 
+                    this.uxReportSetup[1]["Database Type"].SetValue(DatabaseTypeEnum.SQL);
+                    this.uxReportSetup[1]["Database Type"].IsReadOnly = true;
+                    this.uxReportSetup["DB File Location"].Visibility = Visibility.Collapsed;
+                    this.uxReportSetup[1]["Port"].Visibility = Visibility.Collapsed;
+                    this.uxReportSetup[1]["SSL Mode"].Visibility = Visibility.Collapsed;
                     break;
+
+                case StorageTypeEnum.Postgres:
+
+                    if (this.uxReportSetup.Items.Count > 1)
+                    {
+                        this.uxReportSetup[1].Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        this.uxReportSetup.Items.Add(DbConfiguration.Instance.ReportSetup.DataBaseSource);
+                    }
+
+                    this.uxReportSetup[1]["Database Type"].SetValue(DatabaseTypeEnum.POSTGRES);
+                    this.uxReportSetup[1]["Database Type"].IsReadOnly = true;
+                    this.uxReportSetup["DB File Location"].Visibility = Visibility.Collapsed;
+                    this.uxReportSetup[1]["Port"].Visibility = Visibility.Visible;
+                    this.uxReportSetup[1]["SSL Mode"].Visibility = Visibility.Visible;
+
+                    break;
+
+                //case StorageTypeEnum.FileSystem:
+                case StorageTypeEnum.SQLite:
+                default:
+                    this.uxReportSetup["DB File Location"].Visibility = Visibility.Visible;
+
+                    break;
+
             }
         }
     }

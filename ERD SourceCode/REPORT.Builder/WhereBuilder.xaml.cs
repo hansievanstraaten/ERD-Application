@@ -141,6 +141,7 @@ namespace REPORT.Builder
                     case SqlWhereOperatorsEnum.None:
 
                         List<WhereParameter> removeChildren = new List<WhereParameter>();
+                        List<WhereParameterModel> whereParameters = new List<WhereParameterModel>();
 
                         foreach(WhereParameter clause in this.uxSectionLinks.Children)
                         {
@@ -148,6 +149,8 @@ namespace REPORT.Builder
                             {
                                 removeChildren.Add(clause);
                             }
+
+                            whereParameters.Add(clause.WhereClause);
                         }
 
                         foreach(WhereParameter clause in removeChildren)
@@ -155,7 +158,7 @@ namespace REPORT.Builder
                             this.uxSectionLinks.Children.Remove(clause);
                         }
 
-                        this.SelectedSection.SqlManager.AddWhereModels(new WhereParameterModel[] { });
+                        this.SelectedSection.SqlManager.AddWhereModels(whereParameters.ToArray());
 
                         break;
 

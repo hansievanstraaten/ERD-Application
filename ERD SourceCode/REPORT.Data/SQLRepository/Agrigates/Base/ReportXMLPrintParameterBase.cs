@@ -18,8 +18,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 
 
 		// Primary Keys
-		[Key]
-		 	
+		[Key]		 	
 		public string TableName
 		{
 			get
@@ -32,8 +31,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("TableName", ref this._TableName, value);
 			}
 		}
-		[Key]
-		 	
+
+		[Key]		 	
 		public string ColumnName
 		{
 			get
@@ -46,8 +45,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("ColumnName", ref this._ColumnName, value);
 			}
 		}
-		[Key]
-		 	
+		
+		[Key]		 	
 		public int ReportXMLVersion
 		{
 			get
@@ -60,8 +59,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("ReportXMLVersion", ref this._ReportXMLVersion, value);
 			}
 		}
-		[Key]
-		 	
+		
+		[Key]		 	
 		public Int64 MasterReport_Id
 		{
 			get
@@ -74,7 +73,6 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("MasterReport_Id", ref this._MasterReport_Id, value);
 			}
 		}
-
 
 		// Foreign Keys
 

@@ -22,10 +22,11 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		private int _PageMarginBottom;
 		private string _ProjectName;
 		private Int64? _CategoryId;
+        private string _ProductionConnection;
 
 
-		// Primary Keys
-		[Key]
+        // Primary Keys
+        [Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)] 	
 		public Int64 MasterReport_Id
 		{
@@ -214,6 +215,17 @@ namespace REPORT.Data.SQLRepository.Agrigates
 			}
 		}
 
+        public string ProductionConnection
+        {
+            get
+            {
+                return this._ProductionConnection;
+            }
 
-	}
+            set
+            {
+                base.OnPropertyChanged("ProductionConnection", ref this._ProductionConnection, value);
+            }
+        }
+    }
 }

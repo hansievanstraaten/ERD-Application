@@ -8,6 +8,9 @@ namespace ViSo.SharedEnums.ReportEnums
         SQLite = 1,
 
         [Description("MS SQL")]
-        MsSql = 2
+        MsSql = 2,
+
+        [Description("PostgreSQL")]
+        Postgres = 3
     }
 }

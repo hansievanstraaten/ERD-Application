@@ -343,7 +343,7 @@ namespace REPORT.Builder
 
 					this.uxWhereBuilder.AddSectionOptions(this.dataReportSections.ToArray(), sender.GetPropertyValue("SectionGroupIndex").ToInt32());
 
-					this.uxPropertiesCaption.Visibility = Visibility.Collapsed;
+                    this.uxPropertiesCaption.Visibility = Visibility.Collapsed;
 
 					this.uxProperties.Visibility = Visibility.Collapsed;
 
@@ -965,6 +965,16 @@ namespace REPORT.Builder
 			}
 		}
 
+        private void Help_Cliked(object sender, RoutedEventArgs e)
+        {
+            ReportDesignerHelp help = new ReportDesignerHelp();
+
+			help.Owner = Window.GetWindow(this);
+            //Application.Current.MainWindow;
+
+            help.Show();
+        }
+
 		#endregion
 
 		#region PRIVATE PROPERTIES
@@ -1541,6 +1551,7 @@ namespace REPORT.Builder
 			return result;
 		}
 
-		#endregion
-	}
+        #endregion
+
+    }
 }

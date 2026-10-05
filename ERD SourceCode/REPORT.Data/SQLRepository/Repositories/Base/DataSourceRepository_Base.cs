@@ -14,8 +14,8 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 		public DataSourceRepository_Base()
 		{
-			this.dataContext = new DataSourceContext();
-		}
+            this.dataContext = DataSourceContextFactory.CreateDataSourceContext(DatabaseConnection.Instance.StorageType, DatabaseConnection.Instance.ConnectionString);
+        }
 		
 		public DataSourceMasterModel GetDataSourceMasterByPrimaryKey (Int64 MasterReport_Id  )
 		{

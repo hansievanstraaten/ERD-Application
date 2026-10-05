@@ -9,9 +9,11 @@
     <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.5.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
     <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.22.0" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ERD.Base\ERD.Base.csproj" />

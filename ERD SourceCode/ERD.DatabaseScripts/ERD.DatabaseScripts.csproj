@@ -19,7 +19,6 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />

@@ -13,8 +13,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 
 
 		// Primary Keys
-		[Key]
-		 	
+		[Key]		 	
 		public Int64 MasterReport_Id
 		{
 			get
@@ -27,8 +26,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("MasterReport_Id", ref this._MasterReport_Id, value);
 			}
 		}
-		[Key]
-		 	
+		
+		[Key]		 	
 		public string TableName
 		{
 			get

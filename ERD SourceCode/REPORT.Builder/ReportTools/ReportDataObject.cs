@@ -56,7 +56,12 @@ namespace REPORT.Builder.ReportTools
 				{
 					if (item.Name.LocalName == "ColumnModel")
 					{
-						this.ColumnModel = item.Value.ConvertStringToBytes().UnzipFile() as ReportColumnModel;
+						string columnString = System.Text.Json.JsonSerializer.Serialize(item.Value.ConvertStringToBytes().UnzipFile());
+						ReportColumnModel columnsModel = System.Text.Json.JsonSerializer.Deserialize<ReportColumnModel>(columnString);
+
+						this.ColumnModel = columnsModel;
+
+                            //item.Value.ConvertStringToBytes().UnzipFile() as ReportColumnModel;
 
 						continue;
 					}
@@ -184,7 +189,7 @@ namespace REPORT.Builder.ReportTools
 			{
 				this.columnModel = value;
 
-				base.Text = value.ColumnName;
+				base.Text = value?.ColumnName;
 			}
 		}
 

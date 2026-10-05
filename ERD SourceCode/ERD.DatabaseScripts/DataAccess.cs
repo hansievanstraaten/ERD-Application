@@ -20,10 +20,12 @@ namespace ERD.Viewer.Database
             this.accessModel.Construct(databaseModel);
         }
 
-        public bool TestConnection()
-		{
-            return this.accessModel.TestConnection();
-		}
+        public DataAccess(DatabaseTypeEnum databaseType, DatabaseModel databaseModel)
+        {
+            this.accessModel = this.CreateClass(databaseType);
+
+            this.accessModel.Construct(databaseModel);
+        }
 
         public DataAccess(DatabaseTypeEnum databaseType, Dictionary<string, string> connectionValues)
         {
@@ -31,6 +33,11 @@ namespace ERD.Viewer.Database
 
             this.accessModel.Construct(connectionValues);
         }
+
+        public bool TestConnection()
+		{
+            return this.accessModel.TestConnection();
+		}
 
         public XDocument ExecuteQuery(string sqlQuery, int commandTimeout = 30)
         {

@@ -2,7 +2,6 @@
 using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.DataContext;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -12,11 +11,11 @@ namespace REPORT.Data.SQLRepository.Repositories
 
     public class BuildReportRepository
     {
-        private ReportTablesContext dataContext;
+        private DataSourceContext dataContext;
 
         public BuildReportRepository()
         {
-            this.dataContext = new ReportTablesContext();
+            this.dataContext = DataSourceContextFactory.CreateDataSourceContext(DatabaseConnection.Instance.StorageType, DatabaseConnection.Instance.ConnectionString);
         }
 
         public int GetReportXMLVersion(long MasterReport_Id)

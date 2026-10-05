@@ -1,8 +1,11 @@
-﻿using ERD.Models;
+﻿using ERD.Base;
+using ERD.Common;
+using ERD.Models;
 using ERD.Viewer.Database;
 using GeneralExtensions;
 using REPORT.Builder.Common;
 using REPORT.Builder.ReportComponents;
+using REPORT.Data.Common;
 using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
@@ -76,7 +79,6 @@ namespace REPORT.Builder.Printing
                     .ToDictionary(t => t.Key, c => c.ToList());
             }
 
-            this.dataAccessConnection = connection;
 
             Dictionary<string, XElement[]> sqlOrderBy = xmlReport
                 .Root
@@ -97,6 +99,14 @@ namespace REPORT.Builder.Printing
             }
 
             string reportTypeValue = xmlReport.Root.Element("ReportSettings").Attribute("ReportTypeEnum").Value;
+
+            DatabaseModel instanceDBModel = Connections.Instance.DatabaseModel;
+
+            try
+            {
+            Connections.Instance.DatabaseModel = connection;
+
+            this.dataAccessConnection = connection;
 
             #region BUILD REPORT DATA
 
@@ -123,6 +133,12 @@ namespace REPORT.Builder.Printing
             }
 
             #endregion
+
+            }
+            finally
+            {
+                Connections.Instance.DatabaseModel = instanceDBModel;
+            }
 
             foreach(XElement reportSum in xmlReport.Root.Descendants().Where(a => a.Attribute("ObjectType") != null
                                                                                && a.Attribute("ObjectType").Value == "ReportSum"))
@@ -440,11 +456,11 @@ namespace REPORT.Builder.Printing
             if (this.dataAccessConnection == null)
             {
                 ReportConnection connection = this.repo.GetConnection(this.masterReport_Id);
-
+                
                 this.dataAccessConnection = connection.CopyToObject(new DatabaseModel()) as DatabaseModel;
             }
 
-            this.data = new DataAccess(this.dataAccessConnection);
+            this.data = new DataAccess(this.dataAccessConnection.DatabaseType, this.dataAccessConnection);
         }
     
         private void SetInvokedValues(string tableName, XElement row)

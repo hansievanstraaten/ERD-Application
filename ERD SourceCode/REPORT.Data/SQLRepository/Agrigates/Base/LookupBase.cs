@@ -11,10 +11,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 		private int _GroupKey;
 		private string _GroupDescription;
 
-
 		// Primary Keys
-		[Key]
-		 	
+		[Key]		 	
 		public string LookupGroup
 		{
 			get
@@ -27,8 +25,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("LookupGroup", ref this._LookupGroup, value);
 			}
 		}
-		[Key]
-		 	
+		
+		[Key]		 	
 		public int GroupKey
 		{
 			get

@@ -1,0 +1,7 @@
+Release notes: 2.1.1.0
+*********************
+- Add support for SQLLite and PostgreSQL for the Report Builder
+- Add Quick help on Report Designer
+
+Minor bugs and fixes:
+*********************:

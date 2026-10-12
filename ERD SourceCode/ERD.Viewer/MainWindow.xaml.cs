@@ -6,11 +6,14 @@ using ERD.DatabaseScripts;
 using ERD.DatabaseScripts.Compare;
 using ERD.DatabaseScripts.Engineering;
 using ERD.FileManagement;
+using ERD.Git;
+using ERD.Git.Models;
 using ERD.Models;
 using ERD.Viewer.Build;
 using ERD.Viewer.Comparer;
 using ERD.Viewer.Database;
 using ERD.Viewer.Tools;
+using ERD.Viewer.Tools.Common;
 using GeneralExtensions;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -29,9 +32,13 @@ using System.Windows.Input;
 using System.Xml.Linq;
 using ViSo.Common;
 using ViSo.Dialogs.Controls;
+using ViSo.Dialogs.Input;
+using ViSo.Dialogs.ModelViewer;
 using WPF.Tools.BaseClasses;
 using WPF.Tools.Exstention;
 using WPF.Tools.Functions;
+using WPF.Tools.ModelViewer;
+using WPF.Tools.ToolModels;
 
 namespace ERD.Viewer
 {
@@ -42,7 +49,7 @@ namespace ERD.Viewer
         private List<string> connectionsInMenue = new List<string>();
 
         private CanvasLocksListener listener = new CanvasLocksListener();
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -66,6 +73,7 @@ namespace ERD.Viewer
             this.Loaded += this.MainWindow_Loaded;
         }
 
+        #region MAIN WINDOW EVENTS
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             _ = SetTitleAsync();
@@ -102,6 +110,129 @@ namespace ERD.Viewer
             }
         }
 
+        #endregion
+
+        #region MENU EVENTS
+
+        #region FILE EVENTS
+
+        private void NewProject_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ProjectSetup setup = new ProjectSetup(new ProjectModel(), new DatabaseModel());
+
+                bool? result = setup.ShowDialog();
+
+                if (result.HasValue && !result.Value)
+                {
+                    return;
+                }
+
+                General.ProjectModel = setup.SelectedProjectModel;
+
+                Connections.Instance.SetDefaultDatabaseModel(setup.SelectedDatabaseModel, false);
+
+                this.ActivateMenu();
+
+                this.LoadToolsStack();
+
+                this.LoadConnectionsMenue();
+
+                this.listener.StartWatcher();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void OpenProject_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog dlg = new OpenFileDialog();
+
+                dlg.Filter = $"(*.{FileTypes.eprj})|*.{FileTypes.eprj}";
+
+                bool? result = dlg.ShowDialog();
+
+                if (!result.HasValue || !result.Value)
+                {
+                    return;
+                }
+
+                this.OpenProject(dlg.FileName);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void CloneRepository_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                GitCloneRequestModel request = new GitCloneRequestModel();
+
+                ModelView.OnItemBrowse += this.CloneRepository_OnItemBrowseEvent;
+
+                if (ModelView.ShowDialog("Clone Repository", request).IsFalse())
+                {
+                    return;
+                }
+
+                ERDGit.Clone(request);
+
+                string projectFileName = Directory.GetFiles(request.LocalPath, $"*.{FileTypes.eprj}", SearchOption.AllDirectories).FirstOrDefault();
+
+                this.OpenProject(projectFileName);
+
+                while (General.ProjectModel == null)
+                {
+                    Sleep.ThreadWaitSeconds(1);
+                }
+
+                bool needUpdate = false;
+
+                if (string.IsNullOrWhiteSpace(General.ProjectModel.GitUsername))
+                {
+                    General.ProjectModel.GitUsername = request.Username.Encrypt();
+                    needUpdate = true;
+                }
+
+                if (string.IsNullOrWhiteSpace(General.ProjectModel.GitPassword))
+                {
+                    General.ProjectModel.GitPassword = request.Password.Encrypt();
+                    needUpdate = true;
+                }
+
+                if (needUpdate)
+                {
+                    this.SaveModel();
+
+                    MessageBox.Show("The Clone process caused some changes to the files that must be pushed back to the server. Please do a Commit and Push to the server.");
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                this.SaveModel();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
         private void ExitProject_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -111,6 +242,705 @@ namespace ERD.Viewer
             catch (Exception err)
             {
                 MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        #endregion
+
+        #region PROJECT EVENTS
+
+        private void EditProject_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (General.ProjectModel == null)
+                {
+                    MessageBox.Show("No Project Selected");
+
+                    return;
+                }
+
+                ProjectSetup setup = new ProjectSetup(General.ProjectModel, Connections.Instance.DefaultDatabaseModel);
+
+                setup.AutoSize = true;
+
+                bool? result = setup.ShowDialog();
+
+                if (result.HasValue && !result.Value)
+                {
+                    return;
+                }
+
+                this.listener.StartWatcher();
+
+                this.LoadConnectionsMenue();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void AddCanvas_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ErdCanvasModel segment = new ErdCanvasModel() { SegmentTables = new List<TableModel>() };
+
+                ErdTabSetup tab = new ErdTabSetup(segment);
+
+                bool? result = tab.ShowDialog();
+
+                if (!result.HasValue || !result.Value)
+                {
+                    return;
+                }
+
+                if (canvasDictionary.ContainsKey(segment.ModelSegmentControlName))
+                {
+                    MessageBox.Show($"Duplicate Names {segment.ModelSegmentName} not allowed");
+
+                    return;
+                }
+
+                this.AddCanvasObject(segment);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        #endregion
+
+        #region GIT EVENTS
+
+        private void Fetch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string remoteName = ERDGit.GetCurrentBranchRemoteName(General.ProjectModel.FileDirectory);
+
+                GitAuthentication auth = new GitAuthentication
+                {
+                    Username = General.ProjectModel.GitUsername.Decrypt(),
+                    Password = General.ProjectModel.GitPassword.Decrypt()
+                };
+
+                ERDGit.Fetch(General.ProjectModel.FileDirectory, remoteName, auth);
+
+                int changes = ERDGit.GetIncomingChangeCount(General.ProjectModel.FileDirectory);
+
+                MessageBox.Show($"Incoming changes: {changes}");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void Pull_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                GitIdentity identity = new GitIdentity();
+
+                if (ModelView.ShowDialog("Pull Changes", identity).IsFalse())
+                {
+                    return;
+                }
+
+                PullResult result = ERDGit.Pull(General.ProjectModel.FileDirectory, identity, new GitAuthentication
+                {
+                    Username = General.ProjectModel.GitUsername.Decrypt(),
+                    Password = General.ProjectModel.GitPassword.Decrypt()
+                });
+
+                if (result.HasConflicts)
+                {
+                    MessageBox.Show("The pull has conflicts in the following files:\n\n" +
+                        string.Join("\n", result.ConflictedFiles),
+                        "Merge Conflicts",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
+                    // Open your conflict resolution window here.
+                    // Example:
+                    // new GitConflictWindow(result.ConflictedFiles).ShowDialog();
+
+                    return;
+                }
+
+                this.ReloadProject();
+
+                MessageBox.Show("Pull Completed");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void Commit_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                GitCommitRequest request = new GitCommitRequest();
+
+                if (ModelView.ShowDialog("Commit and Push Changes", request).IsFalse())
+                {
+                    return;
+                }
+
+                GitAuthentication auth = new GitAuthentication
+                {
+                    Username = General.ProjectModel.GitUsername.Decrypt(),
+                    Password = General.ProjectModel.GitPassword.Decrypt()
+                };
+
+                ERDGit.StageAll(General.ProjectModel.FileDirectory);
+
+                ERDGit.Commit(General.ProjectModel.FileDirectory, request);
+
+                MessageBox.Show("Commit Completed");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void Push_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                IReadOnlyList<GitFileStatus> changes = ERDGit.GetStatus(General.ProjectModel.FileDirectory);
+
+                if (changes.Count > 0)
+                {
+                    MessageBox.Show($"There are {changes.Count} chage(s) that must be committed first.");
+                    return;
+                }
+
+                IReadOnlyList<GitRemoteInfo> remotes = ERDGit.GetRemotes(General.ProjectModel.FileDirectory);
+
+                string remoteName = remotes.Count == 1 ? remotes[0].Name : string.Empty;
+
+                if (remotes.Count > 1)
+                {
+                    GitRemoteSelect request = new GitRemoteSelect();
+
+                    if (ModelView.ShowDialog("Commit and Push Changes", request).IsFalse())
+                    {
+                        return;
+                    }
+
+                    remoteName = request.RemoteName;
+                }
+
+                GitAuthentication auth = new GitAuthentication
+                {
+                    Username = General.ProjectModel.GitUsername.Decrypt(),
+                    Password = General.ProjectModel.GitPassword.Decrypt()
+                };
+
+                ERDGit.Push(General.ProjectModel.FileDirectory, remoteName, auth);
+
+                MessageBox.Show("Push Completed");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void PendingChanges_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                IReadOnlyList<GitFileStatus> changes = ERDGit.GetStatus(General.ProjectModel.FileDirectory);
+
+                if (changes.Count == 0)
+                {
+                    MessageBox.Show("There are not pending changes");
+                    return;
+                }
+
+                int maxLength = changes.Max(c => c.Path.Length) + 5;
+                int totalLength = maxLength + changes.Max(t => t.Status.Length);
+
+                StringBuilder changeMessage = new StringBuilder();
+
+                changeMessage.AppendLine("Filename".PadRight(maxLength) + "Changes");
+
+                changeMessage.AppendLine(new string('-', totalLength));
+
+                foreach (GitFileStatus change in changes)
+                {
+                    changeMessage.AppendLine($"{change.Path.PadRight(maxLength)}{change.Status}");
+                }
+
+                MonospacedMessageBox messageBox = new MonospacedMessageBox()
+                {
+                    Message = changeMessage.ToString(),
+                    MinWidth = 600,
+                    MinHeight = 400
+                };
+
+                ControlDialog.ShowDialog("Changes", messageBox, string.Empty, showCancelButton: false, autoSize: true);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void NewBranch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string fileDir = General.ProjectModel.FileDirectory;
+
+                GitBranchInfo branch = ERDGit.GetCurrentBranch(fileDir);
+
+                string titleMessage = $"Would you like to create a new branch from '{branch.Name}'?";
+
+                if (InputBox.ShowDialog(this, true, titleMessage, "Branch Name").IsFalse())
+                {
+                    return;
+                }
+
+                ERDGit.CreateBranch(fileDir, InputBox.Result);
+
+                this.SetBranchNameMessage(fileDir);
+
+                MessageBox.Show($"Branch '{InputBox.Result}' created and checked out.");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void GetRemoteBranch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                IReadOnlyList<GitBranchInfo> remoteBranches = ERDGit.GetRemoteBranches(General.ProjectModel.FileDirectory);
+                List<DataItemModel> branchList = new List<DataItemModel>();
+
+                branchList.Add(new DataItemModel { DisplayValue = "<Select>", ItemKey = string.Empty });
+
+                foreach (GitBranchInfo item in remoteBranches)
+                {
+                    branchList.Add(new DataItemModel { DisplayValue = item.Name, ItemKey = item.CanonicalName });
+                }
+
+                GitRemoteBranches remotes = new GitRemoteBranches();
+
+                remotes.Branches = branchList.ToArray();
+
+                if (ModelView.ShowDialog("Select Branch", remotes).IsFalse())
+                {
+                    return;
+                }              
+
+                ERDGit.CreateBranchFromRemote(General.ProjectModel.FileDirectory, remotes.BranchName);
+
+                this.ReloadProject();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void ChangeBranch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (this.DiscardPendingChanges() == false) // The user selected NO
+                {
+                    return;
+                }
+
+                GitLocalBranches localBranches = new GitLocalBranches();
+
+                if (ModelView.ShowDialog("Select Branch", localBranches).IsFalse())
+                {
+                    return;
+                }
+
+                GitBranchInfo currentBranch = ERDGit.GetCurrentBranch(General.ProjectModel.FileDirectory);
+
+                if (currentBranch.Name == localBranches.BranchName)
+                {
+                    MessageBox.Show($"You are already on branch '{currentBranch.Name}'");
+                    return;
+                }
+
+                ERDGit.Checkout(General.ProjectModel.FileDirectory, localBranches.BranchName);
+
+                this.ReloadProject();
+                                
+                this.SetBranchNameMessage(General.ProjectModel.FileDirectory);
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void ResolveConflicts_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }   
+        }
+
+        private void ViewBranchHistory_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string fileDir = General.ProjectModel.FileDirectory;
+
+                IReadOnlyList<GitCommitInfo> history = ERDGit.GetHistory(fileDir);
+
+                int maxLength = history.Max(c => c.Author.Length) + 5;
+                int totalLength = maxLength + history.Max(t => t.Message.Length);
+
+                StringBuilder changeMessage = new StringBuilder();
+
+                changeMessage.AppendLine("Filename".PadRight(maxLength) + "Changes");
+
+                changeMessage.AppendLine(new string('-', totalLength));
+
+                foreach (GitCommitInfo change in history)
+                {
+                    changeMessage.AppendLine($"{change.Author.PadRight(maxLength)}{change.Message}");
+                }
+
+                MonospacedMessageBox messageBox = new MonospacedMessageBox()
+                {
+                    Message = changeMessage.ToString(),
+                    MinWidth = 600,
+                    MinHeight = 400
+                };
+
+                ControlDialog.ShowDialog("Changes", messageBox, string.Empty, showCancelButton: false, autoSize: true);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void ManageBranches_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void OpenInBrowser_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                IReadOnlyList<GitRemoteInfo> remotes = ERDGit.GetRemotes(General.ProjectModel.FileDirectory);
+
+                string remoteName = remotes.Count == 1 ? remotes[0].Name : string.Empty;
+
+                if (remotes.Count > 1)
+                {
+                    GitRemoteSelect request = new GitRemoteSelect();
+
+                    if (ModelView.ShowDialog("Commit and Push Changes", request).IsFalse())
+                    {
+                        return;
+                    }
+
+                    remoteName = request.RemoteName;
+                }
+
+                ERDGit.OpenInBrowser(General.ProjectModel.FileDirectory, remoteName);
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        #endregion
+
+        #region DATABASE EVENTS
+
+        private void GetDbTables_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MenuItem item = (MenuItem)e.Source;
+
+                this.ReverseEngineer(item);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void RefreshFromDB_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MenuItem item = (MenuItem)e.Source;
+
+                this.RefreshFromDB(item);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void CompareToDB_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MenuItem item = (MenuItem)e.Source;
+
+                this.ComapreToDatabase(item);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void ForwardEngineer_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MenuItem item = (MenuItem)e.Source;
+
+                Connections.Instance.SetConnection(item, true);
+
+                ForwardEngineer forward = new ForwardEngineer();
+
+                forward.ForwardEngineeringCompleted += this.ForwardEngineering_Completed;
+
+                List<TableModel> tablesList = new List<TableModel>();
+
+                List<TableMenuItem> deleteList = new List<TableMenuItem>();
+
+                foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => ((TableMenuItem)t).TableModelObject.IsDeleted))
+                {
+                    tablesList.Add(menuItem.TableModelObject);
+
+                    deleteList.Add(menuItem);
+                }
+
+                foreach (ErdCanvasModel canvas in this.canvasDictionary.Values)
+                {
+                    tablesList.AddRange(canvas.SegmentTables);
+                }
+
+                forward.BuildDatabase(tablesList.ToArray(), false);
+
+                foreach (TableMenuItem xItem in deleteList)
+                {
+                    this.uxTableStack.Children.Remove(xItem);
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
+        private void ScriptDbChanges_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ForwardEngineer forward = new ForwardEngineer();
+
+                List<TableModel> tablesList = new List<TableModel>();
+
+                List<TableMenuItem> deleteList = new List<TableMenuItem>();
+
+                foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => ((TableMenuItem)t).TableModelObject.IsDeleted))
+                {
+                    tablesList.Add(menuItem.TableModelObject);
+
+                    deleteList.Add(menuItem);
+                }
+
+                foreach (ErdCanvasModel canvas in this.canvasDictionary.Values)
+                {
+                    tablesList.AddRange(canvas.SegmentTables);
+                }
+
+                forward.BuildDatabase(tablesList.ToArray(), true);
+
+                foreach (TableMenuItem xItem in deleteList)
+                {
+                    this.uxTableStack.Children.Remove(xItem);
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        #endregion
+
+        #region BUILD EVENTS
+
+        private void ScriptBuildSetup_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (this.canvasDictionary == null ||
+                    this.canvasDictionary.Count == 0 ||
+                    this.canvasDictionary.First().Value.SegmentTables == null ||
+                    this.canvasDictionary.First().Value.SegmentTables.Count == 0 ||
+                    this.canvasDictionary.First().Value.SegmentTables[0].Columns == null ||
+                    this.canvasDictionary.First().Value.SegmentTables[0].Columns.Length == 0)
+                {
+                    throw new ApplicationException("You need at least one Canvas, with at least one Table and some Columns to use this function.");
+                }
+
+                BuildSetup setup = new BuildSetup(this.canvasDictionary.First().Value, this.canvasDictionary.Values.ToList());
+
+                setup.ShowDialog();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void ScriptBuildRun_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (BuildScript.Setup == null)
+                {
+                    MessageBox.Show("Setup required");
+
+                    return;
+                }
+
+                BuildClasses builder = new BuildClasses();
+
+                builder.ScriptFiles(this.canvasDictionary.Values.ToArray(), this.Dispatcher);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        #endregion
+
+        #region REPORT BUILDER EVENTS
+
+        private void ReportSystemSetup_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ReportSystemSetup setup = new ReportSystemSetup(General.ProjectModel.FileDirectory);
+
+                if (ControlDialog.ShowDialog("Setup", setup, "Save", autoSize: true).IsFalse())
+                {
+                    return;
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private void SelectReport_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ReportSelector selector = new ReportSelector(General.ProjectModel.FileDirectory);
+
+                ControlDialog.Show("Reports", selector, string.Empty, showOkButton: false);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        #endregion
+
+        #region HELP AND ABOUT EVENTS
+
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                About about = new About();
+
+                ControlDialog.ShowDialog("About", about, string.Empty, showCancelButton: false, autoSize: true);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region GENERAL EVENT HANDLERS
+
+        private void CloneRepository_OnItemBrowseEvent(object sender, object model, string buttonKey)
+        {
+            try
+            {
+                switch (buttonKey)
+                {
+                    case "Password":
+                        MessageBox.Show("This was only tested on GitHub, and there I had to create a Token. The user name was the name in the URL and the password was the token that I created at 'Profile picture → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token'. Permission 'Contents' selected");
+                        break;
+
+                    default:
+                        System.Windows.Forms.FolderBrowserDialog folder = new System.Windows.Forms.FolderBrowserDialog();
+
+                        if (folder.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                        {
+                            return;
+                        }
+
+                        ModelViewObject viewObj = (ModelViewObject)sender;
+
+                        viewObj["Repository Local Path"].SetValue(folder.SelectedPath);
+
+                        break;
+                }
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
             }
         }
 
@@ -137,7 +967,7 @@ namespace ERD.Viewer
 
                     List<TableMenuItem> tablesStackResult = new List<TableMenuItem>();
 
-                    foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => !((TableMenuItem) t).TableModelObject.IsDeleted))
+                    foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => !((TableMenuItem)t).TableModelObject.IsDeleted))
                     {
                         tablesStackResult.Add(menuItem);
                     }
@@ -204,187 +1034,6 @@ namespace ERD.Viewer
             MessageBox.Show(err.InnerExceptionMessage());
         }
 
-        private void NewProject_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ProjectSetup setup = new ProjectSetup(new ProjectModel(), new DatabaseModel());
-
-                bool? result = setup.ShowDialog();
-
-                if (result.HasValue && !result.Value)
-                {
-                    return;
-                }
-
-                General.ProjectModel = setup.SelectedProjectModel;
-
-                Connections.Instance.SetDefaultDatabaseModel(setup.SelectedDatabaseModel, false);
-
-                this.ActivateMenu();
-
-                this.LoadToolsStack();
-
-                this.LoadConnectionsMenue();
-
-                this.listener.StartWatcher();
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
-            }
-        }
-
-        private void OpenProject_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                OpenFileDialog dlg = new OpenFileDialog();
-
-                dlg.Filter = $"(*.{FileTypes.eprj})|*.{FileTypes.eprj}";
-
-                bool? result = dlg.ShowDialog();
-
-                if (!result.HasValue || !result.Value)
-                {
-                    return;
-                }
-
-                this.OpenProject(dlg.FileName);
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
-            }
-        }
-
-        private void EditProject_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (General.ProjectModel == null)
-                {
-                    MessageBox.Show("No Project Selected");
-
-                    return;
-                }
-
-                ProjectSetup setup = new ProjectSetup(General.ProjectModel, Connections.Instance.DefaultDatabaseModel);
-
-                setup.AutoSize = true;
-
-                bool? result = setup.ShowDialog();
-
-                if (result.HasValue && !result.Value)
-                {
-                    return;
-                }
-
-                this.listener.StartWatcher();
-
-                this.LoadConnectionsMenue();
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
-            }
-        }
-
-        private void Save_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                this.SaveModel();
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
-            }
-        }
-
-        private void GetDbTables_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                MenuItem item = (MenuItem) e.Source;
-
-                this.ReverseEngineer(item);
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
-            }
-        }
-
-        private void RefreshFromDB_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                MenuItem item = (MenuItem) e.Source;
-
-                this.RefreshFromDB(item);
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
-            }
-        }
-
-        private void CompareToDB_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                MenuItem item = (MenuItem) e.Source;
-
-                this.ComapreToDatabase(item);
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
-            }
-        }
-
-        private void ForwardEngineer_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                MenuItem item = (MenuItem) e.Source;
-
-                Connections.Instance.SetConnection(item, true);
-
-                ForwardEngineer forward = new ForwardEngineer();
-
-                forward.ForwardEngineeringCompleted += this.ForwardEngineering_Completed;
-
-                List<TableModel> tablesList = new List<TableModel>();
-
-                List<TableMenuItem> deleteList = new List<TableMenuItem>();
-
-                foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => ((TableMenuItem) t).TableModelObject.IsDeleted))
-                {
-                    tablesList.Add(menuItem.TableModelObject);
-
-                    deleteList.Add(menuItem);
-                }
-
-                foreach (ErdCanvasModel canvas in this.canvasDictionary.Values)
-                {
-                    tablesList.AddRange(canvas.SegmentTables);
-                }
-
-                forward.BuildDatabase(tablesList.ToArray(), false);
-
-                foreach (TableMenuItem xItem in deleteList)
-                {
-                    this.uxTableStack.Children.Remove(xItem);
-                }
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
-            }
-        }
-
         private void ForwardEngineering_Completed(object sender, bool completed)
         {
             if (completed)
@@ -393,75 +1042,10 @@ namespace ERD.Viewer
                 {
                     this.RefreshColumnIds();
                 }
-                    
+
                 this.SetForwardEngineerOptions(true);
-                
+
                 this.SaveModel();
-            }
-        }
-
-        private void ScriptDbChanges_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ForwardEngineer forward = new ForwardEngineer();
-
-                List<TableModel> tablesList = new List<TableModel>();
-
-                List<TableMenuItem> deleteList = new List<TableMenuItem>();
-
-                foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => ((TableMenuItem) t).TableModelObject.IsDeleted))
-                {
-                    tablesList.Add(menuItem.TableModelObject);
-
-                    deleteList.Add(menuItem);
-                }
-
-                foreach (ErdCanvasModel canvas in this.canvasDictionary.Values)
-                {
-                    tablesList.AddRange(canvas.SegmentTables);
-                }
-
-                forward.BuildDatabase(tablesList.ToArray(), true);
-
-                foreach (TableMenuItem xItem in deleteList)
-                {
-                    this.uxTableStack.Children.Remove(xItem);
-                }
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
-
-        private void AddCanvas_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ErdCanvasModel segment = new ErdCanvasModel() {SegmentTables = new List<TableModel>()};
-
-                ErdTabSetup tab = new ErdTabSetup(segment);
-
-                bool? result = tab.ShowDialog();
-
-                if (!result.HasValue || !result.Value)
-                {
-                    return;
-                }
-
-                if (canvasDictionary.ContainsKey(segment.ModelSegmentControlName))
-                {
-                    MessageBox.Show($"Duplicate Names {segment.ModelSegmentName} not allowed");
-
-                    return;
-                }
-
-                this.AddCanvasObject(segment);
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.GetFullExceptionMessage());
             }
         }
 
@@ -495,7 +1079,7 @@ namespace ERD.Viewer
 
                 string itemName = table.TableName.MakeAlphaNumeric();
 
-                TableMenuItem tableItem = tables.FirstOrDefault(t => ((TableMenuItem) t).Name == itemName) as TableMenuItem;
+                TableMenuItem tableItem = tables.FirstOrDefault(t => ((TableMenuItem)t).Name == itemName) as TableMenuItem;
 
                 if (tableItem == null)
                 {
@@ -506,7 +1090,7 @@ namespace ERD.Viewer
                     this.uxTableStack.Children.Insert(0, tableItem);
                 }
 
-                string segmentName = ((TableCanvas) sender).ErdSegment.ModelSegmentName;
+                string segmentName = ((TableCanvas)sender).ErdSegment.ModelSegmentName;
 
                 tableItem.SetErdCanvas(segmentName, segmentName.IsNullEmptyOrWhiteSpace());
             }
@@ -520,7 +1104,7 @@ namespace ERD.Viewer
         {
             try
             {
-                TableCanvas canvas = (TableCanvas) sender;
+                TableCanvas canvas = (TableCanvas)sender;
 
                 this.canvasDictionary[canvas.ErdSegment.ModelSegmentControlName].SegmentTables.Remove(tableModel);
 
@@ -530,7 +1114,7 @@ namespace ERD.Viewer
                     .Replace(' ', '_')
                     .Replace(".", string.Empty);
 
-                TableMenuItem tableItem = tables.FirstOrDefault(t => ((TableMenuItem) t).Name == itemName) as TableMenuItem;
+                TableMenuItem tableItem = tables.FirstOrDefault(t => ((TableMenuItem)t).Name == itemName) as TableMenuItem;
 
                 if (tableItem != null)
                 {
@@ -547,7 +1131,7 @@ namespace ERD.Viewer
         {
             try
             {
-                TableMenuItem item = (TableMenuItem) sender;
+                TableMenuItem item = (TableMenuItem)sender;
 
                 if (item.ErdCanvas.IsNullEmptyOrWhiteSpace())
                 {
@@ -556,7 +1140,7 @@ namespace ERD.Viewer
 
                 this.uxTabControl.SetActive(item.ErdCanvas);
 
-                TableCanvas tab = (TableCanvas) this.uxTabControl[item.ErdCanvas];
+                TableCanvas tab = (TableCanvas)this.uxTabControl[item.ErdCanvas];
 
                 TableModel table = tab[item.TableName];
 
@@ -569,104 +1153,14 @@ namespace ERD.Viewer
             }
         }
 
-        private void ScriptBuildRun_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (BuildScript.Setup == null)
-                {
-                    MessageBox.Show("Setup required");
-
-                    return;
-                }
-
-                BuildClasses builder = new BuildClasses();
-
-                builder.ScriptFiles(this.canvasDictionary.Values.ToArray(), this.Dispatcher);
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
-
-        private void ScriptBuildSetup_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (this.canvasDictionary == null ||
-                    this.canvasDictionary.Count == 0 ||
-                    this.canvasDictionary.First().Value.SegmentTables == null ||
-                    this.canvasDictionary.First().Value.SegmentTables.Count == 0 ||
-                    this.canvasDictionary.First().Value.SegmentTables[0].Columns == null ||
-                    this.canvasDictionary.First().Value.SegmentTables[0].Columns.Length == 0)
-                {
-                    throw new ApplicationException("You need at least one Canvas, with at least one Table and some Columns to use this function.");
-                }
-
-                BuildSetup setup = new BuildSetup(this.canvasDictionary.First().Value, this.canvasDictionary.Values.ToList());
-
-                setup.ShowDialog();
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
-
         private void ProjectFiles_Changed(object sender, string fullPathName, ErdCanvasModel changedModel)
         {
             this.LoadModelChanges(changedModel, fullPathName);
         }
-        
+
         private void ProjectLocks_Changed(object sender, string fullPathName, FileSystemEventArgs e)
         {
             this.SetLocks(fullPathName);
-        }
-
-        private void ReportSystemSetup_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ReportSystemSetup setup = new ReportSystemSetup(General.ProjectModel.FileDirectory);
-
-                if (ControlDialog.ShowDialog("Setup", setup, "Save", autoSize:true).IsFalse())
-                {
-                    return;
-                }
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
-
-        private void SelectReport_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ReportSelector selector = new ReportSelector(General.ProjectModel.FileDirectory);
-
-                ControlDialog.Show("Reports", selector, string.Empty, showOkButton: false);
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
-
-        private void About_Click(object sender, RoutedEventArgs e)
-        {
-            try
-			{
-                About about = new About();
-
-                ControlDialog.ShowDialog("About", about, string.Empty, showCancelButton: false, autoSize: true);
-			}
-            catch (Exception err)
-			{
-                MessageBox.Show(err.InnerExceptionMessage());
-			}
         }
 
         private void ReleaseNotes_Click(object sender, RoutedEventArgs e)
@@ -704,9 +1198,9 @@ namespace ERD.Viewer
                 }
                 else
                 {
-					#region Version check passed and normal install updates process
+                    #region Version check passed and normal install updates process
 
-					string message = $"Would you like to Download and Install version {VersionManager.ServerVersion} now?";
+                    string message = $"Would you like to Download and Install version {VersionManager.ServerVersion} now?";
 
                     if (MessageBox.Show(message, "New Version", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                     {
@@ -744,7 +1238,7 @@ namespace ERD.Viewer
 
                     _ = version.DownloadAndInstallUpdatesAsyn(Application.Current.Dispatcher);
 
-					#endregion
+                    #endregion
                 }
             }
             catch (Exception err)
@@ -777,6 +1271,10 @@ namespace ERD.Viewer
             Application.Current.Shutdown();
         }
 
+        #endregion
+
+        #region PRIVATE ASYNC METHODS
+
         private async void ReverseEngineer(object sender)
         {
             try
@@ -789,7 +1287,7 @@ namespace ERD.Viewer
                     {
                         this.Dispatcher.Invoke(() =>
                         {
-                            Connections.Instance.SetConnection((MenuItem) sender, true);
+                            Connections.Instance.SetConnection((MenuItem)sender, true);
                         });
 
                         ReverseEngineer reverse = new ReverseEngineer(this.Dispatcher);
@@ -845,7 +1343,7 @@ namespace ERD.Viewer
                             foreach (TableModel table in segment.SegmentTables)
                             {
                                 table.PrimaryKeyClusterConstraintName = reverse.GetTablePrimaryKeyCluster(table.TableName);
-                                
+
                                 if (!tableAndColumns.ContainsKey(table.TableName))
                                 {   // The table is on the canvas but not in the database
                                     // New table, or exists in the default DB but not in the connection DB
@@ -863,8 +1361,8 @@ namespace ERD.Viewer
                                         if (!segment.IsLocked && tableColumn.AreEqual(databaseColumn, skipCompareRead).IsFalse())
                                         {   // This runs slow as it is so we try not to perform unnecessary dispatcher work
                                             // Lock canvas
-                                            this.Dispatcher.Invoke(() => 
-                                            { 
+                                            this.Dispatcher.Invoke(() =>
+                                            {
                                                 segment.SetLock(true, true);
                                             });
                                         }
@@ -981,7 +1479,7 @@ namespace ERD.Viewer
                     tablesList.AddRange(canvas.SegmentTables);
                 }
 
-                foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => !((TableMenuItem) t).TableModelObject.IsDeleted))
+                foreach (TableMenuItem menuItem in this.uxTableStack.FindVisualControls(typeof(TableMenuItem)).Where(t => !((TableMenuItem)t).TableModelObject.IsDeleted))
                 {
                     if (!tablesList.Any(ta => ta.TableName == menuItem.TableName))
                     {
@@ -1115,7 +1613,7 @@ namespace ERD.Viewer
                             string[] fileData = File.ReadAllLines(fileInfo.FullName);
 
                             ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
-                                
+
                             segment.SetLock(false, false);
 
                             EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", segment.ModelSegmentControlName);
@@ -1235,6 +1733,163 @@ namespace ERD.Viewer
 
         }
 
+        private async void LoadModelChanges(ErdCanvasModel changedModel, string fullPathName)
+        {
+            try
+            {
+                await Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        if (!this.canvasDictionary.ContainsKey(changedModel.ModelSegmentName))
+                        {
+                            EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", changedModel.ModelSegmentControlName);
+
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                int activeTabIndex = this.uxTabControl.SelectedIndex;
+
+                                this.AddCanvasObject(changedModel);
+
+                                this.uxTabControl.SetActive(activeTabIndex);
+                            });
+                        }
+                        else
+                        {
+                            TableCanvas canvas = this.uxTabControl.Items
+                                .FirstOrDefault(cn => ((TableCanvas)cn).ErdSegment.ModelSegmentControlName == changedModel.ModelSegmentControlName)
+                                .To<TableCanvas>();
+
+                            canvas.RefreshModel(changedModel);
+                        }
+                    }
+                    catch (Exception err)
+                    {
+
+                    }
+
+                });
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+
+            this.SetLocks(fullPathName);
+        }
+
+        private async void SetLocks(string fullPathName)
+        {
+            try
+            {
+                await Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        List<string> lockedFiles = CanvasLocks.Instance.GetLockedFiles();
+
+                        foreach (TableCanvas canvas in this.uxTabControl.Items)
+                        {
+                            canvas.CheckLockStatus(lockedFiles);
+                        }
+                    }
+                    catch (Exception err)
+                    {
+
+                    }
+                });
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+            finally
+            {
+                // The initial lock was set in
+                // ERD.FileManagement.CanvasLocksListener
+                // private void File_Changed(object sender, FileSystemEventArgs e)
+                lock (CanvasLocks.Instance.IgnoreFiles)
+                {
+                    CanvasLocks.Instance.IgnoreFiles.Remove(fullPathName);
+                }
+            }
+        }
+
+        private async Task SetTitleAsync()
+        {
+            try
+            {
+                string thisVersion = General.GetProductVersion("ViSo.Viewer");
+
+                Title = General.ProjectModel == null
+                    ? $"ViSo-nice (Version {thisVersion})"
+                    : $"ViSo-nice (Version {thisVersion}) - {General.ProjectModel.ModelName}";
+
+                VersionManager version = new VersionManager();
+
+                if (await version.HaveUpdatesAsync(thisVersion))
+                {
+                    if (VersionManager.CheckForUpdatesFailed)
+                    {
+                        this.uxInstallUpdates.Content = "Updates Failed";
+                    }
+
+                    this.uxInstallUpdates.Visibility = Visibility.Visible;
+                    this.uxInstallUpdates.StartAnimation();
+
+                    await Task.Delay(TimeSpan.FromSeconds(10));
+
+                    this.uxInstallUpdates.EndAnimation();
+                }
+            }
+            catch
+            {
+                Title = General.ProjectModel == null
+                    ? "ViSo-nice"
+                    : $"ViSo-nice - {General.ProjectModel.ModelName}";
+            }
+        }
+
+        #endregion
+
+        #region PRIVATE METHODS
+
+        private bool DiscardPendingChanges()
+        {
+            IReadOnlyList<GitFileStatus> changes = ERDGit.GetStatus(General.ProjectModel.FileDirectory);
+
+            if (changes.Count > 0)
+            {
+                string complexMessage = "There are pending changes in your current branch.\n\n" +
+                    "Selecting Yes will permanently discard these changes and continue " +
+                    "checking out the new branch.\n\n" +
+                    "Selecting No will cancel the checkout and keep you on the current branch.\n\n" +
+                    "Do you want to discard the pending changes?";
+
+                MessageBoxResult changeResult = MessageBox.Show(complexMessage, "Pending Changes", MessageBoxButton.YesNo);
+
+                if (changeResult == MessageBoxResult.No)
+                {
+                    return false;
+                }
+
+                ERDGit.DiscardChanges(General.ProjectModel.FileDirectory);
+
+            }
+
+            return true;
+        }
+
+        private void ReloadProject()
+        {
+            this.uxTabControl.ClearItems();
+            this.canvasDictionary.Clear();
+            this.connectionsInMenue.Clear();
+            
+            string projectFileName = Directory.GetFiles(General.ProjectModel.FileDirectory, $"*.{FileTypes.eprj}", SearchOption.AllDirectories).FirstOrDefault();
+            this.OpenProject(projectFileName);
+        }
+
         private void SaveModel()
         {
             string saveFileFullName = Path.Combine(General.ProjectModel.FileDirectory, $"{General.ProjectModel.ModelName}.{FileTypes.eprj}");
@@ -1281,6 +1936,9 @@ namespace ERD.Viewer
 
             Connections.Instance.DefaultDatabaseModel.IsEncrypted = true;
 
+            // Do this to prevent leaking of sensitive information
+            Connections.Instance.DefaultDatabaseModel.HasModelChanged = false; 
+
             project.AppendLine(JsonConvert.SerializeObject(Connections.Instance.DefaultDatabaseModel));
 
             Connections.Instance.DefaultDatabaseModel.Password = Connections.Instance.DefaultDatabaseModel.Password.Decrypt();
@@ -1292,6 +1950,9 @@ namespace ERD.Viewer
                 connectionKey.Value.Password = connectionKey.Value.Password.Encrypt();
 
                 connectionKey.Value.IsEncrypted = true;
+
+                // Do this to prevent leaking of sensitive information
+                connectionKey.Value.HasModelChanged = false;
 
                 project.AppendLine(JsonConvert.SerializeObject(connectionKey.Value));
 
@@ -1345,11 +2006,54 @@ namespace ERD.Viewer
 
             this.uxMenuProject.IsEnabled = true;
 
+            this.uxMenuGit.IsEnabled = true;
+
             this.uxMenuDatabase.IsEnabled = true;
 
             this.uxMenuBuild.IsEnabled = true;
 
             this.uxMenuReport.IsEnabled = true;
+
+            this.SetGitMenu();
+        }
+
+        private void SetGitMenu()
+        {
+            string fileDir = General.ProjectModel.FileDirectory;
+            bool haveGit = ERDGit.IsRepository(fileDir);
+
+            this.uxCloneRepository.IsEnabled = !haveGit;
+
+            this.uxCommit.IsEnabled = haveGit;
+
+            this.uxFetch.IsEnabled = haveGit;
+            this.uxPull.IsEnabled = haveGit;
+            this.uxPush.IsEnabled = haveGit;
+            this.uxPendingChanges.IsEnabled = haveGit;
+
+            this.uxNewBranch.IsEnabled = haveGit;
+            this.uxChangeBranch.IsEnabled = haveGit;
+            this.uxResolveConflicts.IsEnabled = haveGit;
+            this.uxViewBranchHistory.IsEnabled = haveGit;
+            this.uxManageBranches.IsEnabled = haveGit;
+
+            this.uxOpenInBrowser.IsEnabled = haveGit;
+
+            if (haveGit)
+            {
+                this.SetBranchNameMessage(fileDir);
+            }
+        }
+
+        private void SetBranchNameMessage(string fileDir)
+        {
+            GitBranchInfo info = ERDGit.GetCurrentBranch(fileDir);
+
+            this.uxGitBranch.Content = $"Branch: {info.Name}";
+
+            int conflicts = ERDGit.GetConflicts(fileDir).Count;
+
+            this.uxResolveConflicts.Header = conflicts > 0 ? $"Resolve Conflicts ({conflicts})" : "Resolve Conflicts";
         }
 
         private void LoadConnectionsMenue()
@@ -1366,13 +2070,13 @@ namespace ERD.Viewer
                 {
                     this.connectionsInMenue.Add(Connections.Instance.DefaultConnectionName);
 
-                    MenuItem defaultReverseItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
+                    MenuItem defaultReverseItem = new MenuItem { Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName };
 
-                    MenuItem defaultRefreshItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
+                    MenuItem defaultRefreshItem = new MenuItem { Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName };
 
-                    MenuItem defaultCompareItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
+                    MenuItem defaultCompareItem = new MenuItem { Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName };
 
-                    MenuItem defaultForwardItem = new MenuItem {Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName};
+                    MenuItem defaultForwardItem = new MenuItem { Header = $"{Connections.Instance.DefaultConnectionName} ({Connections.Instance.DefaultDatabaseName})", Tag = Connections.Instance.DefaultConnectionName };
 
                     defaultReverseItem.Click += this.GetDbTables_Click;
 
@@ -1398,13 +2102,13 @@ namespace ERD.Viewer
 
                     this.connectionsInMenue.Add(connectionKey.Key);
 
-                    MenuItem reverseItem = new MenuItem {Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key};
+                    MenuItem reverseItem = new MenuItem { Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key };
 
-                    MenuItem refreshItem = new MenuItem {Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key};
+                    MenuItem refreshItem = new MenuItem { Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key };
 
-                    MenuItem compareItem = new MenuItem {Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key};
+                    MenuItem compareItem = new MenuItem { Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key };
 
-                    MenuItem forwardItem = new MenuItem {Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key};
+                    MenuItem forwardItem = new MenuItem { Header = $"{connectionKey.Key} ({connectionKey.Value.DatabaseName})", Tag = connectionKey.Key };
 
                     reverseItem.Click += this.GetDbTables_Click;
 
@@ -1432,7 +2136,7 @@ namespace ERD.Viewer
 
             this.canvasDictionary.Add(segment.ModelSegmentControlName, segment);
 
-            TableCanvas canvas = new TableCanvas(segment, Connections.Instance.DatabaseModel) {Name = segment.ModelSegmentControlName, Title = segment.ModelSegmentName};
+            TableCanvas canvas = new TableCanvas(segment, Connections.Instance.DatabaseModel) { Name = segment.ModelSegmentControlName, Title = segment.ModelSegmentName };
 
             canvas.TableAdded += this.CanvasTable_Added;
 
@@ -1452,21 +2156,21 @@ namespace ERD.Viewer
 
             UIElement[] tables = this.uxTableStack.FindVisualControls(typeof(TableMenuItem));
 
-            double maxWidth = tables.HasElements() ? tables.Max(m => ((TableMenuItem) m).DesiredNameWidth) : 0;
+            double maxWidth = tables.HasElements() ? tables.Max(m => ((TableMenuItem)m).DesiredNameWidth) : 0;
 
             foreach (TableModel tableItem in tablesList.OrderBy(n => n.SchemaName)
                                                        .ThenBy(t => t.TableName))
             {
                 string itemName = tableItem.TableName.MakeAlphaNumeric();
 
-                UIElement tableElement = tables.FirstOrDefault(t => ((TableMenuItem) t).Name == itemName);
+                UIElement tableElement = tables.FirstOrDefault(t => ((TableMenuItem)t).Name == itemName);
 
                 if (tableElement != null)
                 {
                     continue;
                 }
 
-                TableMenuItem item = new TableMenuItem(tableItem) {Name = itemName };
+                TableMenuItem item = new TableMenuItem(tableItem) { Name = itemName };
 
                 item.TableMenuItemDoubleClick += this.TableMenuItem_DoubleClick;
 
@@ -1486,13 +2190,13 @@ namespace ERD.Viewer
 
             foreach (UIElement menuItemElement in tables)
             {
-                ((TableMenuItem) menuItemElement).DesiredNameWidth = maxWidth;
+                ((TableMenuItem)menuItemElement).DesiredNameWidth = maxWidth;
             }
         }
 
         private void LoadToolsStack()
         {
-            TableMenuItem tableTool = new TableMenuItem(new TableModel {TableName = "Table", SchemaName = string.Empty, IsNewTable = true}) {Name = "Table"};
+            TableMenuItem tableTool = new TableMenuItem(new TableModel { TableName = "Table", SchemaName = string.Empty, IsNewTable = true }) { Name = "Table" };
 
             tableTool.TableMenuItemDoubleClick += this.TableMenuItem_DoubleClick;
 
@@ -1513,88 +2217,6 @@ namespace ERD.Viewer
             }
         }
 
-        private async void LoadModelChanges(ErdCanvasModel changedModel, string fullPathName)
-        {
-            try
-            {
-                await Task.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        if (!this.canvasDictionary.ContainsKey(changedModel.ModelSegmentName))
-                        {
-                            EventParser.ParseMessage(this, this.Dispatcher, "Adding Canvas", changedModel.ModelSegmentControlName);
-
-                            this.Dispatcher.Invoke(() =>
-                            {
-                                int activeTabIndex = this.uxTabControl.SelectedIndex;
-
-                                this.AddCanvasObject(changedModel);
-
-                                this.uxTabControl.SetActive(activeTabIndex);
-                            });
-                        }
-                        else
-                        {
-                            TableCanvas canvas = this.uxTabControl.Items
-                                .FirstOrDefault(cn => ((TableCanvas) cn).ErdSegment.ModelSegmentControlName == changedModel.ModelSegmentControlName)
-                                .To<TableCanvas>();
-
-                            canvas.RefreshModel(changedModel);
-                        }
-                    }
-                    catch (Exception err)
-                    {
-
-                    }
-                    
-                });
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-
-            this.SetLocks(fullPathName);
-        }
-
-        private async void SetLocks(string fullPathName)
-        {
-            try
-            {
-                await Task.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        List<string> lockedFiles = CanvasLocks.Instance.GetLockedFiles();
-
-                        foreach (TableCanvas canvas in this.uxTabControl.Items)
-                        {
-                            canvas.CheckLockStatus(lockedFiles);
-                        }
-                    }
-                    catch (Exception err)
-                    {
-
-                    }
-                });
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-            finally
-            {
-                // The initial lock was set in
-                // ERD.FileManagement.CanvasLocksListener
-                // private void File_Changed(object sender, FileSystemEventArgs e)
-                lock (CanvasLocks.Instance.IgnoreFiles)
-                {
-                    CanvasLocks.Instance.IgnoreFiles.Remove(fullPathName);
-                }
-            }
-        }
-
         private void SetForwardEngineerOptions(bool isEnabled)
         {
             if (this.uxForwardEngineer.Items == null || this.uxForwardEngineer.Items.Count == 0)
@@ -1602,7 +2224,7 @@ namespace ERD.Viewer
                 return;
             }
 
-            foreach(MenuItem item in this.uxForwardEngineer.Items)
+            foreach (MenuItem item in this.uxForwardEngineer.Items)
             {
                 if (item.Tag.ParseToString() == Connections.Instance.DefaultConnectionName)
                 {
@@ -1613,94 +2235,9 @@ namespace ERD.Viewer
             }
         }
 
-        // private async void SetTitle()
-        // {
-        //     await Task.Factory.StartNew(() =>
-        //     {
-        //         try
-        //         {
-        //             string thisVersion = General.GetProductVersion("ViSo.Viewer");
 
-        //             string resultText = General.ProjectModel == null ?
-        //             $"ViSo-nice (Version {thisVersion})" 
-        //             :
-        //             $"ViSo-nice (Version {thisVersion}) - {General.ProjectModel.ModelName}";
+        #endregion
 
-        //             this.Dispatcher.Invoke(() =>
-        //             {
-        //                 this.Title = resultText;
-        //             });
-
-        //             VersionManager version = new VersionManager();
-
-        //             if (await version.HaveUpdates(thisVersion))
-        //             {
-        //                 this.Dispatcher.Invoke(() =>
-        //                 {
-        //                     if (VersionManager.CheckForUpdatesFailed)
-        //{
-        //                         this.uxInstallUpdates.Content = "Updates Failed";
-        //                     }
-
-        //                     this.uxInstallUpdates.Visibility = Visibility.Visible;
-
-        //                     this.uxInstallUpdates.StartAnimation();
-        //                 });
-
-        //                 Sleep.ThreadWaitSeconds(10);
-
-        //                 this.Dispatcher.Invoke(() =>
-        //                 {
-        //                     this.uxInstallUpdates.EndAnimation();
-        //                 });
-        //             }
-        //         }
-        //         catch
-        //         {
-        //             this.Dispatcher.Invoke(() =>
-        //             {
-        //                 this.Title = General.ProjectModel == null ?
-        //                 "ViSo-nice"
-        //                 :
-        //                 $"ViSo-nice - {General.ProjectModel.ModelName}";
-        //             });
-        //         }
-        //     });
-        // }
-        private async Task SetTitleAsync()
-        {
-            try
-            {
-                string thisVersion = General.GetProductVersion("ViSo.Viewer");
-
-                Title = General.ProjectModel == null
-                    ? $"ViSo-nice (Version {thisVersion})"
-                    : $"ViSo-nice (Version {thisVersion}) - {General.ProjectModel.ModelName}";
-
-                VersionManager version = new VersionManager();
-
-                if (await version.HaveUpdatesAsync(thisVersion))
-                {
-                    if (VersionManager.CheckForUpdatesFailed)
-                    {
-                        this.uxInstallUpdates.Content = "Updates Failed";
-                    }
-
-                    this.uxInstallUpdates.Visibility = Visibility.Visible;
-                    this.uxInstallUpdates.StartAnimation();
-
-                    await Task.Delay(TimeSpan.FromSeconds(10));
-
-                    this.uxInstallUpdates.EndAnimation();
-                }
-            }
-            catch
-            {
-                Title = General.ProjectModel == null
-                    ? "ViSo-nice"
-                    : $"ViSo-nice - {General.ProjectModel.ModelName}";
-            }
-        }
-
+        
     }
 }

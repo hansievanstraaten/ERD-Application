@@ -63,8 +63,6 @@ namespace ERD.Build.Models
       }
     }
 
-
-
     [FieldInformationAttribute("Code", Sort = 5)]
     [BrowseButtonAttribute("EditCodeKey", "", "Edit")]
     public string Code

@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERD.DataExport", "ERD.DataE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERD.LegacyHelper", "ERD.LegacyHelper\ERD.LegacyHelper.csproj", "{6957E1EB-E361-4FC8-914A-739EA5DD46F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERD.Git", "ERD.Git\ERD.Git.csproj", "{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +193,14 @@ Global
 		{6957E1EB-E361-4FC8-914A-739EA5DD46F8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6957E1EB-E361-4FC8-914A-739EA5DD46F8}.Release|x64.ActiveCfg = Release|Any CPU
 		{6957E1EB-E361-4FC8-914A-739EA5DD46F8}.Release|x64.Build.0 = Release|Any CPU
+		{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}.Debug|x64.Build.0 = Debug|Any CPU
+		{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}.Release|x64.ActiveCfg = Release|Any CPU
+		{D8CA5930-080A-42EF-B558-BBFE0BEF62F6}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

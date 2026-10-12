@@ -36,6 +36,7 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="LibGit2Sharp" Version="0.32.0" />
     <PackageReference Include="MdXaml" Version="1.27.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.10" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
@@ -52,7 +53,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.87.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.90.1" />
     <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.22.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
@@ -71,6 +72,7 @@
     <ProjectReference Include="..\ERD.DatabaseScripts\ERD.DatabaseScripts.csproj" />
     <ProjectReference Include="..\ERD.DataExport\ERD.DataExport.csproj" />
     <ProjectReference Include="..\ERD.FileManagement\ERD.FileManagement.csproj" />
+    <ProjectReference Include="..\ERD.Git\ERD.Git.csproj" />
     <ProjectReference Include="..\ERD.LegacyHelper\ERD.LegacyHelper.csproj" />
     <ProjectReference Include="..\ERD.Models\ERD.Models.csproj" />
     <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />

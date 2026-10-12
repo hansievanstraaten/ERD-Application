@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibGit2Sharp" Version="0.32.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ERD.Common\ERD.Common.csproj" />
+    <ProjectReference Include="..\GeneralExtensions\GeneralExtensions.csproj" />
+    <ProjectReference Include="..\WPF.Tools\WPF.Tools.csproj" />
+  </ItemGroup>
+
+</Project>

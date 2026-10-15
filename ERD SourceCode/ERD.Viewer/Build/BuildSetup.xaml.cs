@@ -3,6 +3,7 @@ using ERD.Build;
 using ERD.Build.Models;
 using ERD.Models;
 using GeneralExtensions;
+using Microsoft.FSharp.Core;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
@@ -32,36 +33,36 @@ namespace ERD.Viewer.Build
 
         // Lightweight placeholder used to defer creation of heavy BuildOption controls
         // Must derive from UserControlBase because uxTabs.Items is a TabItemsCollection (ObservableCollection<UserControlBase>)
-        private class BuildOptionPlaceholder : UserControlBase
-        {
-            public OptionSetupModel OptionSetup { get; set; } = new OptionSetupModel();
-            public List<ErdCanvasModel> AllErdCanvases { get; set; }
-            public ErdCanvasModel SampleCanvas { get; set; }
-            public TableModel SelectedTable { get; set; }
+        //private class BuildOptionPlaceholder : UserControlBase
+        //{
+        //    public OptionSetupModel OptionSetup { get; set; } = new OptionSetupModel();
+        //    public List<ErdCanvasModel> AllErdCanvases { get; set; }
+        //    public ErdCanvasModel SampleCanvas { get; set; }
+        //    public TableModel SelectedTable { get; set; }
 
-            public BuildOptionPlaceholder()
-            {
-                // Provide a minimal visual so TabControl can display something inexpensive
-                this.Content = new Grid
-                {
-                    Margin = new Thickness(8),
-                    Children =
-                    {
-                        new TextBlock
-                        {
-                            Text = "Loading...",
-                            VerticalAlignment = VerticalAlignment.Center,
-                            HorizontalAlignment = HorizontalAlignment.Center,
-                            Opacity = 0.5
-                        }
-                    }
-                };
+        //    public BuildOptionPlaceholder()
+        //    {
+        //        // Provide a minimal visual so TabControl can display something inexpensive
+        //        this.Content = new Grid
+        //        {
+        //            Margin = new Thickness(8),
+        //            Children =
+        //            {
+        //                new TextBlock
+        //                {
+        //                    Text = "Loading...",
+        //                    VerticalAlignment = VerticalAlignment.Center,
+        //                    HorizontalAlignment = HorizontalAlignment.Center,
+        //                    Opacity = 0.5
+        //                }
+        //            }
+        //        };
 
-                // default values for tab header behavior
-                this.ShowCloseButton = true;
-                this.Title = "Loading";
-            }
-        }
+        //        // default values for tab header behavior
+        //        this.ShowCloseButton = true;
+        //        this.Title = "Loading";
+        //    }
+        //}
 
         public BuildSetup(ErdCanvasModel sampleCanvas, List<ErdCanvasModel> allErdCanvases)
         {
@@ -215,10 +216,14 @@ namespace ERD.Viewer.Build
                     {
                         bo.SelectedTable = this.selectedTable;
                     }
-                    else if (item is BuildOptionPlaceholder ph)
+                    else
                     {
-                        ph.SelectedTable = this.selectedTable;
+                        throw new InvalidOperationException($"Unexpected tab item type: {item.GetType().FullName}. Expected BuildOption or BuildOptionPlaceholder.");
                     }
+                    //else if (item is BuildOptionPlaceholder ph)
+                    //{
+                    //    ph.SelectedTable = this.selectedTable;
+                    //}
                 }
 
             }
@@ -237,18 +242,15 @@ namespace ERD.Viewer.Build
                     return;
                 }
 
-                // Create placeholder only — defer heavy BuildOption construction
-                var placeholder = new BuildOptionPlaceholder
+                BuildOption option = new BuildOption(this.canvas, this.allErdCanvasModels)
                 {
-                    SampleCanvas = this.canvas,
-                    AllErdCanvases = this.allErdCanvasModels,
                     Title = InputBox.Result,
+                    OptionSetup = new OptionSetupModel { OptionModelName = InputBox.Result },
                     ShowCloseButton = true,
-                    SelectedTable = this.selectedTable,
-                    OptionSetup = new OptionSetupModel { OptionModelName = InputBox.Result }
+                    SelectedTable = this.selectedTable
                 };
 
-                this.uxTabs.Items.Add(placeholder);
+                this.uxTabs.Items.Add(option);
             }
             catch (Exception err)
             {
@@ -276,17 +278,27 @@ namespace ERD.Viewer.Build
         private void SetTab(OptionSetupModel optionModel)
         {
             // Add a lightweight placeholder; the actual BuildOption is created only when needed
-            var placeholder = new BuildOptionPlaceholder
+            //BuildOptionPlaceholder placeholder = new BuildOptionPlaceholder
+            //{
+            //    SampleCanvas = this.canvas,
+            //    AllErdCanvases = this.allErdCanvasModels,
+            //    Title = optionModel.OptionModelName,
+            //    OptionSetup = optionModel,
+            //    ShowCloseButton = true,
+            //    SelectedTable = this.selectedTable
+            //};
+
+            //this.uxTabs.Items.Add(placeholder);
+
+            BuildOption option = new BuildOption(this.canvas, this.allErdCanvasModels)
             {
-                SampleCanvas = this.canvas,
-                AllErdCanvases = this.allErdCanvasModels,
                 Title = optionModel.OptionModelName,
                 OptionSetup = optionModel,
                 ShowCloseButton = true,
                 SelectedTable = this.selectedTable
             };
 
-            this.uxTabs.Items.Add(placeholder);
+            this.uxTabs.Items.Add(option);
 
             if (this.uxTabs.Content != null)
             { 
@@ -322,10 +334,14 @@ namespace ERD.Viewer.Build
                 {
                     BuildScript.Setup.BuildOptions.Add(bo.OptionSetup);
                 }
-                else if (item is BuildOptionPlaceholder ph)
+                else
                 {
-                    BuildScript.Setup.BuildOptions.Add(ph.OptionSetup);
+                    throw new InvalidOperationException($"Unexpected tab item type: {item.GetType().FullName}. Expected BuildOption or BuildOptionPlaceholder.");                    
                 }
+                //else if (item is BuildOptionPlaceholder ph)
+                //{
+                //    BuildScript.Setup.BuildOptions.Add(ph.OptionSetup);
+                //}
             }
         }
 
@@ -371,49 +387,49 @@ namespace ERD.Viewer.Build
                 return; // already created
             }
 
-            if (item is BuildOptionPlaceholder ph)
-            {
-                try
-                {
-                    // Construct the heavy control on the UI thread so bindings/layout happen correctly
-                    BuildOption option = new BuildOption(ph.SampleCanvas ?? this.canvas, ph.AllErdCanvases ?? this.allErdCanvasModels)
-                    {
-                        Title = ph.Title,
-                        OptionSetup = ph.OptionSetup,
-                        ShowCloseButton = ph.ShowCloseButton,
-                        SelectedTable = ph.SelectedTable
-                    };
+            //if (item is BuildOptionPlaceholder ph)
+            //{
+            //    try
+            //    {
+            //        // Construct the heavy control on the UI thread so bindings/layout happen correctly
+            //        BuildOption option = new BuildOption(ph.SampleCanvas ?? this.canvas, ph.AllErdCanvases ?? this.allErdCanvasModels)
+            //        {
+            //            Title = ph.Title,
+            //            OptionSetup = ph.OptionSetup,
+            //            ShowCloseButton = ph.ShowCloseButton,
+            //            SelectedTable = ph.SelectedTable
+            //        };
 
-                    // Replace placeholder with real control at the same index while preserving order
-                    int replaceIndex = this.uxTabs.Items.IndexOf(ph);
+            //        // Replace placeholder with real control at the same index while preserving order
+            //        int replaceIndex = this.uxTabs.Items.IndexOf(ph);
 
-                    //this.uxTabs.Content = option;
+            //        //this.uxTabs.Content = option;
 
-                    if (replaceIndex < 0)
-                    {
-                        // fallback: append
-                        this.uxTabs.Items.Add(option);
-                        this.uxTabs.SetActive(this.uxTabs.Items.Count - 1);
-                    }
-                    else
-                    {
-                        // remove placeholder and insert the real option at same index
-                        //this.uxTabs.Items.RemoveAt(replaceIndex);
-                        //this.uxTabs.Items.Insert(replaceIndex, option);
-                        this.uxTabs.Items[replaceIndex].Content = option;
+            //        if (replaceIndex < 0)
+            //        {
+            //            // fallback: append
+            //            this.uxTabs.Items.Add(option);
+            //            this.uxTabs.SetActive(this.uxTabs.Items.Count - 1);
+            //        }
+            //        else
+            //        {
+            //            // remove placeholder and insert the real option at same index
+            //            //this.uxTabs.Items.RemoveAt(replaceIndex);
+            //            //this.uxTabs.Items.Insert(replaceIndex, option);
+            //            this.uxTabs.Items[replaceIndex].Content = option;
 
-                        this.uxTabs.OnTabSelected -= this.UxTabs_OnTabSelected;
-                        // make sure the replaced tab becomes active
-                        this.uxTabs.SetActive(replaceIndex);
+            //            this.uxTabs.OnTabSelected -= this.UxTabs_OnTabSelected;
+            //            // make sure the replaced tab becomes active
+            //            this.uxTabs.SetActive(replaceIndex);
 
-                        this.uxTabs.OnTabSelected += this.UxTabs_OnTabSelected;
-                    }
-                }
-                catch (Exception err)
-                {
-                    MessageBox.Show(err.InnerExceptionMessage());
-                }
-            }
+            //            this.uxTabs.OnTabSelected += this.UxTabs_OnTabSelected;
+            //        }
+            //    }
+            //    catch (Exception err)
+            //    {
+            //        MessageBox.Show(err.InnerExceptionMessage());
+            //    }
+            //}
         }
 
         private void UxTabs_OnTabSelected(object sender, int itemIndex)

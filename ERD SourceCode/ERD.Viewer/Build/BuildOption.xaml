@@ -36,7 +36,10 @@
 
                 <ModelViewer:ModelViewer Grid.Row="0" Grid.Column="0"  x:Name="uxOptionSetup" ModelViewItemBrowse="OptionSetup_Browse" />
 
-                <ModelViewer:ModelViewer Grid.Row="1" Grid.Column="0" x:Name="uxBuildTypes" ModelViewItemBrowse="BuildTypes_Browse" />
+                <!--<ModelViewer:ModelViewer Grid.Row="1" Grid.Column="0" x:Name="uxBuildTypes" ModelViewItemBrowse="BuildTypes_Browse" />-->
+                <StackPanel Grid.Row="1" Grid.Column="0" x:Name="uxBuildTypes">
+                    
+                </StackPanel>
 
             </Grid>
         </ScrollViewer>

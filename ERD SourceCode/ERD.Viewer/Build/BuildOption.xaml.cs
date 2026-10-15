@@ -6,6 +6,7 @@ using GeneralExtensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using ViSo.Dialogs.Input;
 using WPF.Tools.BaseClasses;
@@ -56,7 +57,7 @@ namespace ERD.Viewer.Build
 
                 if (this.IsLoaded)
 				{
-                    this.LoadSampleScript();
+                    _ = this.LoadSampleScriptAsync();
 				}
 			}
         }
@@ -82,7 +83,7 @@ namespace ERD.Viewer.Build
                 {
                     if (this.SelectedTable.TableName != this.lastLoadTableName)
 					{
-                        this.LoadSampleScript();
+                        _ = this.LoadSampleScriptAsync();
 					}
 
                     return;
@@ -103,14 +104,14 @@ namespace ERD.Viewer.Build
 
                 foreach (BuildTypeModel buildType in this.OptionSetup.BuildTypes)
                 {
-                    this.uxBuildTypes.Items.Add(buildType);
+                    BuildTypeControl control = new BuildTypeControl(buildType);
 
-                    this.uxBuildTypes[buildType.BuildTypeIndex].Header = $"{buildType.BuildTypeName} = [[{buildType.BuildTypeIndex}]]";
+                    this.uxBuildTypes.Children.Add(control);
 
                     buildType.PropertyChanged += this.BuildType_Changed;
                 }
 
-                this.LoadSampleScript();
+                _ = this.LoadSampleScriptAsync();
 
                 base.WasFirstLoaded = true;
             }
@@ -156,9 +157,9 @@ namespace ERD.Viewer.Build
 
                 this.OptionSetup.BuildTypes = this.OptionSetup.BuildTypes.Add(buildType);
 
-                this.uxBuildTypes.Items.Add(buildType);
+                BuildTypeControl control = new BuildTypeControl(buildType);
 
-                this.uxBuildTypes[buildType.BuildTypeIndex].Header = $"{InputBox.Result} = [[{buildType.BuildTypeIndex}]]";
+                this.uxBuildTypes.Children.Add(control);
 
                 buildType.PropertyChanged += this.BuildType_Changed;
             }
@@ -168,11 +169,11 @@ namespace ERD.Viewer.Build
             }
         }
 
-        private void BuildType_Changed(object sender, PropertyChangedEventArgs e)
+        private async void BuildType_Changed(object sender, PropertyChangedEventArgs e)
         {
             if (this.IsLoaded)
             {
-                this.LoadSampleScript();
+                await this.LoadSampleScriptAsync();
             }
         }
 
@@ -195,29 +196,6 @@ namespace ERD.Viewer.Build
 
                         break;
                 }
-            }
-            catch (Exception err)
-            {
-                MessageBox.Show(err.InnerExceptionMessage());
-            }
-        }
-
-        private void BuildTypes_Browse(object sender, string buttonKey)
-        {
-            try
-            {
-                ModelViewObject viewObject = (ModelViewObject) sender;
-
-                TextEditor editor = new TextEditor("Code", viewObject["Code"].GetValue().ParseToString());
-
-                if (editor.ShowDialog().IsFalse())
-                {
-                    return;
-                }
-
-                viewObject["Code"].SetValue(editor.Text);
-
-                viewObject["Code"].Focus();
             }
             catch (Exception err)
             {
@@ -260,6 +238,11 @@ namespace ERD.Viewer.Build
             }
         }
     
+        private async Task LoadSampleScriptAsync()
+        {
+            await Task.Run(() => this.LoadSampleScript());
+        }
+
         private void LoadSampleScript()
 		{
             try
@@ -268,27 +251,31 @@ namespace ERD.Viewer.Build
 
                 this.lastLoadTableName = this.SelectedTable.TableName;
 
+                string result = string.Empty;
+
                 switch (this.OptionSetup.RepeatOption)
                 {
                     case RepeatOptionEnum.ForeachCanvas:
 
-                        this.uxSampleScript.Text = this.scripting.BuildSampleForeachCanvasScript(this.SelectedCanvas, this.allErdCanvasModels, this.OptionSetup);
+                        result = this.scripting.BuildSampleForeachCanvasScript(this.SelectedCanvas, this.allErdCanvasModels, this.OptionSetup);
 
                         break;
 
                     case RepeatOptionEnum.ForeachTableProject:
 
-                        this.uxSampleScript.Text = this.scripting.BuildSampleForeachTableScript(this.SelectedCanvas, this.allErdCanvasModels, this.SelectedTable, this.OptionSetup);
+                        result = this.scripting.BuildSampleForeachTableScript(this.SelectedCanvas, this.allErdCanvasModels, this.SelectedTable, this.OptionSetup);
 
                         break;
 
                     case RepeatOptionEnum.SingleFile:
 
-                        this.uxSampleScript.Text = this.scripting.BuildSingleFile(this.OptionSetup);
+                        result = this.scripting.BuildSingleFile(this.OptionSetup);
 
                         break;
 
                 }
+
+                Dispatcher.Invoke(() => this.uxSampleScript.Text = result);
 
             }
             catch (Exception err)

@@ -98,7 +98,6 @@ namespace ERD.Build.Models
       }
     }
 
-
     public BuildTypeModel[] BuildTypes
     {
       get

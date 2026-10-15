@@ -1674,11 +1674,14 @@ namespace ERD.Viewer
 
                 this.SetLocks(string.Empty);
 
-                (bool isResolved, bool requireReload) = this.CheckConfilcts();
-
-                if (requireReload)
+                if (ERDGit.IsRepository(General.ProjectModel.FileDirectory))
                 {
-                    this.ReloadProject();
+                    (bool isResolved, bool requireReload) = this.CheckConfilcts();
+
+                    if (requireReload)
+                    {
+                        this.ReloadProject();
+                    }
                 }
             }
             catch (Exception err)
@@ -2024,6 +2027,8 @@ namespace ERD.Viewer
 
             this.uxOpenProject.IsEnabled = false;
 
+            this.uxCloneRepository.IsEnabled = false;
+
             this.uxMenuSaveProject.IsEnabled = true;
 
             this.uxMenuProject.IsEnabled = true;
@@ -2044,8 +2049,6 @@ namespace ERD.Viewer
             string fileDir = General.ProjectModel.FileDirectory;
             bool haveGit = ERDGit.IsRepository(fileDir);
 
-            this.uxCloneRepository.IsEnabled = !haveGit;
-
             this.uxCommit.IsEnabled = haveGit;
 
             this.uxFetch.IsEnabled = haveGit;
@@ -2054,6 +2057,7 @@ namespace ERD.Viewer
             this.uxPendingChanges.IsEnabled = haveGit;
 
             this.uxNewBranch.IsEnabled = haveGit;
+            this.uxGetRemoteBranch.IsEnabled = haveGit;
             this.uxChangeBranch.IsEnabled = haveGit;
             this.uxResolveConflicts.IsEnabled = haveGit;
             this.uxViewBranchHistory.IsEnabled = haveGit;
@@ -2286,7 +2290,5 @@ namespace ERD.Viewer
 
 
         #endregion
-
-        
     }
 }

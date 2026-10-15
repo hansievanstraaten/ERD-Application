@@ -1,7 +1,7 @@
 ﻿using WPF.Tools.Attributes;
 using WPF.Tools.BaseClasses;
 
-namespace ERD.Git.Models
+namespace ERD.Git.Models.GitModels
 {
     [ModelNameAttribute("Clone Repository")]
     public sealed class GitCloneRequestModel : ModelsBase

@@ -1,4 +1,4 @@
-﻿using ERD.Git.Models;
+﻿using ERD.Git.Models.GitModels;
 using LibGit2Sharp;
 using System.Diagnostics;
 
@@ -11,6 +11,14 @@ namespace ERD.Git
     /// </summary>
     public static class ERDGit
     {
+        #region CONSTATNS
+        public const string HEAD = "<<<<<<< HEAD";
+        public const string MERGE = "=======";
+        public const string END = ">>>>>>>";
+        public const string Base = "|||||||";
+
+        #endregion
+
         #region REPOSITORY
 
         /// <summary>
@@ -386,6 +394,12 @@ namespace ERD.Git
         {
             using Repository repo = Open(repositoryPath);
 
+            if (repo.Info.CurrentOperation != CurrentOperation.None)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot pull while repository operation '{repo.Info.CurrentOperation}' is in progress.");
+            }
+
             Signature signature = CreateSignature(identity);
 
             PullOptions options = new PullOptions
@@ -405,13 +419,10 @@ namespace ERD.Git
                 signature,
                 options);
 
-            List<string?> conflictedFiles = repo.Index.Conflicts
-                .Select(conflict => conflict.Ours?.Path
-                    ?? conflict.Theirs?.Path
-                    ?? conflict.Ancestor?.Path)
-                .Where(path => path != null)
-                .Distinct()
-                .ToList();
+            List<string> conflictedFiles = GetConflictPaths(repo);
+
+            if (conflictedFiles.Count > 0)
+                repo.Index.Write();
 
             return new PullResult
             {
@@ -618,15 +629,23 @@ namespace ERD.Git
         {
             using Repository repo = Open(repositoryPath);
 
-            List<string?> conflictedFiles = repo.Index.Conflicts
-                .Select(conflict => conflict.Ours?.Path
-                    ?? conflict.Theirs?.Path
-                    ?? conflict.Ancestor?.Path)
-                .Where(path => path != null)
-                .Distinct()
+            return GetConflictPaths(repo)
+                .Select(path => (string?)path)
                 .ToList();
+        }
 
-            return conflictedFiles;//.Where(path => path != null).Select(path => path!).ToList();
+        public static GitRepositoryState GetRepositoryState(string repositoryPath)
+        {
+            using Repository repo = Open(repositoryPath);
+
+            List<string> conflictedFiles = GetConflictPaths(repo);
+
+            return new GitRepositoryState
+            {
+                CurrentOperation = repo.Info.CurrentOperation.ToString(),
+                IsOperationInProgress = repo.Info.CurrentOperation != CurrentOperation.None,
+                ConflictedFiles = conflictedFiles
+            };
         }
 
         #endregion
@@ -736,6 +755,126 @@ namespace ERD.Git
                 })
                 .ToList();
         }
+
+        public static IReadOnlyList<GitCommitInfo> GetHistory(
+            string repositoryPath,
+            string branchName,
+            int maxCount = 100)
+        {
+            using Repository repo = Open(repositoryPath);
+
+            Branch branch = repo.Branches[branchName]
+                ?? throw new ArgumentException(
+                    $"Branch '{branchName}' was not found.",
+                    nameof(branchName));
+
+            return branch.Commits
+                .Take(maxCount)
+                .Select(c => new GitCommitInfo
+                {
+                    Sha = c.Sha,
+                    ShortSha = c.Sha[..Math.Min(7, c.Sha.Length)],
+                    Message = c.MessageShort,
+                    Author = c.Author.Name,
+                    AuthorEmail = c.Author.Email,
+                    Date = c.Author.When
+                })
+                .ToList();
+        }
+
+        //public static IReadOnlyList<GitFileChangeInfo> GetCommitChanges(string repositoryPath, string commitSha) 
+        //{
+        //    using Repository repo = Open(repositoryPath);
+
+        //    Commit commit = repo.Lookup<Commit>(commitSha) ?? throw new ArgumentException($"Commit '{commitSha}' was not found.",nameof(commitSha));
+
+        //    Tree? parentTree = commit.Parents.FirstOrDefault()?.Tree;
+
+        //    Patch patch = parentTree == null
+        //        ? repo.Diff.Compare<Patch>(null, commit.Tree)
+        //        : repo.Diff.Compare<Patch>(parentTree, commit.Tree);
+
+        //    return patch
+        //        .Select(change => new GitFileChangeInfo
+        //        {
+        //            FilePath = change.Path,
+        //            ChangeType = change.Status.ToString(),
+        //            LinesAdded = change.LinesAdded,
+        //            LinesDeleted = change.LinesDeleted
+        //        })
+        //        .ToList();
+        //}
+
+
+        public static IReadOnlyList<GitFileChangeInfo> GetCommitChanges(
+            string repositoryPath,
+            string commitSha)
+        {
+            using Repository repo = Open(repositoryPath);
+
+            Commit commit = repo.Lookup<Commit>(commitSha)
+                ?? throw new ArgumentException(
+                    $"Commit '{commitSha}' was not found.",
+                    nameof(commitSha));
+
+            Tree? parentTree = commit.Parents.FirstOrDefault()?.Tree;
+            Tree currentTree = commit.Tree;
+
+            Patch patch = parentTree == null
+                ? repo.Diff.Compare<Patch>(null, currentTree)
+                : repo.Diff.Compare<Patch>(parentTree, currentTree);
+
+            return patch.Select(change =>
+            {
+                string? previousContent = null;
+                string? currentContent = null;
+
+                switch (change.Status)
+                {
+                    case ChangeKind.Added:
+                        currentContent = GetFileContent(
+                            currentTree, change.Path);
+                        break;
+
+                    case ChangeKind.Deleted:
+                        previousContent = GetFileContent(
+                            parentTree, change.Path);
+                        break;
+
+                    case ChangeKind.Modified:
+                        previousContent = GetFileContent(
+                            parentTree, change.Path);
+
+                        currentContent = GetFileContent(
+                            currentTree, change.Path);
+                        break;
+                }
+
+                return new GitFileChangeInfo
+                {
+                    FilePath = change.Path,
+                    ChangeType = change.Status.ToString(),
+                    LinesAdded = change.LinesAdded,
+                    LinesDeleted = change.LinesDeleted,
+                    PreviousContent = previousContent,
+                    CommitedContent = currentContent
+                };
+            }).ToList();
+        }
+
+        private static string? GetFileContent(Tree? tree, string path)
+        {
+            if (tree == null)
+                return null;
+
+            TreeEntry? entry = tree[path];
+
+            if (entry?.Target is not Blob blob)
+                return null;
+
+            return blob.GetContentText();
+        }
+
 
         #endregion
 
@@ -897,6 +1036,29 @@ namespace ERD.Git
                 DateTimeOffset.Now);
         }
 
+        private static List<string> GetConflictPaths(Repository repo)
+        {
+            List<string> indexConflicts = repo.Index.Conflicts
+                .Select(conflict => conflict.Ours?.Path
+                    ?? conflict.Theirs?.Path
+                    ?? conflict.Ancestor?.Path)
+                .Where(path => !string.IsNullOrWhiteSpace(path))
+                .Select(path => path!)
+                .ToList();
+
+            List<string> statusConflicts = repo.RetrieveStatus()
+                .Where(entry => (entry.State & FileStatus.Conflicted) != 0)
+                .Select(entry => entry.FilePath)
+                .Where(path => !string.IsNullOrWhiteSpace(path))
+                .ToList();
+
+            return indexConflicts
+                .Concat(statusConflicts)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(path => path)
+                .ToList();
+        }
+
         //private static Signature CreateSignature()
         //{
         //    using WindowsIdentity identity = WindowsIdentity.GetCurrent();
@@ -970,69 +1132,6 @@ namespace ERD.Git
                 authentication);
         }
 
-        public static void CreateLocalFromRemoteSelection(string repoPath)
-        {
-            using (var repo = new Repository(repoPath))
-            {
-                // 1. Get all remote-tracking branches dynamically
-                var remoteBranches = repo.Branches
-                    .Where(b => b.IsRemote)
-                    .ToList();
-
-                if (!remoteBranches.Any())
-                {
-                    Console.WriteLine("No remote branches found. Please fetch from your remote first.");
-                    return;
-                }
-
-                // 2. Display the list cleanly to the user
-                Console.WriteLine("Available Remote Branches:");
-                for (int i = 0; i < remoteBranches.Count; i++)
-                {
-                    // FriendlyName returns "origin/feature-branch"
-                    // RemoteName returns "origin" safely, regardless of the cloud host
-                    Console.WriteLine($"[{i}] {remoteBranches[i].FriendlyName} (Remote: {remoteBranches[i].RemoteName})");
-                }
-
-                // 3. Capture user choice
-                Console.Write("\nSelect a branch number to checkout: ");
-                if (!int.TryParse(Console.ReadLine(), out int choice) || choice < 0 || choice >= remoteBranches.Count)
-                {
-                    Console.WriteLine("Invalid selection.");
-                    return;
-                }
-
-                Branch selectedRemoteBranch = remoteBranches[choice];
-
-                // 4. Safely extract the raw branch name without the remote prefix
-                // LibGit2Sharp natively calculates the upstream destination via its Canonical Name
-                string cleanBranchName = selectedRemoteBranch.FriendlyName
-                    .Substring(selectedRemoteBranch.RemoteName.Length + 1); // Trims "origin/"
-
-                // 5. Check if the local branch already exists
-                Branch localBranch = repo.Branches[cleanBranchName];
-
-                if (localBranch == null)
-                {
-                    Console.WriteLine($"Creating local branch '{cleanBranchName}' tracking '{selectedRemoteBranch.FriendlyName}'...");
-
-                    // Point the local branch head directly to the exact commit reference of the remote
-                    localBranch = repo.CreateBranch(cleanBranchName, selectedRemoteBranch.Tip);
-
-                    // Set up standard tracking configuration upstream
-                    repo.Branches.Update(localBranch, b => b.TrackedBranch = selectedRemoteBranch.CanonicalName);
-                }
-                else
-                {
-                    Console.WriteLine($"Local branch '{cleanBranchName}' already exists. Skipping creation.");
-                }
-
-                // 6. Checkout the local branch
-                Commands.Checkout(repo, localBranch);
-                Console.WriteLine($"Successfully switched to branch: {repo.Head.FriendlyName}");
-            }
-        }
-
-        #endregion
+        #endregion    
     }
 }

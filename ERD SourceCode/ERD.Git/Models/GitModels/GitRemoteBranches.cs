@@ -3,7 +3,7 @@ using WPF.Tools.Attributes;
 using WPF.Tools.ModelViewer;
 using WPF.Tools.ToolModels;
 
-namespace ERD.Git.Models
+namespace ERD.Git.Models.GitModels
 {
     public class GitRemoteBranches
     {

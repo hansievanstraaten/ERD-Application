@@ -7,11 +7,12 @@ using ERD.DatabaseScripts.Compare;
 using ERD.DatabaseScripts.Engineering;
 using ERD.FileManagement;
 using ERD.Git;
-using ERD.Git.Models;
+using ERD.Git.Models.GitModels;
 using ERD.Models;
 using ERD.Viewer.Build;
 using ERD.Viewer.Comparer;
 using ERD.Viewer.Database;
+using ERD.Viewer.Git;
 using ERD.Viewer.Tools;
 using ERD.Viewer.Tools.Common;
 using GeneralExtensions;
@@ -358,17 +359,12 @@ namespace ERD.Viewer
 
                 if (result.HasConflicts)
                 {
-                    MessageBox.Show("The pull has conflicts in the following files:\n\n" +
-                        string.Join("\n", result.ConflictedFiles),
-                        "Merge Conflicts",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    (bool isResolved, bool requireReload) = this.CheckConfilcts();
 
-                    // Open your conflict resolution window here.
-                    // Example:
-                    // new GitConflictWindow(result.ConflictedFiles).ShowDialog();
-
-                    return;
+                    if (!isResolved)
+                    {
+                        return;
+                    }
                 }
 
                 this.ReloadProject();
@@ -581,6 +577,8 @@ namespace ERD.Viewer
 
                 ERDGit.Checkout(General.ProjectModel.FileDirectory, localBranches.BranchName);
 
+                (bool isResolved, bool requireReload) = this.CheckConfilcts();
+
                 this.ReloadProject();
                                 
                 this.SetBranchNameMessage(General.ProjectModel.FileDirectory);
@@ -596,7 +594,9 @@ namespace ERD.Viewer
         {
             try
             {
-
+                GitConflictResolver resolver = new GitConflictResolver();
+                resolver.Owner = this;
+                resolver.ShowDialog();
             }
             catch (Exception err)
             {
@@ -645,11 +645,25 @@ namespace ERD.Viewer
         {
             try
             {
+                GitBranchManager manager = new GitBranchManager();
 
+                manager.Owner = this;
+
+                manager.ShowDialog();
+
+                if (manager.BranchChanged)
+                {
+                    (bool isResolved, bool requireReload) = this.CheckConfilcts();
+                    this.ReloadProject();
+                    this.SetBranchNameMessage(General.ProjectModel.FileDirectory);
+                }
             }
             catch (Exception err)
             {
                 MessageBox.Show(err.GetFullExceptionMessage());
+            }
+            finally
+            {
             }
         }
 
@@ -1611,8 +1625,9 @@ namespace ERD.Viewer
                             Paths.WaitFileRelease(fileInfo.FullName);
 
                             string[] fileData = File.ReadAllLines(fileInfo.FullName);
+                            int loadIndex = fileData[0].Contains(ERDGit.HEAD) ? 1 : 0;
 
-                            ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[0], typeof(ErdCanvasModel)) as ErdCanvasModel;
+                            ErdCanvasModel segment = JsonConvert.DeserializeObject(fileData[loadIndex], typeof(ErdCanvasModel)) as ErdCanvasModel;
 
                             segment.SetLock(false, false);
 
@@ -1658,6 +1673,13 @@ namespace ERD.Viewer
                 }
 
                 this.SetLocks(string.Empty);
+
+                (bool isResolved, bool requireReload) = this.CheckConfilcts();
+
+                if (requireReload)
+                {
+                    this.ReloadProject();
+                }
             }
             catch (Exception err)
             {
@@ -2050,10 +2072,37 @@ namespace ERD.Viewer
             GitBranchInfo info = ERDGit.GetCurrentBranch(fileDir);
 
             this.uxGitBranch.Content = $"Branch: {info.Name}";
+        }
 
-            int conflicts = ERDGit.GetConflicts(fileDir).Count;
+        private (bool isResolved, bool requireReload) CheckConfilcts()
+        {
+            int conflicts = 0;
+            bool requireReload = false;
+
+        ENVALIDATECONFLICT:
+
+            bool isResolved = false;
+
+            if (conflicts > 0)
+            {
+                this.uxMenuSaveProject.IsEnabled = false;
+                GitConflictResolver resolver = new GitConflictResolver();
+                resolver.Owner = this;
+                resolver.ShowDialog();
+                isResolved = resolver.Resolved;
+                requireReload = true;
+            }
+
+            conflicts = ERDGit.GetConflicts(General.ProjectModel.FileDirectory).Count;
 
             this.uxResolveConflicts.Header = conflicts > 0 ? $"Resolve Conflicts ({conflicts})" : "Resolve Conflicts";
+
+            if (conflicts > 0)
+            {
+                goto ENVALIDATECONFLICT;
+            }
+
+            return (isResolved, requireReload);
         }
 
         private void LoadConnectionsMenue()

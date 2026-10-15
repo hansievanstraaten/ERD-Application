@@ -1,4 +1,4 @@
-﻿namespace ERD.Git.Models
+﻿namespace ERD.Git.Models.GitModels
 {
     public sealed class PullResult
     {
@@ -6,7 +6,7 @@
         
         public string Status { get; init; } = string.Empty;
         
-        public List<string?> ConflictedFiles { get; set; } = new List<string?>();
+        public IReadOnlyList<string> ConflictedFiles { get; init; } = new List<string>();
 
         public bool HasConflicts => ConflictedFiles.Count > 0;
     }

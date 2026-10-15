@@ -1,7 +1,7 @@
 ﻿using System.Security.Principal;
 using WPF.Tools.Attributes;
 
-namespace ERD.Git.Models
+namespace ERD.Git.Models.GitModels
 {
     public class GitIdentity
     {

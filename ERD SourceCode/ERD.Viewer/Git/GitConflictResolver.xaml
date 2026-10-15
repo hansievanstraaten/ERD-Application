@@ -1,0 +1,85 @@
+﻿<src:WindowBase xmlns:Stacks="clr-namespace:WPF.Tools.Stacks;assembly=WPF.Tools"  
+                xmlns:CommonControls="clr-namespace:WPF.Tools.CommonControls;assembly=WPF.Tools"  
+                x:Class="ERD.Viewer.Comparer.GitConflictResolver"
+                xmlns:src="clr-namespace:WPF.Tools.BaseClasses;assembly=WPF.Tools"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:local="clr-namespace:ERD.Viewer.Comparer"
+                mc:Ignorable="d"
+                Title="GitConflictResolver" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="3" />
+            <ColumnDefinition Width="45*" />
+            <ColumnDefinition Width="3" />
+            <ColumnDefinition Width="45*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="45*" />
+            <RowDefinition Height="3" />
+            <RowDefinition Height="45*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
+            <CommonControls:LableItem x:Name="uxConflictCount"  Content="Files"/>
+            <Button MinWidth="40" Background="Transparent" Click="Next_Clicked" >&gt;|</Button>
+            <Button MinWidth="40" Background="Transparent" Click="Back_Clicked" >|&lt;</Button>
+            <Button Background="Transparent" Click="AcceptMerge_Clicked" >Accept Merge</Button>
+        </StackPanel>
+
+        <CommonControls:LableItem Grid.Row="1" Grid.Column="0" Content="Files"/>
+
+        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
+            <CommonControls:CheckBoxItem x:Name="uxSelectIncoming" Checked="SelectAll_Checked" Unchecked="SelectAll_Unchecked" />
+            <CommonControls:LableItem Content="Select all from Incoming" />            
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="4" Orientation="Horizontal">
+            <CommonControls:CheckBoxItem x:Name="uxSelectLocal" IsChecked="True" Checked="SelectAll_Checked" Unchecked="SelectAll_Unchecked" />
+            <CommonControls:LableItem  Content="Select all from Local" />            
+        </StackPanel>
+        
+        <StackPanel x:Name="uxConflicts" Grid.Row="2" Grid.Column="0" Grid.RowSpan="3" Orientation="Vertical" MinWidth="100">
+            
+        </StackPanel>
+
+        <CommonControls:VerticalGridSplit Grid.Row="2" Grid.Column="1" />
+
+        <RichTextBox  x:Name="uxIncoming"  Grid.Row="2" Grid.Column="2" IsReadOnly="True"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.ScrollChanged="RichTextBox_ScrollChanged" />
+        
+        <CommonControls:VerticalGridSplit Grid.Row="2" Grid.Column="3" />
+
+        <RichTextBox  x:Name="uxLocal"  Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="3" IsReadOnly="True"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.ScrollChanged="RichTextBox_ScrollChanged" />
+
+        <CommonControls:HorizontalGridSplit Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3"  />
+        
+        <RichTextBox x:Name="uxMerged" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3"
+                     VerticalScrollBarVisibility="Auto"
+                     HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.ScrollChanged="RichTextBox_ScrollChanged" />
+
+        <CommonControls:LableItem Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5">
+            <Label>
+                <TextBlock
+                    Foreground="Red"
+                    FontWeight="Bold"
+                    Text="Warning: It may occur that columns was added to the same table, and the merge does not identify them as two new columns but rather a value change of the same property. For this some manual intervention would be required, or you will need to re add the lost column after the merge"
+                    TextWrapping="Wrap" />
+            </Label>
+        </CommonControls:LableItem>
+
+    </Grid>
+</src:WindowBase>

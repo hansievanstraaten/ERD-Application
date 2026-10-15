@@ -3,25 +3,25 @@ using WPF.Tools.Attributes;
 using WPF.Tools.ModelViewer;
 using WPF.Tools.ToolModels;
 
-namespace ERD.Git.Models
+namespace ERD.Git.Models.GitModels
 {
-    public class GitRemoteSelect
+    public sealed class GitLocalBranches
     {
-        [FieldInformation("Remote Name", IsRequired = true, Sort = 3)]
+        [FieldInformation("Branch", IsRequired = true, Sort = 3)]
         [ItemTypeAttribute(ModelItemTypeEnum.ComboBox, IsComboboxEditable = false)]
-        [ValuesSourceAttribute("RemoteItems")]
-        public string RemoteName { get; set; } = string.Empty;
+        [ValuesSourceAttribute("Branches")]
+        public string BranchName { get; set; } = string.Empty;
 
-        public DataItemModel[] RemoteItems
+        public DataItemModel[] Branches
         {
             get
             {
                 List<DataItemModel> result = new List<DataItemModel>();
-                IReadOnlyList<GitRemoteInfo> remotes = ERDGit.GetRemotes(General.ProjectModel.FileDirectory);
+                IReadOnlyList<GitBranchInfo> branches = ERDGit.GetLocalBranches(General.ProjectModel.FileDirectory);
 
                 result.Add(new DataItemModel { DisplayValue = "<Select>", ItemKey = string.Empty });
 
-                foreach (GitRemoteInfo item in remotes)
+                foreach (GitBranchInfo item in branches)
                 {
                     result.Add(new DataItemModel { DisplayValue = item.Name, ItemKey = item.Name });
                 }

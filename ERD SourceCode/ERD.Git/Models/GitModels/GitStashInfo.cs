@@ -1,4 +1,4 @@
-﻿namespace ERD.Git.Models
+﻿namespace ERD.Git.Models.GitModels
 {
     public sealed class GitStashInfo
     {

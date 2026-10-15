@@ -6,6 +6,7 @@ using GeneralExtensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using ViSo.Dialogs.Input;
@@ -19,15 +20,13 @@ namespace ERD.Viewer.Build
 	/// </summary>
 	public partial class BuildOption : UserControlBase
     {
+        private bool optionSetupAdded;
         private string lastLoadTableName = string.Empty;
-
         private TableModel selectedTable;
-
         private SampleScript scripting = new SampleScript();
-
         private OptionSetupModel optionSetup;
-
         private List<ErdCanvasModel> allErdCanvasModels;
+        private CancellationTokenSource sampleScriptLoadCancellation;
 
         public BuildOption(ErdCanvasModel sampleCanvas, List<ErdCanvasModel> allErdCanvases)
         {
@@ -53,11 +52,14 @@ namespace ERD.Viewer.Build
             
             set
 			{
+                string currentTableName = this.selectedTable?.TableName;
+
                 this.selectedTable = value;
 
-                if (this.IsLoaded)
+
+                if (this.IsLoaded && this.selectedTable?.TableName != currentTableName)
 				{
-                    _ = this.LoadSampleScriptAsync();
+                    this.QueueLoadSampleScript();
 				}
 			}
         }
@@ -81,9 +83,10 @@ namespace ERD.Viewer.Build
             {
                 if (base.WasFirstLoaded)
                 {
-                    if (this.SelectedTable.TableName != this.lastLoadTableName)
+
+                    if (this.SelectedTable?.TableName != this.lastLoadTableName)
 					{
-                        _ = this.LoadSampleScriptAsync();
+                        this.QueueLoadSampleScript();
 					}
 
                     return;
@@ -96,8 +99,13 @@ namespace ERD.Viewer.Build
                     this.OptionSetup.OptionModelName = this.Title;
                 }
 
-                this.uxOptionSetup.Items.Add(this.OptionSetup);
+                if (!this.optionSetupAdded)
+                {
+                    this.uxOptionSetup.Items.Add(this.OptionSetup);
+                    this.optionSetupAdded = true;
+                }
 
+                this.optionSetup.PropertyChanged -= this.OptionSetup_Changed;
                 this.optionSetup.PropertyChanged += this.OptionSetup_Changed;
 
                 this.SetOptionSetup();
@@ -111,9 +119,11 @@ namespace ERD.Viewer.Build
                     buildType.PropertyChanged += this.BuildType_Changed;
                 }
 
-                _ = this.LoadSampleScriptAsync();
+                this.QueueLoadSampleScript(0);
 
                 base.WasFirstLoaded = true;
+
+                this.Loaded -= this.BuildOption_Loaded;
             }
             catch (Exception err)
             {
@@ -169,11 +179,11 @@ namespace ERD.Viewer.Build
             }
         }
 
-        private async void BuildType_Changed(object sender, PropertyChangedEventArgs e)
+        private void BuildType_Changed(object sender, PropertyChangedEventArgs e)
         {
             if (this.IsLoaded)
             {
-                await this.LoadSampleScriptAsync();
+                this.QueueLoadSampleScript();
             }
         }
 
@@ -238,15 +248,49 @@ namespace ERD.Viewer.Build
             }
         }
     
-        private async Task LoadSampleScriptAsync()
+        private void QueueLoadSampleScript(int delayMilliseconds = 250)
         {
-            await Task.Run(() => this.LoadSampleScript());
+            try
+            {
+                this.sampleScriptLoadCancellation?.Cancel();
+                this.sampleScriptLoadCancellation?.Dispose();
+
+                this.sampleScriptLoadCancellation = new CancellationTokenSource();
+
+                _ = this.LoadSampleScriptAsync(delayMilliseconds, this.sampleScriptLoadCancellation.Token);
+            }
+            catch
+            {
+                // DO NOTHING
+            }
+        }
+
+        private async Task LoadSampleScriptAsync(int delayMilliseconds, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (delayMilliseconds > 0)
+                {
+                    await Task.Delay(delayMilliseconds, cancellationToken);
+                }
+
+                await Task.Run(() => this.LoadSampleScript(), cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                // DO NOTHING
+            }
         }
 
         private void LoadSampleScript()
 		{
             try
             {
+                if (this.OptionSetup == null || this.SelectedTable == null)
+                {
+                    return;
+                }
+
                 this.scripting.LanguageOption = this.OptionSetup.LanguageOption;
 
                 this.lastLoadTableName = this.SelectedTable.TableName;
@@ -275,7 +319,7 @@ namespace ERD.Viewer.Build
 
                 }
 
-                Dispatcher.Invoke(() => this.uxSampleScript.Text = result);
+                Dispatcher.BeginInvoke(new Action(() => this.uxSampleScript.Text = result));
 
             }
             catch (Exception err)

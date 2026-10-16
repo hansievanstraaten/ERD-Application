@@ -1,16 +1,14 @@
 ﻿using GeneralExtensions;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Linq;
-using System.Windows.Documents;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
 
 namespace REPORT.Builder.Printing
 {
-    internal static class XmlHelper
+    public static class XmlHelper
     {
-        internal static bool IsDataObject(this XElement reportObject)
+        public static bool IsDataObject(this XElement reportObject)
         {
             return reportObject.Attribute("ObjectType").Value == "ReportDataObject";
         }

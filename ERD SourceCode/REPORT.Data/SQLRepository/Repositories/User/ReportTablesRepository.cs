@@ -86,7 +86,21 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result.CopyToObject(new ReportConnectionModel()) as ReportConnectionModel;
 		}
 
-		public List<ReportMasterModel> GetReportMasterByCategoryId( long categoryId)
+		public ReportMasterModel GetReportMaster(long masterReport_Id)
+		{
+            ReportMaster result = this.dataContext
+                .ReportsMaster
+                .FirstOrDefault(r => r.MasterReport_Id == masterReport_Id);
+            if (result == null)
+            {
+                return null;
+            }
+            ReportMasterModel model = result.CopyToObject(new ReportMasterModel()) as ReportMasterModel;
+            model.ReportXMLVersion = this.GetReportXMLVersion(model.MasterReport_Id);
+            return model;	
+        }
+
+        public List<ReportMasterModel> GetReportMasterByCategoryId( long categoryId)
 		{
 			List<ReportMaster> agrigates = this.dataContext
 				.ReportsMaster
@@ -136,12 +150,11 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result;
 		}
 
-		public List<ReportMasterModel> GetReportMasterByReportTypeEnum(int ReportTypeEnum, string projectName, long categoryId)
+		public List<ReportMasterModel> GetReportMasterByReportTypeEnum(int ReportTypeEnum, long categoryId)
 		{
 			List<ReportMaster> agrigates = this.dataContext
 				.ReportsMaster
 				.Where(fk => fk.ReportTypeEnum == ReportTypeEnum
-						  && fk.ProjectName == projectName
 						  && fk.CategoryId == categoryId)
 				.ToList();
 
@@ -163,7 +176,28 @@ namespace REPORT.Data.SQLRepository.Repositories
 			return result;
 		}
 
-		public List<ReportCategoryModel> GetActiveCategories()
+        public List<ReportMasterHeaderModel> GetReportMasterByReportTypeEnumHeader(int ReportTypeEnum, long categoryId)
+        {
+            List<ReportMaster> agrigates = this.dataContext
+                .ReportsMaster
+                .Where(fk => fk.ReportTypeEnum == ReportTypeEnum
+                          && fk.CategoryId == categoryId)
+                .ToList();
+
+            if (agrigates.Count == 0)
+            {
+                return new List<ReportMasterHeaderModel>();
+            }
+
+
+            List<object> objectList = agrigates.CopyToObject(typeof(ReportMasterHeaderModel));
+
+            List<ReportMasterHeaderModel> result = objectList.TryCast<ReportMasterHeaderModel>().OrderBy(n => n.ReportName).ToList();
+
+            return result;
+        }
+
+        public List<ReportCategoryModel> GetActiveCategories()
         {
 			List<ReportCategory> result = base.dataContext
 				.ReportCategories

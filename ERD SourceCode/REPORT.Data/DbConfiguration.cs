@@ -42,7 +42,7 @@ namespace REPORT.Data
 
 		public string ReportSetupFileName { get; private set; }
 		
-		public ReportSetupModel ReportSetup { get; private set; }
+		public ReportSetupModel ReportSetup { get; set; }
 
 		public bool Save()
 		{

@@ -33,8 +33,6 @@ namespace REPORT.Builder
 
         public string ReportFileName { get; private set; }
 
-        //public ReportSetupModel ReportSetup { get; private set; }
-
         private void InitializeTabs()
         {
             try

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>f8facfb1-6cf9-4483-9a3c-3d49151d4e39</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\REPORT.Builder\REPORT.Builder.csproj" />
+    <ProjectReference Include="..\REPORT.Data\REPORT.Data.csproj" />
+    <ProjectReference Include="..\Report.Web.Presenters\Report.Web.Presenters.csproj" />
+  </ItemGroup>
+
+</Project>

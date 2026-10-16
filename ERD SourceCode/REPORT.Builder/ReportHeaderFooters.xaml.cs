@@ -49,7 +49,7 @@ namespace REPORT.Builder
             this.HeadersAndFooters = repo
                 .GetReportMasterByReportTypeEnum(
                         (int)this.selectedReportType, 
-                        General.ProjectModel.ModelName, 
+                        //General.ProjectModel.ModelName, 
                         this.reportCategoryId.HasValue ? this.reportCategoryId.Value : 0)
                 .ToArray();
         }

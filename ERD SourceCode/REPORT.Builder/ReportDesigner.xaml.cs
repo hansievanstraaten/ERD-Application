@@ -1377,9 +1377,9 @@ namespace REPORT.Builder
 
 			BuildReportXML xmlBuild = new BuildReportXML();
 
-			XDocument repotXml = xmlBuild.GetReport(reportXml, connection, this.ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster, parameterFilters);
+			XDocument reportDocumentXml = xmlBuild.GetReport(reportXml, connection, this.ReportMaster.CopyToObject(new ReportMaster()) as ReportMaster, parameterFilters);
 
-			reportPrint.PrintDocument(repotXml);
+			reportPrint.PrintDocument(reportDocumentXml);
 
 			return reportPrint.Pages;
 		}

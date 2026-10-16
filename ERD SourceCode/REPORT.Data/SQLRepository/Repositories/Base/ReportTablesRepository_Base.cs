@@ -44,8 +44,28 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;
 		}
-		
-		public ReportConnectionModel GetReportConnectionByPrimaryKey (Int64 MasterReport_Id, string ReportConnectionName  )
+
+        public ReportXMLModel GetReportXMLByPrimaryKey(Int64 MasterReport_Id)
+        {
+            ReportXML result = this.dataContext
+                .ReportsXML
+                .FirstOrDefault(pk => pk.IsActiveVersion && pk.MasterReport_Id == MasterReport_Id);
+
+            if (result == null)
+            {
+                result = this.dataContext
+                .ReportsXML
+				.Where(pk => pk.MasterReport_Id == MasterReport_Id)
+                .OrderByDescending(r => r.ReportXMLVersion)
+                .LastOrDefault();
+
+                return result == null ? null : result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;
+            }
+
+            return result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;
+        }
+
+        public ReportConnectionModel GetReportConnectionByPrimaryKey (Int64 MasterReport_Id, string ReportConnectionName  )
 		{
 			ReportConnection result =this.dataContext
 				.ReportConnections

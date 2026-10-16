@@ -28,6 +28,7 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("ReportXMLVersion", ref this._ReportXMLVersion, value);
 			}
 		}
+
 		[Key]
 		 	
 		public Int64 MasterReport_Id

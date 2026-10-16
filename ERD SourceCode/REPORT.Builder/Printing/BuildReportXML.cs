@@ -53,15 +53,15 @@ namespace REPORT.Builder.Printing
         private Dictionary<string, object> invokeInstances = new Dictionary<string, object>();
 
         public XDocument GetReport(
-          XDocument xmlReport, 
-          DatabaseModel connection, 
-          ReportMaster reportMaster, 
+          XDocument xmlReport,
+          DatabaseModel connection,
+          ReportMaster reportMaster,
           List<ReportXMLPrintParameterModel> filters)
         {
             if (filters.Count > 0 && filters.Any(p => p.IsRequired.IsTrue() && p.FilterValue.IsNullEmptyOrWhiteSpace()))
-			{
+            {
                 throw new ApplicationException("One or more required filters was not passed with a value. Report Print canceled.");
-			}
+            }
 
             if (this.repo == null)
             {
@@ -89,8 +89,8 @@ namespace REPORT.Builder.Printing
 
             Dictionary<string, string> orderByDictionary = new Dictionary<string, string>();
 
-            foreach(KeyValuePair<string, XElement[]> orderKey in sqlOrderBy)
-			{
+            foreach (KeyValuePair<string, XElement[]> orderKey in sqlOrderBy)
+            {
                 string[] orderString = orderKey.Value
                     .Select(x => x.Attribute("ObjectColumn").Value)
                     .ToArray();
@@ -104,43 +104,46 @@ namespace REPORT.Builder.Printing
 
             try
             {
-            Connections.Instance.DatabaseModel = connection;
+                Connections.Instance.DatabaseModel = connection;
 
-            this.dataAccessConnection = connection;
+                this.dataAccessConnection = connection;
 
-            #region BUILD REPORT DATA
+                #region BUILD REPORT DATA
 
-            ReportTypeEnum reportType = (ReportTypeEnum)reportTypeValue.ToInt32();
+                ReportTypeEnum reportType = (ReportTypeEnum)reportTypeValue.ToInt32();
 
-            if (reportType == ReportTypeEnum.ReportContent)
-            {
-                this.CreateConnectionObject();
+                if (reportType == ReportTypeEnum.ReportContent)
+                {
+                    this.CreateConnectionObject();
 
-                XElement dataNode = new XElement("ReportData");
+                    XElement dataNode = new XElement("ReportData");
 
-                this.dataSections = xmlReport.Root
-                    .Descendants("ReportSection")
-                    .Where(st => st.Attribute("SectionType").Value == "5") // SectionTypeEnum.TableData
-                    .ToDictionary(d => d.Attribute("SectionIndex").Value.ToInt32());
+                    this.dataSections = xmlReport.Root
+                        .Descendants("ReportSection")
+                        .Where(st => st.Attribute("SectionType").Value == "5") // SectionTypeEnum.TableData
+                        .ToDictionary(d => d.Attribute("SectionIndex").Value.ToInt32());
 
-                this.sectionIndex = 1;
+                    this.sectionIndex = 1;
 
-                this.DoSectionSetup();
+                    this.DoSectionSetup();
 
-                this.BuildReportData(dataNode);
+                    this.BuildReportData(dataNode);
 
-                xmlReport.Root.Add(dataNode);
+                    xmlReport.Root.Add(dataNode);
+                }
+
+                #endregion
             }
-
-            #endregion
-
+            catch (Exception ex)
+            {
+                throw;
             }
             finally
             {
                 Connections.Instance.DatabaseModel = instanceDBModel;
             }
 
-            foreach(XElement reportSum in xmlReport.Root.Descendants().Where(a => a.Attribute("ObjectType") != null
+            foreach (XElement reportSum in xmlReport.Root.Descendants().Where(a => a.Attribute("ObjectType") != null
                                                                                && a.Attribute("ObjectType").Value == "ReportSum"))
             {
                 int parentSetionGroupIndex = reportSum.Attribute("ParentSectionGroupIndex").Value.ToInt32();
@@ -150,17 +153,17 @@ namespace REPORT.Builder.Printing
                 string sumColumn = reportSum.Attribute("SumColumn").Value;
 
                 if (sumColumn.IsNullEmptyOrWhiteSpace())
-				{   // The user did not perfom a full setup
+                {   // The user did not perfom a full setup
                     continue;
-				}
+                }
 
-                foreach(XElement tableRow in xmlReport.Root
+                foreach (XElement tableRow in xmlReport.Root
                     .Element("ReportData")
                     .Descendants()
                     .Where(pg => pg.Attribute("SectionGroupIndex") != null
                                  && pg.Attribute("SectionGroupIndex").Value.ToInt32() == parentSetionGroupIndex))
                 {
-					IEnumerable<XElement> sumItems = parentSetionGroupIndex == sectionGroupIndex ?
+                    IEnumerable<XElement> sumItems = parentSetionGroupIndex == sectionGroupIndex ?
                         tableRow
                         .Elements()
                         .Elements()
@@ -172,7 +175,7 @@ namespace REPORT.Builder.Printing
                                   && ln.Parent.Parent.Attribute("SectionGroupIndex") != null
                                   && ln.Parent.Parent.Attribute("SectionGroupIndex").Value.ToInt32() == sectionGroupIndex);
 
-					decimal result = 0;
+                    decimal result = 0;
 
                     if (sumItems.Count() != 0)
                     {
@@ -192,7 +195,7 @@ namespace REPORT.Builder.Printing
 
                     reportSum.Add(sumElemet);
                 }
-			}
+            }
 
             #region PAGE OPTIONS
 
@@ -260,7 +263,9 @@ namespace REPORT.Builder.Printing
 
             ReportMaster reportMaster = this.repo.GetReportMaster(this.masterReport_Id);
 
-            return this.GetReport(result, null, reportMaster, filters);
+            DatabaseModel connection = Connections.Instance.GetConnection(Connections.Instance.DefaultConnectionName);
+
+            return this.GetReport(result, connection, reportMaster, filters);
         }
 
         private void BuildReportData(XElement dataNode)
@@ -269,18 +274,18 @@ namespace REPORT.Builder.Printing
 
             string sectionTableName = this.indexSqlManager[this.sectionIndex].TableName;
 
-			this.indexSqlManager[this.sectionIndex]
-				.AddFilterParameters((this.tableFilters.ContainsKey(sectionTableName) ?
-					this.tableFilters[sectionTableName] :
-					new List<ReportXMLPrintParameterModel>()));
+            this.indexSqlManager[this.sectionIndex]
+                .AddFilterParameters((this.tableFilters.ContainsKey(sectionTableName) ?
+                    this.tableFilters[sectionTableName] :
+                    new List<ReportXMLPrintParameterModel>()));
 
             if (this.orderByDictionary.ContainsKey(sectionTableName))
-			{
+            {
                 this.indexSqlManager[this.sectionIndex]
                     .AddOrderByString(this.orderByDictionary[sectionTableName]);
-			}
+            }
 
-			XDocument data = this.data.ExecuteQuery(this.FormatSQL(this.indexSqlManager[this.sectionIndex].SQLQuery), this.commandTimeout);
+            XDocument data = this.data.ExecuteQuery(this.FormatSQL(this.indexSqlManager[this.sectionIndex].SQLQuery), this.commandTimeout);
 
             XElement sectionData = new XElement(sectionTableName);
 
@@ -456,32 +461,32 @@ namespace REPORT.Builder.Printing
             if (this.dataAccessConnection == null)
             {
                 ReportConnection connection = this.repo.GetConnection(this.masterReport_Id);
-                
+
                 this.dataAccessConnection = connection.CopyToObject(new DatabaseModel()) as DatabaseModel;
             }
 
             this.data = new DataAccess(this.dataAccessConnection.DatabaseType, this.dataAccessConnection);
         }
-    
+
         private void SetInvokedValues(string tableName, XElement row)
-		{
-            foreach(XElement column in row.Elements())
-			{
+        {
+            foreach (XElement column in row.Elements())
+            {
                 string columnKey = $"[{tableName}].[{column.Name.LocalName}]";
 
                 if (!this.indexSqlManager[this.sectionIndex].InvokeReplacementColumnModels.ContainsKey(columnKey))
-				{
+                {
                     continue;
-				}
+                }
 
                 column.Add(new XAttribute("Value", column.Value));
 
                 column.Value = InvokeReplacement(columnKey, column.Value);
             }
-		}
+        }
 
         private void RunUpdateStements(XDocument xmlReport)
-		{
+        {
             foreach (CanvasSqlManager item in this.indexSqlManager.Values)
             {
                 foreach (KeyValuePair<string, UpdateStatementModel> statement in item.UpdateStatementModels)
@@ -519,32 +524,32 @@ namespace REPORT.Builder.Printing
         }
 
         private string InvokeReplacement(string columnKey, string columnValue)
-		{
-			object instance = null;
-                
+        {
+            object instance = null;
+
             ReportsInvokeReplaceModel invokeModel = this.indexSqlManager[this.sectionIndex].InvokeReplacementColumnModels[columnKey];
 
-			if (!this.invokeInstances.ContainsKey(columnKey))
-			{
+            if (!this.invokeInstances.ContainsKey(columnKey))
+            {
                 Assembly asm = Assembly.LoadFile(invokeModel.SelectDll);
 
-				Type executingType = asm.GetType(invokeModel.NamespaceValue);
+                Type executingType = asm.GetType(invokeModel.NamespaceValue);
 
-				instance = Activator.CreateInstance(executingType);
+                instance = Activator.CreateInstance(executingType);
 
-				this.invokeInstances.Add(columnKey, instance);
-			}
-			else
-			{
-				instance = this.invokeInstances[columnKey];
-			}
+                this.invokeInstances.Add(columnKey, instance);
+            }
+            else
+            {
+                instance = this.invokeInstances[columnKey];
+            }
 
-			string output = instance.InvokeMethod(
-				instance,
+            string output = instance.InvokeMethod(
+                instance,
                 invokeModel.SelectedMethod,
-				new object[] { columnValue }).ParseToString();
+                new object[] { columnValue }).ParseToString();
 
-			return output;
-		}
+            return output;
+        }
     }
 }

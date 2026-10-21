@@ -1,7 +1,11 @@
 using GeneralExtensions;
 using System;
+using System.Collections.Generic;
+using System.Windows.Media;
+using ViSo.SharedEnums;
 using WPF.Tools.Attributes;
 using WPF.Tools.BaseClasses;
+using WPF.Tools.ToolModels;
 
 namespace REPORT.Data.Models
 {
@@ -16,7 +20,9 @@ namespace REPORT.Data.Models
 		private string _FilterCaption;
 		private string _DefaultValue;
 		private string filterValue;
+		private OperatorsEnum _Operator;
 		private bool? _IsRequired;
+
 
 		/// <summary>
 		/// <para>Report XML Version</para>
@@ -144,6 +150,21 @@ namespace REPORT.Data.Models
 			}
 		}
 
+        [FieldInformationAttribute("Operator", Sort = 2)]
+        [ValuesSourceAttribute("OperatorValues")]
+		public OperatorsEnum Operator
+		{
+			get
+            {
+                return this._Operator;
+            }
+
+            set
+            {
+                this._Operator = value;
+            }
+        }
+
 		/// <summary>
 		/// <para>Default Value</para>
 		/// <para></para>
@@ -173,5 +194,20 @@ namespace REPORT.Data.Models
 				base.OnPropertyChanged("IsRequired", ref this._IsRequired, value);
 			}
 		}
-	}
+
+        public DataItemModel[] OperatorValues
+        {
+            get
+            {
+                List<DataItemModel> result = new List<DataItemModel>();
+
+                foreach (OperatorsEnum item in Enum.GetValues(typeof(OperatorsEnum)))
+                {
+                    result.Add(new DataItemModel { DisplayValue = item.GetDescriptionAttribute(), ItemKey = item });
+                }
+
+                return result.ToArray();
+            }
+        }
+    }
 }

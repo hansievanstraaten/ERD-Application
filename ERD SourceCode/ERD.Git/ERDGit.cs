@@ -1,4 +1,5 @@
-﻿using ERD.Git.Models.GitModels;
+﻿using ERD.Common;
+using ERD.Git.Models.GitModels;
 using LibGit2Sharp;
 using System.Diagnostics;
 
@@ -401,6 +402,13 @@ namespace ERD.Git
             GitIdentity identity,
             GitAuthentication authentication)
         {
+            IReadOnlyList<GitFileStatus> changes = ERDGit.GetStatus(repositoryPath);
+
+            if (changes.Count > 0)
+            {
+                throw new Exception("Uncommitted pending changes will prevent this request. Please commit pending changes and then try again.");
+            }
+
             using Repository repo = Open(repositoryPath);
 
             if (repo.Info.CurrentOperation != CurrentOperation.None)

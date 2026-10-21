@@ -104,8 +104,46 @@ namespace REPORT.Builder.Common.DatabaseOptions
                     continue;
                 }
 
-                result.AppendLine($"{filter.TableName}.{filter.ColumnName} = '{filter.FilterValue}'");
-                
+                switch (filter.Operator)
+                {                        
+                    case OperatorsEnum.NotEquals:
+                        result.AppendLine($"[{filter.ColumnName}] != '{filter.FilterValue}'");
+                        break;
+
+                    case OperatorsEnum.GreaterThan:
+                        result.AppendLine($"[{filter.ColumnName}] > '{filter.FilterValue}'");
+                        break;
+
+                    case OperatorsEnum.LessThan:
+                        result.AppendLine($"[{filter.ColumnName}] < '{filter.FilterValue}'");
+                        break;
+
+                    case OperatorsEnum.GreaterThanOrEqual:
+                        result.AppendLine($"[{filter.ColumnName}] >= '{filter.FilterValue}'");
+                        break;
+
+                    case OperatorsEnum.LessThanOrEqual:
+                        result.AppendLine($"[{filter.ColumnName}] <= '{filter.FilterValue}'");
+                        break;
+
+                    case OperatorsEnum.Contains:
+                        result.AppendLine($"[{filter.ColumnName}] LIKE '%{filter.FilterValue}%'");
+                        break;
+
+                    case OperatorsEnum.StartsWith:
+                        result.AppendLine($"[{filter.ColumnName}] LIKE '{filter.FilterValue}%'");
+                        break;
+
+                    case OperatorsEnum.EndsWith:
+                        result.AppendLine($"[{filter.ColumnName}] LIKE '%{filter.FilterValue}'");
+                        break;
+
+                    case OperatorsEnum.Equals:
+                    default:
+                        result.AppendLine($"[{filter.ColumnName}] = '{filter.FilterValue}'");
+                        break;
+                }
+
                 if (x < validFilters.Count - 1)
 				{
                     result.Append(" AND ");

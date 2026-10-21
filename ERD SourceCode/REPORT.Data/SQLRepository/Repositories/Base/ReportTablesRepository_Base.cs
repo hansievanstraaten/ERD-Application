@@ -1,4 +1,5 @@
 using GeneralExtensions;
+using Microsoft.EntityFrameworkCore;
 using REPORT.Data.Models;
 using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.DataContext;
@@ -59,7 +60,7 @@ namespace REPORT.Data.SQLRepository.Repositories
                 .OrderByDescending(r => r.ReportXMLVersion)
                 .LastOrDefault();
 
-                return result == null ? null : result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;
+                return result == null ? throw new Exception("ReportXML not found") : result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;
             }
 
             return result.CopyToObject(new ReportXMLModel()) as ReportXMLModel;

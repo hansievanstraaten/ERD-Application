@@ -110,7 +110,7 @@ namespace ERD.Git
             int maxIndex = Math.Max(incomingLines.Length, localLines.Length) + incomingDiffLocations.Count + localDiffLocations.Count;
             int executingIndex = 0;
 
-            while (executingIndex < maxIndex)
+            while (executingIndex <= maxIndex)
             {
                 try
                 {

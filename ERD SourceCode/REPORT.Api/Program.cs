@@ -2,8 +2,12 @@ using ERD.Base;
 using ERD.Common;
 using ERD.Models;
 using ERD.Models.ReportModels;
+using Microsoft.OpenApi;
+using REPORT.Api.Constants;
+using REPORT.Api.Middleware;
 using REPORT.Data;
 using REPORT.Data.SQLRepository.Repositories;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using ViSo.SharedEnums.ReportEnums;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +17,21 @@ builder.Services.AddControllers();
 
 // OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => 
+{
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+    {
+        Description = "API Key needed to access the reports endpoints. Example: \"x-api-key: {key}\"",
+        Name = AppConstants.X_API_KEY,
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("ApiKey", document)] = new List<string>()
+    });
+});
 
 //General.ProjectModel.ModelName
 builder.Services.AddSingleton<Connections>(serviceProvider =>
@@ -87,15 +105,23 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
-app.MapGet("/", () => Results.Redirect("/swagger"));
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint($"/swagger/{AppConstants.SwaggerVersion}/swagger.json", "GOF API Services");
+    //c.InjectJavascript("/swagger/custom.js");
+    c.DocExpansion(DocExpansion.None);
+});
+
+app.MapGet("/", () => Results.Redirect("/swagger"))
+   .ExcludeFromDescription();
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseMiddleware<ValidationMiddleWare>();
 
 app.MapControllers();
 

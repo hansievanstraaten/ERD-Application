@@ -14,7 +14,6 @@
 [[ForeignTablePluralName]]=Replaces with the Foreign table Plural Name.,
 [[ForeignTableDescription]]=Replaces with the Foreign table description.,
 
-
 [[ColumnName]]=Replaces with the Column Name.,
 [[ColumnFriendlyName]]=Replaces with the Column Friendly Name.,
 [[ColumnDescription]]=Replaces with the Column Description.,

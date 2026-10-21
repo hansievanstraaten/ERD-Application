@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -52,7 +53,6 @@ namespace IconSet
             {
                 source = null;
             }
-            //}
         }
 
         public static Bitmap ConvertImageSourceToBitmap(this ImageSource source)
@@ -85,7 +85,14 @@ namespace IconSet
             }
             finally
             {
-                Marshal.Release(prt);
+                try
+                {
+                    //Marshal.Release(prt);
+                }
+                catch
+                {
+                    // ignored
+                }
 
                 src = null;
 
@@ -93,6 +100,46 @@ namespace IconSet
             }
 
             return result;
+        }
+
+        public static string ConvertImageSourceToString(this ImageSource source)
+        {
+            if (source is not BitmapSource bitmapSource)
+                return string.Empty;
+
+            using var stream = new MemoryStream();
+
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+            encoder.Save(stream);
+
+            return Convert.ToBase64String(stream.ToArray());
+        }
+
+        public static ImageSource ConvertStringToImageSource(this string value)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    return IconSets.ResourceImageSource("DefaultImage", 25);
+
+                byte[] bytes = Convert.FromBase64String(value);
+
+                using var stream = new MemoryStream(bytes);
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = stream;
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                return bitmap;
+            }
+            catch
+            {
+                return IconSets.ResourceImageSource("DefaultImage", 25);
+            }
         }
     }
 }

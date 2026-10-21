@@ -42,39 +42,6 @@ namespace REPORT.Data.SQLRepository.DataContext
             base.OnModelCreating(modelBuilder);
 
             ContextManagement.OnModelCreating(modelBuilder);
-
-            // We'll deal with your existing mappings next.
-            //modelBuilder.Conventions.Remove<DecimalPropertyConvention>();
-            //modelBuilder.Conventions.Add(new DecimalPropertyConvention(18, 6));
-
-            //modelBuilder.Configurations.Add(new DataSourceMasterMapping());
-            //modelBuilder.Configurations.Add(new DataSourceTableMapping());
         }
-
-        //      public DataSourceContext() : base(DatabaseConnection.Instance.CreateConnection(), true)
-        //{
-        //	switch (DatabaseConnection.Instance.StorageType)
-        //	{
-        //		case StorageTypeEnum.SQLite:
-        //			Database.SetInitializer(new CreateDatabaseIfNotExists<DataSourceContext>());
-        //			Database.SetInitializer(new MigrateDatabaseToLatestVersion<DataSourceContext, DataSourceConfiguration>());
-        //			break;
-
-        //		case StorageTypeEnum.MsSql:
-        //			Database.SetInitializer(new CreateDatabaseIfNotExists<DataSourceContext>());
-        //			Database.SetInitializer(new MigrateDatabaseToLatestVersion<DataSourceContext, DataSourceConfiguration>());
-        //			break;
-        //	}
-        //}
-
-        //protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        //{
-        //	modelBuilder.Conventions.Remove<DecimalPropertyConvention>();
-        //	modelBuilder.Conventions.Add(new DecimalPropertyConvention(18, 6));
-
-        //	modelBuilder.Configurations.Add(new DataSourceMasterMapping());
-        //	modelBuilder.Configurations.Add(new DataSourceTableMapping());
-
-        //}
     }
 }

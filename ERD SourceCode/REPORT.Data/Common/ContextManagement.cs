@@ -43,6 +43,26 @@ namespace REPORT.Data.Common
                     x.ReportXMLVersion,
                     x.MasterReport_Id
                 });
+
+            modelBuilder.Entity<ReportMaster>()
+                .HasOne(x => x.ReportCategory)
+                .WithMany(x => x.Reports)
+                .HasForeignKey(x => x.CategoryId);
+
+            modelBuilder.Entity<ReportConnection>()
+                .HasOne(m => m.ReportMaster)
+                .WithMany(m => m.ReportConnections)
+                .HasForeignKey(m => m.MasterReport_Id);
+
+            modelBuilder.Entity<ReportXML>()
+                .HasOne(r => r.ReportMaster)
+                .WithMany(r => r.ReportXML)
+                .HasForeignKey(r => r.MasterReport_Id);
+
+            modelBuilder.Entity<ReportXMLPrintParameter>()
+                .HasOne(p => p.ReportXML)
+                .WithMany(p => p.Parameters)
+                .HasForeignKey(p => new { p.ReportXMLVersion, p.MasterReport_Id });
         }
     }
 }

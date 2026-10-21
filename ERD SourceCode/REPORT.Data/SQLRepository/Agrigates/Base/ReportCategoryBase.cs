@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Windows.Documents;
 using WPF.Tools.BaseClasses;
 
 namespace REPORT.Data.SQLRepository.Agrigates
@@ -66,5 +67,6 @@ namespace REPORT.Data.SQLRepository.Agrigates
 				base.OnPropertyChanged("ParentCategoryId", ref this._ParentCategoryId, value);
 			}
 		}
-	}
+		
+    }
 }

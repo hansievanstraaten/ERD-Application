@@ -1,26 +1,15 @@
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace REPORT.Data.SQLRepository.Agrigates
 {
     public class ReportXML : ReportXMLBase
 	{
-		// NOTE: For PK that is not identity add the 
-		// [Key]
-		// [DatabaseGenerated(DatabaseGeneratedOption.None)]
-		// Attributes
+        // Inheritance was only done as a POC and there is not real practical reason for doing so
 
-		// Exsample
-		//[Key]
-		//[DatabaseGenerated(DatabaseGeneratedOption.None)]
-		//new public Int64 MasterReport_Id
-		//{
-		//	get
-		//	{
-		//		return base.MasterReport_Id;
-		//	}
+        [ForeignKey(nameof(MasterReport_Id))]
+        public ReportMaster ReportMaster { get; set; }
 
-		//	set
-		//	{
-		//		base.MasterReport_Id = value;
-		//	}
-		//}
-	}
+        public List<ReportXMLPrintParameter> Parameters { get; set; } = new();
+    }
 }

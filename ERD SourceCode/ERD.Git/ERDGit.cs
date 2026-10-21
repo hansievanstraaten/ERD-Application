@@ -244,6 +244,15 @@ namespace ERD.Git
             }
         }
 
+        public static string? GetRemoteUrl(string repositoryPath)
+        {
+            using Repository repo = new Repository(repositoryPath);
+
+            string? remoteUrl = repo.Network.Remotes.FirstOrDefault()?.Url;
+
+            return remoteUrl;
+        }
+
         #endregion
 
         #region BRANCHES

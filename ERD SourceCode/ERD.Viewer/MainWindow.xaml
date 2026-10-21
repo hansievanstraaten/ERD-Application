@@ -54,6 +54,7 @@
                 <MenuItem x:Name="uxManageBranches" Header="Manage Branches" Click="ManageBranches_Click" />
                 <Separator />
                 <MenuItem x:Name="uxOpenInBrowser" Header="Open in Browser" Click="OpenInBrowser_Click" />
+                <MenuItem x:Name="uxGitCredentials" Header="Git Credentials" Click="GitCredentials_Click" />
             </MenuItem>
 
             <MenuItem x:Name="uxMenuDatabase" IsEnabled="False" Header="Database">

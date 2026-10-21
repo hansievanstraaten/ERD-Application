@@ -6,6 +6,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 {
     public class DataSourceTable : DataSourceTableBase
 	{
+        // Inheritance was only done as a POC and there is not real practical reason for doing so
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         new public Int64 MasterReport_Id

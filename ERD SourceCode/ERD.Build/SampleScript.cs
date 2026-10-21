@@ -1,42 +1,27 @@
 ﻿using ERD.Build.BuildEnums;
-using ERD.Build.Models;
-using System.Text;
-using GeneralExtensions;
-using System.Linq;
-using ERD.Models;
-using System.Collections.Generic;
 using ERD.Build.DataMappings;
-using System.Data;
+using ERD.Build.Models;
 using ERD.DatabaseScripts;
+using ERD.Models;
+using GeneralExtensions;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Windows.Documents;
 
 
 namespace ERD.Build
 {
     public class SampleScript
     {
+        private bool ignoreIsFKCheck = false;
         private ErdCanvasModel ErdCanvas;
-
         private List<ErdCanvasModel> AllErdCanvasModels;
-
-        private TableModel SelectedTable
-        {
-            get;
-            set;
-        }
-
+        private TableModel SelectedTable { get; set; }
         private TableModel SelectedReferencedTable { get; set; }
-
-        private ColumnObjectModel SelectedColumn
-        {
-            get;
-            set;
-        }
-
-        public LanguageOptionEnum LanguageOption
-        {
-            get;
-            set;
-        }
+        private ColumnObjectModel SelectedColumn { get; set; }
+        public LanguageOptionEnum LanguageOption { get; set; }
 
         public string BuildSingleFile(OptionSetupModel classOption)
         {
@@ -412,6 +397,56 @@ namespace ERD.Build
 
                     #endregion
 
+                case RepeatTypeEnum.ForeachParentTable:
+
+                    #region FOREACH PARENT TABLE
+
+                    Dictionary<string, TableModel> parentTables = new Dictionary<string, TableModel>();
+
+                    foreach(ColumnObjectModel column in this.SelectedTable.Columns.Where(c => c.IsForeignkey))
+                    {
+                        string tableName = column.ForeignKeys[0].ForeignKeyTable;
+
+                        TableModel tableModel = this.AllErdCanvasModels.SelectMany(m => m.SegmentTables).FirstOrDefault(t => t.TableName == tableName);
+
+                        parentTables[tableName] =  tableModel;
+                    }
+
+                    foreach(TableModel table in parentTables.Values)
+                    {
+                        this.SelectedReferencedTable = table;
+
+                        injectionText.Append(this.ReplaceParameters(buildType.Code));
+                    }
+
+                    break;
+
+                    #endregion
+
+                case RepeatTypeEnum.ForeachParentTableReferencedColumn:
+
+                    #region FOREACH PARENT TABLE REFERENCED COLUMN
+
+                    this.ignoreIsFKCheck = true;
+
+                    foreach (ColumnObjectModel column in this.SelectedTable.Columns.Where(c => c.IsForeignkey))
+                    {
+                        string tableName = column.ForeignKeys[0].ForeignKeyTable;
+                        TableModel tableModel = this.AllErdCanvasModels.SelectMany(m => m.SegmentTables).FirstOrDefault(t => t.TableName == tableName);
+                        this.SelectedReferencedTable = tableModel;
+
+                        foreach (ForeignKeyObjectModel contraint in column.ForeignKeys)
+                        {
+                            this.SelectedColumn = this.SelectedReferencedTable.Columns.FirstOrDefault(c => c.ColumnName == contraint.ForeignKeyColumn);
+                            injectionText.Append(this.ReplaceParameters(buildType.Code));
+                        }
+                    }
+
+                    this.ignoreIsFKCheck = false;
+
+                    break;
+                    #endregion
+                
                 case RepeatTypeEnum.Once:
                 default:
 
@@ -439,6 +474,11 @@ namespace ERD.Build
                 .Replace("[[PrimaryKey]]", this.PrimaryKeyColumnName)
                 .Replace("[[ForeignKey]]", this.ForeignKeyColumnName)
                 .Replace("[[NoKeyColumn]]", this.NoKeyColumnColumnName)
+
+                .Replace("[[ParentTableName]]", this.ForeignTableName)
+                .Replace("[[ParentTableFriendlyName]]", this.ForeignTableFriendlyName)
+                .Replace("[[ParentTablePluralName]]", this.ForeignTablePluralName)
+                .Replace("[[ParentTableDescription]]", this.ForeignTableDescription)
 
                 .Replace("[[ForeignTableName]]", this.ForeignTableName)
                 .Replace("[[ForeignTableFriendlyName]]", this.ForeignTableFriendlyName)
@@ -602,7 +642,7 @@ namespace ERD.Build
         {
             get
             {
-                if (this.SelectedColumn == null || !this.SelectedColumn.IsForeignkey)
+                if (this.SelectedColumn == null || (this.ignoreIsFKCheck == false && !this.SelectedColumn.IsForeignkey))
                 {
                     return string.Empty;
                 }

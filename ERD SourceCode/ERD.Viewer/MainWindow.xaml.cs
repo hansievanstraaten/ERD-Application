@@ -696,6 +696,32 @@ namespace ERD.Viewer
             }
         }
 
+        private void GitCredentials_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                GitCredentialModel gitCredentials = new GitCredentialModel
+                {
+                    Username = General.ProjectModel.GitUsername.Decrypt(),
+                    Password = General.ProjectModel.GitPassword.Decrypt()
+                };
+
+                if (ModelView.ShowDialog("Git Credentials", gitCredentials).IsFalse())
+                {
+                    return;
+                }
+                    
+                General.ProjectModel.GitUsername = gitCredentials.Username.Encrypt();                    
+                General.ProjectModel.GitPassword = gitCredentials.Password.Encrypt();
+
+                this.SaveModel();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.GetFullExceptionMessage());
+            }
+        }
+
         #endregion
 
         #region DATABASE EVENTS

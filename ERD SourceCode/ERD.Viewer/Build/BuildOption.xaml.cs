@@ -322,7 +322,7 @@ namespace ERD.Viewer.Build
                 Dispatcher.BeginInvoke(new Action(() => this.uxSampleScript.Text = result));
 
             }
-            catch (Exception err)
+            catch (Exception err)            
             {
                 // DO NOTHING
             }

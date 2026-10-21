@@ -124,18 +124,25 @@ namespace REPORT.Builder.ReportTools
                 base.Height = value;
             }
         }
-    
+
+        //public string ImageString_OLD
+        //{
+        //    get
+        //    {
+        //        return base.Source.ConvertImageSourceToBitmap().ZipFile().ConvertBytesToString();
+        //    }
+
+        //    set
+        //    {
+        //        base.Source = (value.ConvertStringToBytes().UnzipFile() as System.Drawing.Bitmap).ConvertToImageSource();
+        //    }
+        //}
+
         public string ImageString
         {
-            get
-            {
-                return base.Source.ConvertImageSourceToBitmap().ZipFile().ConvertBytesToString();
-            }
+            get => base.Source.ConvertImageSourceToString();
 
-            set
-            {
-                base.Source = (value.ConvertStringToBytes().UnzipFile() as System.Drawing.Bitmap).ConvertToImageSource();
-            }
+            set => base.Source = value.ConvertStringToImageSource();
         }
     }
 }

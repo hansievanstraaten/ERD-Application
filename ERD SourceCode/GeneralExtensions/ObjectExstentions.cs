@@ -123,68 +123,6 @@ namespace GeneralExtensions
             return (T)item;
         }
 
-        //public static object CloneTo<T>(this T source, Type resultT)
-        //{
-        //  Type sourceT = source.GetType();
-
-        //  ConstructorInfo constructorInfo = resultT.GetConstructor(Type.EmptyTypes);
-
-        //  object result = constructorInfo.Invoke(null);
-
-        //  foreach (PropertyInfo item in sourceT.GetProperties())
-        //  {
-        //    try
-        //    {
-        //      PropertyInfo resultP = resultT.GetProperty(item.Name);
-
-        //      if (resultP == null)
-        //      {
-        //        continue;
-        //      }
-
-        //      resultP.SetValue(result, item.GetValue(source, null), null);
-        //    }
-        //    catch
-        //    {
-        //      // Do Nothing
-        //    }
-        //  }
-
-        //  return result;
-        //}
-
-        //public static T Clone<T>(this T source)
-        //{
-        //  Type sourceT = source.GetType();
-
-        //  Type resultT  = source.GetType();
-
-        //  ConstructorInfo constructorInfo = resultT.GetConstructor(Type.EmptyTypes);
-
-        //  object result = constructorInfo.Invoke(null);
-
-        //  foreach (PropertyInfo item in sourceT.GetProperties())
-        //  {
-        //    try
-        //    {
-        //      PropertyInfo resultP = resultT.GetProperty(item.Name);
-
-        //      if (resultP == null)
-        //      {
-        //        continue;
-        //      }
-
-        //      resultP.SetValue(result, item.GetValue(source, null), null);
-        //    }
-        //    catch
-        //    {
-        //      // Do Nothing
-        //    }
-        //  }
-
-        //  return (T)result;
-        //}
-
         public static byte[] ZipFile<T>(this T source)
         {
             byte[] result = null;

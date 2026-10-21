@@ -6,6 +6,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
 {
     public class ReportConnection : ReportConnectionBase
 	{
+        // Inheritance was only done as a POC and there is not real practical reason for doing so
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         new public Int64 MasterReport_Id
@@ -20,5 +22,8 @@ namespace REPORT.Data.SQLRepository.Agrigates
                 base.MasterReport_Id = value;
             }
         }
+
+        [ForeignKey(nameof(MasterReport_Id))]
+        public ReportMaster ReportMaster { get; set; }
     }
 }

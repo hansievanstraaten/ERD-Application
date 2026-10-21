@@ -30,6 +30,12 @@ namespace ERD.Build.BuildEnums
         [Description("Foreach Referenced Table")]
         ForeachReferencedTable,
 
+        [Description("Foreach Parent Table")]
+        ForeachParentTable,
+
+        [Description("Foreach Referenced Column in Parent Table")]
+        ForeachParentTableReferencedColumn,
+
         [Description("Foreach Table in Project")]
         ForeachTableInProject
 

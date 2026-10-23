@@ -2,6 +2,28 @@
 
 This manual explains the user interface of **ERD.Viewer (ViSo-nice)** in simple terms, based on the menu and controls in `MainWindow.xaml`, and the windows/user controls opened from those actions.
 
+## Document Index
+
+- [1) Main Window Overview A](#1-main-window-overview)
+- [2) Top Menu - Detailed Guide (Menu Order)](#2-top-menu---detailed-guide-menu-order)
+  	- [File](#file)
+    - [Project](#project)
+    - [Git](#git)
+    - [Database](#database)
+    - [Build](#build)
+    - [Report Builder](#report-builder)
+    - [Help And About](#help-and-about)
+- [3) Workspace Editing Areas](#3-workspace-editing-areas)
+    - [Left Panel - Tools Stack](#left-panel---tools-stack)
+    - [Left Panel - Database Tables List](#left-panel---database-tables-list)
+    - [Workspace Tabs (Canvas Area)](#workspace-tabs-canvas-area)
+- [4) Table and Relation Editing](#4-table-and-relation-editing)
+    - [Table Object UI (inside a canvas)](#table-object-ui-inside-a-canvas)
+    - [Relation Editing Flow](#relation-editing-flow)
+- [5) Status, Locking, and Quick Start](#5-status-locking-and-quick-start)
+    - [Status and Locking Behavior (User Visible)](#status-and-locking-behavior-user-visible)
+    - [Practical Quick Start](#practical-quick-start)
+
 ---
 
 ## 1) Main Window Overview

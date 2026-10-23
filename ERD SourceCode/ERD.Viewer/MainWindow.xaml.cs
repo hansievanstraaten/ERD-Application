@@ -962,7 +962,7 @@ namespace ERD.Viewer
                     .GetObject("ERD_Viewer_User_Manual") as string
                     ?? throw new InvalidOperationException("Manual resource not found.");
 
-                DocumentHelper.ShowDocument(documentText);
+                DocumentHelper.ShowMarkDownDocument(documentText);
 
                 //Markdown markdown = new Markdown();
                 //FlowDocument flowDocument = markdown.Transform(documentText);

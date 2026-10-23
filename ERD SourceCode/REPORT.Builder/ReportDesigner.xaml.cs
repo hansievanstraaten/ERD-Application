@@ -968,7 +968,7 @@ namespace REPORT.Builder
 
         private void Help_Cliked(object sender, RoutedEventArgs e)
         {
-			DocumentHelper.ShowDocument(this.QuiqueHelp);
+			DocumentHelper.ShowMarkDownDocument(this.QuiqueHelp);
         }
 
         private string QuiqueHelp

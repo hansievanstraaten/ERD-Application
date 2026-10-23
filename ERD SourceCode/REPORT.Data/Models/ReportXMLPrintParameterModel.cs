@@ -208,6 +208,11 @@ namespace REPORT.Data.Models
 
                 return result.ToArray();
             }
+
+			set
+			{
+				// NOTE: We need this for the API View model
+			}
         }
     }
 }

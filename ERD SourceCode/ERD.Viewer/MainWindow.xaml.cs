@@ -16,20 +16,28 @@ using ERD.Viewer.Git;
 using ERD.Viewer.Tools;
 using ERD.Viewer.Tools.Common;
 using GeneralExtensions;
+using MdXaml;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using REPORT.Builder;
+using REPORT.Builder.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Xps.Packaging;
 using System.Xml.Linq;
 using ViSo.Common;
 using ViSo.Dialogs.Controls;
@@ -939,6 +947,61 @@ namespace ERD.Viewer
                 About about = new About();
 
                 ControlDialog.ShowDialog("About", about, string.Empty, showCancelButton: false, autoSize: true);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.InnerExceptionMessage());
+            }
+        }
+
+        private async void ReferenceDocument_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string documentText = Properties.Resources.ResourceManager
+                    .GetObject("ERD_Viewer_User_Manual") as string
+                    ?? throw new InvalidOperationException("Manual resource not found.");
+
+                DocumentHelper.ShowDocument(documentText);
+
+                //Markdown markdown = new Markdown();
+                //FlowDocument flowDocument = markdown.Transform(documentText);
+
+                //flowDocument.FontFamily = new FontFamily("Arial");
+                //flowDocument.FontSize = 12;
+                //flowDocument.PageWidth = 816;
+                //flowDocument.PageHeight = 1056;
+                //flowDocument.PagePadding = new Thickness(60);
+                //flowDocument.ColumnWidth = double.PositiveInfinity;
+
+                //string xpsPath = Path.Combine(Path.GetTempPath(), $"ERD-{Guid.NewGuid():N}.xps");
+
+                //using (var xps = new XpsDocument(xpsPath, FileAccess.ReadWrite))
+                //{
+                //    var paginator11 = ((IDocumentPaginatorSource)flowDocument).DocumentPaginator;
+
+                //    XpsDocument.CreateXpsDocumentWriter(xps).Write(paginator11);
+                //}
+
+                //using (XpsDocument xps = new XpsDocument(xpsPath, FileAccess.Read))
+                //{
+                //    FixedDocumentSequence sequence = xps.GetFixedDocumentSequence();
+
+                //    DocumentViewer viewer = new DocumentViewer
+                //    {
+                //        Document = sequence
+                //    };
+
+                //    Window window = new Window
+                //    {
+                //        Title = "XPS Test",
+                //        Width = 900,
+                //        Height = 700,
+                //        Content = viewer
+                //    };
+
+                //    window.ShowDialog();
+                //}
             }
             catch (Exception err)
             {
@@ -2316,5 +2379,7 @@ namespace ERD.Viewer
 
 
         #endregion
+
+        
     }
 }

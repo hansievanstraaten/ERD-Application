@@ -30,7 +30,8 @@ namespace ERD.Viewer
 				   "The Reporting Solution was developed just for fun, and I hope you will enjoy it." + Environment.NewLine + Environment.NewLine +
 				   "Your support is appreciated, and some feedback would be appreciated." + Environment.NewLine +
 				   "Info.ViSoNice @gmail.com" + Environment.NewLine + Environment.NewLine +
-				   "NS: For this release the help files and release notes are in the GitHub repository under the 'ERD Msi' Folder. This may change in later versions.";
+                   "NS: For this release the release notes are in the GitHub repository under the 'ERD Msi .Net 10' Folder." + Environment.NewLine +
+                   "The help files are embedded in the application it self under 'Help and About -> Reference Document' and the help in the Git Repository (Under ERD Msi) is there for previous versions support only.";
 		}
 
 		private void GoToGitHub_Cliked(object sender, System.Windows.Input.MouseButtonEventArgs e)

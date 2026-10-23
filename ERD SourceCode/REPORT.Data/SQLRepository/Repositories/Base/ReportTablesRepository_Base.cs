@@ -107,8 +107,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return result.CopyToObject(new ReportXMLPrintParameterModel()) as ReportXMLPrintParameterModel;
 		}
-
-		
+				
 		public List<ReportMasterModel> GetReportMasterByForeignKeyCategoryId (Int64? CategoryId)
 		{
 			List<ReportMaster> result = this.dataContext
@@ -126,8 +125,7 @@ namespace REPORT.Data.SQLRepository.Repositories
 
 			return objectList.TryCast<ReportMasterModel>().ToList();
 		}
-
-		
+				
 		public List<ReportMasterModel> GetReportMasterByReportName (string ReportName)
 		{
 			List<ReportMaster> result = this.dataContext

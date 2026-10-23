@@ -1,12 +1,10 @@
 ﻿using ERD.Common;
-using ERD.Models;
 using GeneralExtensions;
 using Microsoft.AspNetCore.Mvc;
+using REPORT.Api.Models;
 using REPORT.Builder.Printing;
 using REPORT.Data.Models;
-using REPORT.Data.SQLRepository.Agrigates;
 using REPORT.Data.SQLRepository.Repositories;
-using System.Diagnostics.Metrics;
 using System.Xml.Linq;
 using ViSo.SharedEnums.ReportEnums;
 
@@ -55,7 +53,9 @@ namespace REPORT.Api.Controllers
 
             XDocument report = XDocument.Parse(reportXml);
 
-            List<ReportXMLPrintParameterModel> parameterFilters = this.GetReportparameterFilters(report, reportXmlModel.ReportXMLVersion, masterReport_Id);
+            List<ReportXMLPrintParameterViewModel> parameterFilters = this.GetReportparameterFilters(report, reportXmlModel.ReportXMLVersion, masterReport_Id)
+                .Select(c => c.CopyToObject(new ReportXMLPrintParameterViewModel()) as ReportXMLPrintParameterViewModel)
+                .ToList();
 
             return base.Ok(parameterFilters);
         }

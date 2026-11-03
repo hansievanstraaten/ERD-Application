@@ -1,0 +1,14 @@
+Release notes: 2.2.0.0
+*********************
+- Add basic GIT Support
+- Changed to Script builder to depend less on binding for performance improvements
+- Source Code - Added a Reports API (Windows Server only) to extend the usability of reports beyond the Desktop App. (API-Key in appsettings.json)
+	• Note that there are two database connection settings
+		a. Database - This is for the reports system to draw the data to populate the report from. (Project -> Edit Project)
+		b. Reports - This is the database that holds the report configuration (Report Builder -> Setup)
+- Added Filter Operators to the report filters
+- Basic User Manual provided under Help and About -> Reference Document
+
+Minor bugs and fixes:
+*********************:
+- Minor bugs fixed

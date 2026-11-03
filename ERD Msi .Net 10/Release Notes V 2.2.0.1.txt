@@ -1,0 +1,7 @@
+Release notes: 2.2.0.1
+*********************
+- Update NuGet Vulnerabilities
+
+Minor bugs and fixes:
+*********************:
+- Fix Postgres parameter query bug

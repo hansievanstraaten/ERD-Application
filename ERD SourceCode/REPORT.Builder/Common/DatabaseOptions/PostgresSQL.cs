@@ -57,7 +57,6 @@ namespace REPORT.Builder.Common.DatabaseOptions
                 }
             }
 
-            // Add replacement SQL here
             foreach (KeyValuePair<string, ReportSQLReplaceHeaderModel> replacekey in replacementColumns)
             {
                 result.Replace(replacekey.Key, this.BuildReplacementSQL(replacekey));
@@ -76,8 +75,10 @@ namespace REPORT.Builder.Common.DatabaseOptions
 
             foreach (WhereParameterModel parameter in whereParameterModel.OrderBy(so => so.OperatorIndex))
             {
-                result.AppendLine(
-                    $"{parameter.ColumnName} = @{parameter.ParameterName} " +
+                string formatedColumnName = $"\"{parameter.ColumnName.Replace(".", "\".\"")}\"";
+                string[] parameterName = parameter.ParameterName.Split('.');
+
+                result.AppendLine($"{formatedColumnName} = @\"{parameterName.Last()}\" " +
                     $"{(parameter.AndOrOperator == SqlWhereOperatorsEnum.None ? string.Empty : parameter.AndOrOperator.ParseToString())} ");
             }
 

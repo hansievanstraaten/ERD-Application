@@ -1,6 +1,8 @@
 ﻿using GeneralExtensions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using REPORT.Builder.Common;
 using REPORT.Builder.ReportComponents;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations.Design;
 using System.Drawing.Printing;
@@ -23,6 +25,8 @@ namespace REPORT.Builder.Printing
         private int pageMarginTop;
 
         private int pageMarginBottom;
+
+        private int dataPageCout = 1;
 
         private double pageHeaderHeight;
 
@@ -265,7 +269,7 @@ namespace REPORT.Builder.Printing
 
                 foreach(XElement item in headerCanvas.GetReportObjects())
                 {
-                    this.activeCanvas.AddPageHeaderObject(item);
+                    this.activeCanvas.AddPageHeaderObject(item, this.dataPageCout);
                 }
 
                 this.activeCanvas.TopOffset += this.activeCanvas.HeaderHeight;
@@ -285,11 +289,13 @@ namespace REPORT.Builder.Printing
 
                 foreach (XElement item in footerCanvas.GetReportObjects())
                 {
-                    this.activeCanvas.AddPageFooterObject(item);
+                    this.activeCanvas.AddPageFooterObject(item, this.dataPageCout);
                 }
             }
 
             this.AddCanvas(this.activeCanvas);
+
+            ++this.dataPageCout;
 
             this.activeCanvas = null;
         }
@@ -373,7 +379,13 @@ namespace REPORT.Builder.Printing
             {
                 if (item.IsDataObject())
                 {
-                    XElement dataValue = row.Element(item.GetObjectColumn());
+                    string columnName = item.GetObjectColumn();
+
+                    XElement dataValue = row.Elements()
+                        .FirstOrDefault(e => string.Equals(
+                            e.Name.LocalName,
+                            columnName,
+                            StringComparison.OrdinalIgnoreCase));
 
                     if (item.IsEmptyDataSuppressed() && (dataValue == null || dataValue.Value.IsNullEmptyOrWhiteSpace()))
 					{

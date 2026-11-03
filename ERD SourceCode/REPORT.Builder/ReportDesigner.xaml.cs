@@ -56,15 +56,15 @@ namespace REPORT.Builder
 
 		public ReportDesigner(ReportMasterModel masterModel)
 		{
-			InitializeComponent();
-
-			this.InitializeToolsStack();
-
-			SizeChanged += this.ReportDesigner_SizeChanged;
+			this.InitializeComponent();
 
 			this.reportDesignType = (ReportTypeEnum)masterModel.ReportTypeEnum;
 
 			this.ReportMaster = masterModel;
+
+			this.InitializeToolsStack();
+
+			SizeChanged += this.ReportDesigner_SizeChanged;
 
 			this.uxReportMasterModel.Items.Add(this.ReportMaster);
 
@@ -90,7 +90,7 @@ namespace REPORT.Builder
 			this.ReportMaster.PropertyChanged += this.ReportMaster_PropertyChanged;
 		}
 
-		#region PBLIC PROPERTIES
+		#region PUBLIC PROPERTIES
 
 		public ReportMasterModel ReportMaster
 		{
@@ -1115,6 +1115,15 @@ namespace REPORT.Builder
 
 			ReportXMLModel reportXML = repo.GetReportXMLByPrimaryKey(this.ReportMaster.ReportXMLVersion, this.ReportMaster.MasterReport_Id);
 
+			if (reportXML == null)
+			{
+                this.ReportMaster.ReportXMLVersion = 1;
+
+                this.InitializeReportSections();
+
+				return;
+            }
+
 			string reportXml = reportXML.BinaryXML.UnzipFile().ParseToString();
 
 			XDocument report = XDocument.Parse(reportXml);
@@ -1242,7 +1251,12 @@ namespace REPORT.Builder
 			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Page Break", ToolType = typeof(ReportPageBreak) });
 
 			this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Report Sum", ToolType = typeof(ReportSum) });
-		}
+
+			if (this.reportDesignType == ReportTypeEnum.PageHeaderAndFooter)
+            { 
+                this.uxToolsStack.Children.Add(new ToolsMenuItem { Caption = "Page Number", ToolType = typeof(ReportPageNumber) });                
+            }
+        }
 
 		private void RefreshMarginMarkers()
 		{

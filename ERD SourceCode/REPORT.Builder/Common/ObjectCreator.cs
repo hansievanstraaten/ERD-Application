@@ -97,6 +97,14 @@ namespace REPORT.Builder.Common
 
                     return reportSum as UIElement;
 
+                case "ReportPageNumber":
+
+                    ReportPageNumber pageNumber = new ReportPageNumber();
+
+                    pageNumber.ItemXml = xmlObject;
+
+                    return pageNumber as UIElement;
+
                 default:
 
                     return new ReportLabel() as UIElement;

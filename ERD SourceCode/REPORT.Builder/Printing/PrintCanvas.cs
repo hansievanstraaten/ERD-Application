@@ -38,9 +38,11 @@ namespace REPORT.Builder.Printing
             }
         }
 
-        public void AddPageHeaderObject(XElement item)
+        public void AddPageHeaderObject(XElement item, int pageCount)
         {
             UIElement element = ObjectCreator.CreateReportObject(item, false);
+
+            this.SetPageCount(item, element, pageCount);
 
             Canvas.SetLeft(element, element.GetPropertyValue("Left").ToDouble());
 
@@ -49,9 +51,11 @@ namespace REPORT.Builder.Printing
             this.Children.Add(element);
         }
 
-        public void AddPageFooterObject(XElement item)
+        public void AddPageFooterObject(XElement item, int pageCount)
         {
             UIElement element = ObjectCreator.CreateReportObject(item, false);
+
+            this.SetPageCount(item, element, pageCount);
 
             double sectionOffset = this.Height - (this.BottomMargin + this.FooterHeight);
 
@@ -59,8 +63,10 @@ namespace REPORT.Builder.Printing
 
             Canvas.SetTop(element, (element.GetPropertyValue("Top").ToDouble() + sectionOffset));
 
+
             this.Children.Add(element);
         }
+
 
         public bool AddObject(XElement item, SectionTypeEnum sectionType, out double elementBottom, out string textOverflow)
         {
@@ -176,5 +182,17 @@ namespace REPORT.Builder.Printing
 
             itemHeight = dataObj.Height;
 		}
-	}
+	
+        private void SetPageCount(XElement item, UIElement element, int pageCount)
+        {
+            string objectTypeName = item.Attribute("ObjectType").Value;
+
+            switch (objectTypeName)
+            {
+                case "ReportPageNumber":
+                    element.SetPropertyValue("Text", $"Page {pageCount}");
+                    break;
+            }
+        }
+    }
 }

@@ -79,7 +79,6 @@ namespace REPORT.Builder.Printing
                     .ToDictionary(t => t.Key, c => c.ToList());
             }
 
-
             Dictionary<string, XElement[]> sqlOrderBy = xmlReport
                 .Root
                 .Descendants("ReportObject")

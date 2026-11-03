@@ -26,12 +26,15 @@ namespace REPORT.Data.SQLRepository.Repositories
 				return model.ReportXMLVersion;
 			}
 
-			int result = this.dataContext
+			List<int> versionsList = this.dataContext
 				.ReportsXML
 				.Where(r => r.MasterReport_Id == MasterReport_Id)
-				.Max(m => m.ReportXMLVersion);
+				.Select(v => v.ReportXMLVersion)
+				.ToList();
 
-			if (result == 0)
+            int result = versionsList.Count == 0 ? 0 : versionsList.Max();
+
+            if (result == 0)
             {
 				return 1;
             }

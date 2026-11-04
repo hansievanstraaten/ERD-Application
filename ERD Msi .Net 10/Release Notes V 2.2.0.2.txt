@@ -1,0 +1,7 @@
+Release notes: 2.2.0.2
+*********************
+- Fixed PDF export failure caused by missing Windows-1252 encoding registration.
+
+Minor bugs and fixes:
+*********************:
+- 

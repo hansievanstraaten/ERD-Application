@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Data.SQLite;
+using System.Text;
 using WPF.Tools.BaseClasses;
 
 namespace ERD.Viewer
@@ -13,6 +14,7 @@ namespace ERD.Viewer
         {
             DbProviderFactories.RegisterFactory("System.Data.SQLite", SQLiteFactory.Instance);
             DbProviderFactories.RegisterFactory("System.Data.SqlClient", System.Data.SqlClient.SqlClientFactory.Instance);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
         private void ApplicationBase_Exit(object sender, System.Windows.ExitEventArgs e)

@@ -111,24 +111,25 @@ namespace REPORT.Builder.Printing
         }
 
         private List<string> ConvertXpsBatchesToPdf(List<string> fileNames, string outputPath)
-		{
+        {
             List<string> pdfFileNames = new List<string>();
 
-            foreach(string file in fileNames)
-			{
-                PdfSharp.Xps.XpsModel.XpsDocument pdfDocument = PdfSharp.Xps.XpsModel.XpsDocument.Open(file);
+            foreach (string file in fileNames)
+            {
+                string pdfFile = Path.ChangeExtension(file, ".pdf");
 
-                PdfSharp.Xps.XpsConverter.Convert(pdfDocument, Path.ChangeExtension(file, "pdf"), 0);
+                using (PdfSharp.Xps.XpsModel.XpsDocument pdfDocument = PdfSharp.Xps.XpsModel.XpsDocument.Open(file))
+                {
+                    PdfSharp.Xps.XpsConverter.Convert(pdfDocument, pdfFile, 0);
+                }
 
-                this.DeleteXpsFile(file);
+                File.Delete(file);
 
-                pdfDocument.Close();
-
-                pdfFileNames.Add(Path.ChangeExtension(file, "pdf"));
+                pdfFileNames.Add(pdfFile);
             }
 
             return pdfFileNames;
-		}
+        }
 
         private void MergePdfFiles(List<string> fileNames, string outputPath)
         {

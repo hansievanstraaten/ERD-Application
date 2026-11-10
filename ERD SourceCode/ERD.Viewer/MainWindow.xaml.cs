@@ -1240,8 +1240,7 @@ namespace ERD.Viewer
 
                 TableModel table = tab[item.TableName];
 
-                tab.ZoomTo(table.CanvasLocation);
-
+                tab.BringToView(table.CanvasLocation);
             }
             catch (Exception err)
             {

@@ -1,0 +1,10 @@
+Release notes: 2.2.0.3
+*********************
+- Improve relationship lines to avoid crossing other tables. This will not redraw if you drop a table on a line but will when the canvas is loaded or when the line crossing's table is moved.
+- Enhance canvas zoom to zoom on Cursor and not the top left corner of the tab the canvas is in.
+- Improve table locator when a tables is double clicked in the tables list. This now will attempt to bring the table as close to the top left of the screen as is possible with its location on the canvas.
+  It will also zoom the canvas out to a readable size when moving to the location
+
+Minor bugs and fixes:
+*********************:
+- 

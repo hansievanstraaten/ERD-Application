@@ -19,20 +19,23 @@ namespace ERD.Viewer.Tools
 {
     internal class TableWorkingCanvas : Canvas
     {
+        private const double relationClearance = 15.0;
+        private const double relationTurnPenalty = 20.0;
+        private const double routeBoundaryMargin = 50.0;
+        private const double routeEpsilon = 0.001;
+        
+        private const double linePadding = 5;
+        private const double anchorStartOffset = 3;
+        private const double relationLeadOutLength = 20.0;
+
         internal delegate void TableMoveEvent(object sender, bool isDrag);
-
         internal delegate void TableAddedEvent(object sender, TableModel table);
-
         internal delegate void RemoveTableEvent(object sender, TableModel tableModel);
-
         internal delegate void CanvasChangedEvent(object sender, object changedItem);
 
         internal event TableMoveEvent TableMove;
-
         internal event TableAddedEvent TableAdded;
-
         internal event RemoveTableEvent RemoveTable;
-
         internal event CanvasChangedEvent CanvasChanged;
 
         private bool wasFirstLoaded = false;
@@ -554,6 +557,492 @@ namespace ERD.Viewer.Tools
             table.InvalidateVisual();
         }
 
+        #region TABLE OBSTACLE ROUTING
+
+        private sealed class RouteSearchNode
+        {
+            public int XIndex { get; set; }
+
+            public int YIndex { get; set; }
+
+            // 0 = Start, 1 = Horizontal, 2 = Vertical
+            public int Direction { get; set; }
+
+            public double G { get; set; }
+
+            public double H { get; set; }
+
+            public double F => G + H;
+
+            public RouteSearchNode Parent { get; set; }
+
+            public string Key => $"{XIndex}|{YIndex}|{Direction}";
+        }
+
+        private Point[] RouteAroundTables(Point start, Point end, TableObject parentTable, TableObject childTable, Point[] existingPoints,
+            int parentLinkIndex, int childLinkIndex)
+        {
+            if (parentTable == childTable)
+            {
+                return existingPoints;
+            }
+
+            Point parentLeadOut = this.GetTableLeadOutPoint(parentTable, start, parentLinkIndex);
+
+            Point childLeadOut = this.GetTableLeadOutPoint(childTable, end, childLinkIndex);
+
+            // Preserve the existing crow's-foot decoration points.
+            Point[] crowFootPoints = existingPoints
+                .Skip(2)
+                .ToArray();
+
+            // Build the original route, but include the two lead-out points.
+            List<Point> originalRoute = new List<Point>();
+
+            originalRoute.Add(start);
+            originalRoute.Add(parentLeadOut);
+            originalRoute.AddRange(existingPoints.Take(2));
+            originalRoute.Add(childLeadOut);
+            originalRoute.Add(end);
+
+            // If the route is clear, do NOT invoke A*.
+            if (!this.RouteIntersectsObstacles(originalRoute, this.GetTableObstacles(parentTable, childTable)))
+            {
+                return new Point[] { parentLeadOut }
+                    .Concat(existingPoints.Take(2))
+                    .Concat(new Point[] { childLeadOut })
+                    .Concat(crowFootPoints)
+                    .ToArray();
+            }
+
+            // Only perform A* when another table obstructs the route.
+            List<Rect> obstacles = this.GetTableObstacles(parentTable, childTable);
+
+            Point[] newRoute = this.FindOrthogonalRoute(parentLeadOut, childLeadOut, obstacles);
+
+            if (newRoute == null || newRoute.Length < 2)
+            {
+                return existingPoints;
+            }
+
+            return new Point[] { parentLeadOut }
+                .Concat(newRoute.Skip(1).Take(newRoute.Length - 2))
+                .Concat(new Point[] { childLeadOut })
+                .Concat(crowFootPoints)
+                .ToArray();
+        }
+
+        private List<Rect> GetTableObstacles(TableObject parentTable, TableObject childTable)
+        {
+            List<Rect> obstacles = new List<Rect>();
+
+            TableObject[] tables = this
+                .FindVisualControls(typeof(TableObject))
+                .OfType<TableObject>()
+                .ToArray();
+
+            foreach (TableObject table in tables)
+            {
+                if (table == parentTable || table == childTable)
+                {
+                    continue;
+                }
+
+                double width = table.ActualWidth;
+                double height = table.ActualHeight;
+
+                if (width <= 0)
+                {
+                    width = table.DesiredSize.Width;
+                }
+
+                if (height <= 0)
+                {
+                    height = table.DesiredSize.Height;
+                }
+
+                if (width <= 0 || height <= 0)
+                {
+                    continue;
+                }
+
+                Rect obstacle = new Rect(table.Location.X - relationClearance,
+                    table.Location.Y - relationClearance,
+                    width + (relationClearance * 2),
+                    height + (relationClearance * 2));
+
+                obstacles.Add(obstacle);
+            }
+
+            return obstacles;
+        }
+
+        private bool RouteIntersectsObstacles(List<Point> route, List<Rect> obstacles)
+        {
+            for (int i = 0; i < route.Count - 1; i++)
+            {
+                Point start = route[i];
+                Point end = route[i + 1];
+
+                foreach (Rect obstacle in obstacles)
+                {
+                    if (this.SegmentIntersectsObstacle(start, end, obstacle))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool SegmentIntersectsObstacle(Point start, Point end, Rect obstacle)
+        {
+            bool horizontal = Math.Abs(start.Y - end.Y) < routeEpsilon;
+
+            bool vertical = Math.Abs(start.X - end.X) < routeEpsilon;
+
+            if (horizontal)
+            {
+                double y = start.Y;
+                double left = Math.Min(start.X, end.X);
+                double right = Math.Max(start.X, end.X);
+
+                bool crossesVertically = y > obstacle.Top + routeEpsilon &&
+                    y < obstacle.Bottom - routeEpsilon;
+
+                bool crossesHorizontally = right > obstacle.Left + routeEpsilon &&
+                    left < obstacle.Right - routeEpsilon;
+
+                return crossesVertically && crossesHorizontally;
+            }
+
+            if (vertical)
+            {
+                double x = start.X;
+
+                double top = Math.Min(start.Y, end.Y);
+                double bottom = Math.Max(start.Y, end.Y);
+
+                bool crossesHorizontally = x > obstacle.Left + routeEpsilon &&
+                    x < obstacle.Right - routeEpsilon;
+
+                bool crossesVertically = bottom > obstacle.Top + routeEpsilon &&
+                    top < obstacle.Bottom - routeEpsilon;
+
+                return crossesHorizontally && crossesVertically;
+            }
+
+            // The router only generates orthogonal lines.
+            // Treat an unexpected diagonal as obstructed.
+            return true;
+        }
+
+        private Point[] FindOrthogonalRoute(Point start, Point end, List<Rect> obstacles)
+        {
+            SortedSet<double> xCoordinates = new SortedSet<double>();
+            SortedSet<double> yCoordinates = new SortedSet<double>();
+
+            xCoordinates.Add(start.X);
+            xCoordinates.Add(end.X);
+            yCoordinates.Add(start.Y);
+            yCoordinates.Add(end.Y);
+
+            // Add the edges of every expanded obstacle.
+            foreach (Rect obstacle in obstacles)
+            {
+                xCoordinates.Add(obstacle.Left);
+                xCoordinates.Add(obstacle.Right);
+                yCoordinates.Add(obstacle.Top);
+                yCoordinates.Add(obstacle.Bottom);
+            }
+
+            // Add an outer routing corridor around all obstacles.
+            // This gives A* an alternative when the direct route is blocked.
+            double minX = Math.Min(start.X, end.X);
+            double maxX = Math.Max(start.X, end.X);
+            double minY = Math.Min(start.Y, end.Y);
+            double maxY = Math.Max(start.Y, end.Y);
+
+            foreach (Rect obstacle in obstacles)
+            {
+                minX = Math.Min(minX, obstacle.Left);
+                maxX = Math.Max(maxX, obstacle.Right);
+                minY = Math.Min(minY, obstacle.Top);
+                maxY = Math.Max(maxY, obstacle.Bottom);
+            }
+
+            xCoordinates.Add(minX - routeBoundaryMargin);
+            xCoordinates.Add(maxX + routeBoundaryMargin);
+            yCoordinates.Add(minY - routeBoundaryMargin);
+            yCoordinates.Add(maxY + routeBoundaryMargin);
+
+            double[] xs = xCoordinates.ToArray();
+            double[] ys = yCoordinates.ToArray();
+
+            int startX = Array.IndexOf(xs, start.X);
+            int startY = Array.IndexOf(ys, start.Y);
+
+            int endX = Array.IndexOf(xs, end.X);
+            int endY = Array.IndexOf(ys, end.Y);
+
+            if (startX < 0 || startY < 0 ||
+                endX < 0 || endY < 0)
+            {
+                return null;
+            }
+
+            List<RouteSearchNode> open = new List<RouteSearchNode>();
+
+            Dictionary<string, RouteSearchNode> bestNodes = new Dictionary<string, RouteSearchNode>();
+
+            HashSet<string> closed = new HashSet<string>();
+
+            RouteSearchNode firstNode = new RouteSearchNode
+            {
+                XIndex = startX,
+                YIndex = startY,
+                Direction = 0,
+                G = 0,
+                H = Math.Abs(end.X - start.X) +
+                    Math.Abs(end.Y - start.Y)
+            };
+
+            open.Add(firstNode);
+
+            bestNodes.Add(firstNode.Key, firstNode);
+
+            while (open.Count > 0)
+            {
+                // Select the node with the lowest estimated total cost.
+                int bestIndex = 0;
+
+                for (int i = 1; i < open.Count; i++)
+                {
+                    if (open[i].F < open[bestIndex].F)
+                    {
+                        bestIndex = i;
+                    }
+                }
+
+                RouteSearchNode current = open[bestIndex];
+
+                open.RemoveAt(bestIndex);
+
+                if (closed.Contains(current.Key))
+                {
+                    continue;
+                }
+
+                closed.Add(current.Key);
+
+                // Destination reached.
+                if (current.XIndex == endX &&
+                    current.YIndex == endY)
+                {
+                    return this.ReconstructRoute(current, xs, ys, start, end);
+                }
+
+                // Four possible movements:
+                // Left, Right, Up and Down.
+                int[,] movements =
+                {
+                    { -1,  0 },
+                    {  1,  0 },
+                    {  0, -1 },
+                    {  0,  1 }
+                };
+
+                for (int i = 0; i < movements.GetLength(0); i++)
+                {
+                    int nextX = current.XIndex + movements[i, 0];
+                    int nextY = current.YIndex + movements[i, 1];
+
+                    if (nextX < 0 || nextX >= xs.Length ||
+                        nextY < 0 || nextY >= ys.Length)
+                    {
+                        continue;
+                    }
+
+                    Point currentPoint = new Point(xs[current.XIndex], ys[current.YIndex]);
+
+                    Point nextPoint = new Point(xs[nextX], ys[nextY]);
+
+                    // Reject nodes inside obstacles.
+                    if (this.IsPointInsideObstacle(nextPoint, obstacles))
+                    {
+                        continue;
+                    }
+
+                    // Reject segments crossing obstacles.
+                    bool blocked = obstacles.Any(obstacle =>
+                        this.SegmentIntersectsObstacle(
+                            currentPoint,
+                            nextPoint,
+                            obstacle));
+
+                    if (blocked)
+                    {
+                        continue;
+                    }
+
+                    int direction = movements[i, 0] != 0 ? 1 : 2;
+
+                    double distance = Math.Abs(nextPoint.X - currentPoint.X) +
+                        Math.Abs(nextPoint.Y - currentPoint.Y);
+
+                    double turnCost = current.Direction != 0 && current.Direction != direction
+                            ? relationTurnPenalty
+                            : 0;
+
+                    double tentativeG = current.G + distance + turnCost;
+
+                    RouteSearchNode nextNode = new RouteSearchNode
+                    {
+                        XIndex = nextX,
+                        YIndex = nextY,
+                        Direction = direction,
+                        G = tentativeG,
+                        H = Math.Abs(end.X - nextPoint.X) +
+                            Math.Abs(end.Y - nextPoint.Y),
+                        Parent = current
+                    };
+
+                    if (closed.Contains(nextNode.Key))
+                    {
+                        continue;
+                    }
+
+                    if (bestNodes.TryGetValue(nextNode.Key, out RouteSearchNode existingNode))
+                    {
+                        if (tentativeG >= existingNode.G)
+                        {
+                            continue;
+                        }
+
+                        // Update an already discovered node.
+                        existingNode.G = tentativeG;
+                        existingNode.Parent = current;
+
+                        continue;
+                    }
+
+                    bestNodes.Add(nextNode.Key, nextNode);
+
+                    open.Add(nextNode);
+                }
+            }
+
+            // No valid route was found.
+            return null;
+        }
+
+        private bool IsPointInsideObstacle(Point point, List<Rect> obstacles)
+        {
+            return obstacles.Any(obstacle =>
+                point.X > obstacle.Left + routeEpsilon &&
+                point.X < obstacle.Right - routeEpsilon &&
+                point.Y > obstacle.Top + routeEpsilon &&
+                point.Y < obstacle.Bottom - routeEpsilon);
+        }
+
+        private Point[] ReconstructRoute(RouteSearchNode destination, double[] xs, double[] ys, Point start, Point end)
+        {
+            List<Point> route = new List<Point>();
+            RouteSearchNode current = destination;
+
+            while (current != null)
+            {
+                route.Add(new Point(xs[current.XIndex], ys[current.YIndex]));
+                current = current.Parent;
+            }
+
+            route.Reverse();
+
+            // Remove unnecessary intermediate points where the
+            // route continues in the same direction.
+            List<Point> simplified = new List<Point>();
+
+            foreach (Point point in route)
+            {
+                simplified.Add(point);
+
+                while (simplified.Count >= 3)
+                {
+                    Point a = simplified[simplified.Count - 3];
+                    Point b = simplified[simplified.Count - 2];
+                    Point c = simplified[simplified.Count - 1];
+
+                    bool sameHorizontal = Math.Abs(a.Y - b.Y) < routeEpsilon 
+                        && Math.Abs(b.Y - c.Y) < routeEpsilon;
+
+                    bool sameVertical = Math.Abs(a.X - b.X) < routeEpsilon 
+                        && Math.Abs(b.X - c.X) < routeEpsilon;
+
+                    if (sameHorizontal || sameVertical)
+                    {
+                        simplified.RemoveAt(simplified.Count - 2);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            // Ensure the exact original endpoints are retained.
+            simplified[0] = start;
+            simplified[simplified.Count - 1] = end;
+
+            return simplified.ToArray();
+        }
+
+        private Point GetTableLeadOutPoint(TableObject table, Point anchorPoint, int linkIndex)
+        {
+            double left = table.Location.X;
+            double top = table.Location.Y;
+
+            double width = table.DesiredSize.Width;
+            double height = table.DesiredSize.Height;
+
+            double right = left + width;
+            double bottom = top + height;
+
+            // Determine which table edge contains the anchor point.
+            double distanceLeft = Math.Abs(anchorPoint.X - left);
+            double distanceRight = Math.Abs(anchorPoint.X - right);
+            double distanceTop = Math.Abs(anchorPoint.Y - top);
+            double distanceBottom = Math.Abs(anchorPoint.Y - bottom);
+
+            double shortestDistance = Math.Min(Math.Min(distanceLeft, distanceRight), Math.Min(distanceTop, distanceBottom));
+
+            double leadOutOffset = (linkIndex * linePadding) + relationLeadOutLength;
+
+            // Move directly away from the closest table edge.
+            if (shortestDistance == distanceLeft)
+            {
+                return new Point(anchorPoint.X - leadOutOffset,
+                    anchorPoint.Y);
+            }
+
+            if (shortestDistance == distanceRight)
+            {
+                return new Point(anchorPoint.X + leadOutOffset,
+                    anchorPoint.Y);
+            }
+
+            if (shortestDistance == distanceTop)
+            {
+                return new Point( anchorPoint.X,
+                    anchorPoint.Y - leadOutOffset);
+            }
+
+            return new Point(anchorPoint.X,
+                anchorPoint.Y + leadOutOffset);
+        }
+
+        #endregion
+
         #region LINE MAINTENANCE
 
         private void AddRelationsDrawing(TableObject parentTable)
@@ -691,7 +1180,6 @@ namespace ERD.Viewer.Tools
 
             string[] tablesArray = relationKey.Split(new string[] {"||"}, StringSplitOptions.RemoveEmptyEntries);
 
-            //int childKeyLinkCount = childTable.Table.Columns.Where(cc => cc.ForeignKeyTable == tablesArray[0] && cc.InPrimaryKey).Count();
             int childKeyLinkCount = childTable.Table.Columns.Where(cc => cc.ForeignKeys.Any(t => t.ForeignKeyTable == tablesArray[0]) && cc.InPrimaryKey).Count();
 
             int childKeyCount = childTable.Table.Columns.Where(ck => ck.InPrimaryKey).Count();
@@ -713,6 +1201,9 @@ namespace ERD.Viewer.Tools
                 new System.Drawing.Point((int)childPoint.X, (int)childPoint.Y),
                 parentWidth, childWidth, parentBottom, childBottom);
 
+            var pN = parentTable.Table.TableName;
+            var cN = childTable.Table.TableName;
+
             if (childTable.Table.TableName == parentTable.Table.TableName)
             {
                 #region TABLE REFERENCE IT SELF
@@ -723,7 +1214,7 @@ namespace ERD.Viewer.Tools
 
                 childPoint.X += parentTable.DesiredSize.Width;
 
-                childPoint.Y += (yOffset + 20);
+                childPoint.Y += (yOffset + linePadding);
 
                 result[0] = new Point(parentPoint.X + xOffset, parentPoint.Y);
 
@@ -739,13 +1230,13 @@ namespace ERD.Viewer.Tools
 
                 parentPoint.X += parentTable.DesiredSize.Width;
 
-                double parentHeightCentre = parentPoint.Y + (parentTable.DesiredSize.Height / 2);
+                double parentHeightCentre = parentPoint.Y + (parentTable.DesiredSize.Height / anchorStartOffset);
 
-                double childHeightCentre = childPoint.Y + (childTable.DesiredSize.Height / 2);
+                double childHeightCentre = childPoint.Y + (childTable.DesiredSize.Height / anchorStartOffset);
 
-                parentPoint.Y = parentHeightCentre + (parentLinkIndex * 20);
+                parentPoint.Y = parentHeightCentre + (parentLinkIndex * linePadding);
 
-                childPoint.Y = childHeightCentre + (childLinkIndex * 20);
+                childPoint.Y = childHeightCentre + (childLinkIndex * linePadding);
 
                 double xOffP = (parentPoint.X - childPoint.X) / 2;
 
@@ -766,13 +1257,13 @@ namespace ERD.Viewer.Tools
 
                 childPoint.X += childTable.DesiredSize.Width;
 
-                double parentHeightCentre = parentPoint.Y + (parentTable.DesiredSize.Height / 2);
+                double parentHeightCentre = parentPoint.Y + (parentTable.DesiredSize.Height / anchorStartOffset);
 
-                double childHeightCentre = childPoint.Y + (childTable.DesiredSize.Height / 2);
+                double childHeightCentre = childPoint.Y + (childTable.DesiredSize.Height / anchorStartOffset);
 
-                parentPoint.Y = parentHeightCentre + (parentLinkIndex * 20);
+                parentPoint.Y = parentHeightCentre + (parentLinkIndex * linePadding);
 
-                childPoint.Y = childHeightCentre + (childLinkIndex * 20);
+                childPoint.Y = childHeightCentre + (childLinkIndex * linePadding);
 
                 double xOffP = (parentPoint.X - childPoint.X) / 2;
 
@@ -793,13 +1284,13 @@ namespace ERD.Viewer.Tools
 
                 childPoint.Y += childTable.DesiredSize.Height;
 
-                double parentWidthCentre = parentPoint.X + (parentTable.DesiredSize.Width / 2);
+                double parentWidthCentre = parentPoint.X + (parentTable.DesiredSize.Width / anchorStartOffset);
 
-                double childWidthCentre = childPoint.X + (childTable.DesiredSize.Width / 2);
+                double childWidthCentre = childPoint.X + (childTable.DesiredSize.Width / anchorStartOffset);
 
-                parentPoint.X = parentWidthCentre + (parentLinkIndex * 20);
+                parentPoint.X = parentWidthCentre + (parentLinkIndex * linePadding);
 
-                childPoint.X = childWidthCentre + (childLinkIndex * 20);
+                childPoint.X = childWidthCentre + (childLinkIndex * linePadding);
 
                 double yOffP = (parentPoint.Y - childPoint.Y) / 2;
 
@@ -820,13 +1311,13 @@ namespace ERD.Viewer.Tools
 
                 parentPoint.Y += parentTable.DesiredSize.Height;
 
-                double parentWidthCentre = parentPoint.X + (parentTable.DesiredSize.Width / 2);
+                double parentWidthCentre = parentPoint.X + (parentTable.DesiredSize.Width / anchorStartOffset);
 
-                double childWidthCentre = childPoint.X + (childTable.DesiredSize.Width / 2);
+                double childWidthCentre = childPoint.X + (childTable.DesiredSize.Width / anchorStartOffset);
 
-                parentPoint.X = parentWidthCentre + (parentLinkIndex * 20);
+                parentPoint.X = parentWidthCentre + (parentLinkIndex * linePadding);
 
-                childPoint.X = childWidthCentre + (childLinkIndex * 20);
+                childPoint.X = childWidthCentre + (childLinkIndex * linePadding);
 
                 double yOffP = (parentPoint.Y - childPoint.Y) / 2;
 
@@ -842,7 +1333,7 @@ namespace ERD.Viewer.Tools
                 #endregion
             }
 
-            return result;
+            return this.RouteAroundTables(parentPoint, childPoint, parentTable, childTable, result, parentLinkIndex, childLinkIndex);
         }
 
         private Point[] AddLeftCrowsFeet(Point[] intersectionPoints, Point childPoint)

@@ -92,9 +92,9 @@ namespace ERD.Viewer.Tools
             set;
         }
 
-        public void ZoomTo(Point location)
+        public void BringToView(Point location)
         {
-            this.uxCanvasScroll.ZoomTo(location);
+            this.uxCanvasScroll.BringToView(location);
         }
 
         public async void RefreshModel(ErdCanvasModel changedModel)
@@ -341,6 +341,5 @@ namespace ERD.Viewer.Tools
 
             this.uxTabLock.Content = "This Canvas is locked by You";
         }
-
 	}
 }

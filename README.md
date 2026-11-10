@@ -7,33 +7,212 @@
 	</body>
 </html>
 
-Welcome to ViSo-Nice ERD Application.<BR/><BR/>
-
-<a style="color:#0000FF" href="https://raw.githubusercontent.com/hansievanstraaten/ERD-Application/master/ERD%20Msi/ViSo.Viewer.msi" download="ViSo.Viewer.msi">Download Application</a>
-
-Current Version supports Microsoft SQL and C# Code. More may follow in due time.
-New: Now with a simple Direct from the DB reporting solution.
+# Welcome to ViSo-Nice ERD Application
 
 
-The Application was developed as part of a necessity to have a visual representation on a database and managing database entities as part of the representation.
 
-Support for multiple databases, without the necessity to create a new instance of the ERD Model. Alternative database connections are not required to provide a password that makes this application ideal for deployment to production environments where the production database is not available for development.
+**A Visual Database Modelling and Management Tool**
 
-Multiple canvases per model allows for smaller canvases and acts as one great ERD. Each canvas is saved on its own that allows for developers to work on the same ERD Model without Merage conflicts. For Later development the locking of canvases will be implemented to ensure that developers do not work on the same canvas at the same time.
-Files are saved in Json format that provides editability in raw file format, for those who are brave, though I cannot guarantee correct application functionality one a file has been edited.
+<a href="https://github.com/hansievanstraaten/ERD-Application/raw/refs/heads/master/ERD%20Msi%20.Net%2010/ViSo.Viewer.msi" download="ViSo.Viewer.msi">
+    <strong>Download ViSo-Nice ERD Application (MSI)</strong>
+</a>
 
-Only table that are on a canvas are active, and are updated during Reverse and Forward Engineering, as well as File Scripting.
 
-File Scripting is available for C#, but I would love to add more languages, if you would like a language implementation to feel free to ask or download the source and add the functionality yourself. I would however like if you share your changes once it is tested and correct. Scripting is a bit tricky and I will provide a document as soon as posable on this matter.
-Current development only supports MS SQL, and as with the scripting languages, I would like to extend this, though this will be a bit trickier and some specialist assistance in the database arena would be appreciated.
+## About the Application
 
-Virtual relations allow for relations to be created without any database constraint. These types of relations are only visible on the canvas and will not be deployed to your database. Thus, you can create relations on your ERD and don’t need to worry about database performance on larger database models where data IO is of more importance than relational management.
 
-The Application are ideal for small to larger size databases, and I tested it on a database consisting of about 900 tables. Tends to be a bit slow on some functions such as database comparisons, but in general performance was good.
 
-This desktop application is developed in C# using WPF, .Net Framework 4.7.
-Upgrades and changes will be periodic, and without notice. 
-The Msi Build will change after each stable version.
+ViSo-Nice ERD was developed out of a practical need for a visual representation of database structures, together with the ability to manage database entities directly within that representation.
 
-Happy Huntings,
-Hope you can use this application to your own benefit.
+
+
+The application aims to simplify database modelling, development and maintenance by bringing database structures into a visual environment where developers can design, explore and manage their database models.
+
+
+
+## Key Features
+
+
+
+### Multiple Database Connections
+
+
+
+The application supports multiple database connections without requiring separate instances of an ERD model.
+
+
+
+Alternative database connections do not require passwords, making it particularly useful in environments where production databases are not directly accessible to developers. This allows developers to maintain and work with database models across different environments without needing direct production database credentials.
+
+
+
+### Multiple Canvases per Model
+
+
+
+A single ERD model can contain multiple canvases, allowing large database structures to be divided into smaller, more manageable sections while remaining part of one overall model.
+
+
+
+Each canvas is saved independently. This makes it possible for multiple developers to work on the same ERD model without creating unnecessary file merge conflicts.
+
+
+
+Canvas locking is planned for a future release to prevent multiple developers from modifying the same canvas simultaneously.
+
+
+
+### JSON-Based File Storage
+
+
+
+ERD models are stored in JSON format, making the underlying files accessible and editable outside the application.
+
+
+
+For those who are brave enough to edit the files directly, the structure is there to explore. However, manual modifications may affect the integrity of the model, and correct application functionality cannot be guaranteed after external changes.
+
+
+
+### Canvas-Based Database Management
+
+
+
+Only tables placed on a canvas are considered active for operations such as:
+
+
+
+* Database Reverse Engineering.
+* Database Forward Engineering.
+* File Scripting.
+
+
+
+This provides greater control over which database entities are included in development and deployment operations.
+
+
+
+### File Scripting
+
+
+
+File scripting currently supports C#, allowing developers to generate scripts from their ERD models.
+
+
+
+I would love to extend this functionality to support additional programming languages. If you have a particular language in mind, feel free to get in touch.
+
+
+
+Alternatively, you are welcome to download the source code and contribute your own language implementation. I would appreciate it if you shared your tested and working contributions with the project.
+
+
+
+Scripting has its complexities, and I intend to provide additional technical documentation as soon as possible.
+
+
+
+### Database Support
+
+
+
+Current development supports Microsoft SQL Server and Postgres.
+
+
+
+Expanding support to additional database platforms is one of the goals for future development. However, database-specific implementation introduces some additional complexities, and contributions or specialist assistance in this area would be greatly appreciated.
+
+
+
+### Virtual Relationships
+
+
+
+Virtual relationships allow developers to define relationships between tables without creating actual database constraints.
+
+
+
+These relationships exist exclusively within the ERD model and are not deployed to the database.
+
+
+
+This is particularly useful when working with larger database structures where logical relationships are important for documentation and visual understanding, but enforcing those relationships through database constraints is not necessarily desirable.
+
+
+
+Virtual relationships provide the flexibility to document and visualize database relationships without introducing additional database-level constraints or potentially affecting data operations.
+
+
+
+## Performance and Scalability
+
+
+
+ViSo-Nice ERD is designed to accommodate both small and larger database structures.
+
+
+
+During testing, the application was used against a database containing approximately 900 tables. Although certain operations, particularly database comparisons, can become slower with larger models, overall performance has been encouraging.
+
+
+## Git
+Git support provides a manner for teams to share ERD models. Where Locking attempts to prevent developers from editing the same canvas at the same time by having the project in a shared folder, Git, on the other hand, depends on file merging to ensure model integrity. 
+
+Both techniques can be tested, and where File locking is a simple solution, Git provides a more complex but trusted mythology.
+
+## Report Builder
+This provides a report builder for old school reports, with separate headers and footers to make it easier on maintenance tasks such as changing company logo's and contact information.
+
+The source code have a working Report API to illustrate how reports can be accessed for integration with your current system.
+
+Note: The reporting solution requires a database and currently supports SQLite, MS SQL and Postgres
+
+## Technology
+
+
+
+ViSo-Nice ERD is a Windows desktop application developed using:
+
+
+
+* **Programming Language:** C#
+* **UI Framework:** Windows Presentation Foundation (WPF)
+* **Runtime:** .NET 10
+
+
+
+## Development and Updates
+
+
+
+Development is ongoing, and updates, improvements and new functionality will be released periodically and without prior notice.
+
+
+
+The MSI installation package will be updated with each stable release, so the installer may change as new versions become available.
+
+
+
+## Final Thoughts
+
+
+
+ViSo-Nice ERD started as a practical solution to a development need, and I hope it can be equally useful to other developers.
+
+
+
+There is still plenty of room for improvement, and contributions, suggestions and ideas are always welcome.
+
+
+
+Feel free to explore the application, experiment with its functionality and make use of it in your own development environment.
+
+
+
+**Happy Hunting!**
+
+
+
+*Hope you find it as useful as I have.*
+
+

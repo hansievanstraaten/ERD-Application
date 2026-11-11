@@ -161,7 +161,7 @@ Git support provides a manner for teams to share ERD models. Where Locking attem
 Both techniques can be tested, and where File locking is a simple solution, Git provides a more complex but trusted mythology.
 
 ## Report Builder
-This provides a report builder for old school reports, with separate headers and footers to make it easier on maintenance tasks such as changing company logo's and contact information.
+This provides a Visual Report Designer with Integrated Database Reporting and API Support, with separate headers and footers to make it easier on maintenance tasks such as changing company logo's and contact information.
 
 The source code have a working Report API to illustrate how reports can be accessed for integration with your current system.
 

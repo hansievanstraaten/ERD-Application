@@ -1,0 +1,7 @@
+Release notes: 2.2.0.4
+*********************
+- Remove the "Page" prefix on the report page number during printing. This now will only print the actual page number with out the word "Page" as prefix.
+
+Minor bugs and fixes:
+*********************:
+- 

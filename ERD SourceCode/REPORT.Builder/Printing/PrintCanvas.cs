@@ -190,7 +190,7 @@ namespace REPORT.Builder.Printing
             switch (objectTypeName)
             {
                 case "ReportPageNumber":
-                    element.SetPropertyValue("Text", $"Page {pageCount}");
+                    element.SetPropertyValue("Text", pageCount.ToString());
                     break;
             }
         }

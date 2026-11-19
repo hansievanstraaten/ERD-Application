@@ -1,0 +1,14 @@
+Release notes: 2.2.0.5
+*********************
+- Enhance Relation lines to improve tracking. Mouse enter changes line to Orange. Left mouse Click changes it to Red or Default
+- Script Builder IF condition enhanced to allow for ELSE statements. 
+	• [[IF{{[[TableName]] == Main THEN Main Table ELSE [[TableName]] is Selected}}]]
+		If True: Main Table
+		if False" {The table Name} is Selected
+	• [[IF{{[[TableName]] == Main THEN Main Table}}]]
+		If True: Main Table
+		If False:
+
+Minor bugs and fixes:
+*********************:
+- 

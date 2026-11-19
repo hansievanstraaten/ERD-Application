@@ -4,8 +4,8 @@ This manual explains the user interface of **ERD.Viewer (ViSo-nice)** in simple 
 
 ## Document Index
 
-- [1) Main Window Overview A](#1-main-window-overview)
-- [2) Top Menu - Detailed Guide (Menu Order)](#2-top-menu---detailed-guide-menu-order)
+- [1. Main Window Overview A](#1-main-window-overview)
+- [2. Top Menu - Detailed Guide (Menu Order)](#2-top-menu---detailed-guide-menu-order)
   	- [File](#file)
     - [Project](#project)
     - [Git](#git)
@@ -13,14 +13,14 @@ This manual explains the user interface of **ERD.Viewer (ViSo-nice)** in simple 
     - [Build](#build)
     - [Report Builder](#report-builder)
     - [Help And About](#help-and-about)
-- [3) Workspace Editing Areas](#3-workspace-editing-areas)
+- [3. Workspace Editing Areas](#3-workspace-editing-areas)
     - [Left Panel - Tools Stack](#left-panel---tools-stack)
     - [Left Panel - Database Tables List](#left-panel---database-tables-list)
     - [Workspace Tabs (Canvas Area)](#workspace-tabs-canvas-area)
-- [4) Table and Relation Editing](#4-table-and-relation-editing)
+- [4. Table and Relation Editing](#4-table-and-relation-editing)
     - [Table Object UI (inside a canvas)](#table-object-ui-inside-a-canvas)
     - [Relation Editing Flow](#relation-editing-flow)
-- [5) Status, Locking, and Quick Start](#5-status-locking-and-quick-start)
+- [5. Status, Locking, and Quick Start](#5-status-locking-and-quick-start)
     - [Status and Locking Behavior (User Visible)](#status-and-locking-behavior-user-visible)
     - [Practical Quick Start](#practical-quick-start)
 
@@ -276,7 +276,7 @@ Script Builder is one of the strongest accelerators in ERD.Viewer.
 
 #### Advanced template behavior
 - **Nested block injection** via `[[index]]` (example: body block contains `[[1]]`, `[[2]]`).
-- **Conditional insertion** via `[[IF{{A==B then Text}}]]`.
+- **Conditional insertion** via `[[IF{{A==B then Text}}]]` Or `[[IF{{A==B then Text When True else Text When False}}]]` .
 - **Optional trailing text markers** via `[[? ... ]]` to prevent trailing separators.
 
 #### Recommended workflow for teams
@@ -487,6 +487,12 @@ In Relation Editor:
 - Confirm to create/update relation mapping
 
 The relation is then drawn on the canvas.
+
+Relation visual behavior:
+- Hover over relation to view the relation meta data
+- When mouse enters the relation turns orange for tracking
+- When a relation is selected by mouse left click changes its color to Red or Default depending on previous selection
+- Right Click provides a context menu to Edit or Delete a relation. (Remember to save the ERD after changes)
 
 ---
 

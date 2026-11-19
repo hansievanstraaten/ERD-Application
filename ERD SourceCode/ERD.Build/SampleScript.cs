@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Documents;
 
 
@@ -116,18 +117,16 @@ namespace ERD.Build
 
             string checkValue = result.Substring(startIfIndex, indexLength);
 
-            string[] checkValues = checkValue
-                .Replace(startIfString, string.Empty)
-                .Replace(endIfString, string.Empty)
-                .Split(new string[] { "==", "then" }, System.StringSplitOptions.RemoveEmptyEntries);
+            string[] checkValues = Regex.Split(checkValue.Replace(startIfString, string.Empty).Replace(endIfString, string.Empty), "==|then|else", RegexOptions.IgnoreCase);
 
             if (checkValues[0].Trim() == checkValues[1].Trim())
             {
-                result.Replace(checkValue, checkValues[2], startIfIndex, indexLength);
+                result.Replace(checkValue, checkValues[2].TrimStart(), startIfIndex, indexLength);
             }
             else
             {
-                result.Replace(checkValue, string.Empty, startIfIndex, indexLength);
+                string elseValue = checkValues.Length > 3 ? checkValues[3].TrimStart() : string.Empty;
+                result.Replace(checkValue, elseValue, startIfIndex, indexLength);
             }
 
             this.ExecuteIfStatment(ref result, startIfIndex);

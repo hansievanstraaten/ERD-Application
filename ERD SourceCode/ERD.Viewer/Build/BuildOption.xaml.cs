@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using ViSo.Dialogs.Input;
 using WPF.Tools.BaseClasses;
-using WPF.Tools.ModelViewer;
 
 namespace ERD.Viewer.Build
 {
@@ -231,12 +230,7 @@ namespace ERD.Viewer.Build
 
                 case RepeatOptionEnum.SingleFile:
 
-                    this.uxOptionSetup[0, 0].Caption = "File Name MyFile.cs'";
-
-                    if (this.OptionSetup.BuildTypes.HasElements() && this.OptionSetup.BuildTypes.Length >= 1)
-                    {
-                        this.uxAddBuildType.IsEnabled = false;
-                    }
+                    this.uxOptionSetup[0, 0].Caption = "File Name 'MyFile.cs'";
 
                     break;
 
@@ -313,7 +307,7 @@ namespace ERD.Viewer.Build
 
                     case RepeatOptionEnum.SingleFile:
 
-                        result = this.scripting.BuildSingleFile(this.OptionSetup);
+                        result = this.scripting.BuildSingleFile(this.SelectedCanvas, this.allErdCanvasModels, this.OptionSetup);
 
                         break;
 

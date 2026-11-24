@@ -532,7 +532,7 @@ namespace ERD.Viewer.Tools
 
                 viewCodeScript.Items.Add(allScript);
 
-                foreach (OptionSetupModel option in BuildScript.Setup.BuildOptions.Where(o => o.RepeatOption == RepeatOptionEnum.ForeachTableProject))
+                foreach (OptionSetupModel option in BuildScript.Setup.BuildOptions)
                 {
                     MenuItem optionItem = new MenuItem { Header = option.OptionModelName, Tag = option };
 

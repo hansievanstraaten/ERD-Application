@@ -77,8 +77,8 @@ namespace ERD.Build
                     continue;
                 }
 
-                string result = this.scriptor.BuildSingleFile(option);
-
+                string result = this.scriptor.BuildSingleFile(this.canvases[0], this.canvases.ToList(), option);
+                
                 File.WriteAllText(filePath, result);
             }
         }

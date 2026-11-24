@@ -24,12 +24,16 @@ namespace ERD.Build
         private ColumnObjectModel SelectedColumn { get; set; }
         public LanguageOptionEnum LanguageOption { get; set; }
 
-        public string BuildSingleFile(OptionSetupModel classOption)
+        public string BuildSingleFile(ErdCanvasModel sampleCanvas, List<ErdCanvasModel> allErdModels, OptionSetupModel classOption)
         {
             if (classOption.BuildTypes.Length == 0)
             {
                 return string.Empty;
             }
+
+            this.ErdCanvas = sampleCanvas;
+
+            this.AllErdCanvasModels = allErdModels;
 
             StringBuilder result = new StringBuilder();
 
@@ -37,7 +41,10 @@ namespace ERD.Build
 
             BuildTypeModel body = classOption.BuildTypes.FirstOrDefault(mi => mi.BuildTypeIndex == minIndex);
 
-            result.Append(body.Code);
+            //result.Append(body.Code);
+            result.Append(this.ReplaceParameters(body.Code));
+
+            this.BuildTypeIteration(ref result, classOption.BuildTypes);
 
             this.ExecuteIfStatment(ref result, 0);
 

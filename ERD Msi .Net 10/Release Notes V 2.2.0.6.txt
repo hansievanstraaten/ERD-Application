@@ -1,0 +1,7 @@
+Release notes: 2.2.0.6
+*********************
+- Script Builder: Enhance single file scripts to make use of data context that will allow usage of foreach table option
+
+Minor bugs and fixes:
+*********************:
+- 

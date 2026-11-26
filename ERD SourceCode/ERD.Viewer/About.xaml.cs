@@ -29,7 +29,7 @@ namespace ERD.Viewer
 				   "resolve situation that I encountered." + Environment.NewLine + Environment.NewLine +
 				   "The Reporting Solution was developed just for fun, and I hope you will enjoy it." + Environment.NewLine + Environment.NewLine +
 				   "Your support is appreciated, and some feedback would be appreciated." + Environment.NewLine +
-				   "Info.ViSoNice @gmail.com" + Environment.NewLine + Environment.NewLine +
+				   "Info.ViSoNice@gmail.com" + Environment.NewLine + Environment.NewLine +
                    "NS: For this release the release notes are in the GitHub repository under the 'ERD Msi .Net 10' Folder." + Environment.NewLine +
                    "The help files are embedded in the application it self under 'Help and About -> Reference Document' and the help in the Git Repository (Under ERD Msi) is there for previous versions support only.";
 		}

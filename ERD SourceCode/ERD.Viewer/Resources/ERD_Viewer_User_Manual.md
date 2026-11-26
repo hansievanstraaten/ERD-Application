@@ -490,9 +490,36 @@ The relation is then drawn on the canvas.
 
 Relation visual behavior:
 - Hover over relation to view the relation meta data
-- When mouse enters the relation turns orange for tracking
-- When a relation is selected by mouse left click changes its color to Red or Default depending on previous selection
+- Line style and color:
+  - **Database Relation**: solid line in light steel blue
+  - **Virtual Relation**: solid line in light green (diagram-only relation, not scripted to DB)
+  - **Not enforced/optional child FK**: shown by an optional marker (small open circle) on the child end, not by a dotted line
+- Endpoint notation:
+  - Parent side shows a **one** marker (short bar)
+  - Child side shows **one** marker for one-to-one style links
+  - Child side shows **crow's-foot** marker for many-side links
+- Hover and click behavior:
+  - On mouse enter, relation line turns **orange** for tracking
+  - On mouse leave, relation returns to its normal color unless selected
+  - Left-click toggles selection color between **red** (selected) and default relation color
 - Right Click provides a context menu to Edit or Delete a relation. (Remember to save the ERD after changes)
+
+### Relation style examples (visual guide)
+
+Text samples below are simplified examples of how relation endpoints are drawn:
+
+| Relation intent | Sample drawing |
+|---|---|
+| One-to-one (required) | `TableA —\|────────\|— TableB` |
+| One-to-many | `TableA —\|────────<— TableB` |
+| Optional one-to-one | `TableA —\|────────o\|— TableB` |
+| Optional one-to-many | `TableA —\|────────o<— TableB` |
+| Virtual relation (diagram-only) | `TableA —\|────────<— TableB` (same solid style, light green color) |
+
+Legend:
+- `|` = one
+- `<` = many (crow's-foot side)
+- `o` = optional (nullable child side)
 
 ---
 

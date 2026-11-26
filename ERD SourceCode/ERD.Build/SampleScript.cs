@@ -273,9 +273,16 @@ namespace ERD.Build
 
                     for (int keyCol = 0; keyCol < keyColumnsArray.Length; ++keyCol)
                     {
+                        TableModel? referenceTable = this.AllErdCanvasModels.SelectMany(m => m.SegmentTables)
+                            .FirstOrDefault(t => t.TableName == keyColumnsArray[keyCol].ForeignKeys.FirstOrDefault()?.ForeignKeyTable);
+
+                        this.SelectedReferencedTable = referenceTable;
+
                         this.SelectedColumn = keyColumnsArray[keyCol];
 
                         injectionText.Append(this.ReplaceParameters(buildType.Code));
+
+                        this.SelectedReferencedTable = null;
                     }
 
                     break;
@@ -312,9 +319,16 @@ namespace ERD.Build
 
                     for (int keyCol = 0; keyCol < foreignKeyColumnsArray.Length; ++keyCol)
                     {
+                        TableModel? referenceTable = this.AllErdCanvasModels.SelectMany(m => m.SegmentTables)
+                            .FirstOrDefault(t => t.TableName == foreignKeyColumnsArray[keyCol].ForeignKeys.FirstOrDefault()?.ForeignKeyTable);
+
+                        this.SelectedReferencedTable = referenceTable;
+
                         this.SelectedColumn = foreignKeyColumnsArray[keyCol];
 
                         injectionText.Append(this.ReplaceParameters(buildType.Code));
+
+                        this.SelectedReferencedTable = null;
                     }
 
                     break;
@@ -331,9 +345,16 @@ namespace ERD.Build
 
                     for (int keyCol = 0; keyCol < foreignAndPrimaryKeyColumnsArray.Length; ++keyCol)
                     {
+                        TableModel? referenceTable = this.AllErdCanvasModels.SelectMany(m => m.SegmentTables)
+                            .FirstOrDefault(t => t.TableName == foreignAndPrimaryKeyColumnsArray[keyCol].ForeignKeys.FirstOrDefault()?.ForeignKeyTable);
+
+                        this.SelectedReferencedTable = referenceTable;
+
                         this.SelectedColumn = foreignAndPrimaryKeyColumnsArray[keyCol];
 
                         injectionText.Append(this.ReplaceParameters(buildType.Code));
+
+                        this.SelectedReferencedTable = null;
                     }
 
 					break;
@@ -365,9 +386,16 @@ namespace ERD.Build
 
                     foreach (ColumnObjectModel column in this.SelectedTable.Columns)
                     {
+                        TableModel? referenceTable = this.AllErdCanvasModels.SelectMany(m => m.SegmentTables)
+                            .FirstOrDefault(t => t.TableName == column.ForeignKeys.FirstOrDefault()?.ForeignKeyTable);
+
+                        this.SelectedReferencedTable = referenceTable;
+
                         this.SelectedColumn = column;
 
                         injectionText.Append(this.ReplaceParameters(buildType.Code));
+
+                        this.SelectedReferencedTable = null;
                     }
 
                     break;
@@ -411,7 +439,7 @@ namespace ERD.Build
 
                     foreach(ColumnObjectModel column in this.SelectedTable.Columns.Where(c => c.IsForeignkey))
                     {
-                        string tableName = column.ForeignKeys[0].ForeignKeyTable;
+                        string tableName = column.ForeignKeys.FirstOrDefault()?.ForeignKeyTable;
 
                         TableModel tableModel = this.AllErdCanvasModels.SelectMany(m => m.SegmentTables).FirstOrDefault(t => t.TableName == tableName);
 
@@ -437,7 +465,7 @@ namespace ERD.Build
 
                     foreach (ColumnObjectModel column in this.SelectedTable.Columns.Where(c => c.IsForeignkey))
                     {
-                        string tableName = column.ForeignKeys[0].ForeignKeyTable;
+                        string tableName = column.ForeignKeys.FirstOrDefault()?.ForeignKeyTable;
                         TableModel tableModel = this.AllErdCanvasModels.SelectMany(m => m.SegmentTables).FirstOrDefault(t => t.TableName == tableName);
                         this.SelectedReferencedTable = tableModel;
 

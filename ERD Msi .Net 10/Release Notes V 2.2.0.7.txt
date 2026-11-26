@@ -1,0 +1,8 @@
+Release notes: 2.2.0.7
+*********************
+- Enhance relationship lines to provide a better user experience. Lines now  have endings more inline with ERD standards
+- Extend Script building with better support for referenced tables in foreign key columns
+
+Minor bugs and fixes:
+*********************:
+- 

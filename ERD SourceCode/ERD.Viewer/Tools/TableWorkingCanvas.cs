@@ -27,6 +27,9 @@ namespace ERD.Viewer.Tools
         private const double linePadding = 5;
         private const double anchorStartOffset = 3;
         private const double relationLeadOutLength = 20.0;
+        private const double crowFootDepth = 6.0; 
+        private const double crowFootTipInset = 4.5;
+        private const double crowFootSpread = 6.0;
 
         internal delegate void TableMoveEvent(object sender, bool isDrag);
         internal delegate void TableAddedEvent(object sender, TableModel table);
@@ -1096,6 +1099,8 @@ namespace ERD.Viewer.Tools
 
             relationKeyValue.Value.ClearPath();
 
+            relationKeyValue.Value.IsChildOptional = false;
+
             relationKeyValue.Value.IntersectionPoints = new Point[] {selfPoint, selfStub};
 
             this.AddLineDrwaings(relationKeyValue, self, self, selfPoint, selfPoint);
@@ -1136,6 +1141,8 @@ namespace ERD.Viewer.Tools
 
             relationKeyValue.Value.ClearPath();
 
+            relationKeyValue.Value.IsChildOptional = this.IsChildRelationOptional(relationKeyValue.Value, childTable);
+
             relationKeyValue.Value.IntersectionPoints = this.CalculateIntersectionPoints(parentTable, childTable, relationKeyValue.Key, ref xOffset, ref yOffset, ref parentPoint, ref childPoint);
 
             this.AddLineDrwaings(relationKeyValue, parentTable, childTable, parentPoint, childPoint);
@@ -1161,6 +1168,26 @@ namespace ERD.Viewer.Tools
             this.Children.Add(relationKeyValue.Value.LinePath[0]);
 
             this.Children.Add(relationKeyValue.Value.LinePath[1]);
+        }
+
+        private bool IsChildRelationOptional(DatabaseRelation relation, TableObject childTable)
+        {
+            if (relation?.Columns == null || childTable?.Table?.Columns == null)
+            {
+                return false;
+            }
+
+            foreach (ColumnRelationMapModel mappedColumn in relation.Columns)
+            {
+                ColumnObjectModel childColumn = childTable.Table.Columns.FirstOrDefault(c => c.ColumnName == mappedColumn.ChildColumn);
+
+                if (childColumn != null && childColumn.AllowNulls)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private Point[] CalculateIntersectionPoints(
@@ -1340,19 +1367,23 @@ namespace ERD.Viewer.Tools
         {
             Point[] result = new Point[7];
 
+            double baseX = childPoint.X + crowFootDepth;
+
+            double tipX = baseX - crowFootTipInset;
+
             result[0] = intersectionPoints[0];
 
             result[1] = intersectionPoints[1];
 
-            result[2] = new Point(childPoint.X + 12, childPoint.Y);
+            result[2] = new Point(baseX, childPoint.Y);
 
-            result[3] = new Point(childPoint.X + 8, childPoint.Y - 5);
+            result[3] = new Point(tipX, childPoint.Y - crowFootSpread);
 
-            result[4] = new Point(childPoint.X + 12, childPoint.Y);
+            result[4] = new Point(baseX, childPoint.Y);
 
-            result[5] = new Point(childPoint.X + 8, childPoint.Y + 5);
+            result[5] = new Point(tipX, childPoint.Y + crowFootSpread);
 
-            result[6] = new Point(childPoint.X + 12, childPoint.Y);
+            result[6] = new Point(baseX, childPoint.Y);
 
             return result;
         }
@@ -1361,19 +1392,23 @@ namespace ERD.Viewer.Tools
         {
             Point[] result = new Point[7];
 
+            double baseX = childPoint.X - crowFootDepth;
+
+            double tipX = baseX + crowFootTipInset;
+
             result[0] = intersectionPoints[0];
 
             result[1] = intersectionPoints[1];
 
-            result[2] = new Point(childPoint.X - 12, childPoint.Y);
+            result[2] = new Point(baseX, childPoint.Y);
 
-            result[3] = new Point(childPoint.X - 8, childPoint.Y - 5);
+            result[3] = new Point(tipX, childPoint.Y - crowFootSpread);
 
-            result[4] = new Point(childPoint.X - 12, childPoint.Y);
+            result[4] = new Point(baseX, childPoint.Y);
 
-            result[5] = new Point(childPoint.X - 8, childPoint.Y + 5);
+            result[5] = new Point(tipX, childPoint.Y + crowFootSpread);
 
-            result[6] = new Point(childPoint.X - 12, childPoint.Y);
+            result[6] = new Point(baseX, childPoint.Y);
 
             return result;
         }
@@ -1382,19 +1417,23 @@ namespace ERD.Viewer.Tools
         {
             Point[] result = new Point[7];
 
+            double baseY = childPoint.Y + crowFootDepth;
+
+            double tipY = baseY - crowFootTipInset;
+
             result[0] = intersectionPoints[0];
 
             result[1] = intersectionPoints[1];
 
-            result[2] = new Point(childPoint.X, childPoint.Y + 12);
+            result[2] = new Point(childPoint.X, baseY);
 
-            result[3] = new Point(childPoint.X + 5, childPoint.Y + 8);
+            result[3] = new Point(childPoint.X + crowFootSpread, tipY);
 
-            result[4] = new Point(childPoint.X, childPoint.Y + 12);
+            result[4] = new Point(childPoint.X, baseY);
 
-            result[5] = new Point(childPoint.X - 5, childPoint.Y + 8);
+            result[5] = new Point(childPoint.X - crowFootSpread, tipY);
 
-            result[6] = new Point(childPoint.X, childPoint.Y + 12);
+            result[6] = new Point(childPoint.X, baseY);
 
             return result;
         }
@@ -1403,19 +1442,23 @@ namespace ERD.Viewer.Tools
         {
             Point[] result = new Point[7];
 
+            double baseY = childPoint.Y - crowFootDepth;
+
+            double tipY = baseY + crowFootTipInset;
+
             result[0] = intersectionPoints[0];
 
             result[1] = intersectionPoints[1];
 
-            result[2] = new Point(childPoint.X, childPoint.Y - 12);
+            result[2] = new Point(childPoint.X, baseY);
 
-            result[3] = new Point(childPoint.X + 5, childPoint.Y - 8);
+            result[3] = new Point(childPoint.X + crowFootSpread, tipY);
 
-            result[4] = new Point(childPoint.X, childPoint.Y - 12);
+            result[4] = new Point(childPoint.X, baseY);
 
-            result[5] = new Point(childPoint.X - 5, childPoint.Y - 8);
+            result[5] = new Point(childPoint.X - crowFootSpread, tipY);
 
-            result[6] = new Point(childPoint.X, childPoint.Y - 12);
+            result[6] = new Point(childPoint.X, baseY);
 
             return result;
         }
